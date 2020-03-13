@@ -47,15 +47,15 @@ Montgomery = 826075
 Bucks = 628341
 philly =1581000
 S_default = Delaware+ Chester + Montgomery + Bucks + philly
-S = st.sidebar.number_input('Regional Population', value=S_default, step=100000, format='%i')
+S = st.number_input('Regional Population', value=S_default, step=100000, format='%i')
 
 detection_prob = 0.05
 
-initial_infections = st.sidebar.number_input('Current Infections', value=27, step=10, format='%i')
+initial_infections = st.number_input('Current Infections', value=27, step=10, format='%i')
 
 S, I, R = S, initial_infections/detection_prob, 0
 
-doubling_time = 6.
+doubling_time = st.number_input('Doubling Time (days)', value=6, step=1, format='%i')
 intrinsic_growth_rate = 2**(1/doubling_time) - 1
 
 recovery_days = 14.0
@@ -90,7 +90,7 @@ if st.checkbox('Show Infection Rate Data'):
     st.dataframe(infect_table)
 
 st.subheader('Projected Hospital impact')
-Penn_market_share = 0.15
+Penn_market_share = st.number_input('Hospital market share', 0, 100, value=15, step=1, format='%i') / 100.0
 
 hosp_rate = st.sidebar.number_input('Hospitalization %', 0, 100, value=5, step=1, format='%i') / 100.0
 icu_rate = st.sidebar.number_input('ICU %', 0, 100, value=2, step=1, format='%i') / 100.0
