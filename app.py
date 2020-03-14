@@ -32,7 +32,11 @@ Penn_market_share = st.sidebar.number_input('Hospital Market Share (%)', 0, 100,
 
 st.title('COVID SIR modeling')
 st.subheader('SIR modeling of infections/recovery')
-st.text('(The number of infected and recovered individuals at any given moment)')
+st.markdown("""Disrete-time SIR model
+
+The model consists of individuals who are either Susceptible ( S ), Infected ( I ), or Recovered ( R ).
+
+The epidemic proceeds via a growth and decline process. This is the core model of infectious disease spread and has been in use in epidemiology for many years.""")
 
 # The SIR model, one time step
 def sir(y, beta, gamma, N):
@@ -104,7 +108,7 @@ if st.checkbox('Show Infection Rate Data'):
     st.dataframe(infect_table)
 
 st.subheader('Projected Hospital Impact')
-st.text('(The number of individuals requiring hospitalization in a region)')
+st.markdown('The number of individuals requiring hospitalization in a region')
 
 hosp = i * hosp_rate * Penn_market_share
 icu = i * icu_rate * Penn_market_share
@@ -132,7 +136,7 @@ if st.checkbox('Show Hospital Impact Data'):
     st.dataframe(impact_table)
 
 st.subheader('Admissions')
-st.text('(The number of individuals requiring hospitalization in a specific hospital)')
+st.markdown('The number of new admissions')
 
 # New cases
 projection_admits = projection.iloc[:-1,:] - projection.shift(1)
@@ -158,7 +162,7 @@ if st.checkbox('Show Admissions Data'):
     st.dataframe(admits_table)
 
 st.subheader('Census')
-st.text('(Count of patients in the specific hospital)')
+st.markdown('Running census accounting for arrivals and discharges')
 
 # ALOS for each category of COVID-19 case (total guesses)
 
