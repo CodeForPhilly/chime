@@ -3,6 +3,13 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
+
 Delaware = 564696
 Chester = 519293
 Montgomery = 826075
