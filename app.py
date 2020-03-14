@@ -56,7 +56,7 @@ S = st.sidebar.number_input(
 )
 
 st.markdown(
-    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).*"""
+    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).* **If you see any error messages please reload the page.**"""
 )
 st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.subheader(
@@ -162,7 +162,7 @@ n_days = 60
 s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=0.005)
 
 
-st.subheader("Projected Hospital Impact")
+st.subheader("Projected Hospitalization Demand at Penn Medicine Facilities")
 st.markdown(
     "The number of COVID-19 patients projected to require hospitalization at Penn"
 )
