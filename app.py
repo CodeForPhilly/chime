@@ -19,7 +19,7 @@ S_default = Delaware + Chester + Montgomery + Bucks + philly
 
 # Widgets
 initial_infections = st.sidebar.number_input(
-    "Current Known Infections", value=27, step=10, format="%i"
+    "Current Known Infections", value=31, step=10, format="%i"
 )
 detection_prob = (
     st.sidebar.number_input(
@@ -116,26 +116,7 @@ beta = (
 n_days = 60
 
 s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=0.005)
-fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-# ax.plot(s,label='S')
-ax.plot(i, label="Infected")
-ax.plot(r, label="Recovered")
-ax.legend(loc=0)
-ax.set_xlabel("days from today")
-ax.set_ylabel("Case Volume")
-ax.grid("on")
-st.pyplot()
 
-# Show data
-days = np.array(range(0, n_days + 1))
-data_list = [days, i, r]
-data_dict = dict(zip(["days", "infections", "recovered"], data_list))
-projection_area = pd.DataFrame.from_dict(data_dict)
-infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
-infect_table.index = range(infect_table.shape[0])
-
-if st.checkbox("Show Infection Rate Data"):
-    st.dataframe(infect_table)
 
 st.subheader("Projected Hospital Impact")
 st.markdown("The number of individuals requiring hospitalization in a region")
@@ -188,7 +169,7 @@ ax.set_ylabel("Daily Admissions")
 st.pyplot()
 
 admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
-admits_table['days'] = admits_table.index
+admits_table["days"] = admits_table.index
 admits_table.index = range(admits_table.shape[0])
 admits_table = admits_table.fillna(0)
 
@@ -229,8 +210,30 @@ census_df = census_df[["days", "hosp", "icu", "vent"]]
 
 census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
 census_table.index = range(census_table.shape[0])
-census_table.loc[0,:] = 0
+census_table.loc[0, :] = 0
 census_table = census_table.dropna()
 
 if st.checkbox("Show Census Data"):
     st.dataframe(census_table)
+
+st.markdown("""**Click the checkbox below to view the raw SIR similation data**""")
+if st.checkbox("Show Infection Rate Data"):
+    fig, ax = plt.subplots(1, 1, figsize=(10, 4))
+    # ax.plot(s,label='S')
+    ax.plot(i, label="Infected")
+    ax.plot(r, label="Recovered")
+    ax.legend(loc=0)
+    ax.set_xlabel("days from today")
+    ax.set_ylabel("Case Volume")
+    ax.grid("on")
+    st.pyplot()
+
+    # Show data
+    days = np.array(range(0, n_days + 1))
+    data_list = [days, i, r]
+    data_dict = dict(zip(["days", "infections", "recovered"], data_list))
+    projection_area = pd.DataFrame.from_dict(data_dict)
+    infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
+    infect_table.index = range(infect_table.shape[0])
+
+    st.dataframe(infect_table)
