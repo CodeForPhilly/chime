@@ -10,16 +10,17 @@ hide_menu_style = """
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-Delaware = 564696
-Chester = 519293
-Montgomery = 826075
-Bucks = 628341
+delaware = 564696
+chester = 519293
+montgomery = 826075
+bucks = 628341
 philly = 1581000
-S_default = Delaware + Chester + Montgomery + Bucks + philly
+S_default = delaware + chester + montgomery + bucks + philly
+known_infections = 31
 
 # Widgets
 initial_infections = st.sidebar.number_input(
-    "Current Known Infections", value=31, step=10, format="%i"
+    "Current Known Infections", value=known_infections, step=10, format="%i"
 )
 detection_prob = (
     st.sidebar.number_input(
@@ -71,6 +72,40 @@ if st.checkbox("Show Additional Info"):
         """S_{t+1} = (-\\beta S_t I_t) + S_t
     I_{t+1} = (\\beta S_t I_t - \\gamma I_t) + I_t
     R_{t+1} = (\\gamma I_t) + R_t"""
+    )
+
+    st.markdown(
+        """To project the expected impact to Penn Medicine, we'll need to estimate the terms of the model. 
+
+To do this, we'll use a combination of empirical data from other locations, informed estimates based on logical reasoning, and best guesses from the American Hospital Association.
+
+
+### Parameters
+First, we need to express the two parameters $\beta$ and $\gamma$ in terms of quantities we can estimate.
+
+- The $\gamma$ parameter represents 1 over the mean recovery time in days. Since the CDC is recomending 14 days of self quarantine, we'll use $\gamma = 1/14$. 
+- Next, the AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
+$$g = (1/T_d)^{{(1/2)}} - 1$$
+- Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$, $\\beta$ becomes a function of the initial population size of susceptable individuals.
+$$\\beta = (g + \\gamma)/s$$
+
+### Initial Conditions
+
+- Total size of susceptible population will be the entire catchment area for Penn Medicine entities
+ - Delaware = {delaware}
+ - Chester = {chester}
+ - Montgomery = {montgomery}
+ - Bucks = {bucks}
+ - Philly = {philly}
+- The inital number of infected will be the total number of confirmed cases in the area ({initial_infections}), divided by some detection probability to account for under testing {detection_prob}.""".format(
+            delaware=delaware,
+            chester=chester,
+            montgomery=montgomery,
+            bucks=bucks,
+            philly=philly,
+            initial_infections=initial_infections,
+            detection_prob=detection_prob,
+        )
     )
 
 # The SIR model, one time step
