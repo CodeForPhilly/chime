@@ -92,11 +92,11 @@ $$\\beta = (g + \\gamma)/s$$
 ### Initial Conditions
 
 - The total size of the susceptible population will be the entire catchment area for Penn Medicine entities
- - Delaware = {delaware}
- - Chester = {chester}
- - Montgomery = {montgomery}
- - Bucks = {bucks}
- - Philly = {philly}
+  - Delaware = {delaware}
+  - Chester = {chester}
+  - Montgomery = {montgomery}
+  - Bucks = {bucks}
+  - Philly = {philly}
 - The initial number of infected will be the total number of confirmed cases in the area ({initial_infections}), divided by some detection probability to account for under testing {detection_prob}.""".format(
             delaware=delaware,
             chester=chester,
