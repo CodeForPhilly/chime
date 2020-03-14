@@ -79,23 +79,23 @@ To do this, we'll use a combination of empirical data from other locations, info
 
 
 ### Parameters
-First, we need to express the two parameters $\beta$ and $\gamma$ in terms of quantities we can estimate.
+First, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
 
-- The $\gamma$ parameter represents 1 over the mean recovery time in days. Since the CDC is recomending 14 days of self quarantine, we'll use $\gamma = 1/14$. 
+- The $\\gamma$ parameter represents 1 over the mean recovery time in days. Since the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/14$. 
 - Next, the AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
 $$g = (1/T_d)^{{(1/2)}} - 1$$
-- Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$, $\\beta$ becomes a function of the initial population size of susceptable individuals.
+- Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$, $\\beta$ becomes a function of the initial population size of susceptible individuals.
 $$\\beta = (g + \\gamma)/s$$
 
 ### Initial Conditions
 
-- Total size of susceptible population will be the entire catchment area for Penn Medicine entities
+- The total size of the susceptible population will be the entire catchment area for Penn Medicine entities
  - Delaware = {delaware}
  - Chester = {chester}
  - Montgomery = {montgomery}
  - Bucks = {bucks}
  - Philly = {philly}
-- The inital number of infected will be the total number of confirmed cases in the area ({initial_infections}), divided by some detection probability to account for under testing {detection_prob}.""".format(
+- The initial number of infected will be the total number of confirmed cases in the area ({initial_infections}), divided by some detection probability to account for under testing {detection_prob}.""".format(
             delaware=delaware,
             chester=chester,
             montgomery=montgomery,
