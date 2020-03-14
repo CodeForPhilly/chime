@@ -117,10 +117,10 @@ data_dict = dict(zip(['days', 'hosp', 'icu', 'vent'], data_list))
 
 projection = pd.DataFrame.from_dict(data_dict)
 
-impact_table = (projection_area.iloc[::7, :]).apply(np.floor)
+impact_table = (projection.iloc[::7, :]).apply(np.floor)
 impact_table.index = range(impact_table.shape[0])
 
-if st.checkbox('Show Hospital impact Data'):
+if st.checkbox('Show Hospital Impact Data'):
     st.dataframe(impact_table)
 
 st.subheader('Admissions')
@@ -131,6 +131,7 @@ projection_admits = projection.iloc[:-1,:] - projection.shift(1)
 projection_admits[projection_admits < 0] = 0
 
 plot_projection_days = 50
+projection_admits['days'] = range(projection_admits.shape[0])
 
 fig, ax = plt.subplots(1,1, figsize=(10,4))
 ax.plot(projection_admits.head(plot_projection_days)['hosp'],'.-',label='Hospitalized')
@@ -142,14 +143,22 @@ ax.grid('on')
 ax.set_ylabel('Daily Admissions')
 st.pyplot()
 
+admits_table = (projection_admits.iloc[::7, :]).apply(np.floor)
+admits_table.index = range(admits_table.shape[0])
+
+if st.checkbox('Show Admissions Data'):
+    st.dataframe(admits_table)
+
 st.subheader('Census')
 st.text('(Count of patients in the specific hospital)')
 
 # ALOS for each category of COVID-19 case (total guesses)
 
-los_dict = {'icu': icu_los,
-           'hosp': hosp_los,
-           'vent': vent_los}
+los_dict = {
+    'hosp': hosp_los,
+    'icu': icu_los,
+    'vent': vent_los,
+}
 
 fig, ax = plt.subplots(1,1, figsize=(10,4))
 
@@ -165,3 +174,14 @@ ax.set_xlabel('Days from today')
 ax.grid('on')
 ax.set_ylabel('Census')
 st.pyplot()
+
+census_df = pd.DataFrame(census_dict)
+census_df['days'] = census_df.index
+census_df = census_df[['days', 'hosp', 'icu', 'vent']]
+census_df = census_df.dropna()
+
+census_table = (census_df.iloc[::7, :]).apply(np.floor)
+census_table.index = range(census_table.shape[0])
+
+if st.checkbox('Show Census Data'):
+    st.dataframe(census_table)
