@@ -68,11 +68,9 @@ The epidemic proceeds via a growth and decline process. This is the core model o
 if st.checkbox("Show Additional Info"):
     st.markdown("""The dynamics are given by the following 3 equations.""")
 
-    st.latex(
-        """S_{t+1} = (-\\beta S_t I_t) + S_t
-    I_{t+1} = (\\beta S_t I_t - \\gamma I_t) + I_t
-    R_{t+1} = (\\gamma I_t) + R_t"""
-    )
+    st.latex("S_{t+1} = (-\\beta S_t I_t) + S_t")
+    st.latex("I_{t+1} = (\\beta S_t I_t - \\gamma I_t) + I_t")
+    st.latex("R_{t+1} = (\\gamma I_t) + R_t")
 
     st.markdown(
         """To project the expected impact to Penn Medicine, we'll need to estimate the terms of the model. 
