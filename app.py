@@ -160,7 +160,8 @@ beta = (
 
 n_days = st.slider("Number of days to project", 30, 200, 60, 1, "%i")
 
-s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=0.005)
+beta_decay = 0.0
+s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=beta_decay)
 
 
 hosp = i * hosp_rate * Penn_market_share
