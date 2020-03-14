@@ -45,20 +45,20 @@ vent_rate = (
 hosp_los = st.sidebar.number_input("Hospital LOS", value=5, step=1, format="%i")
 icu_los = st.sidebar.number_input("ICU LOS", value=7, step=1, format="%i")
 vent_los = st.sidebar.number_input("Vent LOS", value=14, step=1, format="%i")
-S = st.sidebar.number_input(
-    "Regional Population", value=S_default, step=100000, format="%i"
-)
 Penn_market_share = (
     st.sidebar.number_input(
         "Hospital Market Share (%)", 0, 100, value=15, step=1, format="%i"
     )
     / 100.0
 )
+S = st.sidebar.number_input(
+    "Regional Population", value=S_default, step=100000, format="%i"
+)
 
 st.markdown(
     """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).*"""
 )
-st.title("COVID Hospital Impact Model for Epidemics")
+st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.subheader(
     "[Discrete-time SIR modeling](https://mathworld.wolfram.com/SIRModel.html) of infections/recovery"
 )
@@ -75,9 +75,9 @@ if st.checkbox("Show Additional Info"):
     st.latex("R_{t+1} = (\\gamma I_t) + R_t")
 
     st.markdown(
-        """To project the expected impact to Penn Medicine, we'll need to estimate the terms of the model. 
+        """To project the expected impact to Penn Medicine, we estimate the terms of the model. 
 
-To do this, we'll use a combination of empirical data from other locations, informed estimates based on logical reasoning, and best guesses from the American Hospital Association.
+To do this, we use a combination of estimates from other locations, informed estimates based on logical reasoning, and best guesses from the American Hospital Association.
 
 
 ### Parameters
@@ -163,7 +163,9 @@ s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=0.005)
 
 
 st.subheader("Projected Hospital Impact")
-st.markdown("The number of COVID-19 patients requiring hospitalization in the region")
+st.markdown(
+    "The number of COVID-19 patients projected to require hospitalization at Penn"
+)
 
 hosp = i * hosp_rate * Penn_market_share
 icu = i * icu_rate * Penn_market_share
@@ -191,7 +193,7 @@ if st.checkbox("Show Hospital Impact Data"):
     st.dataframe(impact_table)
 
 st.subheader("Admissions")
-st.markdown("The number of new admissions")
+st.markdown("The number of **daily** new admissions")
 
 # New cases
 projection_admits = projection.iloc[:-1, :] - projection.shift(1)
