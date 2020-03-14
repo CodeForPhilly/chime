@@ -30,7 +30,7 @@ vent_los = st.sidebar.number_input('Vent LOS', value=14, step=1, format='%i')
 S = st.sidebar.number_input('Regional Population', value=S_default, step=100000, format='%i')
 Penn_market_share = st.sidebar.number_input('Hospital Market Share (%)', 0, 100, value=15, step=1, format='%i') / 100.0
 
-st.title('COVID SIR modeling')
+st.title('COVID Hospital Impact Model for Epidemics')
 st.subheader('SIR modeling of infections/recovery')
 st.markdown("""Disrete-time SIR model
 
