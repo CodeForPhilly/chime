@@ -67,7 +67,7 @@ st.markdown(
 
 The epidemic proceeds via a growth and decline process. This is the core model of infectious disease spread and has been in use in epidemiology for many years."""
 )
-if st.checkbox("Show Additional Info"):
+if st.checkbox("More info about this tool"):
     st.markdown("""The dynamics are given by the following 3 equations.""")
 
     st.latex("S_{t+1} = (-\\beta S_t I_t) + S_t")
@@ -283,3 +283,8 @@ if st.checkbox("Show Infection Rate Data"):
     infect_table.index = range(infect_table.shape[0])
 
     st.dataframe(infect_table)
+
+st.subheader("References")
+st.markdown(
+    """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19"""
+)
