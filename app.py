@@ -54,10 +54,13 @@ Penn_market_share = (
     / 100.0
 )
 
+st.markdown(
+    """This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/)."""
+)
 st.title("COVID Hospital Impact Model for Epidemics")
 st.subheader("SIR modeling of infections/recovery")
 st.markdown(
-    """Disrete-time SIR model
+    """Discrete-time SIR model
 
 The model consists of individuals who are either Susceptible ( S ), Infected ( I ), or Recovered ( R ).
 
@@ -119,7 +122,7 @@ s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=0.005)
 
 
 st.subheader("Projected Hospital Impact")
-st.markdown("The number of individuals requiring hospitalization in a region")
+st.markdown("The number of COVID-19 patients requiring hospitalization in the region")
 
 hosp = i * hosp_rate * Penn_market_share
 icu = i * icu_rate * Penn_market_share
@@ -216,7 +219,7 @@ census_table = census_table.dropna()
 if st.checkbox("Show Census Data"):
     st.dataframe(census_table)
 
-st.markdown("""**Click the checkbox below to view the raw SIR similation data**""")
+st.markdown("""**Click the checkbox below to view the raw SIR simulation data**""")
 if st.checkbox("Show Infection Rate Data"):
     fig, ax = plt.subplots(1, 1, figsize=(10, 4))
     # ax.plot(s,label='S')
