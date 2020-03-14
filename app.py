@@ -55,17 +55,23 @@ Penn_market_share = (
 )
 
 st.markdown(
-    """This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/)."""
+    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).*"""
 )
 st.title("COVID Hospital Impact Model for Epidemics")
 st.subheader("SIR modeling of infections/recovery")
 st.markdown(
-    """Discrete-time SIR model
-
-The model consists of individuals who are either Susceptible ( S ), Infected ( I ), or Recovered ( R ).
+    """The model consists of individuals who are either _Susceptible_ ($S$), _Infected_ ($I$), or _Recovered_ ($R$). 
 
 The epidemic proceeds via a growth and decline process. This is the core model of infectious disease spread and has been in use in epidemiology for many years."""
 )
+if st.checkbox("Show Additional Info"):
+    st.markdown("""The dynamics are given by the following 3 equations.""")
+
+    st.latex(
+        """S_{t+1} = (-\\beta S_t I_t) + S_t
+    I_{t+1} = (\\beta S_t I_t - \\gamma I_t) + I_t
+    R_{t+1} = (\\gamma I_t) + R_t"""
+    )
 
 # The SIR model, one time step
 def sir(y, beta, gamma, N):
