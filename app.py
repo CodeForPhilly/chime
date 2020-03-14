@@ -59,7 +59,9 @@ st.markdown(
     """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).*"""
 )
 st.title("COVID Hospital Impact Model for Epidemics")
-st.subheader("SIR modeling of infections/recovery")
+st.subheader(
+    "[Discrete-time SIR modeling](https://mathworld.wolfram.com/SIRModel.html) of infections/recovery"
+)
 st.markdown(
     """The model consists of individuals who are either _Susceptible_ ($S$), _Infected_ ($I$), or _Recovered_ ($R$). 
 
