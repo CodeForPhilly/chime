@@ -20,14 +20,9 @@ known_infections = 31
 
 # Widgets
 initial_infections = st.sidebar.number_input(
-    "Current Known Infections", value=known_infections, step=10, format="%i"
+    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
-detection_prob = (
-    st.sidebar.number_input(
-        "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
-    )
-    / 100.0
-)
+current_hosp = st.sidebar.number_input("Currently Hospitalized COVID-19 Patients", value=2, step=1, format="%i")
 doubling_time = st.sidebar.number_input(
     "Doubling Time (days)", value=6, step=1, format="%i"
 )
@@ -54,6 +49,9 @@ Penn_market_share = (
 S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
 )
+
+total_infections = current_hosp / Penn_market_share / hosp_rate
+detection_prob = initial_infections / total_infections
 
 st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.markdown(
@@ -98,7 +96,7 @@ $$\\beta = (g + \\gamma)/s$$
   - Montgomery = {montgomery}
   - Bucks = {bucks}
   - Philly = {philly}
-- The initial number of infected will be the total number of confirmed cases in the area ({initial_infections}), divided by some detection probability to account for under testing {detection_prob}.""".format(
+- The initial number of infected will be the total number of confirmed cases in the area ({initial_infections}), divided by some detection probability to account for under testing {detection_prob:.2f}.""".format(
             delaware=delaware,
             chester=chester,
             montgomery=montgomery,
@@ -200,7 +198,7 @@ st.pyplot()
 admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
 admits_table["day"] = admits_table.index
 admits_table.index = range(admits_table.shape[0])
-admits_table = admits_table.fillna(0)
+admits_table = admits_table.fillna(0).astype(int)
 
 if st.checkbox("Show Projected Admissions in tabular form"):
     st.dataframe(admits_table)
@@ -242,7 +240,7 @@ census_df = census_df[["day", "hosp", "icu", "vent"]]
 census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
 census_table.index = range(census_table.shape[0])
 census_table.loc[0, :] = 0
-census_table = census_table.dropna()
+census_table = census_table.dropna().astype(int)
 
 if st.checkbox("Show Projected Census in tabular form"):
     st.dataframe(census_table)
@@ -278,3 +276,4 @@ st.markdown(
 * We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine 
     """
 )
+st.markdown("© 2020, The Trustees of the University of Pennsylvania")
