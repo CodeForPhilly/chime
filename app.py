@@ -60,8 +60,6 @@ def sim_sir(S, I, R, beta, gamma, n_days, beta_decay=None):
     return s, i, r
 
 ## RUN THE MODEL
-st.subheader('SIR modeling of infections/recovery')
-
 
 S, I, R = S, initial_infections/detection_prob, 0
 
@@ -99,7 +97,7 @@ if st.checkbox('Show Infection Rate Data'):
     st.dataframe(infect_table)
 
 st.subheader('Projected Hospital Impact')
-st.title('(The number of individuals requiring hospitalization in a region)')
+st.text('(The number of individuals requiring hospitalization in a region)')
 
 hosp = i * hosp_rate * Penn_market_share
 icu = i * icu_rate * Penn_market_share
