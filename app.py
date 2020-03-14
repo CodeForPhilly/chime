@@ -157,15 +157,15 @@ beta = (
     intrinsic_growth_rate + gamma
 ) / S  # {rate based on doubling time} / {initial S}
 
-n_days = 60
-
-s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=0.005)
-
-
 st.subheader("Projected Hospitalization Demand at Penn Medicine Facilities")
 st.markdown(
     "The number of COVID-19 patients projected to require hospitalization at Penn"
 )
+
+n_days = st.slider("Number of days to project", 30, 200, 60, 1, "%i")
+
+s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=0.005)
+
 
 hosp = i * hosp_rate * Penn_market_share
 icu = i * icu_rate * Penn_market_share
@@ -193,13 +193,13 @@ if st.checkbox("Show Hospital Impact Data"):
     st.dataframe(impact_table)
 
 st.subheader("Admissions")
-st.markdown("The number of **daily** new admissions")
+st.markdown("The number of **daily** new admissions at Penn hospitals")
 
 # New cases
 projection_admits = projection.iloc[:-1, :] - projection.shift(1)
 projection_admits[projection_admits < 0] = 0
 
-plot_projection_days = 50
+plot_projection_days = n_days - 10
 projection_admits["days"] = range(projection_admits.shape[0])
 
 fig, ax = plt.subplots(1, 1, figsize=(10, 4))
@@ -223,7 +223,7 @@ if st.checkbox("Show Admissions Data"):
     st.dataframe(admits_table)
 
 st.subheader("Census")
-st.markdown("Running census accounting for arrivals and discharges")
+st.markdown("Running census accounting for arrivals and discharges at Penn hospitals")
 
 # ALOS for each category of COVID-19 case (total guesses)
 
@@ -264,6 +264,7 @@ if st.checkbox("Show Census Data"):
 
 st.markdown("""**Click the checkbox below to view the raw SIR simulation data**""")
 if st.checkbox("Show Infection Rate Data"):
+    st.subheader("The number of infected and recovered individuals at any given moment")
     fig, ax = plt.subplots(1, 1, figsize=(10, 4))
     # ax.plot(s,label='S')
     ax.plot(i, label="Infected")
