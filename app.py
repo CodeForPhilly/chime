@@ -108,6 +108,7 @@ ax.plot(icu,'.-',label='ICU')
 ax.plot(vent,'.-',label='Ventilated')
 ax.legend(loc=0)
 ax.set_xlabel('days from today')
+ax.set_ylabel('Patients')
 ax.grid('on')
 st.pyplot()
 
