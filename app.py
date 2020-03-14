@@ -55,11 +55,12 @@ S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
 )
 
+st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.markdown(
     """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).* **If you see any error messages please reload the page.**"""
 )
-st.title("COVID-19 Hospital Impact Model for Epidemics")
-if st.checkbox("More info about this tool"):
+
+if st.checkbox("Show more info about this tool"):
     st.subheader(
         "[Discrete-time SIR modeling](https://mathworld.wolfram.com/SIRModel.html) of infections/recovery"
     )
@@ -170,7 +171,7 @@ vent = i * vent_rate * Penn_market_share
 
 days = np.array(range(0, n_days + 1))
 data_list = [days, hosp, icu, vent]
-data_dict = dict(zip(["days", "hosp", "icu", "vent"], data_list))
+data_dict = dict(zip(["day", "hosp", "icu", "vent"], data_list))
 
 projection = pd.DataFrame.from_dict(data_dict)
 
@@ -182,7 +183,7 @@ projection_admits = projection.iloc[:-1, :] - projection.shift(1)
 projection_admits[projection_admits < 0] = 0
 
 plot_projection_days = n_days - 10
-projection_admits["days"] = range(projection_admits.shape[0])
+projection_admits["day"] = range(projection_admits.shape[0])
 
 fig, ax = plt.subplots(1, 1, figsize=(10, 4))
 ax.plot(
@@ -197,7 +198,7 @@ ax.set_ylabel("Daily Admissions")
 st.pyplot()
 
 admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
-admits_table["days"] = admits_table.index
+admits_table["day"] = admits_table.index
 admits_table.index = range(admits_table.shape[0])
 admits_table = admits_table.fillna(0)
 
@@ -235,8 +236,8 @@ ax.set_ylabel("Census")
 st.pyplot()
 
 census_df = pd.DataFrame(census_dict)
-census_df["days"] = census_df.index
-census_df = census_df[["days", "hosp", "icu", "vent"]]
+census_df["day"] = census_df.index
+census_df = census_df[["day", "hosp", "icu", "vent"]]
 
 census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
 census_table.index = range(census_table.shape[0])
@@ -283,7 +284,7 @@ if st.checkbox("Show Additional Data"):
     # Show data
     days = np.array(range(0, n_days + 1))
     data_list = [days, s, i, r]
-    data_dict = dict(zip(["days", "susceptible", "infections", "recovered"], data_list))
+    data_dict = dict(zip(["day", "susceptible", "infections", "recovered"], data_list))
     projection_area = pd.DataFrame.from_dict(data_dict)
     infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
     infect_table.index = range(infect_table.shape[0])
