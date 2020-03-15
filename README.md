@@ -1,4 +1,7 @@
 # CHIME
+The **C**OVID-19 **H**ospital **I**mpact **M**odel for **E**pidemics
+
+[![CHIME](https://user-images.githubusercontent.com/1069047/76693244-5e07e980-6638-11ea-9e02-1c265c86fd2b.gif)](https://pennchime.herokuapp.com/)
 
 ## Development
 To test the app locally just run:
