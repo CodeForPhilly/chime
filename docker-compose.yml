@@ -1,0 +1,8 @@
+version: '3.1'
+
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "${PORT}:8000"
