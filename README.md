@@ -1,7 +1,7 @@
 # CHIME
 The **C**OVID-19 **H**ospital **I**mpact **M**odel for **E**pidemics
 
-[![CHIME](https://user-images.githubusercontent.com/1069047/76693244-5e07e980-6638-11ea-9e02-1c265c86fd2b.gif)](https://pennchime.herokuapp.com/)
+[![CHIME](https://user-images.githubusercontent.com/1069047/76693244-5e07e980-6638-11ea-9e02-1c265c86fd2b.gif)](http://predictivehealthcare.pennmedicine.org/chime)
 
 ## Development
 To test the app locally just run:
@@ -25,4 +25,4 @@ port, then set `PORT` in the `.env` file.
 ## Deployment
 **Before you push your changes to master make sure that everything works in development mode.**
 
-Changes merged to `master` will be automatically deployed to [pennchime.herokuapp.com](https://pennchime.herokuapp.com/).
+Changes merged to `master` will be automatically deployed to [pennchime.herokuapp.com](http://predictivehealthcare.pennmedicine.org/chime).
