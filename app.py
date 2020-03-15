@@ -89,7 +89,14 @@ First, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of 
 
     st.markdown("""
 - Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$, $\\beta$ becomes a function of the initial population size of susceptible individuals.
-$$\\beta = (g + \\gamma)/s$$
+$$\\beta = (g + \\gamma)/s$$.  If we don't scale by $s$, $$\\beta$$ can be interpreted as the _effective_ _contact_ _rate_ -- the transmissibility scaled by the number of people exposed.
+
+R0 is the average number of people who will be infected by any given infected person.  When R0 is greater than 1, it means that a disease will grow.  Higher R0's imply more rapid growth.  It is defined as """)
+    st.latex("R0 = \\beta /\\gamma \\times s")
+
+    st.markdown("""
+    
+Our default parameters -- a doubling time of 6 days and a recovery time of 14 days -- imply an R0 of 2.71.
 
 ### Initial Conditions
 
