@@ -1,6 +1,8 @@
 import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
 import numpy as np  # type: ignore
+import matplotlib  # type: ignore
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # type: ignore
 
 from constants import (
@@ -26,7 +28,7 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.markdown(
-    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).* **If you see any error messages please reload the page.**"""
+    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).*"""
 )
 
 # Get the input
