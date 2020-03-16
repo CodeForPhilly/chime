@@ -31,24 +31,26 @@ st.markdown(
     """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).*"""
 )
 
+
 # Get the input
-Penn_market_share = _Penn_market_share()
 initial_infections = _initial_infections()
+current_hosp = _current_hosp()
 doubling_time = _doubling_time()
 hosp_rate = _hosp_rate()
-vent_rate = _vent_rate()
 icu_rate = _icu_rate()
-S = _S()
-current_hosp = _current_hosp()
-detection_prob = _detection_prob(initial_infections, current_hosp, Penn_market_share, hosp_rate)
+vent_rate = _vent_rate()
 hosp_los = _hosp_los()
 icu_los = _icu_los()
 vent_los = _vent_los()
-n_days = st.slider("Number of days to project", 30, 200, 60, 1, "%i")
+Penn_market_share = _Penn_market_share()
+S = _S()
 
-
+detection_prob = _detection_prob(initial_infections, current_hosp, Penn_market_share, hosp_rate)
 if st.checkbox("Show more info about this tool"):
     show_more_info_about_this_tool(initial_infections, detection_prob)
+
+n_days = st.slider("Number of days to project", 30, 200, 60, 1, "%i")
+
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
