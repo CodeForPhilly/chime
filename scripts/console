@@ -1,10 +1,10 @@
 set -eu -o pipefail
 shopt -s failglob
 
-ENV=$1
-
-if [ -z "${ENV}" ]; then 
-    ENV='local'
+if [ -z "$@" ]; then
+    ENV=local
+else
+    ENV="$1"
 fi
 
 case $ENV in
