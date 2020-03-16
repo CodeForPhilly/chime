@@ -1,0 +1,25 @@
+set -eu -o pipefail
+shopt -s failglob
+
+ENV=$1
+
+if [ -z "${ENV}" ]; then 
+    ENV='local'
+fi
+
+case $ENV in
+
+  local)
+    URL=http://localhost:8000
+    ;;
+
+  dev)
+    URL=http://pennchime.herokuapp.com
+    ;;
+
+  # FUTURE - other targets - Heroku / Linode / Production DNS entry?
+
+esac
+
+
+open $URL

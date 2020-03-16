@@ -1,0 +1,4 @@
+set -eu -o pipefail
+shopt -s failglob
+
+docker-compose up -d

@@ -1,0 +1,8 @@
+set -eu -o pipefail
+shopt -s failglob
+
+scripts/test
+
+docker build -t upenn/chime .
+
+# FUTURE - should the container be pushed anywhere?

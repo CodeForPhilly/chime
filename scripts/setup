@@ -1,0 +1,4 @@
+set -eu -o pipefail
+shopt -s failglob
+
+# TODO - what is the difference between this and bootstrap?
