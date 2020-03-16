@@ -1,0 +1,9 @@
+name: chime
+channels: 
+- defaults
+dependencies: 
+- python>=3.6
+- streamlit
+- numpy
+- pandas
+- matplotlib
