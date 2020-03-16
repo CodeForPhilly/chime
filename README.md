@@ -12,7 +12,21 @@ To test the app locally just run:
 
 This will open a browser window with the app running.
 
-### Developing with docker
+### With `pipenv`
+```bash
+pipenv shell
+pipenv install
+streamlit run app.py
+```
+
+### With `conda` 
+```bash
+conda create -f environment.yml
+source activate chime
+streamlit run app.py
+```
+
+### Developing with `docker`
 
 Copy `.env.example` to be `.env` and run the container.
 
