@@ -8,7 +8,7 @@ Join out [Code For America](https://codeforphilly.org/projects/chime--covid-19_h
 ## Development
 To test the app locally just run:
 
-`streamlit run src/app.py`
+`streamlit run app.py`
 
 This will open a browser window with the app running.
 
@@ -16,14 +16,14 @@ This will open a browser window with the app running.
 ```bash
 pipenv shell
 pipenv install
-streamlit run src/app.py
+streamlit run app.py
 ```
 
 ### With `conda` 
 ```bash
 conda create -f environment.yml
 source activate chime
-streamlit run src/app.py
+streamlit run app.py
 ```
 
 ### Developing with `docker`
