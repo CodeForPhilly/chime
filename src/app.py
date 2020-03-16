@@ -16,7 +16,6 @@ from sidebar import (
 from markdown import (show_more_info_about_this_tool)
 from model import (
     model,
-    # hosp_los, icu_los, vent_los
 )
 
 hide_menu_style = """
