@@ -7,18 +7,21 @@ from constants import (
     DELAWARE, CHESTER, MONTGOMERY, BUCKS, PHILLY, S_DEFAULT, KNOWN_INFECTIONS
 )
 from sidebar import (
-    initial_infections, current_hosp, doubling_time, hosp_rate, icu_rate, vent_rate,
-    hosp_los, icu_los, vent_los, Penn_market_share, S, total_infections, detection_prob,
-    los_dict
+    _initial_infections, _current_hosp, _doubling_time, _hosp_rate, _icu_rate, _vent_rate,
+    _hosp_los, _icu_los, _vent_los, _Penn_market_share, _S, _total_infections, _detection_prob,
+    _los_dict
 )
 from markdown import (show_more_info_about_this_tool)
-from model import (projection, n_days, s, i, r)
+from model import (
+    model,
+    # hosp_los, icu_los, vent_los
+)
 
 hide_menu_style = """
-        <style>
-        #MainMenu {visibility: hidden;}
-        </style>
-        """
+       <style>
+       #MainMenu {visibility: hidden;}
+       </style>
+       """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 st.title("COVID-19 Hospital Impact Model for Epidemics")
@@ -26,11 +29,40 @@ st.markdown(
     """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).* **If you see any error messages please reload the page.**"""
 )
 
+# Get the input
+Penn_market_share = _Penn_market_share()
+initial_infections = _initial_infections()
+doubling_time = _doubling_time()
+hosp_rate = _hosp_rate()
+vent_rate = _vent_rate()
+icu_rate = _icu_rate()
+S = _S()
+current_hosp = _current_hosp()
+detection_prob = _detection_prob(initial_infections, current_hosp, Penn_market_share, hosp_rate)
+hosp_los = _hosp_los()
+icu_los = _icu_los()
+vent_los = _vent_los()
+n_days = st.slider("Number of days to project", 30, 200, 60, 1, "%i")
+
+
 if st.checkbox("Show more info about this tool"):
-    show_more_info_about_this_tool()
+    show_more_info_about_this_tool(initial_infections, detection_prob)
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
+
+
+projection, s, i, r = model(
+    initial_infections=initial_infections,
+    detection_prob=detection_prob,
+    doubling_time=doubling_time,
+    n_days=n_days,
+    hosp_rate=hosp_rate,
+    icu_rate=icu_rate,
+    vent_rate=vent_rate,
+    Penn_market_share=Penn_market_share,
+    S=S
+)
 
 # New cases
 projection_admits = projection.iloc[:-1, :] - projection.shift(1)
@@ -69,7 +101,7 @@ st.markdown(
 fig, ax = plt.subplots(1, 1, figsize=(10, 4))
 
 census_dict = {}
-for k, los in los_dict.items():
+for k, los in _los_dict(hosp_los, icu_los, vent_los).items():
     census = (
         projection_admits.cumsum().iloc[:-los, :]
         - projection_admits.cumsum().shift(los).fillna(0)

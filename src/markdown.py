@@ -3,14 +3,10 @@
 import streamlit as st  # type: ignore
 
 from constants import (
-    DELAWARE, CHESTER, MONTGOMERY, BUCKS, PHILLY, S_DEFAULT, KNOWN_INFECTIONS
-)
-from sidebar import (
-    initial_infections, detection_prob
+    DELAWARE, CHESTER, MONTGOMERY, BUCKS, PHILLY
 )
 
-
-def show_more_info_about_this_tool():
+def show_more_info_about_this_tool(initial_infections, detection_prob):
     """Show more info about this tool"""
     st.subheader(
         "[Discrete-time SIR modeling](https://mathworld.wolfram.com/SIRModel.html) of infections/recovery"
@@ -64,3 +60,4 @@ $$\\beta = (g + \\gamma)/s$$
             detection_prob=detection_prob,
         )
     )
+    return None
