@@ -366,17 +366,17 @@ if st.checkbox("Show Additional Projections"):
 
 st.subheader("Guidance on Selecting Inputs")
 st.markdown(
-    """* **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. 
-* **Currently Hospitalized COVID-19 Patients:** The number of.
-* **Doubling Time (days):** 
-* **Hospitalization %(of total infections):**
-* **ICU %(of total infections):** 
-* **Ventilated %(of total infections):** 
-* **Hospital Length of Stay:**
-* **ICU Length of Stay:**
-* **Vent Length of Stay:** 
-* **Hospital Market Share (%):**
-* **Regional Population:**  
+    """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19. This number is used in conjunction with market share and hospitalization % to estimate the total number of infected individuals in your region.
+* **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This input is used to estimate the detection rate of infected individuals. 
+* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association has projected doubling rates between 7 and 10 days. The doubling time will be higher (slower spread) or lower (faster spread) depending on the amount of social distancing in your region. 
+* **Hospitalization %(of total infections):** Percentage of **all** infected cases which will need hospitalization.
+* **ICU %(of total infections):** Percentage of **all** infected cases which will need to be treated in an ICU.
+* **Ventilated %(of total infections):** Percentage of **all** infected cases which will need mechanical ventilation.
+* **Hospital Length of Stay:** Average number of days of treatment needed for hospitalized patients. 
+* **ICU Length of Stay:** Average number of days of ICU treatment needed for ICU patients.
+* **Vent Length of Stay:**  Average number of days of ventilation needed for Ventilated patients.
+* **Hospital Market Share (%):** The proportion patients in the region that is likely to come to your hospital (as oppossed to other hospitals in the region) when they get sick.
+* **Regional Population:** Total population size of the catchment region of your hospital(s). 
     """
 )
 
