@@ -368,4 +368,4 @@ st.markdown(
 * We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
     """
 )
-st.markdown("Â© 2020, The Trustees of the University of Pennsylvania")
+st.markdown("© 2020, The Trustees of the University of Pennsylvania")
