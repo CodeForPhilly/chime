@@ -8,8 +8,10 @@
   - Data Analysis
   - Application Development
   - Operations Support
+  - [Developer_Guide](DEVELOPER_GUIDE.md)
 - Operations
   - [The `chime-live` Cluster](./operations/chime-live-cluster.md)
   - [Deploy to Your Own Cluster](./operations/byok8s.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Maintainers](MAINTAINERS.md)
 - [Glossary](GLOSSARY.md)
