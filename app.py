@@ -102,10 +102,36 @@ To do this, we use a combination of estimates from other locations, informed est
 
 
 ### Parameters
-First, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
 
-- The $\\gamma$ parameter represents 1 over the mean recovery time in days. Since the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/14$. 
-- Next, the AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
+The model's parameters, $\\beta$ and $\\gamma$, determine the virulence of the epidemic.  
+
+$$\\beta$$ can be interpreted as the _effective_ _contact_ _rate_:
+""")
+    st.latex("\\beta = \\tau \\times \\bar{c}")
+
+    st.markdown(
+"""which is the transmissibility ($$\\tau$$) multiplied by the average number of people exposed ($$\\bar{c}$$).  The transmissibility is the basic virulence of the pathogen.  The number of people exposed _c_ is the parameter that can be changed through social distancing.
+
+
+$\\gamma$ is the inverse of the mean recovery time, in days.  I.e.: if $\\gamma = \\frac{1}{14}$, then the average infection will clear in 14 days. 
+
+An important descriptive parameter is the _basic_ _reproduction_ _number_, or *R0*.  R0 is the average number of people who will be infected by any given infected person.  When R0 is greater than 1, it means that a disease will grow.  Higher R0's imply more rapid growth.  It is defined as """)
+    st.latex("R0 = \\beta /\\gamma")
+
+    st.markdown("""
+
+R0 gets bigger when
+
+- there are more contacts between people
+- when the pathogen is more virulent
+- when people have the pathogen for longer periods of time
+
+Our default parameters -- a doubling time of 6 days and a recovery time of 14 days -- imply an R0 of 2.71.
+
+To use the model, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
+
+- $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/14$. 
+- To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling_ _times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
 """
     )
     st.latex("g = 2^{1/T_d} - 1")
@@ -113,14 +139,8 @@ First, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of 
     st.markdown(
         """
 - Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$, $\\beta$ becomes a function of the initial population size of susceptible individuals.
-$$\\beta = (g + \\gamma)/s$$.  If we don't scale by $s$, $$\\beta$$ can be interpreted as the _effective_ _contact_ _rate_ -- the transmissibility scaled by the number of people exposed.
+$$\\beta = (g + \\gamma)$$.
 
-R0 is the average number of people who will be infected by any given infected person.  When R0 is greater than 1, it means that a disease will grow.  Higher R0's imply more rapid growth.  It is defined as """)
-    st.latex("R0 = \\beta /\\gamma \\times s")
-
-    st.markdown("""
-    
-Our default parameters -- a doubling time of 6 days and a recovery time of 14 days -- imply an R0 of 2.71.
 
 ### Initial Conditions
 
