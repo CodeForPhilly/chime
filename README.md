@@ -47,6 +47,8 @@ port (as described above), then you also have to set `PORT` in the `.env` file.
 
 **NOTE** this is just for usage, not for development--- you would have to restart and possibly rebuild the app every time you change the code.
 
+If you'd like to use `docker-compose` for development, please run `docker-compose up --build` every time you make changes. 
+
 ## Deployment
 **Before you push your changes to master make sure that everything works in development mode.**
 
