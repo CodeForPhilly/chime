@@ -1,0 +1,21 @@
+name: Publish GitBook to GH Pages
+
+on:
+  push:
+    branches:
+      - 'master'
+
+
+jobs:
+  gh-pages-projection:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Update holobranch: gh-pages'
+      uses: JarvusInnovations/hologit@actions/projector/v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        HAB_LICENSE: accept
+      with:
+        ref: master
+        holobranch: gh-pages
+        commit-to: gh-pages

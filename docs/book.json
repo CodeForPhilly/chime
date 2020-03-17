@@ -1,0 +1,5 @@
+{
+    "plugins": [
+        "mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"
+    ]
+}
