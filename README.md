@@ -3,7 +3,9 @@ The **C**OVID-19 **H**ospital **I**mpact **M**odel for **E**pidemics
 
 [![CHIME](https://user-images.githubusercontent.com/1069047/76693244-5e07e980-6638-11ea-9e02-1c265c86fd2b.gif)](http://predictivehealthcare.pennmedicine.org/chime)
 
-Join out [Code For America](https://codeforphilly.org/projects/chime--covid-19_hospital_impact_model_for_epidemics) team or our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you'd like to chat with us. We'd appreciate your [feedback](http://predictivehealthcare.pennmedicine.org/contact/).
+Interested in [contributing](https://codeforphilly.github.io/chime/CONTRIBUTING.html)?
+
+Join our [Code For Philly](https://codeforphilly.org/projects/chime) project or our [Slack workspace](https://codeforphilly.org/chat) in the [#covid19-chime-penn](https://codeforphilly.org/chat/covid19-chime-penn) channel if you'd like to chat with us. We'd appreciate your [feedback](http://predictivehealthcare.pennmedicine.org/contact/).
 
 ## Development
 To test the app locally just run:
