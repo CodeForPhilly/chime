@@ -32,14 +32,14 @@ doubling_time = st.sidebar.number_input(
     "Doubling Time (days)", value=6, step=1, format="%i"
 )
 hosp_rate = (
-    st.sidebar.number_input("Hospitalization %(of total infections)", 0, 100, value=5, step=1, format="%i")
+    st.sidebar.number_input("Hospitalization %(total infections)", 0, 100, value=5, step=1, format="%i")
     / 100.0
 )
 icu_rate = (
-    st.sidebar.number_input("ICU %(of total infections)", 0, 100, value=2, step=1, format="%i") / 100.0
+    st.sidebar.number_input("ICU %(total infections)", 0, 100, value=2, step=1, format="%i") / 100.0
 )
 vent_rate = (
-    st.sidebar.number_input("Ventilated %(of total infections)", 0, 100, value=1, step=1, format="%i")
+    st.sidebar.number_input("Ventilated %(total infections)", 0, 100, value=1, step=1, format="%i")
     / 100.0
 )
 hosp_los = st.sidebar.number_input("Hospital Length of Stay", value=7, step=1, format="%i")
@@ -367,16 +367,16 @@ if st.checkbox("Show Additional Projections"):
 
 st.subheader("Guidance on Selecting Inputs")
 st.markdown(
-    """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19. This number is used in conjunction with market share and hospitalization % to estimate the total number of infected individuals in your region.
+    """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate the total number of infected individuals in your region.
 * **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This input is used to estimate the detection rate of infected individuals. 
-* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association has projected doubling rates between 7 and 10 days. The doubling time will be higher (slower spread) or lower (faster spread) depending on the amount of social distancing in your region. 
-* **Hospitalization %(of total infections):** Percentage of **all** infected cases which will need hospitalization.
-* **ICU %(of total infections):** Percentage of **all** infected cases which will need to be treated in an ICU.
-* **Ventilated %(of total infections):** Percentage of **all** infected cases which will need mechanical ventilation.
-* **Hospital Length of Stay:** Average number of days of treatment needed for hospitalized patients. 
-* **ICU Length of Stay:** Average number of days of ICU treatment needed for ICU patients.
-* **Vent Length of Stay:**  Average number of days of ventilation needed for Ventilated patients.
-* **Hospital Market Share (%):** The proportion patients in the region that is likely to come to your hospital (as oppossed to other hospitals in the region) when they get sick.
+* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association currently projects doubling rates between 7 and 10 days. The doubling time will be higher (slower spread) or lower (faster spread) depending on the amount of social distancing in your region. 
+* **Hospitalization %(total infections):** Percentage of **all** infected cases which will need hospitalization.
+* **ICU %(total infections):** Percentage of **all** infected cases which will need to be treated in an ICU.
+* **Ventilated %(total infections):** Percentage of **all** infected cases which will need mechanical ventilation.
+* **Hospital Length of Stay:** Average number of days of treatment needed for hospitalized COVID-19 patients. 
+* **ICU Length of Stay:** Average number of days of ICU treatment needed for ICU COVID-19 patients.
+* **Vent Length of Stay:**  Average number of days of ventilation needed for ventilated COVID-19 patients.
+* **Hospital Market Share (%):** The proportion of patients in the region that are likely to come to your hospital (as oppossed to other hospitals in the region) when they get sick. One way to estimate this is to look at all of the hospitals in your region and add up all of the beds. The number of beds at your hospital divided by the total number of beds in the region times 100 will give you a reasonable starting estimate.
 * **Regional Population:** Total population size of the catchment region of your hospital(s). 
     """
 )
