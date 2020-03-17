@@ -256,6 +256,16 @@ for k, los in los_dict.items():
     ).apply(np.ceil)
     census_dict[k] = census[k]
 
+
+census_df = pd.DataFrame(census_dict)
+census_df["day"] = census_df.index
+census_df = census_df[["day", "hosp", "icu", "vent"]]
+
+census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
+census_table.index = range(census_table.shape[0])
+census_table.loc[0, :] = 0
+census_table = census_table.dropna().astype(int)
+
 def admitted_patients_chart(census: pd.DataFrame) -> alt.Chart:
     """docstring"""
     census = census.rename(columns={"hosp": "Hospital Census", "icu": "ICU Census", "vent": "Ventilated Census"})
@@ -274,16 +284,7 @@ def admitted_patients_chart(census: pd.DataFrame) -> alt.Chart:
         .interactive()
     )
 
-st.altair_chart(admitted_patients_chart(census), use_container_width=True)
-
-census_df = pd.DataFrame(census_dict)
-census_df["day"] = census_df.index
-census_df = census_df[["day", "hosp", "icu", "vent"]]
-
-census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
-census_table.index = range(census_table.shape[0])
-census_table.loc[0, :] = 0
-census_table = census_table.dropna().astype(int)
+st.altair_chart(admitted_patients_chart(census_table), use_container_width=True)
 
 if st.checkbox("Show Projected Census in tabular form"):
     st.dataframe(census_table)
