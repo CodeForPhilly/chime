@@ -27,6 +27,10 @@ case $ENV in
     URL=http://pennchime.herokuapp.com
     ;;
 
+  prod)
+    URL=http://penn-chime.phl.io
+    ;;
+
   # FUTURE - other targets - Heroku / Linode / Production DNS entry?
 
 esac
