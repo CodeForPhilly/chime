@@ -22,29 +22,29 @@ known_infections = 63 # update daily
 known_cases = 4 # update daily
 
 # Widgets
-initial_infections = st.sidebar.number_input(
-    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
-)
 current_hosp = st.sidebar.number_input(
     "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
+)
+initial_infections = st.sidebar.number_input(
+    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 doubling_time = st.sidebar.number_input(
     "Doubling Time (days)", value=6, step=1, format="%i"
 )
 hosp_rate = (
-    st.sidebar.number_input("Hospitalization %", 0, 100, value=5, step=1, format="%i")
+    st.sidebar.number_input("Hospitalization %(total infections)", 0, 100, value=5, step=1, format="%i")
     / 100.0
 )
 icu_rate = (
-    st.sidebar.number_input("ICU %", 0, 100, value=2, step=1, format="%i") / 100.0
+    st.sidebar.number_input("ICU %(total infections)", 0, 100, value=2, step=1, format="%i") / 100.0
 )
 vent_rate = (
-    st.sidebar.number_input("Ventilated %", 0, 100, value=1, step=1, format="%i")
+    st.sidebar.number_input("Ventilated %(total infections)", 0, 100, value=1, step=1, format="%i")
     / 100.0
 )
-hosp_los = st.sidebar.number_input("Hospital LOS", value=7, step=1, format="%i")
-icu_los = st.sidebar.number_input("ICU LOS", value=9, step=1, format="%i")
-vent_los = st.sidebar.number_input("Vent LOS", value=10, step=1, format="%i")
+hosp_los = st.sidebar.number_input("Hospital Length of Stay", value=7, step=1, format="%i")
+icu_los = st.sidebar.number_input("ICU Length of Stay", value=9, step=1, format="%i")
+vent_los = st.sidebar.number_input("Vent Length of Stay", value=10, step=1, format="%i")
 Penn_market_share = (
     st.sidebar.number_input(
         "Hospital Market Share (%)", 0.0, 100.0, value=15.0, step=1.0, format="%f"
@@ -81,10 +81,13 @@ Penn Medicine. For questions and comments please see our
 Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*""")
 
 st.markdown(
-    """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
-confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for
-Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
-and Hospital market share (**{Penn_market_share:.0%}**).""".format(
+    """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}** 
+confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for 
+Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**), 
+and Hospital market share (**{Penn_market_share:.0%}**).
+
+A doubling time of {doubling_time} days and a recovery time of {recovery_days} days imply an $R_0$ of {r_naught:.2f}.
+""".format(
         total_infections=total_infections,
         current_hosp=current_hosp,
         hosp_rate=hosp_rate,
@@ -92,8 +95,13 @@ and Hospital market share (**{Penn_market_share:.0%}**).""".format(
         Penn_market_share=Penn_market_share,
         initial_infections=initial_infections,
         detection_prob=detection_prob,
+        recovery_days=recovery_days,
+        r_naught=r_naught,
+        doubling_time=doubling_time
     )
 )
+
+
 
 if st.checkbox("Show more info about this tool"):
     st.subheader(
@@ -141,7 +149,7 @@ R0 gets bigger when
 - when the pathogen is more virulent
 - when people have the pathogen for longer periods of time
 
-A doubling time of {doubling_time} days and a recovery time of {recovery_days} days -- imply an $R_0$ of {r_naught:.2f}.
+A doubling time of {doubling_time} days and a recovery time of {recovery_days} days imply an $R_0$ of {r_naught:.2f}.
 
 To use the model, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
 
@@ -356,6 +364,23 @@ if st.checkbox("Show Additional Projections"):
 
     if st.checkbox("Show Raw SIR Similation Data"):
         st.dataframe(infect_table)
+
+st.subheader("Guidance on Selecting Inputs")
+st.markdown(
+    """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate the total number of infected individuals in your region.
+* **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This input is used to estimate the detection rate of infected individuals. 
+* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association currently projects doubling rates between 7 and 10 days. The doubling time will be higher (slower spread) or lower (faster spread) depending on the amount of social distancing in your region. 
+* **Hospitalization %(total infections):** Percentage of **all** infected cases which will need hospitalization.
+* **ICU %(total infections):** Percentage of **all** infected cases which will need to be treated in an ICU.
+* **Ventilated %(total infections):** Percentage of **all** infected cases which will need mechanical ventilation.
+* **Hospital Length of Stay:** Average number of days of treatment needed for hospitalized COVID-19 patients. 
+* **ICU Length of Stay:** Average number of days of ICU treatment needed for ICU COVID-19 patients.
+* **Vent Length of Stay:**  Average number of days of ventilation needed for ventilated COVID-19 patients.
+* **Hospital Market Share (%):** The proportion of patients in the region that are likely to come to your hospital (as oppossed to other hospitals in the region) when they get sick. One way to estimate this is to look at all of the hospitals in your region and add up all of the beds. The number of beds at your hospital divided by the total number of beds in the region times 100 will give you a reasonable starting estimate.
+* **Regional Population:** Total population size of the catchment region of your hospital(s). 
+    """
+)
+
 
 st.subheader("References & Acknowledgements")
 st.markdown(
