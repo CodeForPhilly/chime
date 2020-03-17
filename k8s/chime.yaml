@@ -18,7 +18,7 @@ spec:
         app: chime
     spec:
       containers:
-      - image: qsam/chime:latest
+      - image: codeforphilly/chime:latest
         name: chime
         ports:
         - containerPort: 8000
