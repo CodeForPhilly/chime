@@ -11,7 +11,7 @@ We maintain a list of [issues](https://github.com/codeforphilly/chime/issues) in
 **Developers** If you are new to the project, check out open issues to see if there is any pre-existing work needed that you can handle. We will need to add your git account to the repo to grant write access - contact us on [Slack](https://codeforphilly.org/chat) in the [covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel.
 
 ## Change Management
-Developers working on this project must adhere to our [Change Management practices](https://github.com/CodeForPhilly/chime/master/workflows/CHANGEMGMT.md). 
+Developers working on this project must adhere to our [Change Management practices](https://github.com/CodeForPhilly/chime/master/.github/CHANGEMGMT.md). 
 
 ## Requesting Functionality
 **Stakeholders/Users** Find us on [Slack](https://codeforphilly.org/chat) in the [covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel to see if your need is already being addressed. 
