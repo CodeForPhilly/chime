@@ -25,7 +25,7 @@ initial_infections = st.sidebar.number_input(
     "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 current_hosp = st.sidebar.number_input(
-    "Currently Hospitalized COVID-19 Patients", value=2, step=1, format="%i"
+    "Currently Hospitalized COVID-19 Patients", value=4, step=1, format="%i"
 )
 doubling_time = st.sidebar.number_input(
     "Doubling Time (days)", value=6, step=1, format="%i"
