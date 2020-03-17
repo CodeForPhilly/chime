@@ -11,4 +11,5 @@
 - Operations
   - [The `chime-live` Cluster](./operations/chime-live-cluster.md)
   - [Deploy to Your Own Cluster](./operations/byok8s.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Glossary](GLOSSARY.md)
