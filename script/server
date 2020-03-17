@@ -1,0 +1,15 @@
+# See https://github.com/github/scripts-to-rule-them-all
+# 
+# script/server is used to start the application.
+#
+# For a web application, this might start up any extra processes
+# that the application requires to run in addition to itself.
+#
+# script/update should be called ahead of any application booting 
+# to ensure that the application is up to date and can run appropriately.
+
+
+set -eu -o pipefail
+shopt -s failglob
+
+docker-compose up -d
