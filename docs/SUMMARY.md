@@ -8,3 +8,5 @@
   - Operations Support
 - Operations
   - [`chime-live` cluster](./operations/chime-live-cluster.md)
+- [Developer Guide](DEVELOPER_GUIDE.md)
+- [Maintainers](MAINTAINERS.md)
