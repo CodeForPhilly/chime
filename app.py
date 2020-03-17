@@ -3,10 +3,7 @@ from typing import Tuple, Dict, Any
 import pandas as pd
 import streamlit as st
 import numpy as np
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import altair as alt 
+import altair as alt
 
 hide_menu_style = """
         <style>
@@ -299,15 +296,26 @@ if st.checkbox("Show Additional Projections"):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
-    fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-    ax.plot(i, label="Infected")
-    ax.plot(r, label="Recovered")
-    ax.legend(loc=0)
-    ax.set_xlabel("days from today")
-    ax.set_ylabel("Case Volume")
-    ax.grid("on")
-    st.pyplot()
 
+    def additional_projections_chart(i: np.ndarray, r: np.ndarray) -> alt.Chart:
+        dat = pd.DataFrame({"Infected": i, "Recovered": r})
+
+        return (
+            alt
+            .Chart(dat.reset_index())
+            .transform_fold(fold=["Infected", "Recovered"])
+            .mark_line()
+            .encode(
+                x=alt.X("index", title="Days from today"),
+                y=alt.Y("value:Q", title="Case Volume"),
+                tooltip=["key:N", "value:Q"],
+                color="key:N"
+            )
+            .interactive()
+        )
+
+    st.altair_chart(additional_projections_chart(i, r), use_container_width=True)
+   
     # Show data
     days = np.array(range(0, n_days + 1))
     data_list = [days, s, i, r]
