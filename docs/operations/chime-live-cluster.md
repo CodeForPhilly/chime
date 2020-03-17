@@ -1,4 +1,4 @@
-# `chime-live` cluster
+# Operations: The `chime-live` Cluster
 
 ## Connecting with `kubectl`
 
