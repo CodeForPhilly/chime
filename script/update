@@ -1,18 +1,14 @@
-# See https://github.com/github/scripts-to-rule-them-all
-#
-# script/update is used to update the project after a fresh pull.
-#
-# If you have not worked on the project for a while, 
-# running script/update after a pull will ensure that everything 
-# inside the project is up to date and ready to work.
-#
-# Typically, script/bootstrap is run inside this script.
-# This is also a good opportunity to run database migrations 
-# or any other things required to get the state of the app into 
-# shape for the current version that is checked out.
+#!/bin/sh
 
-set -eu -o pipefail
-shopt -s failglob
+# script/update: Update application to run for its current checkout.
 
-docker-compose down
-scripts/bootstrap
+set -e
+cd "$(dirname "$0")/.."
+
+
+script/bootstrap
+script/-check-docker-compose
+
+echo
+echo "==> Rebuilding containers…"
+docker-compose up -d --build

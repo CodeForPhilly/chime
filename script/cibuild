@@ -1,16 +1,13 @@
-# See https://github.com/github/scripts-to-rule-them-all
-#
-# script/cibuild is used for your continuous integration server. 
-# This script is typically only called from your CI server.
-#
-# You should set up any specific things for your environment here 
-# before your tests are run. Your test are run simply by calling script/test.
+#!/bin/sh
 
-set -eu -o pipefail
-shopt -s failglob
+# script/cibuild: Build production deployment artifact
 
-scripts/test
+set -e
+cd "$(dirname "$0")/.."
 
-docker build -t upenn/chime .
 
-# FUTURE - should the container be pushed anywhere?
+script/bootstrap
+
+echo
+echo "==> Building and tagging container…"
+docker build -t codeforphilly/chime .

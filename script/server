@@ -1,15 +1,29 @@
-# See https://github.com/github/scripts-to-rule-them-all
-# 
-# script/server is used to start the application.
-#
-# For a web application, this might start up any extra processes
-# that the application requires to run in addition to itself.
-#
-# script/update should be called ahead of any application booting 
-# to ensure that the application is up to date and can run appropriately.
+#!/bin/sh
+
+# script/server: Launch the application and any extra required processes
+#                locally.
+
+set -e
+cd "$(dirname "$0")/.."
 
 
-set -eu -o pipefail
-shopt -s failglob
+script/bootstrap
 
-docker-compose up -d
+if [ ! -f ".env" ]; then
+    echo
+    echo "==> Initializing .env…"
+    cp .env.example .env
+fi
+
+echo
+echo "==> Loading .env…"
+set -o allexport; source .env; set +o allexport
+
+echo
+echo "==> Starting containers with docker-compose…"
+docker-compose up -d --build
+
+echo
+echo "==> App is now ready to go!"
+echo "    *Open http://localhost:${PORT}"
+echo
