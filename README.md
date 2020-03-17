@@ -8,9 +8,15 @@ Join out [Code For America](https://codeforphilly.org/projects/chime--covid-19_h
 ## Development
 To test the app locally just run:
 
-`streamlit run app.py`
+```sh
+streamlit run app.py
+```
 
-This will open a browser window with the app running.
+This will open a browser window with the app running on port 8000. If you need the app to run on another port, you can edit `.streamlit/config.toml`, or use the magic ENV var, `STREAMLIT_SERVER_PORT` - see [this streamlit issue](https://github.com/streamlit/streamlit/pull/527). So, for example, to run the app on port 1234, you would change the last line of `config.toml` to `port = 1234` or invoke the app like this:
+
+```sh
+STREAMLIT_SERVER_PORT=1234 streamlit run app.py
+```
 
 ### With `pipenv`
 ```bash
@@ -19,10 +25,11 @@ pipenv install
 streamlit run app.py
 ```
 
-### With `conda` 
+### With `conda`
 ```bash
-conda create -f environment.yml
+conda env create -f environment.yml
 source activate chime
+pip install streamlit
 streamlit run app.py
 ```
 
@@ -36,9 +43,11 @@ docker-compose up
 ```
 
 You should be able to view the app via `localhost:8000`. If you want to change the
-port, then set `PORT` in the `.env` file.
+port (as described above), then you also have to set `PORT` in the `.env` file.
 
-**NOTE** this is just for usage, not for development--- you would have to restart and possibly rebuild the app every time you change the code. 
+**NOTE** this is just for usage, not for development--- you would have to restart and possibly rebuild the app every time you change the code.
+
+If you'd like to use `docker-compose` for development, please run `docker-compose up --build` every time you make changes. 
 
 ## Deployment
 **Before you push your changes to master make sure that everything works in development mode.**
