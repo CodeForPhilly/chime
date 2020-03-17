@@ -58,6 +58,21 @@ S = st.sidebar.number_input(
 total_infections = current_hosp / Penn_market_share / hosp_rate
 detection_prob = initial_infections / total_infections
 
+S, I, R = S, initial_infections / detection_prob, 0
+
+intrinsic_growth_rate = 2 ** (1 / doubling_time) - 1
+
+recovery_days = 14.0
+# mean recovery rate, gamma, (in 1/days).
+gamma = 1 / recovery_days
+
+# Contact rate, beta
+beta = (
+    intrinsic_growth_rate + gamma
+) / S  # {rate based on doubling time} / {initial S}
+
+r_naught = beta / gamma * S
+
 st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.markdown(
     """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
@@ -105,18 +120,18 @@ To do this, we use a combination of estimates from other locations, informed est
 
 The model's parameters, $\\beta$ and $\\gamma$, determine the virulence of the epidemic.  
 
-$$\\beta$$ can be interpreted as the _effective_ _contact_ _rate_:
+$$\\beta$$ can be interpreted as the _effective contact rate_:
 """)
-    st.latex("\\beta = \\tau \\times \\bar{c}")
+    st.latex("\\beta = \\tau \\times c")
 
     st.markdown(
-"""which is the transmissibility ($$\\tau$$) multiplied by the average number of people exposed ($$\\bar{c}$$).  The transmissibility is the basic virulence of the pathogen.  The number of people exposed _c_ is the parameter that can be changed through social distancing.
+"""which is the transmissibility ($\\tau$) multiplied by the average number of people exposed ($$c$$).  The transmissibility is the basic virulence of the pathogen.  The number of people exposed $c$ is the parameter that can be changed through social distancing.
 
 
-$\\gamma$ is the inverse of the mean recovery time, in days.  I.e.: if $\\gamma = \\frac{1}{14}$, then the average infection will clear in 14 days. 
+$\\gamma$ is the inverse of the mean recovery time, in days.  I.e.: if $\\gamma = 1/{recovery_days}$, then the average infection will clear in recovery_days days. 
 
-An important descriptive parameter is the _basic_ _reproduction_ _number_, or *R0*.  R0 is the average number of people who will be infected by any given infected person.  When R0 is greater than 1, it means that a disease will grow.  Higher R0's imply more rapid growth.  It is defined as """)
-    st.latex("R0 = \\beta /\\gamma")
+An important descriptive parameter is the _basic reproduction number_, or $R_0$.  This represents the average number of people who will be infected by any given infected person.  When $R_0$ is greater than 1, it means that a disease will grow.  Higher $R_0$'s imply more rapid growth.  It is defined as """.format(recovery_days=recovery_days, c='c'))
+    st.latex("R_0 = \\beta /\\gamma")
 
     st.markdown("""
 
@@ -126,13 +141,16 @@ R0 gets bigger when
 - when the pathogen is more virulent
 - when people have the pathogen for longer periods of time
 
-Our default parameters -- a doubling time of 6 days and a recovery time of 14 days -- imply an R0 of 2.71.
+A doubling time of {doubling_time} days and a recovery time of {recovery_days} days -- imply an $R_0$ of {r_naught:.2f}.
 
 To use the model, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
 
-- $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/14$. 
-- To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling_ _times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
-"""
+- $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/{recovery_days}$. 
+- To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
+""".format(doubling_time=doubling_time,
+    recovery_days=recovery_days,
+    r_naught=r_naught
+    )
     )
     st.latex("g = 2^{1/T_d} - 1")
 
@@ -190,22 +208,6 @@ def sim_sir(S, I, R, beta, gamma, n_days, beta_decay=None):
 
     s, i, r = np.array(s), np.array(i), np.array(r)
     return s, i, r
-
-
-## RUN THE MODEL
-
-S, I, R = S, initial_infections / detection_prob, 0
-
-intrinsic_growth_rate = 2 ** (1 / doubling_time) - 1
-
-recovery_days = 14.0
-# mean recovery rate, gamma, (in 1/days).
-gamma = 1 / recovery_days
-
-# Contact rate, beta
-beta = (
-    intrinsic_growth_rate + gamma
-) / S  # {rate based on doubling time} / {initial S}
 
 
 n_days = st.slider("Number of days to project", 30, 200, 60, 1, "%i")
