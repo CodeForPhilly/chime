@@ -18,7 +18,7 @@ montgomery = 826075
 bucks = 628341
 philly = 1581000
 S_default = delaware + chester + montgomery + bucks + philly
-known_infections = 53
+known_infections = 63
 
 # Widgets
 current_hosp = st.sidebar.number_input(
