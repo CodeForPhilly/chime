@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chime
+  # namespace: chime
+  labels:
+    app: chime
+spec:
+  replicas: 15
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: chime
+  template:
+    metadata:
+      labels:
+        app: chime
+    spec:
+      containers:
+      - image: chime
+        name: chime
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chime
+  # namespace: chime
+  labels:
+    app: chime
+spec:
+  selector:
+    app: chime
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8000
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: chime
+  # namespace: chime
+  labels:
+    app: chime
+  annotations:
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  tls:
+  - hosts:
+    - penn-chime.phl.io
+    secretName: tls-secret
+  rules:
+  - host: penn-chime.phl.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: chime
+          servicePort: 80
