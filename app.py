@@ -116,7 +116,7 @@ The epidemic proceeds via a growth and decline process. This is the core model o
     st.latex("R_{t+1} = (\\gamma I_t) + R_t")
 
     st.markdown(
-        """To project the expected impact to Penn Medicine, we estimate the terms of the model.
+        """To project the expected impact to Penn Medicine, we estimate the terms of the model. 
 
 To do this, we use a combination of estimates from other locations, informed estimates based on logical reasoning, and best guesses from the American Hospital Association.
 
