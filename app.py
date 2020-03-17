@@ -242,7 +242,6 @@ st.markdown(
 
 # ALOS for each category of COVID-19 case (total guesses)
 
-# def admitted_patients(projection_admits: pd.DataFrame) -> Tuple[alt.Chart, Dict[str, Any]]:
 los_dict = {
     "hosp": hosp_los,
     "icu": icu_los,
