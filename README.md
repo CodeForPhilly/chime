@@ -3,9 +3,9 @@ The **C**OVID-19 **H**ospital **I**mpact **M**odel for **E**pidemics
 
 [![CHIME](https://user-images.githubusercontent.com/1069047/76693244-5e07e980-6638-11ea-9e02-1c265c86fd2b.gif)](http://predictivehealthcare.pennmedicine.org/chime)
 
-Interested in [contributing](https://github.com/codeforphilly/chime/master/.github/CONTRIBUTING.md)? 
+Interested in [contributing](https://codeforphilly.github.io/chime/CONTRIBUTING.html)?
 
-Join our [Code For Philly](https://codeforphilly.org/projects/chime--covid-19_hospital_impact_model_for_epidemics) project or our [Slack workspace](https://codeforphilly.org/chat) in the [#covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel if you'd like to chat with us. We'd appreciate your [feedback](http://predictivehealthcare.pennmedicine.org/contact/).
+Join our [Code For Philly](https://codeforphilly.org/projects/chime) project or our [Slack workspace](https://codeforphilly.org/chat) in the [#covid19-chime-penn](https://codeforphilly.org/chat/covid19-chime-penn) channel if you'd like to chat with us. We'd appreciate your [feedback](http://predictivehealthcare.pennmedicine.org/contact/).
 
 ## Development
 To test the app locally just run:
@@ -21,7 +21,7 @@ pipenv install
 streamlit run app.py
 ```
 
-### With `conda` 
+### With `conda`
 ```bash
 conda create -f environment.yml
 source activate chime
@@ -40,7 +40,7 @@ docker-compose up
 You should be able to view the app via `localhost:8000`. If you want to change the
 port, then set `PORT` in the `.env` file.
 
-**NOTE** this is just for usage, not for development--- you would have to restart and possibly rebuild the app every time you change the code. 
+**NOTE** this is just for usage, not for development--- you would have to restart and possibly rebuild the app every time you change the code.
 
 ## Deployment
 **Before you push your changes to master make sure that everything works in development mode.**
