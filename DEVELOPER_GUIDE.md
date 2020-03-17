@@ -3,9 +3,9 @@
 ## Table of Contents
 - [Developer Requirements](#developer-requirements)
 - [Project Layout](#project-layout)
-- [Running CHIME Locally](#running-vinyldns-locally)
+- [Running CHIME Locally](#running-chime-locally)
 - [Testing](#testing)
-- [Validating CHIME](#validating-vinyldns)
+- [Validating CHIME](#validating-chime)
 
 ## Developer Requirements
 (List out requirements. We should allow for all platforms (MacOS/Windows/Linux)
