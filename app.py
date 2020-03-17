@@ -1,10 +1,9 @@
+from functools import reduce
+from typing import Tuple, Dict, Any
 import pandas as pd
 import streamlit as st
 import numpy as np
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import altair as alt
 
 hide_menu_style = """
         <style>
@@ -70,6 +69,21 @@ total_infections = initial_infections / detection_prob
 
 
 
+S, I, R = S, initial_infections / detection_prob, 0
+
+intrinsic_growth_rate = 2 ** (1 / doubling_time) - 1
+
+recovery_days = 14.0
+# mean recovery rate, gamma, (in 1/days).
+gamma = 1 / recovery_days
+
+# Contact rate, beta
+beta = (
+    intrinsic_growth_rate + gamma
+) / S  # {rate based on doubling time} / {initial S}
+
+r_naught = beta / gamma * S
+
 st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.markdown(
     """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
@@ -108,18 +122,48 @@ To do this, we use a combination of estimates from other locations, informed est
 
 
 ### Parameters
-First, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
 
-- The $\\gamma$ parameter represents 1 over the mean recovery time in days. Since the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/14$.
-- Next, the AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
-"""
+The model's parameters, $\\beta$ and $\\gamma$, determine the virulence of the epidemic.  
+
+$$\\beta$$ can be interpreted as the _effective contact rate_:
+""")
+    st.latex("\\beta = \\tau \\times c")
+
+    st.markdown(
+"""which is the transmissibility ($\\tau$) multiplied by the average number of people exposed ($$c$$).  The transmissibility is the basic virulence of the pathogen.  The number of people exposed $c$ is the parameter that can be changed through social distancing.
+
+
+$\\gamma$ is the inverse of the mean recovery time, in days.  I.e.: if $\\gamma = 1/{recovery_days}$, then the average infection will clear in {recovery_days} days. 
+
+An important descriptive parameter is the _basic reproduction number_, or $R_0$.  This represents the average number of people who will be infected by any given infected person.  When $R_0$ is greater than 1, it means that a disease will grow.  Higher $R_0$'s imply more rapid growth.  It is defined as """.format(recovery_days=int(recovery_days)    , c='c'))
+    st.latex("R_0 = \\beta /\\gamma")
+
+    st.markdown("""
+
+R0 gets bigger when
+
+- there are more contacts between people
+- when the pathogen is more virulent
+- when people have the pathogen for longer periods of time
+
+A doubling time of {doubling_time} days and a recovery time of {recovery_days} days -- imply an $R_0$ of {r_naught:.2f}.
+
+To use the model, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
+
+- $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/{recovery_days}$. 
+- To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
+""".format(doubling_time=doubling_time,
+    recovery_days=recovery_days,
+    r_naught=r_naught
+    )
     )
     st.latex("g = 2^{1/T_d} - 1")
 
     st.markdown(
         """
 - Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$, $\\beta$ becomes a function of the initial population size of susceptible individuals.
-$$\\beta = (g + \\gamma)/s$$
+$$\\beta = (g + \\gamma)$$.
+
 
 ### Initial Conditions
 
@@ -171,22 +215,6 @@ def sim_sir(S, I, R, beta, gamma, n_days, beta_decay=None):
     return s, i, r
 
 
-## RUN THE MODEL
-
-S, I, R = S, initial_infections / detection_prob, 0
-
-intrinsic_growth_rate = 2 ** (1 / doubling_time) - 1
-
-recovery_days = 14.0
-# mean recovery rate, gamma, (in 1/days).
-gamma = 1 / recovery_days
-
-# Contact rate, beta
-beta = (
-    intrinsic_growth_rate + gamma
-) / S  # {rate based on doubling time} / {initial S}
-
-
 n_days = st.slider("Number of days to project", 30, 200, 60, 1, "%i")
 
 beta_decay = 0.0
@@ -213,17 +241,26 @@ projection_admits[projection_admits < 0] = 0
 plot_projection_days = n_days - 10
 projection_admits["day"] = range(projection_admits.shape[0])
 
-fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-ax.plot(
-    projection_admits.head(plot_projection_days)["hosp"], ".-", label="Hospitalized"
-)
-ax.plot(projection_admits.head(plot_projection_days)["icu"], ".-", label="ICU")
-ax.plot(projection_admits.head(plot_projection_days)["vent"], ".-", label="Ventilated")
-ax.legend(loc=0)
-ax.set_xlabel("Days from today")
-ax.grid("on")
-ax.set_ylabel("Daily Admissions")
-st.pyplot()
+
+def new_admissions_chart(projection_admits: pd.DataFrame, plot_projection_days: int) -> alt.Chart:
+    """docstring"""
+    projection_admits = projection_admits.rename(columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"})
+    return (
+        alt
+        .Chart(projection_admits.head(plot_projection_days))
+        .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
+        .mark_line(point=True)
+        .encode(
+            x=alt.X("day", title="Days from today"),
+            y=alt.Y("value:Q", title="Daily admissions"),
+            color="key:N",
+            tooltip=["day", "key:N"]
+        )
+        .interactive()
+    )
+
+st.altair_chart(new_admissions_chart(projection_admits, plot_projection_days), use_container_width=True)
+
 
 admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
 admits_table["day"] = admits_table.index
@@ -246,22 +283,14 @@ los_dict = {
     "vent": vent_los,
 }
 
-fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-
-census_dict = {}
+census_dict = dict()
 for k, los in los_dict.items():
     census = (
         projection_admits.cumsum().iloc[:-los, :]
         - projection_admits.cumsum().shift(los).fillna(0)
     ).apply(np.ceil)
     census_dict[k] = census[k]
-    ax.plot(census.head(plot_projection_days)[k], ".-", label=k + " census")
-    ax.legend(loc=0)
 
-ax.set_xlabel("Days from today")
-ax.grid("on")
-ax.set_ylabel("Census")
-st.pyplot()
 
 census_df = pd.DataFrame(census_dict)
 census_df["day"] = census_df.index
@@ -271,6 +300,26 @@ census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
 census_table.index = range(census_table.shape[0])
 census_table.loc[0, :] = 0
 census_table = census_table.dropna().astype(int)
+
+def admitted_patients_chart(census: pd.DataFrame) -> alt.Chart:
+    """docstring"""
+    census = census.rename(columns={"hosp": "Hospital Census", "icu": "ICU Census", "vent": "Ventilated Census"})
+
+    return (
+        alt
+        .Chart(census)
+        .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
+        .mark_line(point=True)
+        .encode(
+            x=alt.X("day", title="Days from today"),
+            y=alt.Y("value:Q", title="Census"),
+            color="key:N",
+            tooltip=["day", "key:N"]
+        )
+        .interactive()
+    )
+
+st.altair_chart(admitted_patients_chart(census_table), use_container_width=True)
 
 if st.checkbox("Show Projected Census in tabular form"):
     st.dataframe(census_table)
@@ -282,15 +331,26 @@ if st.checkbox("Show Additional Projections"):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
-    fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-    ax.plot(i, label="Infected")
-    ax.plot(r, label="Recovered")
-    ax.legend(loc=0)
-    ax.set_xlabel("days from today")
-    ax.set_ylabel("Case Volume")
-    ax.grid("on")
-    st.pyplot()
 
+    def additional_projections_chart(i: np.ndarray, r: np.ndarray) -> alt.Chart:
+        dat = pd.DataFrame({"Infected": i, "Recovered": r})
+
+        return (
+            alt
+            .Chart(dat.reset_index())
+            .transform_fold(fold=["Infected", "Recovered"])
+            .mark_line()
+            .encode(
+                x=alt.X("index", title="Days from today"),
+                y=alt.Y("value:Q", title="Case Volume"),
+                tooltip=["key:N", "value:Q"],
+                color="key:N"
+            )
+            .interactive()
+        )
+
+    st.altair_chart(additional_projections_chart(i, r), use_container_width=True)
+   
     # Show data
     days = np.array(range(0, n_days + 1))
     data_list = [days, s, i, r]
