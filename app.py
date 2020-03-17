@@ -60,8 +60,10 @@ detection_prob = initial_infections / total_infections
 
 st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.markdown(
-    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).*"""
-)
+    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
+Penn Medicine. For questions and comments please see our
+[contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/pennsignals/chime). 
+Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*""")
 
 st.markdown(
     """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}** 
