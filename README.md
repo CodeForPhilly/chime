@@ -21,8 +21,9 @@ streamlit run app.py
 
 ### With `conda` 
 ```bash
-conda create -f environment.yml
+conda env create -f environment.yml
 source activate chime
+pip install streamlit
 streamlit run app.py
 ```
 
