@@ -1,4 +1,4 @@
 streamlit
 pandas
 numpy
-matplotlib
+altair

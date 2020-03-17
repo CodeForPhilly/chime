@@ -1,10 +1,9 @@
+from functools import reduce
+from typing import Tuple, Dict, Any
 import pandas as pd
 import streamlit as st
 import numpy as np
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import altair as alt
 
 hide_menu_style = """
         <style>
@@ -236,17 +235,26 @@ projection_admits[projection_admits < 0] = 0
 plot_projection_days = n_days - 10
 projection_admits["day"] = range(projection_admits.shape[0])
 
-fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-ax.plot(
-    projection_admits.head(plot_projection_days)["hosp"], ".-", label="Hospitalized"
-)
-ax.plot(projection_admits.head(plot_projection_days)["icu"], ".-", label="ICU")
-ax.plot(projection_admits.head(plot_projection_days)["vent"], ".-", label="Ventilated")
-ax.legend(loc=0)
-ax.set_xlabel("Days from today")
-ax.grid("on")
-ax.set_ylabel("Daily Admissions")
-st.pyplot()
+
+def new_admissions_chart(projection_admits: pd.DataFrame, plot_projection_days: int) -> alt.Chart:
+    """docstring"""
+    projection_admits = projection_admits.rename(columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"})
+    return (
+        alt
+        .Chart(projection_admits.head(plot_projection_days))
+        .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
+        .mark_line(point=True)
+        .encode(
+            x=alt.X("day", title="Days from today"),
+            y=alt.Y("value:Q", title="Daily admissions"),
+            color="key:N",
+            tooltip=["day", "key:N"]
+        )
+        .interactive()
+    )
+
+st.altair_chart(new_admissions_chart(projection_admits, plot_projection_days), use_container_width=True)
+
 
 admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
 admits_table["day"] = admits_table.index
@@ -269,22 +277,14 @@ los_dict = {
     "vent": vent_los,
 }
 
-fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-
-census_dict = {}
+census_dict = dict()
 for k, los in los_dict.items():
     census = (
         projection_admits.cumsum().iloc[:-los, :]
         - projection_admits.cumsum().shift(los).fillna(0)
     ).apply(np.ceil)
     census_dict[k] = census[k]
-    ax.plot(census.head(plot_projection_days)[k], ".-", label=k + " census")
-    ax.legend(loc=0)
 
-ax.set_xlabel("Days from today")
-ax.grid("on")
-ax.set_ylabel("Census")
-st.pyplot()
 
 census_df = pd.DataFrame(census_dict)
 census_df["day"] = census_df.index
@@ -294,6 +294,26 @@ census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
 census_table.index = range(census_table.shape[0])
 census_table.loc[0, :] = 0
 census_table = census_table.dropna().astype(int)
+
+def admitted_patients_chart(census: pd.DataFrame) -> alt.Chart:
+    """docstring"""
+    census = census.rename(columns={"hosp": "Hospital Census", "icu": "ICU Census", "vent": "Ventilated Census"})
+
+    return (
+        alt
+        .Chart(census)
+        .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
+        .mark_line(point=True)
+        .encode(
+            x=alt.X("day", title="Days from today"),
+            y=alt.Y("value:Q", title="Census"),
+            color="key:N",
+            tooltip=["day", "key:N"]
+        )
+        .interactive()
+    )
+
+st.altair_chart(admitted_patients_chart(census_table), use_container_width=True)
 
 if st.checkbox("Show Projected Census in tabular form"):
     st.dataframe(census_table)
@@ -305,15 +325,26 @@ if st.checkbox("Show Additional Projections"):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
-    fig, ax = plt.subplots(1, 1, figsize=(10, 4))
-    ax.plot(i, label="Infected")
-    ax.plot(r, label="Recovered")
-    ax.legend(loc=0)
-    ax.set_xlabel("days from today")
-    ax.set_ylabel("Case Volume")
-    ax.grid("on")
-    st.pyplot()
 
+    def additional_projections_chart(i: np.ndarray, r: np.ndarray) -> alt.Chart:
+        dat = pd.DataFrame({"Infected": i, "Recovered": r})
+
+        return (
+            alt
+            .Chart(dat.reset_index())
+            .transform_fold(fold=["Infected", "Recovered"])
+            .mark_line()
+            .encode(
+                x=alt.X("index", title="Days from today"),
+                y=alt.Y("value:Q", title="Case Volume"),
+                tooltip=["key:N", "value:Q"],
+                color="key:N"
+            )
+            .interactive()
+        )
+
+    st.altair_chart(additional_projections_chart(i, r), use_container_width=True)
+   
     # Show data
     days = np.array(range(0, n_days + 1))
     data_list = [days, s, i, r]
