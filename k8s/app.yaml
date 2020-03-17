@@ -1,8 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: chime
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: chime
-  # namespace: chime
+  namespace: chime
   labels:
     app: chime
 spec:
@@ -31,7 +38,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: chime
-  # namespace: chime
+  namespace: chime
   labels:
     app: chime
 spec:
@@ -49,7 +56,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: chime
-  # namespace: chime
+  namespace: chime
   labels:
     app: chime
   annotations:
