@@ -4,7 +4,7 @@
 - Getting Started
   - [Try Online](getting-started/try-online.md)
   - [Run Locally](getting-started/run-locally.md)
-- Contributing
+- [Contributing](CONTRIBUTING.md)
   - Data Analysis
   - Application Development
   - Operations Support
