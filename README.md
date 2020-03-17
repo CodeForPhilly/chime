@@ -27,8 +27,9 @@ streamlit run app.py
 
 ### With `conda`
 ```bash
-conda create -f environment.yml
+conda env create -f environment.yml
 source activate chime
+pip install streamlit
 streamlit run app.py
 ```
 
@@ -45,6 +46,8 @@ You should be able to view the app via `localhost:8000`. If you want to change t
 port (as described above), then you also have to set `PORT` in the `.env` file.
 
 **NOTE** this is just for usage, not for development--- you would have to restart and possibly rebuild the app every time you change the code.
+
+If you'd like to use `docker-compose` for development, please run `docker-compose up --build` every time you make changes. 
 
 ## Deployment
 **Before you push your changes to master make sure that everything works in development mode.**
