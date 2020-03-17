@@ -1,6 +1,7 @@
 # Table of Contents
 
 - [Introduction](README.md)
+- [Glossary](GLOSSARY.md)
 - Contributing
   - Data Analysis
   - Application Development
