@@ -9,7 +9,6 @@ verify_ssl = true
 streamlit = "*"
 pandas = "*"
 numpy = "*"
-matplotlib = "*"
 altair = "*"
 
 [requires]
