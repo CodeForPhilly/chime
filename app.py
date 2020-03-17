@@ -2,7 +2,8 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 hide_menu_style = """
@@ -18,7 +19,7 @@ montgomery = 826075
 bucks = 628341
 philly = 1581000
 S_default = delaware + chester + montgomery + bucks + philly
-known_infections = 31
+known_infections = 53
 
 # Widgets
 initial_infections = st.sidebar.number_input(
@@ -59,7 +60,24 @@ detection_prob = initial_infections / total_infections
 
 st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.markdown(
-    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine. For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).*"""
+    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
+Penn Medicine. For questions and comments please see our
+[contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/pennsignals/chime). 
+Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*""")
+
+st.markdown(
+    """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}** 
+confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for 
+Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**), 
+and Hospital market share (**{Penn_market_share:.0%}**).""".format(
+        total_infections=total_infections,
+        current_hosp=current_hosp,
+        hosp_rate=hosp_rate,
+        S=S,
+        Penn_market_share=Penn_market_share,
+        initial_infections=initial_infections,
+        detection_prob=detection_prob,
+    )
 )
 
 if st.checkbox("Show more info about this tool"):
@@ -104,15 +122,12 @@ $$\\beta = (g + \\gamma)/s$$
   - Chester = {chester}
   - Montgomery = {montgomery}
   - Bucks = {bucks}
-  - Philly = {philly}
-- The initial number of infected will be the total number of confirmed cases in the area ({initial_infections}), divided by some detection probability to account for under testing {detection_prob:.2f}.""".format(
+  - Philly = {philly}""".format(
             delaware=delaware,
             chester=chester,
             montgomery=montgomery,
             bucks=bucks,
             philly=philly,
-            initial_infections=initial_infections,
-            detection_prob=detection_prob,
         )
     )
 
