@@ -29,8 +29,12 @@ initial_infections = st.sidebar.number_input(
     "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 doubling_time = st.sidebar.number_input(
-    "Doubling Time (days)", value=6, step=1, format="%i"
+    "Doubling time before social distancing (days)", value=6, step=1, format="%i"
 )
+relative_contact_rate = st.sidebar.number_input(
+    "Social distancing effectiveness (% of baseline contact)", 0, 100, value=100, step=5, format="%i"
+)/100.0
+
 hosp_rate = (
     st.sidebar.number_input("Hospitalization %(total infections)", 0, 100, value=5, step=1, format="%i")
     / 100.0
@@ -69,7 +73,7 @@ gamma = 1 / recovery_days
 # Contact rate, beta
 beta = (
     intrinsic_growth_rate + gamma
-) / S  # {rate based on doubling time} / {initial S}
+) / S * relative_contact_rate # {rate based on doubling time} / {initial S}
 
 r_naught = beta / gamma * S
 
