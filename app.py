@@ -62,11 +62,8 @@ S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
 )
 
-detection_prob = (st.sidebar.number_input(
-    "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
-)/ 100.0)
-
-total_infections = initial_infections / detection_prob
+total_infections = current_hosp / Penn_market_share / hosp_rate
+detection_prob = initial_infections / total_infections
 
 S, I, R = S, initial_infections / detection_prob, 0
 
