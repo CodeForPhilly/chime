@@ -31,7 +31,8 @@ spec:
         - containerPort: 8000
           name: http
           protocol: TCP
-
+      imagePullSecrets:
+      - name: regcred
 ---
 
 apiVersion: v1
