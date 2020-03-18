@@ -74,23 +74,46 @@ beta = (
 
 r_naught = beta / gamma * S
 
-st.title("COVID-19 Hospital Impact Model for Epidemics")
-st.markdown(
-    """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-Penn Medicine. For questions and comments please see our
-[contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/pennsignals/chime).
-Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*""")
+def head():
+    st.title("COVID-19 Hospital Impact Model for Epidemics")
+    st.markdown(
+        """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
+    Penn Medicine. For questions and comments please see our
+    [contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/pennsignals/chime).
+    Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*""")
 
-st.markdown(
+# i know this is commented out code
+# i'm leaving it in in case we regret deleting it
+#   st.markdown(
+#       """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
+#   confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for
+#   Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
+#   and Hospital market share (**{Penn_market_share:.0%}**).""".format(
+#           total_infections=total_infections,
+#           current_hosp=current_hosp,
+#           hosp_rate=hosp_rate,
+#           S=S,
+#           Penn_market_share=Penn_market_share,
+#           initial_infections=initial_infections,
+#           detection_prob=detection_prob,
+#       )
+#   )
+
+    st.markdown(
     """The **{detection_prob:.0%}** rate of detection and **{initial_infections}** confirmed cases imply a
     total number of cases of **{total_infections:.0f}**.""".format(
         total_infections=total_infections,
         initial_infections=initial_infections,
         detection_prob=detection_prob,
     )
-)
+    )
 
-if st.checkbox("Show more info about this tool"):
+    return None
+
+head()
+
+def show_more_info_about_this_tool():
+    """a lot of streamlit writing to screen."""
     st.subheader(
         "[Discrete-time SIR modeling](https://mathworld.wolfram.com/SIRModel.html) of infections/recovery"
     )
@@ -170,6 +193,10 @@ $$\\beta = (g + \\gamma)$$.
             philly=philly,
         )
     )
+    return None
+
+if st.checkbox("Show more info about this tool"):
+    show_more_info_about_this_tool()
 
 # The SIR model, one time step
 def sir(y, beta, gamma, N):
@@ -252,12 +279,13 @@ def new_admissions_chart(projection_admits: pd.DataFrame, plot_projection_days: 
 st.altair_chart(new_admissions_chart(projection_admits, plot_projection_days), use_container_width=True)
 
 
-admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
-admits_table["day"] = admits_table.index
-admits_table.index = range(admits_table.shape[0])
-admits_table = admits_table.fillna(0).astype(int)
 
 if st.checkbox("Show Projected Admissions in tabular form"):
+    admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
+    admits_table["day"] = admits_table.index
+    admits_table.index = range(admits_table.shape[0])
+    admits_table = admits_table.fillna(0).astype(int)
+
     st.dataframe(admits_table)
 
 st.subheader("Admitted Patients (Census)")
@@ -265,31 +293,36 @@ st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
 )
 
-# ALOS for each category of COVID-19 case (total guesses)
+def _census_table(projection_admits, hosp_los, icu_los, vent_los) -> pd.DataFrame:
+    """ALOS for each category of COVID-19 case (total guesses)"""
 
-los_dict = {
-    "hosp": hosp_los,
-    "icu": icu_los,
-    "vent": vent_los,
-}
+    los_dict = {
+        "hosp": hosp_los,
+        "icu": icu_los,
+        "vent": vent_los,
+    }
 
-census_dict = dict()
-for k, los in los_dict.items():
-    census = (
-        projection_admits.cumsum().iloc[:-los, :]
-        - projection_admits.cumsum().shift(los).fillna(0)
-    ).apply(np.ceil)
-    census_dict[k] = census[k]
+    census_dict = dict()
+    for k, los in los_dict.items():
+        census = (
+            projection_admits.cumsum().iloc[:-los, :]
+            - projection_admits.cumsum().shift(los).fillna(0)
+        ).apply(np.ceil)
+        census_dict[k] = census[k]
 
 
-census_df = pd.DataFrame(census_dict)
-census_df["day"] = census_df.index
-census_df = census_df[["day", "hosp", "icu", "vent"]]
+    census_df = pd.DataFrame(census_dict)
+    census_df["day"] = census_df.index
+    census_df = census_df[["day", "hosp", "icu", "vent"]]
 
-census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
-census_table.index = range(census_table.shape[0])
-census_table.loc[0, :] = 0
-census_table = census_table.dropna().astype(int)
+    census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
+    census_table.index = range(census_table.shape[0])
+    census_table.loc[0, :] = 0
+    census_table = census_table.dropna().astype(int)
+
+    return census_table
+
+census_table = _census_table(projection_admits, hosp_los, icu_los, vent_los)
 
 def admitted_patients_chart(census: pd.DataFrame) -> alt.Chart:
     """docstring"""
@@ -314,48 +347,56 @@ st.altair_chart(admitted_patients_chart(census_table), use_container_width=True)
 if st.checkbox("Show Projected Census in tabular form"):
     st.dataframe(census_table)
 
+def additional_projections_chart(i: np.ndarray, r: np.ndarray) -> alt.Chart:
+    dat = pd.DataFrame({"Infected": i, "Recovered": r})
+
+    return (
+        alt
+        .Chart(dat.reset_index())
+        .transform_fold(fold=["Infected", "Recovered"])
+        .mark_line()
+        .encode(
+            x=alt.X("index", title="Days from today"),
+            y=alt.Y("value:Q", title="Case Volume"),
+            tooltip=["key:N", "value:Q"],
+            color="key:N"
+        )
+        .interactive()
+    )
+
 st.markdown(
     """**Click the checkbox below to view additional data generated by this simulation**"""
 )
-if st.checkbox("Show Additional Projections"):
+
+def show_additional_projections():
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
 
-    def additional_projections_chart(i: np.ndarray, r: np.ndarray) -> alt.Chart:
-        dat = pd.DataFrame({"Infected": i, "Recovered": r})
-
-        return (
-            alt
-            .Chart(dat.reset_index())
-            .transform_fold(fold=["Infected", "Recovered"])
-            .mark_line()
-            .encode(
-                x=alt.X("index", title="Days from today"),
-                y=alt.Y("value:Q", title="Case Volume"),
-                tooltip=["key:N", "value:Q"],
-                color="key:N"
-            )
-            .interactive()
-        )
-
     st.altair_chart(additional_projections_chart(i, r), use_container_width=True)
 
-    # Show data
-    days = np.array(range(0, n_days + 1))
-    data_list = [days, s, i, r]
-    data_dict = dict(zip(["day", "susceptible", "infections", "recovered"], data_list))
-    projection_area = pd.DataFrame.from_dict(data_dict)
-    infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
-    infect_table.index = range(infect_table.shape[0])
-
     if st.checkbox("Show Raw SIR Similation Data"):
+        # Show data
+        days = np.array(range(0, n_days + 1))
+        data_list = [days, s, i, r]
+        data_dict = dict(zip(["day", "susceptible", "infections", "recovered"], data_list))
+        projection_area = pd.DataFrame.from_dict(data_dict)
+        infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
+        infect_table.index = range(infect_table.shape[0])
+
         st.dataframe(infect_table)
 
-st.subheader("References & Acknowledgements")
-st.markdown(
-    """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
-* We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
-    """
-)
-st.markdown("© 2020, The Trustees of the University of Pennsylvania")
+
+if st.checkbox("Show Additional Projections"):
+    show_additional_projections()
+   
+def references_acknowledgements():
+    st.subheader("References & Acknowledgements")
+    st.markdown(
+        """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
+    * We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
+        """
+    )
+    st.markdown("© 2020, The Trustees of the University of Pennsylvania")
+
+references_acknowledgements()
