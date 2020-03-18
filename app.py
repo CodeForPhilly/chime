@@ -92,7 +92,7 @@ def head():
     <a href="Penn Medicine - COVID-19 Hospital Impact Model for Epidemics" class="penn-medicine-header__title">Penn Medicine - COVID-19 Hospital Impact Model for Epidemics</a>
 </div>
     """, unsafe_allow_html=True)
-    st.title("COVID-19 Hospital Impact Model for Epidemics")
+    
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine. For questions and comments please see our
