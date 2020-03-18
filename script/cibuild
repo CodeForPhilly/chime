@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# script/cibuild: Build production deployment artifact
+
+set -e
+cd "$(dirname "$0")/.."
+
+
+script/bootstrap
+
+echo
+echo "==> Building and tagging container…"
+docker build -t codeforphilly/chime .

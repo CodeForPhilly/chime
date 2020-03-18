@@ -1,15 +1,13 @@
-FROM python:3.7.7-buster
+FROM python:3.7.7-slim-buster
 
-WORKDIR /app
+COPY .streamlit ~/
 
 COPY ./requirements.txt /app/requirements.txt
 
-RUN pip install -r requirements.txt
+WORKDIR /app
+
+RUN pip install -q -r requirements.txt
 
 COPY . ./
 
-RUN chmod u+x setup.sh && PORT=8000 ./setup.sh
-
-# expanding shell variables in CMD is tricky, see
-# https://stackoverflow.com/questions/23071214/use-environment-variables-in-cmd
-CMD ["streamlit", "run", "--server.port", "8000", "app.py"]
+CMD ["streamlit", "run", "app.py"]

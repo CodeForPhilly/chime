@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# script/bootstrap: Resolve all dependencies that the application requires to
+#                   run.
+
+set -e
+cd "$(dirname "$0")/.."
+
+
+if ! docker-compose ps -q app > /dev/null; then
+    echo "No server running yet, run ./script/server to launch"
+    exit 1
+fi

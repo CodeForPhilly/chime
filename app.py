@@ -25,9 +25,11 @@ known_cases = 4 # update daily
 initial_infections = st.sidebar.number_input(
     "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
-current_hosp = st.sidebar.number_input(
-    "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
-)
+
+detection_prob = (st.sidebar.number_input(
+    "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
+)/ 100.0)
+
 doubling_time = st.sidebar.number_input(
     "Doubling Time (days)", value=6, step=1, format="%i"
 )
@@ -55,8 +57,7 @@ S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
 )
 
-total_infections = current_hosp / Penn_market_share / hosp_rate
-detection_prob = initial_infections / total_infections
+total_infections = initial_infections / detection_prob
 
 S, I, R = S, initial_infections / detection_prob, 0
 
@@ -81,6 +82,7 @@ def head():
     [contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/pennsignals/chime).
     Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*""")
 
+<<<<<<< HEAD
     st.markdown(
         """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
     confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for
@@ -94,6 +96,14 @@ def head():
             initial_infections=initial_infections,
             detection_prob=detection_prob,
         )
+=======
+st.markdown(
+    """The **{detection_prob:.0%}** rate of detection and **{initial_infections}** confirmed cases imply a
+    total number of cases of **{total_infections:.0f}**.""".format(
+        total_infections=total_infections,
+        initial_infections=initial_infections,
+        detection_prob=detection_prob,
+>>>>>>> 55218f24c055dd680f350ab8164a0376da35a03d
     )
     return None
 
