@@ -22,31 +22,36 @@ known_infections = 63 # update daily
 known_cases = 4 # update daily
 
 # Widgets
+current_hosp = st.sidebar.number_input(
+    "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
+)
+
 initial_infections = st.sidebar.number_input(
     "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 
-detection_prob = (st.sidebar.number_input(
-    "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
-)/ 100.0)
-
 doubling_time = st.sidebar.number_input(
-    "Doubling Time (days)", value=6, step=1, format="%i"
+    "Doubling time before social distancing (days)", value=6, step=1, format="%i"
 )
+
+relative_contact_rate = st.sidebar.number_input(
+    "Social distancing (% reduction in social contact)", 0, 100, value=0, step=5, format="%i"
+)/100.0
+
 hosp_rate = (
-    st.sidebar.number_input("Hospitalization %", 0, 100, value=5, step=1, format="%i")
+    st.sidebar.number_input("Hospitalization %(total infections)", 0, 100, value=5, step=1, format="%i")
     / 100.0
 )
 icu_rate = (
-    st.sidebar.number_input("ICU %", 0, 100, value=2, step=1, format="%i") / 100.0
+    st.sidebar.number_input("ICU %(total infections)", 0, 100, value=2, step=1, format="%i") / 100.0
 )
 vent_rate = (
-    st.sidebar.number_input("Ventilated %", 0, 100, value=1, step=1, format="%i")
+    st.sidebar.number_input("Ventilated %(total infections)", 0, 100, value=1, step=1, format="%i")
     / 100.0
 )
-hosp_los = st.sidebar.number_input("Hospital LOS", value=7, step=1, format="%i")
-icu_los = st.sidebar.number_input("ICU LOS", value=9, step=1, format="%i")
-vent_los = st.sidebar.number_input("Vent LOS", value=10, step=1, format="%i")
+hosp_los = st.sidebar.number_input("Hospital Length of Stay", value=7, step=1, format="%i")
+icu_los = st.sidebar.number_input("ICU Length of Stay", value=9, step=1, format="%i")
+vent_los = st.sidebar.number_input("Vent Length of Stay", value=10, step=1, format="%i")
 Penn_market_share = (
     st.sidebar.number_input(
         "Hospital Market Share (%)", 0.0, 100.0, value=15.0, step=1.0, format="%f"
@@ -57,7 +62,8 @@ S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
 )
 
-total_infections = initial_infections / detection_prob
+total_infections = current_hosp / Penn_market_share / hosp_rate
+detection_prob = initial_infections / total_infections
 
 S, I, R = S, initial_infections / detection_prob, 0
 
@@ -70,9 +76,11 @@ gamma = 1 / recovery_days
 # Contact rate, beta
 beta = (
     intrinsic_growth_rate + gamma
-) / S  # {rate based on doubling time} / {initial S}
+) / S * (1-relative_contact_rate) # {rate based on doubling time} / {initial S}
 
-r_naught = beta / gamma * S
+r_t = beta / gamma * S # r_t is r_0 after distancing
+r_naught = r_t / (1-relative_contact_rate)
+doubling_time_t = 1/np.log2(beta*S - gamma +1) # doubling time after distancing
 
 def head():
     st.title("COVID-19 Hospital Impact Model for Epidemics")
@@ -82,29 +90,32 @@ def head():
     [contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/pennsignals/chime).
     Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*""")
 
-# i know this is commented out code
-# i'm leaving it in in case we regret deleting it
-#   st.markdown(
-#       """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
-#   confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for
-#   Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
-#   and Hospital market share (**{Penn_market_share:.0%}**).""".format(
-#           total_infections=total_infections,
-#           current_hosp=current_hosp,
-#           hosp_rate=hosp_rate,
-#           S=S,
-#           Penn_market_share=Penn_market_share,
-#           initial_infections=initial_infections,
-#           detection_prob=detection_prob,
-#       )
-#   )
 
     st.markdown(
-    """The **{detection_prob:.0%}** rate of detection and **{initial_infections}** confirmed cases imply a
-    total number of cases of **{total_infections:.0f}**.""".format(
+        """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
+    confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for
+    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
+    and Hospital market share (**{Penn_market_share:.0%}**).
+
+An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
+**{r_naught:.2f}**.
+
+**Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
+outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**.
+""".format(
         total_infections=total_infections,
         initial_infections=initial_infections,
         detection_prob=detection_prob,
+        current_hosp=current_hosp,
+        hosp_rate=hosp_rate,
+        S=S,
+        Penn_market_share=Penn_market_share,
+        recovery_days=recovery_days,
+        r_naught=r_naught,
+        doubling_time=doubling_time,
+        relative_contact_rate=relative_contact_rate,
+        r_t=r_t,
+        doubling_time_t=doubling_time_t
     )
     )
 
@@ -153,22 +164,34 @@ An important descriptive parameter is the _basic reproduction number_, or $R_0$.
 
     st.markdown("""
 
-R0 gets bigger when
+$R_0$ gets bigger when
 
 - there are more contacts between people
 - when the pathogen is more virulent
 - when people have the pathogen for longer periods of time
 
-A doubling time of {doubling_time} days and a recovery time of {recovery_days} days -- imply an $R_0$ of {r_naught:.2f}.
+A doubling time of {doubling_time} days and a recovery time of {recovery_days} days imply an $R_0$ of {r_naught:.2f}.
 
-To use the model, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
+#### Effect of social distancing
+
+After the beginning of the outbreak, actions to reduce social contact will lower the parameter $c$.  If this happens at
+time $t$, then the number of people infected by any given infected person is $R_t$, which will be lower than $R_0$.
+
+A {relative_contact_rate:.0%} reduction in social contact would increase the time it takes for the outbreak to double,
+to {doubling_time_t:.2f} days from {doubling_time:.2f} days, with a $R_t$ of {r_t:.2f}.
+
+#### Using the model
+
+We need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
 
 - $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/{recovery_days}$.
 - To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
 """.format(doubling_time=doubling_time,
-    recovery_days=recovery_days,
-    r_naught=r_naught
-    )
+           recovery_days=recovery_days,
+           r_naught=r_naught,
+           relative_contact_rate=relative_contact_rate,
+           doubling_time_t=doubling_time_t,
+           r_t=r_t)
     )
     st.latex("g = 2^{1/T_d} - 1")
 
@@ -389,14 +412,32 @@ def show_additional_projections():
 
 if st.checkbox("Show Additional Projections"):
     show_additional_projections()
-   
-def references_acknowledgements():
-    st.subheader("References & Acknowledgements")
-    st.markdown(
-        """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
-    * We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
-        """
-    )
-    st.markdown("© 2020, The Trustees of the University of Pennsylvania")
 
-references_acknowledgements()
+
+# Definitions and footer
+
+st.subheader("Guidance on Selecting Inputs")
+st.markdown(
+    """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate the total number of infected individuals in your region.
+* **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This input is used to estimate the detection rate of infected individuals.
+* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association currently projects doubling rates between 7 and 10 days. This is the doubling time you expect under status quo conditions. To account for reduced contact and other public health interventions, modify the _Social distancing_ input.
+* **Social distancing (% reduction in person-to-person physical contact):** This parameter allows users to explore how reduction in interpersonal contact & transmission (hand-washing) might slow the rate of new infections. It is your estimate of how much social contact reduction is being achieved in your region relative to the status quo. While it is unclear how much any given policy might affect social contact (eg. school closures or remote work), this parameter lets you see how projections change with percentage reductions in social contact.
+* **Hospitalization %(total infections):** Percentage of **all** infected cases which will need hospitalization.
+* **ICU %(total infections):** Percentage of **all** infected cases which will need to be treated in an ICU.
+* **Ventilated %(total infections):** Percentage of **all** infected cases which will need mechanical ventilation.
+* **Hospital Length of Stay:** Average number of days of treatment needed for hospitalized COVID-19 patients.
+* **ICU Length of Stay:** Average number of days of ICU treatment needed for ICU COVID-19 patients.
+* **Vent Length of Stay:**  Average number of days of ventilation needed for ventilated COVID-19 patients.
+* **Hospital Market Share (%):** The proportion of patients in the region that are likely to come to your hospital (as opposed to other hospitals in the region) when they get sick. One way to estimate this is to look at all of the hospitals in your region and add up all of the beds. The number of beds at your hospital divided by the total number of beds in the region times 100 will give you a reasonable starting estimate.
+* **Regional Population:** Total population size of the catchment region of your hospital(s).
+    """
+)
+
+
+st.subheader("References & Acknowledgements")
+st.markdown(
+    """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
+* We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
+    """
+)
+st.markdown("© 2020, The Trustees of the University of Pennsylvania")
