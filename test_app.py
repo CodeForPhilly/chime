@@ -1,5 +1,5 @@
 import chime.app
 
-def sample_test():
+def test_sample():
     assert chime.app.S == 4119405
 
