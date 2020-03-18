@@ -49,10 +49,12 @@ streamlit run app.py
 
 ### Application files
 
-- `script/`: Developer workflow scripts following [GitHub's Scripts To Rule Them All](https://github.com/github/scripts-to-rule-them-all) pattern.
 - `app.py`: Main source for the application
+- `test_app.py`: [pytest](https://docs.pytest.org/en/latest/) tests for `app.py`
+- `script/`: Developer workflow scripts following [GitHub's Scripts To Rule Them All](https://github.com/github/scripts-to-rule-them-all) pattern.
 - `.streamlit/`: [Streamlit config options](https://docs.streamlit.io/cli.html)
 - `.env`: Local environment variables to use when running application, this file is copied from `.env.example` to start you out and then ignored by git
+- `pytest.ini`: Configuration for [pytest](https://docs.pytest.org/en/latest/)
 - `Pipfile`
 - `Pipfile.lock`
 - `environment.yml`
@@ -74,7 +76,14 @@ streamlit run app.py
 
 ## Testing
 
-*No testing routine is available yet. If you have thoughts on how to add one, please contribute!*
+The project is set up for testing with [pytest](https://docs.pytest.org/en/latest/), and the GitHub repository is configured to execute `pytest` against all pull requests automatically.
+
+To run tests locally, enter an environment first with `pipenv` or `conda` as indicated above in [Running CHIME Locally](#running-chime-locally), and then run:
+
+```bash
+pip install pytest
+pytest
+```
 
 ## Validating CHIME
 

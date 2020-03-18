@@ -18,7 +18,7 @@ montgomery = 826075
 bucks = 628341
 philly = 1581000
 S_default = delaware + chester + montgomery + bucks + philly
-known_infections = 63 # update daily
+known_infections = 91 # update daily
 known_cases = 4 # update daily
 
 # Widgets
@@ -27,7 +27,7 @@ current_hosp = st.sidebar.number_input(
 )
 
 initial_infections = st.sidebar.number_input(
-    gCurrently Known Regional Infections", value=known_infections, step=10, format="%i"
+    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 
 doubling_time = st.sidebar.number_input(
@@ -62,6 +62,10 @@ S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
 )
 
+initial_infections = st.sidebar.number_input(
+    "Currently Known Regional Infections (only used to compute detection rate - does not change projections)", value=known_infections, step=10, format="%i"
+)
+
 total_infections = current_hosp / Penn_market_share / hosp_rate
 detection_prob = initial_infections / total_infections
 
@@ -83,7 +87,15 @@ r_naught = r_t / (1-relative_contact_rate)
 doubling_time_t = 1/np.log2(beta*S - gamma +1) # doubling time after distancing
 
 def head():
-    st.title("COVID-19 Hospital Impact Model for Epidemics")
+    st.markdown("""
+<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
+
+<div class="penn-medicine-header__content">
+    <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
+        title="Go to the Penn Medicine home page">Penn Medicine</a>
+    <a id="title" class="penn-medicine-header__title">Penn Medicine - COVID-19 Hospital Impact Model for Epidemics</a>
+</div>
+    """, unsafe_allow_html=True)
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine. For questions and comments please see our
@@ -417,8 +429,7 @@ if st.checkbox("Show Additional Projections"):
 
 st.subheader("Guidance on Selecting Inputs")
 st.markdown(
-    """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate the total number of infected individuals in your region.
-* **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This input is used to estimate the detection rate of infected individuals.
+    """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19 **at your hospital(s)**. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate the total number of infected individuals in your region.
 * **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association currently projects doubling rates between 7 and 10 days. This is the doubling time you expect under status quo conditions. To account for reduced contact and other public health interventions, modify the _Social distancing_ input.
 * **Social distancing (% reduction in person-to-person physical contact):** This parameter allows users to explore how reduction in interpersonal contact & transmission (hand-washing) might slow the rate of new infections. It is your estimate of how much social contact reduction is being achieved in your region relative to the status quo. While it is unclear how much any given policy might affect social contact (eg. school closures or remote work), this parameter lets you see how projections change with percentage reductions in social contact.
 * **Hospitalization %(total infections):** Percentage of **all** infected cases which will need hospitalization.
@@ -429,6 +440,7 @@ st.markdown(
 * **Vent Length of Stay:**  Average number of days of ventilation needed for ventilated COVID-19 patients.
 * **Hospital Market Share (%):** The proportion of patients in the region that are likely to come to your hospital (as opposed to other hospitals in the region) when they get sick. One way to estimate this is to look at all of the hospitals in your region and add up all of the beds. The number of beds at your hospital divided by the total number of beds in the region times 100 will give you a reasonable starting estimate.
 * **Regional Population:** Total population size of the catchment region of your hospital(s).
+* **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This is only used to compute detection rate - **it will not change projections**. This input is used to estimate the detection rate of infected individuals.
     """
 )
 
