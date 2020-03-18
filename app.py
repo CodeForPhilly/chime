@@ -32,7 +32,7 @@ doubling_time = st.sidebar.number_input(
     "Doubling time before social distancing (days)", value=6, step=1, format="%i"
 )
 relative_contact_rate = st.sidebar.number_input(
-    "Increase in social distance (% reduction in social contact)", 0, 100, value=0, step=5, format="%i"
+    "Social distancing (% reduction in social contact)", 0, 100, value=0, step=5, format="%i"
 )/100.0
 
 hosp_rate = (
@@ -92,9 +92,11 @@ confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection
 Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**), 
 and Hospital market share (**{Penn_market_share:.0%}**).
 
-An initial doubling time of {doubling_time} days and a recovery time of {recovery_days} days imply an $R_0$ of 
-{r_naught:.2f}.  With a {relative_contact_rate:.0%} reduction in social contact at time $t$ after the onset of the 
-outbreak, $R_t$ becomes {r_t:.2f}, and the doubling time becomes {doubling_time_t:.2f} days.
+An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of 
+**{r_naught:.2f}**.
+
+**Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the 
+outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**.
 """.format(
         total_infections=total_infections,
         current_hosp=current_hosp,
@@ -393,8 +395,8 @@ st.subheader("Guidance on Selecting Inputs")
 st.markdown(
     """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate the total number of infected individuals in your region.
 * **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This input is used to estimate the detection rate of infected individuals. 
-* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association currently projects doubling rates between 7 and 10 days. The doubling time will be higher (slower spread) or lower (faster spread) depending on the amount of social distancing in your region. 
-* **Increase in social distancing:** This parameter allows users to explore how reduction in interpersonal contact might slow the doubling time during the early stages of the outbreak.  Note that we can't say how much any given policy might affect social distance, such as school closures or remote work.
+* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association currently projects doubling rates between 7 and 10 days. This is the doubling time you expect under status quo conditions. To account for reduced contact and other public health interventions, modify the _Social distancing_ input. 
+* **Social distancing (% reduction in person-to-person physical contact):** This parameter allows users to explore how reduction in interpersonal contact & transmission (hand-washing) might slow the rate of new infections. It is your estimate of how much social contact reduction is being achieved in your region relative to the status quo. While it is unclear how much any given policy might affect social contact (eg. school closures or remote work), this parameter lets you see how projections change with to percentage reductions in social contact.
 * **Hospitalization %(total infections):** Percentage of **all** infected cases which will need hospitalization.
 * **ICU %(total infections):** Percentage of **all** infected cases which will need to be treated in an ICU.
 * **Ventilated %(total infections):** Percentage of **all** infected cases which will need mechanical ventilation.
