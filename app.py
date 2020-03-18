@@ -32,14 +32,14 @@ doubling_time = st.sidebar.number_input(
     "Doubling Time (days)", value=6, step=1, format="%i"
 )
 hosp_rate = (
-    st.sidebar.number_input("Hospitalization %", 0, 100, value=5, step=1, format="%i")
+    st.sidebar.number_input("Hospitalization %", 0.0, 100.0, value=5.0, step=1.0, format="%f")
     / 100.0
 )
 icu_rate = (
-    st.sidebar.number_input("ICU %", 0, 100, value=2, step=1, format="%i") / 100.0
+    st.sidebar.number_input("ICU %", 0.0, 100.0, value=2.0, step=1.0, format="%f") / 100.0
 )
 vent_rate = (
-    st.sidebar.number_input("Ventilated %", 0, 100, value=1, step=1, format="%i")
+    st.sidebar.number_input("Ventilated %", 0.0, 100.0, value=1.0, step=1.0, format="%f")
     / 100.0
 )
 hosp_los = st.sidebar.number_input("Hospital LOS", value=7, step=1, format="%i")
