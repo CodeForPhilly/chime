@@ -65,7 +65,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - penn-chime.phl.io
+    # - penn-chime.phl.io
     - lke.penn-chime.phl.io
     secretName: tls-secret
   rules:
