@@ -383,10 +383,12 @@ streamlit run app.py
 <h2 id="project-layout">Project Layout</h2>
 <h3 id="application-files">Application files</h3>
 <ul>
-<li><code>script/</code>: Developer workflow scripts following <a href="https://github.com/github/scripts-to-rule-them-all" target="_blank">GitHub&apos;s Scripts To Rule Them All</a> pattern.</li>
 <li><code>app.py</code>: Main source for the application</li>
+<li><code>test_app.py</code>: <a href="https://docs.pytest.org/en/latest/" target="_blank">pytest</a> tests for <code>app.py</code></li>
+<li><code>script/</code>: Developer workflow scripts following <a href="https://github.com/github/scripts-to-rule-them-all" target="_blank">GitHub&apos;s Scripts To Rule Them All</a> pattern.</li>
 <li><code>.streamlit/</code>: <a href="https://docs.streamlit.io/cli.html" target="_blank">Streamlit config options</a></li>
 <li><code>.env</code>: Local environment variables to use when running application, this file is copied from <code>.env.example</code> to start you out and then ignored by git</li>
+<li><code>pytest.ini</code>: Configuration for <a href="https://docs.pytest.org/en/latest/" target="_blank">pytest</a></li>
 <li><code>Pipfile</code></li>
 <li><code>Pipfile.lock</code></li>
 <li><code>environment.yml</code></li>
@@ -407,7 +409,11 @@ streamlit run app.py
 <li><code>Procfile</code>: Supports running the application on Heroku</li>
 </ul>
 <h2 id="testing">Testing</h2>
-<p><em>No testing routine is available yet. If you have thoughts on how to add one, please contribute!</em></p>
+<p>The project is set up for testing with <a href="https://docs.pytest.org/en/latest/" target="_blank">pytest</a>, and the GitHub repository is configured to execute <code>pytest</code> against all pull requests automatically.</p>
+<p>To run tests locally, enter an environment first with <code>pipenv</code> or <code>conda</code> as indicated above in <a href="#running-chime-locally">Running CHIME Locally</a>, and then run:</p>
+<pre><code class="lang-bash">pip install pytest
+pytest
+</code></pre>
 <h2 id="validating-chime">Validating CHIME</h2>
 <p><em>No validation routine is available yet. If you have thoughts on how to add one, please contribute!</em></p>
 
@@ -453,7 +459,7 @@ streamlit run app.py
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Application Development","level":"1.3.1","depth":2,"next":{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},"previous":{"title":"Contributing","level":"1.3","depth":1,"path":"CONTRIBUTING.md","ref":"CONTRIBUTING.md","articles":[{"title":"Application Development","level":"1.3.1","depth":2,"path":"contributing/app-dev.md","ref":"contributing/app-dev.md","articles":[]},{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},{"title":"Operations Support","level":"1.3.3","depth":2,"path":"contributing/operations-support.md","ref":"contributing/operations-support.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"contributing/app-dev.md","mtime":"2020-03-18T04:48:37.401Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-18T04:48:44.327Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Application Development","level":"1.3.1","depth":2,"next":{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},"previous":{"title":"Contributing","level":"1.3","depth":1,"path":"CONTRIBUTING.md","ref":"CONTRIBUTING.md","articles":[{"title":"Application Development","level":"1.3.1","depth":2,"path":"contributing/app-dev.md","ref":"contributing/app-dev.md","articles":[]},{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},{"title":"Operations Support","level":"1.3.3","depth":2,"path":"contributing/operations-support.md","ref":"contributing/operations-support.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"contributing/app-dev.md","mtime":"2020-03-18T18:10:39.313Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-18T18:10:45.774Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
