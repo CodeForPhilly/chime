@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>The chime-live Cluster · GitBook</title>
+        <title>Deploy to Heroku · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -57,8 +57,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="heroku.html" />
+    <link rel="next" href="byok8s.html" />
     
+    
+    <link rel="prev" href="chime-live-cluster.html" />
     
 
     </head>
@@ -217,7 +219,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="1.4.1" data-path="chime-live-cluster.html">
+        <li class="chapter " data-level="1.4.1" data-path="chime-live-cluster.html">
             
                 <a href="chime-live-cluster.html">
             
@@ -230,7 +232,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.2" data-path="heroku.html">
+        <li class="chapter active" data-level="1.4.2" data-path="heroku.html">
             
                 <a href="heroku.html">
             
@@ -330,7 +332,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >The chime-live Cluster</a>
+        <a href=".." >Deploy to Heroku</a>
     </h1>
 </div>
 
@@ -345,33 +347,8 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="operations-the-chime-live-cluster">Operations: The <code>chime-live</code> Cluster</h1>
-<h2 id="connecting-with-kubectl">Connecting with <code>kubectl</code></h2>
-<ol>
-<li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/" target="_blank">Install kubectl</a></li>
-<li><a href="https://krew.sigs.k8s.io/docs/user-guide/setup/install/" target="_blank">Install Krew</a>:</li>
-<li><p><a href="https://github.com/corneliusweig/konfig#via-krew" target="_blank">Install konfig</a>:</p>
-<pre><code class="lang-bash"> kubectl krew install konfig
-</code></pre>
-</li>
-<li><p>Obtain <code>chime-live-kubeconfig.yaml</code> file from Code for Philly ops team</p>
-<ul>
-<li>This file contains connection details and credentials for managing the cluster, treat its contents as top-secret!</li>
-</ul>
-</li>
-<li><p>Merge <code>chime-live-kubeconfig.yaml</code> into your local configuration:</p>
-<pre><code class="lang-bash"> kubectl konfig import --save ~/Downloads/chime-live-kubeconfig.yaml
-</code></pre>
-</li>
-<li><p>Switch to <code>lke_chime-live</code> context:</p>
-<pre><code class="lang-bash"> kubectl config use-context lke_chime-live
-</code></pre>
-</li>
-<li><p>Verify connection:</p>
-<pre><code class="lang-bash"> kubectl get pod --all-namespaces
-</code></pre>
-</li>
-</ol>
+                                <h1 id="operations-deploy-to-heroku">Operations: Deploy to Heroku</h1>
+<p>The Heroku instance at <a href="https://pennchime.herokuapp.com/" target="_blank"><code>pennchime.herokuapp.com</code></a> will be automatically redeployed when changes are merged into the <code>master</code> branch off <a href="https://github.com/pennsignals/chime" target="_blank">the <code>pennsignal/chime</code> repository</a>.</p>
 
                                 
                                 </section>
@@ -399,8 +376,12 @@
 
             
                 
+                <a href="chime-live-cluster.html" class="navigation navigation-prev " aria-label="Previous page: The chime-live Cluster">
+                    <i class="fa fa-angle-left"></i>
+                </a>
                 
-                <a href="heroku.html" class="navigation navigation-next navigation-unique" aria-label="Next page: Deploy to Heroku">
+                
+                <a href="byok8s.html" class="navigation navigation-next " aria-label="Next page: Deploy to Your Own Cluster">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -411,7 +392,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"The chime-live Cluster","level":"1.4.1","depth":2,"next":{"title":"Deploy to Heroku","level":"1.4.2","depth":2,"path":"operations/heroku.md","ref":"./operations/heroku.md","articles":[]},"previous":{"title":"Operations","level":"1.4","depth":1,"ref":"","articles":[{"title":"The chime-live Cluster","level":"1.4.1","depth":2,"path":"operations/chime-live-cluster.md","ref":"./operations/chime-live-cluster.md","articles":[]},{"title":"Deploy to Heroku","level":"1.4.2","depth":2,"path":"operations/heroku.md","ref":"./operations/heroku.md","articles":[]},{"title":"Deploy to Your Own Cluster","level":"1.4.3","depth":2,"path":"operations/byok8s.md","ref":"./operations/byok8s.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"operations/chime-live-cluster.md","mtime":"2020-03-18T00:06:20.336Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-18T00:06:26.732Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Deploy to Heroku","level":"1.4.2","depth":2,"next":{"title":"Deploy to Your Own Cluster","level":"1.4.3","depth":2,"path":"operations/byok8s.md","ref":"./operations/byok8s.md","articles":[]},"previous":{"title":"The chime-live Cluster","level":"1.4.1","depth":2,"path":"operations/chime-live-cluster.md","ref":"./operations/chime-live-cluster.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"operations/heroku.md","mtime":"2020-03-18T00:06:20.336Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-18T00:06:26.732Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
