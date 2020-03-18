@@ -27,7 +27,7 @@ current_hosp = st.sidebar.number_input(
 )
 
 initial_infections = st.sidebar.number_input(
-    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
+    gCurrently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 
 doubling_time = st.sidebar.number_input(
