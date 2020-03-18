@@ -1,26 +1,21 @@
 from functools import reduce
-from typing import Tuple, Dict, Any
+from typing import Any, Dict, Tuple
+
+import altair as alt
+import numpy as np
 import pandas as pd
 import streamlit as st
-import numpy as np
-import altair as alt
 
 from chime.models import get_hospitalizations, sim_sir
-from chime.presentation import (
-    hide_menu_style,
-    display_header,
-    show_more_info_about_this_tool,
-    new_admissions_chart,
-    draw_projected_admissions_table,
-    admitted_patients_chart,
-    additional_projections_chart,
-    show_additional_projections,
-    draw_raw_sir_simulation_table,
-    write_definitions,
-    write_footer
-)
+from chime.presentation import (additional_projections_chart,
+                                admitted_patients_chart, display_header,
+                                draw_projected_admissions_table,
+                                draw_raw_sir_simulation_table, hide_menu_style,
+                                new_admissions_chart,
+                                show_additional_projections,
+                                show_more_info_about_this_tool,
+                                write_definitions, write_footer)
 from chime.utils import build_admissions_df, build_census_df
-
 
 # Constants
 delaware = 564696
