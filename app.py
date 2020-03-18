@@ -98,22 +98,26 @@ def head():
     Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
     and Hospital market share (**{Penn_market_share:.0%}**).
 
-    An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
-    **{r_naught:.2f}**.
+An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
+**{r_naught:.2f}**.
 
-    **Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
-    outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**.
-    """.format(
-            total_infections=total_infections,
-            initial_infections=initial_infections,
-            detection_prob=detection_prob,
-            recovery_days=recovery_days,
-            r_naught=r_naught,
-            doubling_time=doubling_time,
-            relative_contact_rate=relative_contact_rate,
-            r_t=r_t,
-            doubling_time_t=doubling_time_t
-        )
+**Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
+outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**.
+""".format(
+        total_infections=total_infections,
+        initial_infections=initial_infections,
+        detection_prob=detection_prob,
+        current_hosp=current_hosp,
+        hosp_rate=hosp_rate,
+        S=S,
+        Penn_market_share=Penn_market_share,
+        recovery_days=recovery_days,
+        r_naught=r_naught,
+        doubling_time=doubling_time,
+        relative_contact_rate=relative_contact_rate,
+        r_t=r_t,
+        doubling_time_t=doubling_time_t
+    )
     )
 
     return None
