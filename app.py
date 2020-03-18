@@ -82,29 +82,32 @@ def head():
     [contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/pennsignals/chime).
     Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*""")
 
-<<<<<<< HEAD
+# i know this is commented out code
+# i'm leaving it in in case we regret deleting it
+#   st.markdown(
+#       """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
+#   confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for
+#   Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
+#   and Hospital market share (**{Penn_market_share:.0%}**).""".format(
+#           total_infections=total_infections,
+#           current_hosp=current_hosp,
+#           hosp_rate=hosp_rate,
+#           S=S,
+#           Penn_market_share=Penn_market_share,
+#           initial_infections=initial_infections,
+#           detection_prob=detection_prob,
+#       )
+#   )
+
     st.markdown(
-        """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
-    confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for
-    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
-    and Hospital market share (**{Penn_market_share:.0%}**).""".format(
-            total_infections=total_infections,
-            current_hosp=current_hosp,
-            hosp_rate=hosp_rate,
-            S=S,
-            Penn_market_share=Penn_market_share,
-            initial_infections=initial_infections,
-            detection_prob=detection_prob,
-        )
-=======
-st.markdown(
     """The **{detection_prob:.0%}** rate of detection and **{initial_infections}** confirmed cases imply a
     total number of cases of **{total_infections:.0f}**.""".format(
         total_infections=total_infections,
         initial_infections=initial_infections,
         detection_prob=detection_prob,
->>>>>>> 55218f24c055dd680f350ab8164a0376da35a03d
     )
+    )
+
     return None
 
 head()
