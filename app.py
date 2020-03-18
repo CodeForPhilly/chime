@@ -83,7 +83,16 @@ r_naught = r_t / (1-relative_contact_rate)
 doubling_time_t = 1/np.log2(beta*S - gamma +1) # doubling time after distancing
 
 def head():
-    st.title("COVID-19 Hospital Impact Model for Epidemics")
+    st.markdown("""
+<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
+
+<div class="penn-medicine-header__content">
+    <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
+        title="Go to the Penn Medicine home page">Penn Medicine</a>
+    <a href="Penn Medicine - COVID-19 Hospital Impact Model for Epidemics" class="penn-medicine-header__title">Penn Medicine - COVID-19 Hospital Impact Model for Epidemics</a>
+</div>
+    """, unsafe_allow_html=True)
+    
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine. For questions and comments please see our
