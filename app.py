@@ -22,20 +22,18 @@ known_infections = 63 # update daily
 known_cases = 4 # update daily
 
 # Widgets
+current_hosp = st.sidebar.number_input(
+    "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
+)
+
 initial_infections = st.sidebar.number_input(
     "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 
-detection_prob = (st.sidebar.number_input(
-    "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
-)/ 100.0)
-
-current_hosp = st.sidebar.number_input(
-    "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
-)
 doubling_time = st.sidebar.number_input(
     "Doubling time before social distancing (days)", value=6, step=1, format="%i"
 )
+
 relative_contact_rate = st.sidebar.number_input(
     "Social distancing (% reduction in social contact)", 0, 100, value=0, step=5, format="%i"
 )/100.0
@@ -63,6 +61,10 @@ Penn_market_share = (
 S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
 )
+
+detection_prob = (st.sidebar.number_input(
+    "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
+)/ 100.0)
 
 total_infections = initial_infections / detection_prob
 
