@@ -255,6 +255,7 @@ st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals
 projection_admits = projection.iloc[:-1, :] - projection.shift(1)
 projection_admits[projection_admits < 0] = 0
 
+
 plot_projection_days = n_days - 10
 projection_admits["day"] = range(projection_admits.shape[0])
 
@@ -293,7 +294,7 @@ st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
 )
 
-def _census_table(projection_admits, hosp_los, icu_los, vent_los) -> pd.DataFrame:
+def _census_df(projection_admits, hosp_los, icu_los, vent_los) -> pd.DataFrame:
     """ALOS for each category of COVID-19 case (total guesses)"""
 
     los_dict = {
@@ -314,23 +315,16 @@ def _census_table(projection_admits, hosp_los, icu_los, vent_los) -> pd.DataFram
     census_df = pd.DataFrame(census_dict)
     census_df["day"] = census_df.index
     census_df = census_df[["day", "hosp", "icu", "vent"]]
+    return census_df
 
-    census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
-    census_table.index = range(census_table.shape[0])
-    census_table.loc[0, :] = 0
-    census_table = census_table.dropna().astype(int)
-
-    return census_table
-
-census_table = _census_table(projection_admits, hosp_los, icu_los, vent_los)
+census_df = _census_df(projection_admits, hosp_los, icu_los, vent_los)
 
 def admitted_patients_chart(census: pd.DataFrame) -> alt.Chart:
     """docstring"""
     census = census.rename(columns={"hosp": "Hospital Census", "icu": "ICU Census", "vent": "Ventilated Census"})
-
     return (
         alt
-        .Chart(census)
+        .Chart(census.head(plot_projection_days))
         .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
         .mark_line(point=True)
         .encode(
@@ -342,9 +336,14 @@ def admitted_patients_chart(census: pd.DataFrame) -> alt.Chart:
         .interactive()
     )
 
-st.altair_chart(admitted_patients_chart(census_table), use_container_width=True)
+st.altair_chart(admitted_patients_chart(census_df), use_container_width=True)
 
 if st.checkbox("Show Projected Census in tabular form"):
+    census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
+    census_table.index = range(census_table.shape[0])
+    census_table.loc[0, :] = 0
+    census_table = census_table.dropna().astype(int)
+
     st.dataframe(census_table)
 
 def additional_projections_chart(i: np.ndarray, r: np.ndarray) -> alt.Chart:
