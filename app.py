@@ -32,7 +32,7 @@ doubling_time = st.sidebar.number_input(
     "Doubling time before social distancing (days)", value=6, step=1, format="%i"
 )
 relative_contact_rate = st.sidebar.number_input(
-    "Social distancing effectiveness (% of baseline contact)", 0, 100, value=100, step=5, format="%i"
+    "Increase in social distance (% reduction in social contact)", 0, 100, value=0, step=5, format="%i"
 )/100.0
 
 hosp_rate = (
@@ -73,9 +73,11 @@ gamma = 1 / recovery_days
 # Contact rate, beta
 beta = (
     intrinsic_growth_rate + gamma
-) / S * relative_contact_rate # {rate based on doubling time} / {initial S}
+) / S * (1-relative_contact_rate) # {rate based on doubling time} / {initial S}
 
-r_naught = beta / gamma * S
+r_t = beta / gamma * S # r_t is r_0 after distancing
+r_naught = r_t / (1-relative_contact_rate)
+doubling_time_t = 1/np.log2(beta*S - gamma +1) # doubling time after distancing
 
 st.title("COVID-19 Hospital Impact Model for Epidemics")
 st.markdown(
@@ -90,7 +92,9 @@ confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection
 Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**), 
 and Hospital market share (**{Penn_market_share:.0%}**).
 
-A doubling time of {doubling_time} days and a recovery time of {recovery_days} days imply an $R_0$ of {r_naught:.2f}.
+An initial doubling time of {doubling_time} days and a recovery time of {recovery_days} days imply an $R_0$ of 
+{r_naught:.2f}.  With a {relative_contact_rate:.0%} reduction in social contact at time $t$ after the onset of the 
+outbreak, $R_t$ becomes {r_t:.2f}, and the doubling time becomes {doubling_time_t:.2f} days.
 """.format(
         total_infections=total_infections,
         current_hosp=current_hosp,
@@ -101,9 +105,13 @@ A doubling time of {doubling_time} days and a recovery time of {recovery_days} d
         detection_prob=detection_prob,
         recovery_days=recovery_days,
         r_naught=r_naught,
-        doubling_time=doubling_time
+        doubling_time=doubling_time,
+        relative_contact_rate=relative_contact_rate,
+        r_t=r_t,
+        doubling_time_t=doubling_time_t
     )
 )
+
 
 
 
@@ -147,7 +155,7 @@ An important descriptive parameter is the _basic reproduction number_, or $R_0$.
 
     st.markdown("""
 
-R0 gets bigger when
+$R_0$ gets bigger when
 
 - there are more contacts between people
 - when the pathogen is more virulent
@@ -155,14 +163,26 @@ R0 gets bigger when
 
 A doubling time of {doubling_time} days and a recovery time of {recovery_days} days imply an $R_0$ of {r_naught:.2f}.
 
-To use the model, we need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
+#### Effect of social distancing
+
+After the beginning of the outbreak, actions to reduce social contact will lower the parameter $c$.  If this happens at 
+time $t$, then the number of people infected by any given infected person is $R_t$, which will be lower than $R_0$.  
+
+A {relative_contact_rate:.0%} reduction in social contact would increase the time it takes for the outbreak to double, 
+to {doubling_time_t:.2f} days from {doubling_time:.2f} days, with a $R_t$ of {r_t:.2f}.
+
+#### Using the model
+
+We need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
 
 - $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/{recovery_days}$.
 - To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
 """.format(doubling_time=doubling_time,
-    recovery_days=recovery_days,
-    r_naught=r_naught
-    )
+           recovery_days=recovery_days,
+           r_naught=r_naught,
+           relative_contact_rate=relative_contact_rate,
+           doubling_time_t=doubling_time_t,
+           r_t=r_t)
     )
     st.latex("g = 2^{1/T_d} - 1")
 
@@ -374,6 +394,7 @@ st.markdown(
     """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate the total number of infected individuals in your region.
 * **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This input is used to estimate the detection rate of infected individuals. 
 * **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association currently projects doubling rates between 7 and 10 days. The doubling time will be higher (slower spread) or lower (faster spread) depending on the amount of social distancing in your region. 
+* **Increase in social distancing:** This parameter allows users to explore how reduction in interpersonal contact might slow the doubling time during the early stages of the outbreak.  Note that we can't say how much any given policy might affect social distance, such as school closures or remote work.
 * **Hospitalization %(total infections):** Percentage of **all** infected cases which will need hospitalization.
 * **ICU %(total infections):** Percentage of **all** infected cases which will need to be treated in an ICU.
 * **Ventilated %(total infections):** Percentage of **all** infected cases which will need mechanical ventilation.
