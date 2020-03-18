@@ -23,10 +23,10 @@ known_cases = 4 # update daily
 
 # Widgets
 initial_infections = st.sidebar.number_input(
-    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
+    "Currently Known Regional Infections", min_value=1, value=known_infections, step=10, format="%i"
 )
 current_hosp = st.sidebar.number_input(
-    "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
+    "Currently Hospitalized COVID-19 Patients", min_value=1, value=known_cases, step=1, format="%i"
 )
 doubling_time = st.sidebar.number_input(
     "Doubling Time (days)", value=6, step=1, format="%i"
