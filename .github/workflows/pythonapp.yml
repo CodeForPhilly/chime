@@ -7,8 +7,8 @@ on:
   push:
     branches:
       - master
-      - feature/**
-      - release/**
+      - 'feature/**'
+      - 'release/**'
   pull_request:
     branches:
       - master
