@@ -18,7 +18,7 @@ montgomery = 826075
 bucks = 628341
 philly = 1581000
 S_default = delaware + chester + montgomery + bucks + philly
-known_infections = 63 # update daily
+known_infections = 91 # update daily
 known_cases = 4 # update daily
 
 # Widgets
