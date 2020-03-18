@@ -1,4 +1,5 @@
 streamlit
 pandas
 numpy
+pytest
 altair
