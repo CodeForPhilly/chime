@@ -1,0 +1,6 @@
+[holomapping]
+root = "docs"
+files = [
+    "**",
+    "!.gitignore"
+]

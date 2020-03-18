@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# script/bootstrap: Resolve all dependencies that the application requires to run.
+
+set -e
+cd "$(dirname "$0")/.."
+
+
+echo
+echo "==> Verifying docker and docker-compose…"
+
+if ! [ -x "$(command -v docker)" ]; then
+    echo "Please install docker"
+    exit 1
+fi
+
+if ! [ -x "$(command -v docker-compose)" ]; then
+    echo "Please install docker-compose"
+    exit 1
+fi
+
+if ! docker info > /dev/null 2>&1; then
+    echo "Docker engine is not running, or your user does not have access to connect."
+    echo "Try starting Docker, adding your user to the docker group, or running this command with sudo"
+    exit 1
+fi

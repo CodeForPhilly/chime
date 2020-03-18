@@ -1,0 +1,5 @@
+[hololens]
+package = "holo/lens-gitbook"
+
+[hololens.output]
+merge = "replace"

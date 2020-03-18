@@ -1,3 +1,18 @@
+# Editors
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Environments
 .env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# mypy
 .mypy_cache/
 __pycache__/
