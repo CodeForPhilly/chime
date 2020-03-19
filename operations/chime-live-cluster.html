@@ -388,6 +388,17 @@
 </code></pre>
 </li>
 </ol>
+<h2 id="applying-changes-to-k8s-manifests">Applying Changes to <code>k8s/</code> Manifests</h2>
+<p>After making changes to the manifests in <code>k8s/</code> that you want to apply, first review the diff for what you&apos;re about to change using an editor that wil color-code the output and make it easy to review:</p>
+<pre><code class="lang-bash">kubectl diff -Rf k8s/ | code -
+</code></pre>
+<p><em>Ignore any instances of <code>generation</code> being incremented</em></p>
+<p>Once you&apos;re satisfied with the results of the diff, you can apply a single manifest:</p>
+<pre><code class="lang-bash">kubectl apply <span class="hljs-_">-f</span> k8s/infra/ingress-nginx.yaml
+</code></pre>
+<p>Or the entire directory:</p>
+<pre><code class="lang-bash">kubectl diff -Rf k8s/
+</code></pre>
 
                                 
                                 </section>
@@ -427,7 +438,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"The chime-live Cluster","level":"1.4.1","depth":2,"next":{"title":"Deploy to Heroku","level":"1.4.2","depth":2,"path":"operations/heroku.md","ref":"./operations/heroku.md","articles":[]},"previous":{"title":"Operations","level":"1.4","depth":1,"ref":"","articles":[{"title":"The chime-live Cluster","level":"1.4.1","depth":2,"path":"operations/chime-live-cluster.md","ref":"./operations/chime-live-cluster.md","articles":[]},{"title":"Deploy to Heroku","level":"1.4.2","depth":2,"path":"operations/heroku.md","ref":"./operations/heroku.md","articles":[]},{"title":"Deploy to Your Own Cluster","level":"1.4.3","depth":2,"path":"operations/byok8s.md","ref":"./operations/byok8s.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"operations/chime-live-cluster.md","mtime":"2020-03-18T18:10:39.313Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-18T18:10:45.774Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"The chime-live Cluster","level":"1.4.1","depth":2,"next":{"title":"Deploy to Heroku","level":"1.4.2","depth":2,"path":"operations/heroku.md","ref":"./operations/heroku.md","articles":[]},"previous":{"title":"Operations","level":"1.4","depth":1,"ref":"","articles":[{"title":"The chime-live Cluster","level":"1.4.1","depth":2,"path":"operations/chime-live-cluster.md","ref":"./operations/chime-live-cluster.md","articles":[]},{"title":"Deploy to Heroku","level":"1.4.2","depth":2,"path":"operations/heroku.md","ref":"./operations/heroku.md","articles":[]},{"title":"Deploy to Your Own Cluster","level":"1.4.3","depth":2,"path":"operations/byok8s.md","ref":"./operations/byok8s.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"operations/chime-live-cluster.md","mtime":"2020-03-19T02:02:32.929Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-19T02:02:40.306Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
