@@ -14,3 +14,9 @@ Join our [Code For Philly](https://codeforphilly.org/projects/chime) project or 
 - [Getting Started: Run Locally](https://codeforphilly.github.io/chime/getting-started/run-locally.html)
 - [Contributing: Overview](https://codeforphilly.github.io/chime/CONTRIBUTING.html)
 - [Contributing: Application Development](https://codeforphilly.github.io/chime/contributing/app-dev.html)
+
+## Thanks
+
+- Created by [Predictive Healthcare @ Penn Medicine](http://predictivehealthcare.pennmedicine.org/)
+- Project management provided by [Code for Philly](https://codeforphilly.org/)
+- Production hosting provided by [Linode Kubernetes Engine](https://www.linode.com/products/kubernetes/)
