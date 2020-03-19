@@ -26,9 +26,6 @@ current_hosp = st.sidebar.number_input(
     "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
 )
 
-initial_infections = st.sidebar.number_input(
-    gCurrently Known Regional Infections", value=known_infections, step=10, format="%i"
-)
 
 doubling_time = st.sidebar.number_input(
     "Doubling time before social distancing (days)", value=6, step=1, format="%i"
@@ -60,6 +57,10 @@ Penn_market_share = (
 )
 S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
+)
+
+initial_infections = st.sidebar.number_input(
+    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 
 total_infections = current_hosp / Penn_market_share / hosp_rate
