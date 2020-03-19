@@ -3,7 +3,7 @@ name: Publish GitBook to GH Pages
 on:
   push:
     branches:
-      - 'master'
+      - 'releases/v1'
 
 
 jobs:
