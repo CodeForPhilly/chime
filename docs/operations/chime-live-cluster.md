@@ -67,5 +67,5 @@ kubectl apply -f k8s/infra/ingress-nginx.yaml
 Or the entire directory:
 
 ```bash
-kubectl diff -Rf k8s/
+kubectl apply -Rf k8s/
 ```
