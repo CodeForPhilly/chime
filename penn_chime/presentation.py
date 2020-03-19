@@ -256,7 +256,7 @@ def new_admissions_chart(
     )
 
 
-def admitted_patients_chart(alt, census: pd.DataFrame) -> alt.Chart:
+def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int) -> alt.Chart:
     """docstring"""
     census = census.rename(
         columns={
@@ -267,7 +267,7 @@ def admitted_patients_chart(alt, census: pd.DataFrame) -> alt.Chart:
     )
 
     return (
-        alt.Chart(census)
+        alt.Chart(census.head(plot_projection_days))
         .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
         .mark_line(point=True)
         .encode(
@@ -321,6 +321,15 @@ def draw_projected_admissions_table(st, projection_admits: pd.DataFrame):
     admits_table = admits_table.fillna(0).astype(int)
 
     st.table(admits_table)
+    return None 
+
+def draw_census_table(st, census_df: pd.DataFrame):
+    census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
+    census_table.index = range(census_table.shape[0])
+    census_table.loc[0, :] = 0
+    census_table = census_table.dropna().astype(int)
+
+    st.table(census_table)
     return None
 
 

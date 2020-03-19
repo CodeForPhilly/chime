@@ -15,7 +15,7 @@ def build_admissions_df(n_days, hosp, icu, vent) -> pd.DataFrame:
 
 def build_census_df(projection_admits, hosp_los, icu_los, vent_los) -> pd.DataFrame:
     """ALOS for each category of COVID-19 case (total guesses)"""
-
+    n_days = np.shape(projection_admits)[0]
     los_dict = {
         "hosp": hosp_los,
         "icu": icu_los,
@@ -33,10 +33,5 @@ def build_census_df(projection_admits, hosp_los, icu_los, vent_los) -> pd.DataFr
     census_df = pd.DataFrame(census_dict)
     census_df["day"] = census_df.index
     census_df = census_df[["day", "hosp", "icu", "vent"]]
-
-    census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
-    census_table.index = range(census_table.shape[0])
-    census_table.loc[0, :] = 0
-    census_table = census_table.dropna().astype(int)
-
-    return census_table
+    census_df = census_df.head(n_days)
+    return census_df
