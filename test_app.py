@@ -31,6 +31,7 @@ st = MockStreamlit()
 
 # test presentation
 
+
 def test_penn_logo_in_header():
     penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
     display_header(st, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -45,6 +46,7 @@ def test_the_rest_of_header_shows_up():
         list(filter(lambda s: random_part_of_header in s, st.render_store))
     ), "The whole header should render"
 
+
 st.cleanup()
 
 
@@ -53,7 +55,7 @@ def test_header_fail():
     """
     Just proving to myself that these tests work
     """
-    some_garbage = 'ajskhlaeHFPIQONOI8QH34TRNAOP8ESYAW4'
+    some_garbage = "ajskhlaeHFPIQONOI8QH34TRNAOP8ESYAW4"
     display_header(st, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     assert len(
         list(filter(lambda s: some_garbage in s, st.render_store))
@@ -73,4 +75,3 @@ def test_sir():
         0.20297029702970298,
         0.0049504950495049506,
     ), "This contrived example should work"
-

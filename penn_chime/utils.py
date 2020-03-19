@@ -30,7 +30,6 @@ def build_census_df(projection_admits, hosp_los, icu_los, vent_los) -> pd.DataFr
         ).apply(np.ceil)
         census_dict[k] = census[k]
 
-
     census_df = pd.DataFrame(census_dict)
     census_df["day"] = census_df.index
     census_df = census_df[["day", "hosp", "icu", "vent"]]

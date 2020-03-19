@@ -1,7 +1,6 @@
 from typing import Tuple
 
 import numpy as np
-import pandas as pd
 
 
 # The SIR model, one time step
@@ -22,7 +21,9 @@ def sir(y, beta, gamma, N):
 
 
 # Run the SIR model forward in time
-def sim_sir(S, I, R, beta, gamma, n_days, beta_decay=0) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def sim_sir(
+    S, I, R, beta, gamma, n_days, beta_decay=0
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     N = S + I + R
     s, i, r = [S], [I], [R]
     for day in range(n_days):

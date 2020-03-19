@@ -1,20 +1,21 @@
-from functools import reduce
-from typing import Any, Dict, Tuple
-
 import altair as alt
 import numpy as np
-import pandas as pd
 import streamlit as st
 
 from penn_chime.models import get_hospitalizations, sim_sir
-from penn_chime.presentation import (additional_projections_chart,
-                                admitted_patients_chart, display_header,
-                                draw_projected_admissions_table,
-                                draw_raw_sir_simulation_table, hide_menu_style,
-                                new_admissions_chart,
-                                show_additional_projections,
-                                show_more_info_about_this_tool,
-                                write_definitions, write_footer)
+from penn_chime.presentation import (
+    additional_projections_chart,
+    admitted_patients_chart,
+    display_header,
+    draw_projected_admissions_table,
+    draw_raw_sir_simulation_table,
+    hide_menu_style,
+    new_admissions_chart,
+    show_additional_projections,
+    show_more_info_about_this_tool,
+    write_definitions,
+    write_footer,
+)
 from penn_chime.utils import build_admissions_df, build_census_df
 
 # Constants
@@ -26,8 +27,8 @@ philly = 1581000
 
 # initial values
 S_default = delaware + chester + montgomery + bucks + philly
-known_infections = 91 # update daily
-known_cases = 4 # update daily
+known_infections = 91  # update daily
+known_cases = 4  # update daily
 
 # This is somewhat dangerous:
 # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
@@ -44,9 +45,12 @@ initial_infections = st.sidebar.number_input(
     "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
 )
 
-detection_prob = (st.sidebar.number_input(
-    "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
-)/ 100.0)
+detection_prob = (
+    st.sidebar.number_input(
+        "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
+    )
+    / 100.0
+)
 
 current_hosp = st.sidebar.number_input(
     "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
@@ -56,22 +60,44 @@ doubling_time = st.sidebar.number_input(
     "Doubling time before social distancing (days)", value=6, step=1, format="%i"
 )
 
-relative_contact_rate = st.sidebar.number_input(
-    "Social distancing (% reduction in social contact)", 0, 100, value=0, step=5, format="%i"
-)/100.0
+relative_contact_rate = (
+    st.sidebar.number_input(
+        "Social distancing (% reduction in social contact)",
+        0,
+        100,
+        value=0,
+        step=5,
+        format="%i",
+    )
+    / 100.0
+)
 
 hosp_rate = (
-    st.sidebar.number_input("Hospitalization %(total infections)", 0.0, 100.0, value=5.0, step=1.0, format="%f")
+    st.sidebar.number_input(
+        "Hospitalization %(total infections)",
+        0.0,
+        100.0,
+        value=5.0,
+        step=1.0,
+        format="%f",
+    )
     / 100.0
 )
 icu_rate = (
-    st.sidebar.number_input("ICU %(total infections)", 0.0, 100.0, value=2.0, step=1.0, format="%f") / 100.0
-)
-vent_rate = (
-    st.sidebar.number_input("Ventilated %(total infections)", 0.0, 100.0, value=1.0, step=1.0, format="%f")
+    st.sidebar.number_input(
+        "ICU %(total infections)", 0.0, 100.0, value=2.0, step=1.0, format="%f"
+    )
     / 100.0
 )
-hosp_los = st.sidebar.number_input("Hospital Length of Stay", value=7, step=1, format="%i")
+vent_rate = (
+    st.sidebar.number_input(
+        "Ventilated %(total infections)", 0.0, 100.0, value=1.0, step=1.0, format="%f"
+    )
+    / 100.0
+)
+hosp_los = st.sidebar.number_input(
+    "Hospital Length of Stay", value=7, step=1, format="%i"
+)
 icu_los = st.sidebar.number_input("ICU Length of Stay", value=9, step=1, format="%i")
 vent_los = st.sidebar.number_input("Vent Length of Stay", value=10, step=1, format="%i")
 market_share = (
@@ -110,12 +136,12 @@ gamma = 1 / recovery_days  # mean recovery rate, in 1/days
 
 # Contact rate, beta
 beta = (
-    intrinsic_growth_rate + gamma
-) / S * (1 - relative_contact_rate)  # {rate based on doubling time} / {initial S}
+    (intrinsic_growth_rate + gamma) / S * (1 - relative_contact_rate)
+)  # {rate based on doubling time} / {initial S}
 
 r_t = beta / gamma * S  # r_t is r_0 after distancing
 r_naught = r_t / (1 - relative_contact_rate)
-doubling_time_t = 1 / np.log2(beta * S - gamma +1)  # doubling time after distancing
+doubling_time_t = 1 / np.log2(beta * S - gamma + 1)  # doubling time after distancing
 
 beta_decay = 0.0
 
@@ -170,8 +196,7 @@ census_table = build_census_df(projection_admits, hosp_los, icu_los, vent_los)
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
 st.altair_chart(
-    new_admissions_chart(alt, projection_admits, n_days - 10),
-    use_container_width=True,
+    new_admissions_chart(alt, projection_admits, n_days - 10), use_container_width=True,
 )
 if st.checkbox("Show Projected Admissions in tabular form"):
     draw_projected_admissions_table(st, projection_admits)
@@ -188,6 +213,6 @@ st.markdown(
 if st.checkbox("Show Additional Projections"):
     show_additional_projections(st, alt, additional_projections_chart, i, r)
     if st.checkbox("Show Raw SIR Simulation Data"):
-        draw_raw_sir_simulation_table(st, n_days, s, i , r)
+        draw_raw_sir_simulation_table(st, n_days, s, i, r)
 write_definitions(st)
 write_footer(st)
