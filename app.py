@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from chime.models import get_hospitalizations, sim_sir
-from chime.presentation import (additional_projections_chart,
+from penn_chime.models import get_hospitalizations, sim_sir
+from penn_chime.presentation import (additional_projections_chart,
                                 admitted_patients_chart, display_header,
                                 draw_projected_admissions_table,
                                 draw_raw_sir_simulation_table, hide_menu_style,
@@ -15,7 +15,7 @@ from chime.presentation import (additional_projections_chart,
                                 show_additional_projections,
                                 show_more_info_about_this_tool,
                                 write_definitions, write_footer)
-from chime.utils import build_admissions_df, build_census_df
+from penn_chime.utils import build_admissions_df, build_census_df
 
 # Constants
 delaware = 564696
