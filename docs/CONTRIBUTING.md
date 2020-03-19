@@ -12,10 +12,10 @@ We maintain a list of [issues in the Code for Philly repo](https://github.com/co
 
 ## Change Management
 
-- Base all work on the latest `master` branch available in [Code for Philly's fork of the `chime` repository](https://github.com/CodeForPhilly/chime).
+- Base all work on the latest `develop` branch available in [Code for Philly's fork of the `chime` repository](https://github.com/CodeForPhilly/chime).
 - Submit your work in the form of a pull request against that same branch.
 - Check in on your pull request periodically after you submit it to see if any changes have been requested or any merge conflicts have arisen from other work getting integrated.
-- If a merge conflict arises, please rebase your branch against the latest `master` branch and force-push the new branch as early as you can. You may need to do this more than once before your changes get merged. Do your best to keep your branch in a mergeable state until it is finished being reviewed and accepted.
+- If a merge conflict arises, please rebase your branch against the latest `develop` branch and force-push the new branch as early as you can. You may need to do this more than once before your changes get merged. Do your best to keep your branch in a mergeable state until it is finished being reviewed and accepted.
 
 ## Requesting Functionality
 
