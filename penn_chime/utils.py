@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
+import streamlit as st
 
-
+@st.cache
 def build_admissions_df(n_days, hosp, icu, vent) -> pd.DataFrame:
     days = np.array(range(0, n_days + 1))
     data_dict = dict(zip(["day", "hosp", "icu", "vent"], [days, hosp, icu, vent]))
@@ -12,7 +13,7 @@ def build_admissions_df(n_days, hosp, icu, vent) -> pd.DataFrame:
     projection_admits["day"] = range(projection_admits.shape[0])
     return projection_admits
 
-
+@st.cache
 def build_census_df(projection_admits, hosp_los, icu_los, vent_los) -> pd.DataFrame:
     """ALOS for each category of COVID-19 case (total guesses)"""
     n_days = np.shape(projection_admits)[0]
