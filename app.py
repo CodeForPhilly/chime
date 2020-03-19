@@ -26,7 +26,7 @@ philly = 1581000
 
 # initial values
 S_default = delaware + chester + montgomery + bucks + philly
-known_infections = 63 # update daily
+known_infections = 91 # update daily
 known_cases = 4 # update daily
 
 # This is somewhat dangerous:
@@ -51,22 +51,24 @@ detection_prob = (st.sidebar.number_input(
 current_hosp = st.sidebar.number_input(
     "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
 )
+
 doubling_time = st.sidebar.number_input(
     "Doubling time before social distancing (days)", value=6, step=1, format="%i"
 )
+
 relative_contact_rate = st.sidebar.number_input(
     "Social distancing (% reduction in social contact)", 0, 100, value=0, step=5, format="%i"
 )/100.0
 
 hosp_rate = (
-    st.sidebar.number_input("Hospitalization %(total infections)", 0, 100, value=5, step=1, format="%i")
+    st.sidebar.number_input("Hospitalization %(total infections)", 0.0, 100.0, value=5.0, step=1.0, format="%f")
     / 100.0
 )
 icu_rate = (
-    st.sidebar.number_input("ICU %(total infections)", 0, 100, value=2, step=1, format="%i") / 100.0
+    st.sidebar.number_input("ICU %(total infections)", 0.0, 100.0, value=2.0, step=1.0, format="%f") / 100.0
 )
 vent_rate = (
-    st.sidebar.number_input("Ventilated %(total infections)", 0, 100, value=1, step=1, format="%i")
+    st.sidebar.number_input("Ventilated %(total infections)", 0.0, 100.0, value=1.0, step=1.0, format="%f")
     / 100.0
 )
 hosp_los = st.sidebar.number_input("Hospital Length of Stay", value=7, step=1, format="%i")
@@ -87,7 +89,12 @@ S = st.sidebar.number_input(
 # Now, derive other variable values from the inputs created above
 hospitalization_rates = (hosp_rate, icu_rate, vent_rate)
 
-total_infections = initial_infections / detection_prob
+initial_infections = st.sidebar.number_input(
+    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
+)
+
+total_infections = current_hosp / market_share / hosp_rate
+detection_prob = initial_infections / total_infections
 
 # S := Susceptible, able to be infected
 # I := Infected, currently infected with the virus

@@ -31,7 +31,15 @@ def display_header(
     r_t,
     doubling_time_t,
 ):
-    st.title("COVID-19 Hospital Impact Model for Epidemics")
+    st.markdown("""
+<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
+
+<div class="penn-medicine-header__content">
+    <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
+        title="Go to the Penn Medicine home page">Penn Medicine</a>
+    <a id="title" class="penn-medicine-header__title">Penn Medicine - COVID-19 Hospital Impact Model for Epidemics</a>
+</div>
+    """, unsafe_allow_html=True)
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine. For questions and comments please see our
@@ -227,7 +235,7 @@ def new_admissions_chart(
             x=alt.X("day", title="Days from today"),
             y=alt.Y("value:Q", title="Daily admissions"),
             color="key:N",
-            tooltip=["day", "key:N"],
+            tooltip=["day", alt.Tooltip("value:Q", format='.0f', title="Admissions"), "key:N"]
         )
         .interactive()
     )
@@ -246,7 +254,7 @@ def admitted_patients_chart(alt, census: pd.DataFrame) -> alt.Chart:
             x=alt.X("day", title="Days from today"),
             y=alt.Y("value:Q", title="Census"),
             color="key:N",
-            tooltip=["day", "key:N"]
+            tooltip=["day", alt.Tooltip("value:Q", format='.0f', title="Census"), "key:N"],
         )
         .interactive()
     )
