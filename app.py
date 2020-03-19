@@ -303,7 +303,7 @@ def new_admissions_chart(projection_admits: pd.DataFrame, plot_projection_days: 
             x=alt.X("day", title="Days from today"),
             y=alt.Y("value:Q", title="Daily admissions"),
             color="key:N",
-            tooltip=["day", "key:N"]
+            tooltip=["day", alt.Tooltip("value:Q", format='.0f', title="Admissions"), "key:N"]
         )
         .interactive()
     )
@@ -362,7 +362,7 @@ def admitted_patients_chart(census: pd.DataFrame) -> alt.Chart:
             x=alt.X("day", title="Days from today"),
             y=alt.Y("value:Q", title="Census"),
             color="key:N",
-            tooltip=["day", "key:N"]
+            tooltip=["day", alt.Tooltip("value:Q", format='.0f', title="Census"), "key:N"]
         )
         .interactive()
     )
