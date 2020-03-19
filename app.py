@@ -41,16 +41,6 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 # these functions create input elements and bind the values they are set to
 # to the variables they are set equal to
 # it's kindof like ember or angular if you are familiar with those
-initial_infections = st.sidebar.number_input(
-    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
-)
-
-detection_prob = (
-    st.sidebar.number_input(
-        "Probability of Detection (%)", 0, 100, value=5, step=1, format="%i"
-    )
-    / 100.0
-)
 
 current_hosp = st.sidebar.number_input(
     "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
@@ -109,15 +99,18 @@ market_share = (
 S = st.sidebar.number_input(
     "Regional Population", value=S_default, step=100000, format="%i"
 )
+
+initial_infections = st.sidebar.number_input(
+    "Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
+    value=known_infections,
+    step=10,
+    format="%i",
+)
 # END combination input element creation and data binding
 
 
 # Now, derive other variable values from the inputs created above
 hospitalization_rates = (hosp_rate, icu_rate, vent_rate)
-
-initial_infections = st.sidebar.number_input(
-    "Currently Known Regional Infections", value=known_infections, step=10, format="%i"
-)
 
 total_infections = current_hosp / market_share / hosp_rate
 detection_prob = initial_infections / total_infections
