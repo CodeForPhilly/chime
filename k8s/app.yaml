@@ -63,6 +63,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   tls:
   - hosts:
@@ -95,7 +96,6 @@ metadata:
   labels:
     app: chime
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-buffering: "on"  # Important!
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_cache static-cache;
