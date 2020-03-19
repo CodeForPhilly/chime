@@ -19,6 +19,7 @@ from penn_chime.presentation import (
 )
 from penn_chime.utils import build_admissions_df, build_census_df
 
+# TODO: Pull out constants, ideally this should come from config/env
 # Constants
 delaware = 564696
 chester = 519293
@@ -26,6 +27,7 @@ montgomery = 826075
 bucks = 628341
 philly = 1581000
 
+# TODO: These need to go into key-storage
 # initial values
 S_default = delaware + chester + montgomery + bucks + philly
 known_infections = 91  # update daily
@@ -43,6 +45,7 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 # to the variables they are set equal to
 # it's kindof like ember or angular if you are familiar with those
 
+# TODO: Refactor all the sidebar stuff into a single function/file
 current_hosp = st.sidebar.number_input(
     "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
 )
@@ -116,6 +119,7 @@ hospitalization_rates = (hosp_rate, icu_rate, vent_rate)
 total_infections = current_hosp / market_share / hosp_rate
 detection_prob = initial_infections / total_infections
 
+# TODO: Pull out the rest of this math code into models.py
 # S := Susceptible, able to be infected
 # I := Infected, currently infected with the virus
 # R := Recovered, no longer infected with the virus
