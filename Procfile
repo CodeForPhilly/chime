@@ -1,1 +1,1 @@
-web: streamlit run CHIME.py
+web: streamlit run app.py
