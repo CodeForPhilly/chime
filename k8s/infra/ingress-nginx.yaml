@@ -16,6 +16,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
+data:
+  http-snippet: |
+      proxy_cache_path /tmp/nginx-cache levels=1:2 keys_zone=static-cache:2m max_size=100m inactive=7d use_temp_path=off;
 
 ---
 kind: ConfigMap
@@ -196,7 +199,7 @@ metadata:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
 spec:
-  replicas: 5
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: ingress-nginx
