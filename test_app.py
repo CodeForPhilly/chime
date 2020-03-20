@@ -116,28 +116,30 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=beta_decay)
-    assert round(s[0], 0) == 4119405
-    assert round(i[0], 2) == 533.33
-    assert round(r[0], 0) == 0.0
-    assert round(s[-1], 2) == 3421436.31
-    assert round(i[-1], 2) == 418157.62
-    assert round(r[-1], 2) == 280344.40
+    s,i,r = sim_sir(5, 6, 7, 0.1, 0.1, 40)
+
+    assert round(s[0], 0) == 5
+    assert round(i[0], 2) == 6
+    assert round(r[0], 0) == 7
+    assert round(s[-1], 2) == 0
+    assert round(i[-1], 2) == 0.18
+    assert round(r[-1], 2) == 17.82
 
 
 def test_sim_sir_df():
     """
     Rounding to move fast past decimal place issues
     """
-    df = sim_sir_df(S, I, R, beta, gamma, n_days, beta_decay=beta_decay)
+
+    df = sim_sir_df(5, 6, 7, 0.1, 0.1, 40)
     first = df.iloc[0]
     last = df.iloc[-1]
-    assert round(first[0], 0) == 4119405
-    assert round(first[1], 2) == 533.33
-    assert round(first[2], 0) == 0.0
-    assert round(last[0], 2) == 3421436.31
-    assert round(last[1], 2) == 418157.62
-    assert round(last[2], 2) == 280344.40
+    assert round(first[0], 0) == 5
+    assert round(first[1], 2) == 6
+    assert round(first[2], 0) == 7
+    assert round(last[0], 2) == 0
+    assert round(last[1], 2) == 0.18
+    assert round(last[2], 2) == 17.82
 
 
 #ef test_initial_conditions():
