@@ -392,15 +392,54 @@
 <li><a href="release-process.html">Create a new release</a></li>
 <li>Wait for the <code>Docker</code> GitHub Actions workflow to complete</li>
 <li>Verify the new version shows up at the top as &quot;Latest version&quot; here: <a href="https://github.com/CodeForPhilly/chime/packages/155340" target="_blank">https://github.com/CodeForPhilly/chime/packages/155340</a></li>
-<li><p>Run:</p>
+<li>Open a new issue on GitHub titled &quot;Deploy chime $VERSION&quot; (ex: <a href="https://github.com/CodeForPhilly/chime/issues/98" target="_blank">https://github.com/CodeForPhilly/chime/issues/98</a>)<ul>
+<li>Note the PR in which the release was approved</li>
+<li>Confirm that the tag for the version was created</li>
+</ul>
+</li>
+<li><p>Create a local branch (based on &quot;develop&quot;) to perform deploy time changed on, named &quot;deploy/$VERSION&quot;</p>
 <pre><code class="lang-bash"> VERSION=1.2.3
- kubectl <span class="hljs-built_in">set</span> image --record deployment/chime chime=<span class="hljs-string">&quot;docker.pkg.github.com/codeforphilly/chime/penn-chime:<span class="hljs-variable">${VERSION}</span>&quot;</span>
+ git rev-parse --abbrev-ref HEAD
+ <span class="hljs-comment"># develop</span>
+ git pull
+ git checkout -b deploy/<span class="hljs-variable">$VERSION</span>
+</code></pre>
+</li>
+<li><p>Update the app.yaml manifest file</p>
+<pre><code class="lang-bash"> VERSION=1.2.3
+ sed -Ei <span class="hljs-string">&quot;s/(- image: .*):(.*)/\1:<span class="hljs-variable">$VERSION</span>/&quot;</span> k8s/app.yaml
+ git add -A
+ <span class="hljs-comment"># verify changes are as expected</span>
+ git diff --staged
+ git commit -m <span class="hljs-string">&quot;Deploy chime <span class="hljs-variable">$VERSION</span>&quot;</span>
+</code></pre>
+</li>
+<li><p>Push changes</p>
+<pre><code class="lang-bash"> VERSION=1.2.3
+ git push -u origin deploy/<span class="hljs-variable">$VERSION</span>
+</code></pre>
+</li>
+<li><p>Open PR on GitHub to merge changes back into develop, ideally with
+the review of another DevOps admin whenever possible. Ensure to link
+to the PR in the deployment issue previously opened on GitHub.</p>
+</li>
+<li><p>Run:</p>
+<pre><code class="lang-bash"> kubectl apply <span class="hljs-_">-f</span> k8s/app.yaml
 </code></pre>
 </li>
 <li><p>Watch rollout status:</p>
-<pre><code class="lang-bash"> kubectl rollout status deployment.v1.apps/chime
+<pre><code class="lang-bash">kubectl -n chime rollout status deployment.v1.apps/chime
 </code></pre>
 </li>
+<li><p>Confirm the expected version is running</p>
+<pre><code class="lang-bash">kubectl -n chime get deployment chime -o yaml | grep image:
+<span class="hljs-comment">#  - image: docker.pkg.github.com/codeforphilly/chime/penn-chime:$VERSION</span>
+</code></pre>
+</li>
+<li><p>Paste the output from steps 11 &amp; 12 into the previously opened deployment issue
+to document the successful deployment and close the issue</p>
+</li>
+<li>$$$ PROFIT $$$</li>
 </ol>
 <h2 id="applying-changes-to-k8s-manifests">Applying Changes to <code>k8s/</code> Manifests</h2>
 <p>After making changes to the manifests in <code>k8s/</code> that you want to apply, first review the diff for what you&apos;re about to change using an editor that wil color-code the output and make it easy to review:</p>
@@ -456,7 +495,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"The chime-live Cluster","level":"1.4.2","depth":2,"next":{"title":"Deploy to Heroku","level":"1.4.3","depth":2,"path":"operations/heroku.md","ref":"./operations/heroku.md","articles":[]},"previous":{"title":"Release Process","level":"1.4.1","depth":2,"path":"operations/release-process.md","ref":"./operations/release-process.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"operations/chime-live-cluster.md","mtime":"2020-03-20T12:40:36.593Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-20T12:40:43.690Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"The chime-live Cluster","level":"1.4.2","depth":2,"next":{"title":"Deploy to Heroku","level":"1.4.3","depth":2,"path":"operations/heroku.md","ref":"./operations/heroku.md","articles":[]},"previous":{"title":"Release Process","level":"1.4.1","depth":2,"path":"operations/release-process.md","ref":"./operations/release-process.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"operations/chime-live-cluster.md","mtime":"2020-03-20T18:23:03.451Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-20T18:23:10.720Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
