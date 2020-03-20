@@ -5,7 +5,7 @@ from app import (S_default, known_infections, known_cases, current_hosp, doublin
                  hosp_rate, icu_rate, vent_rate, hosp_los, icu_los, vent_los, market_share, S, initial_infections,
                  detection_prob, hospitalization_rates, I, R, beta, gamma, n_days, beta_decay,
                  projection_admits, alt)
-from penn_chime.models import sir, sim_sir
+from penn_chime.models import sir, sim_sir, sim_sir_df
 from penn_chime.presentation import display_header, new_admissions_chart
 
 
@@ -70,12 +70,11 @@ def test_header_fail():
 
 # Test the math
 
-
 def test_sir():
     """
     Someone who is good at testing, help
     """
-    assert sir((100, 1, 0), 0.2, 0.5, 1) == (
+    assert sir(100, 1, 0, 0.2, 0.5, 1) == (
         0.7920792079207921,
         0.20297029702970298,
         0.0049504950495049506,
@@ -88,11 +87,26 @@ def test_sim_sir():
     """
     s, i, r = sim_sir(S, I, R, beta, gamma, n_days, beta_decay=beta_decay)
     assert round(s[0], 0) == 4119405
-    assert round(s[-1], 2) == 3421436.31
     assert round(i[0], 2) == 533.33
+    assert round(r[0], 0) == 0.0
+    assert round(s[-1], 2) == 3421436.31
     assert round(i[-1], 2) == 418157.62
-    assert round(r[0], 0) == 0
     assert round(r[-1], 2) == 280344.40
+
+
+def test_sim_sir_df():
+    """
+    Rounding to move fast past decimal place issues
+    """
+    df = sim_sir_df(S, I, R, beta, gamma, n_days, beta_decay=beta_decay)
+    first = df.iloc[0]
+    last = df.iloc[-1]
+    assert round(first[0], 0) == 4119405
+    assert round(first[1], 2) == 533.33
+    assert round(first[2], 0) == 0.0
+    assert round(last[0], 2) == 3421436.31
+    assert round(last[1], 2) == 418157.62
+    assert round(last[2], 2) == 280344.40
 
 
 def test_initial_conditions():
