@@ -14,6 +14,7 @@ DEFAULTS = Constants(
         delaware=delaware,
         chester=chester,
         montgomery=montgomery,
+        bucks=bucks,
         philly=philly),
     known_infections=91,
     known_cases=4,
