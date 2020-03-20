@@ -18,7 +18,7 @@ As of March 19, help is especially wanted in these areas:
 
 ## Before You Begin
 
-- Join the [#covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel, and request write access to the `CodeforPhilly/chime` Github repository.
+- Join the [#covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel, and [request write access](https://codeforphilly.slack.com/archives/CV4NGQYMP/p1584665484368300) to the `CodeforPhilly/chime` Github repository.
 - Our highest-priority work is organized in the [Github Project Management board](https://github.com/CodeForPhilly/chime/projects/2). Look for an issue matching your interests & skills in one of the "Ready" columns.
 - Assign yourself to the issue and add a comment to briefly describe your plan.
 - For new ideas, please first discuss the change(s) you wish to make via [issue](https://github.com/codeforphilly/chime/issues) or appropriate Slack channel (platform/app - #chime-app, devops - #chime-ops, modeling - #chime-analysis). 
