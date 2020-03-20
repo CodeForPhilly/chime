@@ -45,20 +45,31 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 # to the variables they are set equal to
 # it's kindof like ember or angular if you are familiar with those
 
+if known_cases < 1:
+    raise ValueError("Known cases must be larger than one to enable predictions.")
+
 # TODO: Refactor all the sidebar stuff into a single function/file
 current_hosp = st.sidebar.number_input(
-    "Currently Hospitalized COVID-19 Patients", value=known_cases, step=1, format="%i"
+    label="Currently Hospitalized COVID-19 Patients",
+    min_value=0,
+    value=known_cases,
+    step=1,
+    format="%i",
 )
 
 doubling_time = st.sidebar.number_input(
-    "Doubling time before social distancing (days)", value=6, step=1, format="%i"
+    label="Doubling time before social distancing (days)",
+    min_value=0,
+    value=6,
+    step=1,
+    format="%i",
 )
 
 relative_contact_rate = (
     st.sidebar.number_input(
-        "Social distancing (% reduction in social contact)",
-        0,
-        100,
+        label="Social distancing (% reduction in social contact)",
+        min_value=0,
+        max_value=100,
         value=0,
         step=5,
         format="%i",
@@ -68,9 +79,9 @@ relative_contact_rate = (
 
 hosp_rate = (
     st.sidebar.number_input(
-        "Hospitalization %(total infections)",
-        0.0,
-        100.0,
+        label="Hospitalization %(total infections)",
+        min_value=0.001,
+        max_value=100.0,
         value=5.0,
         step=1.0,
         format="%f",
@@ -79,33 +90,62 @@ hosp_rate = (
 )
 icu_rate = (
     st.sidebar.number_input(
-        "ICU %(total infections)", 0.0, 100.0, value=2.0, step=1.0, format="%f"
+        label="ICU %(total infections)",
+        min_value=0.0,
+        max_value=100.0,
+        value=2.0,
+        step=1.0,
+        format="%f",
+
     )
     / 100.0
 )
 vent_rate = (
     st.sidebar.number_input(
-        "Ventilated %(total infections)", 0.0, 100.0, value=1.0, step=1.0, format="%f"
+        label="Ventilated %(total infections)",
+        min_value=0.0,
+        max_value=100.0,
+        value=1.0,
+        step=1.0,
+        format="%f",
     )
     / 100.0
 )
 hosp_los = st.sidebar.number_input(
-    "Hospital Length of Stay", value=7, step=1, format="%i"
+    label="Hospital Length of Stay", min_value=0, value=7, step=1, format="%i",
 )
-icu_los = st.sidebar.number_input("ICU Length of Stay", value=9, step=1, format="%i")
-vent_los = st.sidebar.number_input("Vent Length of Stay", value=10, step=1, format="%i")
+icu_los = st.sidebar.number_input(
+    label="ICU Length of Stay",
+    min_value=0,
+    value=9,
+    step=1,
+    format="%i",
+)
+vent_los = st.sidebar.number_input(
+    label="Vent Length of Stay",
+    min_value=0,
+    value=10,
+    step=1,
+    format="%i",
+)
 market_share = (
     st.sidebar.number_input(
-        "Hospital Market Share (%)", 0.0, 100.0, value=15.0, step=1.0, format="%f"
+        label="Hospital Market Share (%)",
+        min_value=0.001,
+        max_value=100.0,
+        value=15.0,
+        step=1.0,
+        format="%f",
     )
     / 100.0
 )
 S = st.sidebar.number_input(
-    "Regional Population", value=S_default, step=100000, format="%i"
+    label="Regional Population", min_value=1, value=S_default, step=100000, format="%i"
 )
 
 initial_infections = st.sidebar.number_input(
-    "Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
+    label="Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
+    min_value=0,
     value=known_infections,
     step=10,
     format="%i",
@@ -116,8 +156,11 @@ initial_infections = st.sidebar.number_input(
 # Now, derive other variable values from the inputs created above
 hospitalization_rates = (hosp_rate, icu_rate, vent_rate)
 
-total_infections = current_hosp / market_share / hosp_rate
-detection_prob = initial_infections / total_infections
+# market_share > 0, hosp_rate > 0
+total_infections = int(current_hosp / market_share / hosp_rate)
+detection_prob = (
+    initial_infections / total_infections if total_infections > 0  else None
+)
 
 # TODO: Pull out the rest of this math code into models.py
 # S := Susceptible, able to be infected
@@ -125,7 +168,7 @@ detection_prob = initial_infections / total_infections
 # R := Recovered, no longer infected with the virus
 S, I, R = S, total_infections, 0
 
-intrinsic_growth_rate = 2 ** (1 / doubling_time) - 1
+intrinsic_growth_rate = 2 ** (1 / doubling_time) - 1 if doubling_time > 0 else 0
 
 # @TODO make this configurable, or more nuanced
 recovery_days = 14.0
@@ -138,7 +181,11 @@ beta = (
 )  # {rate based on doubling time} / {initial S}
 
 r_t = beta / gamma * S  # r_t is r_0 after distancing
-r_naught = r_t / (1 - relative_contact_rate)
+# Simplify equation to avoid division by zero:
+## r_naught = r_t / (1 - relative_contact_rate)
+r_naught = (intrinsic_growth_rate + gamma)  / gamma
+
+
 doubling_time_t = 1 / np.log2(beta * S - gamma + 1)  # doubling time after distancing
 
 beta_decay = 0.0
