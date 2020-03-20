@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-
+import numpy as np
 
 from app import (current_hosp, doubling_time, relative_contact_rate,
                  S, initial_infections,
@@ -73,20 +73,6 @@ def test_header_fail():
 # Test the math
 
 def test_sir():
-    """
-    Someone who is good at testing, help
-
-    sir docs:
-        sir(s: float, i: float, r: float,
-            beta: float, gamma: float, n: float
-        ) -> Tuple[float, float, float]
-    s: susceptible
-    i: infected
-    r: recovered
-    """
-    # importing directly in test for code clarity (not ideal, but straight forward at least)
-    from app import S, I, R, beta, gamma, n_days
-
     assert sir(100, 1, 0, 0.2, 0.5, 1) == (
         0.7920792079207921,
         0.20297029702970298,
@@ -96,10 +82,10 @@ def test_sir():
     # This takes the active variables from app.py and makes sure the
     # sir fx works as expected
     sir_test = sir(S, I, R, beta, gamma, n_days)
-    assert type(sir_test) == tuple
+    assert isinstance(sir_test, tuple)
     for v in sir_test:
-        assert type(v) == float
-        assert v > 0
+        assert isinstance(v, float)
+        assert v >= 0
 
     # Certain things should *not* work
     with pytest.raises(TypeError) as E:
@@ -135,7 +121,7 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    s,i,r = sim_sir(5, 6, 7, 0.1, 0.1, 40)
+    s, i, r = sim_sir(5, 6, 7, 0.1, 0.1, 40)
 
     assert round(s[0], 0) == 5
     assert round(i[0], 2) == 6
@@ -143,6 +129,12 @@ def test_sim_sir():
     assert round(s[-1], 2) == 0
     assert round(i[-1], 2) == 0.18
     assert round(r[-1], 2) == 17.82
+
+    # Take variables from app.py and test fx
+    sim_sir_test = sim_sir(S, I, R, beta, gamma, n_days, beta_decay)
+    assert type(sim_sir_test) == tuple
+    for v in sim_sir_test:
+        assert isinstance(v, np.ndarray)
 
 
 def test_sim_sir_df():
@@ -160,24 +152,28 @@ def test_sim_sir_df():
     assert round(last[1], 2) == 0.18
     assert round(last[2], 2) == 17.82
 
+    # test with app.py variables
+    sim_sir_df_test = sim_sir_df(S, I, R, beta, gamma, n_days, beta_decay)
+    assert isinstance(sim_sir_df_test, pd.DataFrame)
 
-#ef test_initial_conditions():
-#   """
-#   Note: For the rates (ie hosp_rate) - just change the value, leave the "100" alone.
+
+# def test_initial_conditions():
+#     """
+#     Note: For the rates (ie hosp_rate) - just change the value, leave the "100" alone.
 #       Easier to change whole numbers than decimals.
-#   """
-#   assert current_hosp == known_cases
-#   assert doubling_time == 6
-#   assert relative_contact_rate == 0
-#   assert hosp_rate == 5 / 100
-#   assert icu_rate == 2 / 100
-#   assert vent_rate == 1 / 100
-#   assert hosp_los == 7
-#   assert icu_los == 9
-#   assert vent_los == 10
-#   assert market_share == 15 / 100
-#   assert S == S_default
-#   assert initial_infections == known_infections
+#     """
+#     assert current_hosp == known_cases
+#     assert doubling_time == 6
+#     assert relative_contact_rate == 0
+#     assert hosp_rate == 5 / 100
+#     assert icu_rate == 2 / 100
+#     assert vent_rate == 1 / 100
+#     assert hosp_los == 7
+#     assert icu_los == 9
+#     assert vent_los == 10
+#     assert market_share == 15 / 100
+#     assert S == S_default
+#     assert initial_infections == known_infections
 
 
 def test_derived_variables():
