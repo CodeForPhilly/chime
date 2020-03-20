@@ -39,7 +39,7 @@ jobs:
         python -m pytest
     - name: Run App
       run: |
-        streamlit run app.py 
+        streamlit run app.py &
     - name: Cypress
       uses: cypress-io/github-action@v1.23.2
       with:
