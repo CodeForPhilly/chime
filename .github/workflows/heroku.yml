@@ -24,4 +24,5 @@ jobs:
           heroku_app_name: ${HEROKU_APP}
           heroku_email: ${HEROKU_EMAIL}
       - name: Return app URL
-        run: echo "Deployed to: https://${HEROKU_APP}.herokuapp.com/"
+        run: |
+          echo "Deployed to: https://${HEROKU_APP}.herokuapp.com/"
