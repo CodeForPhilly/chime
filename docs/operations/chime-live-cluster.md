@@ -32,7 +32,7 @@
 
 ## Deploying a New CHIME Version
 
-1. [MaCreateke a new release](release-process.md)
+1. [Create a new release](release-process.md)
 2. Wait for the `Docker` GitHub Actions workflow to complete
 3. Verify the new version shows up at the top as "Latest version" here: https://github.com/CodeForPhilly/chime/packages/155340
 4. Run:
