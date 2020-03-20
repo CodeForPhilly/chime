@@ -18,20 +18,21 @@ from penn_chime.presentation import (
     write_footer,
 )
 from penn_chime.utils import build_admissions_df, build_census_df
+from penn_chime.settings import DEFAULTS
 
-# TODO: Pull out constants, ideally this should come from config/env
-# Constants
-delaware = 564696
-chester = 519293
-montgomery = 826075
-bucks = 628341
-philly = 1581000
-
-# TODO: These need to go into key-storage
-# initial values
-S_default = delaware + chester + montgomery + bucks + philly
-known_infections = 91  # update daily
-known_cases = 4  # update daily
+#   # TODO: Pull out constants, ideally this should come from config/env
+#   # Constants
+#   delaware = 564696
+#   chester = 519293
+#   montgomery = 826075
+#   bucks = 628341
+#   philly = 1581000
+#
+#   # TODO: These need to go into key-storage
+#   # initial values
+#   S_default = delaware + chester + montgomery + bucks + philly
+#   known_infections = 91  # update daily
+#   known_cases = 4  # update daily
 
 # This is somewhat dangerous:
 # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
@@ -52,14 +53,14 @@ if known_cases < 1:
 current_hosp = st.sidebar.number_input(
     label="Currently Hospitalized COVID-19 Patients",
     min_value=0,
-    value=known_cases,
+    value=DEFAULTS.known_cases,
     step=1,
     format="%i",
 )
 
 doubling_time = st.sidebar.number_input(
     label="Doubling time before social distancing (days)",
-    min_value=0,
+    min_value=DEFAULTS.doubling_time,
     value=6,
     step=1,
     format="%i",
@@ -70,7 +71,7 @@ relative_contact_rate = (
         label="Social distancing (% reduction in social contact)",
         min_value=0,
         max_value=100,
-        value=0,
+        value=DEFAULTS.relative_contact_rate,
         step=5,
         format="%i",
     )
@@ -82,7 +83,7 @@ hosp_rate = (
         label="Hospitalization %(total infections)",
         min_value=0.001,
         max_value=100.0,
-        value=5.0,
+        value=DEFAULTS.hosp.rate * 100,
         step=1.0,
         format="%f",
     )
@@ -93,7 +94,7 @@ icu_rate = (
         label="ICU %(total infections)",
         min_value=0.0,
         max_value=100.0,
-        value=2.0,
+        value=DEFAULTS.icu.rate * 100,
         step=1.0,
         format="%f",
 
@@ -105,26 +106,30 @@ vent_rate = (
         label="Ventilated %(total infections)",
         min_value=0.0,
         max_value=100.0,
-        value=1.0,
+        value=DEFAULTS.vent.rate * 100,
         step=1.0,
         format="%f",
     )
     / 100.0
 )
 hosp_los = st.sidebar.number_input(
-    label="Hospital Length of Stay", min_value=0, value=7, step=1, format="%i",
+    label="Hospital Length of Stay",
+    min_value=0,
+    value=DEFAULTS.hosp.length_of_stay,
+    step=1, 
+    format="%i",
 )
 icu_los = st.sidebar.number_input(
     label="ICU Length of Stay",
     min_value=0,
-    value=9,
+    value=DEFAULTS.icu.length_of_stay,
     step=1,
     format="%i",
 )
 vent_los = st.sidebar.number_input(
     label="Vent Length of Stay",
     min_value=0,
-    value=10,
+    value=DEFAULTS.vent.length_of_stay,
     step=1,
     format="%i",
 )
@@ -133,20 +138,25 @@ market_share = (
         label="Hospital Market Share (%)",
         min_value=0.001,
         max_value=100.0,
-        value=15.0,
+        value=DEFAULTS.market_share,
         step=1.0,
         format="%f",
     )
     / 100.0
 )
 S = st.sidebar.number_input(
-    label="Regional Population", min_value=1, value=S_default, step=100000, format="%i"
+    label="Regional Population",
+    min_value=1,
+    value=DEFAULTS.region.s,
+    step=100000,
+    format="%i"
 )
+
 
 initial_infections = st.sidebar.number_input(
     label="Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
     min_value=0,
-    value=known_infections,
+    value=DEFAULTS.known_infections,
     step=10,
     format="%i",
 )
@@ -209,6 +219,7 @@ display_header(
     doubling_time_t=doubling_time_t,
 )
 if st.checkbox("Show more info about this tool"):
+    notes = "The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)"
     show_more_info_about_this_tool(
         st=st,
         recovery_days=recovery_days,
@@ -217,11 +228,9 @@ if st.checkbox("Show more info about this tool"):
         relative_contact_rate=relative_contact_rate,
         doubling_time_t=doubling_time_t,
         r_t=r_t,
-        delaware=delaware,
-        chester=chester,
-        montgomery=montgomery,
-        bucks=bucks,
-        philly=philly,
+        inputs=DEFAULTS,
+        notes=notes
+
     )
 
 # PRESENTATION
