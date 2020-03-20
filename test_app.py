@@ -2,11 +2,11 @@ import pytest
 import pandas as pd
 
 
-# from app import (current_hosp, doubling_time, relative_contact_rate,
-#                  S, initial_infections,
-#                 detection_prob, hospitalization_rates, I, R, beta, gamma, n_days, beta_decay,
-#                 projection_admits, alt)
-#from penn_chime.settings import DEFAULTS
+from app import (current_hosp, doubling_time, relative_contact_rate,
+                 S, initial_infections,
+                 detection_prob, hospitalization_rates, I, R, beta, gamma, n_days, beta_decay,
+                 projection_admits, alt)
+from penn_chime.settings import DEFAULTS
 from penn_chime.models import sir, sim_sir, sim_sir_df
 from penn_chime.presentation import display_header, new_admissions_chart
 
