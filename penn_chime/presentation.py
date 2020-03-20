@@ -2,6 +2,7 @@ import altair as alt
 import numpy as np
 import pandas as pd
 
+from .defaults import Constants
 
 hide_menu_style = """
         <style>
@@ -89,11 +90,8 @@ def show_more_info_about_this_tool(
     relative_contact_rate,
     doubling_time_t,
     r_t,
-    delaware,
-    chester,
-    montgomery,
-    bucks,
-    philly,
+    inputs: Constants,
+    notes: str = ''
 ):
     """a lot of streamlit writing to screen."""
     st.subheader(
@@ -181,18 +179,8 @@ $$\\beta = (g + \\gamma)$$.
 
 ### Initial Conditions
 
-- The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)
-  - Delaware = {delaware}
-  - Chester = {chester}
-  - Montgomery = {montgomery}
-  - Bucks = {bucks}
-  - Philly = {philly}""".format(
-            delaware=delaware,
-            chester=chester,
-            montgomery=montgomery,
-            bucks=bucks,
-            philly=philly,
-        )
+- {notes} \n
+""".format(notes=notes) + "- " + "| \n".join(f"{key} = {value} " for key,value in inputs.region.__dict__.items() if key != '_s')
     )
     return None
 
