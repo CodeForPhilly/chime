@@ -1,3 +1,4 @@
+from datetime import datetime
 import altair as alt
 import numpy as np
 import pandas as pd
@@ -226,18 +227,29 @@ def write_footer(st):
 
 
 def new_admissions_chart(
-    alt, projection_admits: pd.DataFrame, plot_projection_days: int
+    alt, projection_admits: pd.DataFrame, plot_projection_days: int, as_date: bool=False
 ) -> alt.Chart:
     """docstring"""
     projection_admits = projection_admits.rename(
         columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"}
     )
+    projection_admits["date"] = pd.date_range(
+        datetime.now(),
+        periods=projection_admits.shape[0],
+        freq="D"
+    )
+    x_kwargs = (
+        {"shorthand": "date:T", "title": "Date"}
+        if as_date
+        else {"shorthand": "day", "title": "Days from today"}
+    )
+
     return (
         alt.Chart(projection_admits.head(plot_projection_days))
         .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
         .mark_line(point=True)
         .encode(
-            x=alt.X("day", title="Days from today"),
+            x=alt.X(**x_kwargs),
             y=alt.Y("value:Q", title="Daily admissions"),
             color="key:N",
             tooltip=[
