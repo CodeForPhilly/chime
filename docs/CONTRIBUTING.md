@@ -6,22 +6,22 @@ Welcome, grab a cup of coffee, and let's roll our sleeves up! By participating i
 
 As of March 19, help is especially wanted in these areas:
 
-- **Python wizards** for application development ([#chime-app](https://codeforphilly.org/chat?channel=chime-app)
+- **Python wizards** for application development ([#chime-app](https://codeforphilly.org/chat?channel=chime-app))
   - Hardening the code
   - Making it more flexible
   - Unit tests!
-- **DevOps heroes** for application hosting ([#chime-ops](https://codeforphilly.org/chat?channel=chime-ops)
+- **DevOps heroes** for application hosting ([#chime-ops](https://codeforphilly.org/chat?channel=chime-ops))
   - Maintaining Penn's instance
   - Ensuring easy redeploys
-- **Math and stats friends** for model improvements ([#chime-analysis](https://codeforphilly.org/chat?channel=chime-analysis)
+- **Math and stats friends** for model improvements ([#chime-analysis](https://codeforphilly.org/chat?channel=chime-analysis))
 - **Consulting DevOps champs** to help other public agencies set up their own instances ([#chime-help](https://codeforphilly.org/chat?channel=chime-help)
 
 ## Before You Begin
 
-- Introduce yourself in the [#covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel, and request write access to the `CodeforPhilly/chime` Github repository.
+- Join the [#covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel, and request write access to the `CodeforPhilly/chime` Github repository.
 - Our highest-priority work is organized in the [Github Project Management board](https://github.com/CodeForPhilly/chime/projects/2). Look for an issue matching your interests & skills in one of the "Ready" columns.
 - Assign yourself to the issue and add a comment to briefly describe your plan.
-- For new ideas, please first discuss the change(s) you wish to make via [issue](https://github.com/codeforphilly/chime/issues) or [Slack chat](https://codeforphilly.org/chat/covid19-chime-penn). 
+- For new ideas, please first discuss the change(s) you wish to make via [issue](https://github.com/codeforphilly/chime/issues) or appropriate Slack channel (platform/app - #chime-app, devops - #chime-ops, modeling - #chime-analysis). 
 
 ## Making and Submitting Changes
 
