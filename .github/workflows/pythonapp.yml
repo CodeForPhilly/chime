@@ -37,3 +37,6 @@ jobs:
       run: |
         pip install pytest
         python -m pytest
+    - name: Cypress
+      uses: cypress-io/github-action@v1.16.1
+
