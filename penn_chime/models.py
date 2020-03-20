@@ -28,15 +28,15 @@ def sir(
 def gen_sir(
     s: float, i: float, r: float,
     beta: float, gamma: float, n_days: int, beta_decay: float = 0.0
-) -> Generator:
+) -> Generator[Tuple[float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples."""
-    s, i, r, beta_decay = (float(v) for v in (s, i, r, beta_decay))
+    s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
+    f = 1.0 - beta_decay  # okay even if beta_decay is 0.0
     for _ in range(n_days + 1):
         yield s, i, r
         s, i, r = sir(s, i, r, beta, gamma, n)
-        # okay even if beta_decay is 0.0
-        beta = beta * (1.0 - beta_decay)
+        beta *= f
 
 
 @st.cache
@@ -45,13 +45,13 @@ def sim_sir(
     beta: float, gamma: float, n_days: int, beta_decay: float = 0.0
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulate the SIR model forward in time."""
-    s, i, r, beta_decay = (float(v) for v in (s, i, r, beta_decay))
+    s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
+    f = 1.0 - beta_decay  # okay even if beta_decay is 0.0
     s_v, i_v, r_v = [s], [i], [r]
     for day in range(n_days):
         s, i, r = sir(s, i, r, beta, gamma, n)
-        # okay even if beta_decay is 0.0
-        beta = beta * (1.0 - beta_decay)
+        beta *= f
         s_v.append(s)
         i_v.append(i)
         r_v.append(r)
