@@ -46,7 +46,7 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 # to the variables they are set equal to
 # it's kindof like ember or angular if you are familiar with those
 
-if known_cases < 1:
+if DEFAULTS.known_cases < 1:
     raise ValueError("Known cases must be larger than one to enable predictions.")
 
 # TODO: Refactor all the sidebar stuff into a single function/file
@@ -60,8 +60,8 @@ current_hosp = st.sidebar.number_input(
 
 doubling_time = st.sidebar.number_input(
     label="Doubling time before social distancing (days)",
-    min_value=DEFAULTS.doubling_time,
-    value=6,
+    min_value=0,
+    value=DEFAULTS.doubling_time,
     step=1,
     format="%i",
 )
@@ -116,7 +116,7 @@ hosp_los = st.sidebar.number_input(
     label="Hospital Length of Stay",
     min_value=0,
     value=DEFAULTS.hosp.length_of_stay,
-    step=1, 
+    step=1,
     format="%i",
 )
 icu_los = st.sidebar.number_input(
