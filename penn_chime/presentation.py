@@ -180,7 +180,7 @@ $$\\beta = (g + \\gamma)$$.
 ### Initial Conditions
 
 - {notes} \n
-""".format(notes=notes) + "- - " + "| \n".join(f"{key} = {value} " for key,value in inputs.region.__dict__.items() if key != '_s')
+""".format(notes=notes) + "- " + "| \n".join(f"{key} = {value} " for key,value in inputs.region.__dict__.items() if key != '_s')
     )
     return None
 
