@@ -201,9 +201,9 @@ p.n_days = st.slider(
     "Number of days to project",
     min_value=30,
     max_value=200,
-    DEFAULTS.n_days,
+    value=DEFAULTS.n_days,
     step=1,
-    fomat="%i"
+    format="%i"
 )
 
 # format data

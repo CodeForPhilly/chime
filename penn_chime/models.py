@@ -48,7 +48,11 @@ class Parameters:
         # market_share > 0, hosp_rate > 0
         self.infected = infected = \
             current_hospitalized / market_share / hospitalized.rate
-        self.detection_probability = known_infected / infected if infected 1.e-7  else None
+
+        if infected > 1.e-7:
+            self.detection_probability = known_infected / infected
+        else:
+            self.detection_probability = None
 
         # TODO missing initial recovered value
         self.recovered = 0.0
