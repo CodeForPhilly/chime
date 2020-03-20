@@ -157,9 +157,10 @@ initial_infections = st.sidebar.number_input(
 hospitalization_rates = (hosp_rate, icu_rate, vent_rate)
 
 # market_share > 0, hosp_rate > 0
-total_infections = int(current_hosp / market_share / hosp_rate)
+## @TODO: I tried casting this to an int but this breaks unittest comparisons (third digit)
+total_infections = current_hosp / market_share / hosp_rate
 detection_prob = (
-    initial_infections / total_infections if total_infections > 0  else None
+    initial_infections / total_infections if total_infections > 1.e-7  else None
 )
 
 # TODO: Pull out the rest of this math code into models.py
