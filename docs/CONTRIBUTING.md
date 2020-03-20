@@ -1,22 +1,44 @@
 # Contributing
 
-When contributing to this repository, please first discuss the change you wish to make via [issue](https://github.com/codeforphilly/chime/issues), [Slack chat](https://codeforphilly.org/chat/covid19-chime-penn), or any other method with the owners of this repository before making a change.
+Welcome, grab a cup of coffee, and let's roll our sleeves up! By participating in this project, you agree to abide by our [code of conduct](CODE_OF_CONDUCT.md).
 
-Please note we have a [code of conduct](CODE_OF_CONDUCT.md), please follow it in all your interactions with the project.
+## What should I work on?
 
-## Active Needs
+As of March 19, help is especially wanted in these areas:
 
-We maintain a list of [issues in the Code for Philly repo](https://github.com/codeforphilly/chime/issues) that encompasses work requested by stakeholders and technologists.  Each issue is designed to be small enough for one person to implement.
+- **Python wizards** for application development ([#chime-app](https://codeforphilly.org/chat?channel=chime-app))
+  - Hardening the code
+  - Making it more flexible
+  - Unit tests!
+- **DevOps heroes** for application hosting ([#chime-ops](https://codeforphilly.org/chat?channel=chime-ops))
+  - Maintaining Penn's instance
+  - Ensuring easy redeploys
+- **Math and stats friends** for model improvements ([#chime-analysis](https://codeforphilly.org/chat?channel=chime-analysis))
+- **Consulting DevOps champs** to help other public agencies set up their own instances ([#chime-help](https://codeforphilly.org/chat?channel=chime-help)
 
-**Developers** If you are new to the project, check out open issues to see if there is any pre-existing work needed that you can handle. We will need to add your git account to the repo to grant write access - contact us on [Slack](https://codeforphilly.org/chat) in the [covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel.
+## Before You Begin
 
-## Change Management
+- Join the [#covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel, and [request write access](https://codeforphilly.slack.com/archives/CV4NGQYMP/p1584665484368300) to the `CodeforPhilly/chime` Github repository.
+- Our highest-priority work is organized in the [Github Project Management board](https://github.com/CodeForPhilly/chime/projects/2). Look for an issue matching your interests & skills in one of the "Ready" columns.
+- Assign yourself to the issue and add a comment to briefly describe your plan.
+- For new ideas, please first discuss the change(s) you wish to make via [issue](https://github.com/codeforphilly/chime/issues) or appropriate Slack channel (platform/app - #chime-app, devops - #chime-ops, modeling - #chime-analysis). 
 
-- Base all work on the latest `develop` branch available in [Code for Philly's fork of the `chime` repository](https://github.com/CodeForPhilly/chime).
-- Submit your work in the form of a pull request against that same branch.
-- Check in on your pull request periodically after you submit it to see if any changes have been requested or any merge conflicts have arisen from other work getting integrated.
-- If a merge conflict arises, please rebase your branch against the latest `develop` branch and force-push the new branch as early as you can. You may need to do this more than once before your changes get merged. Do your best to keep your branch in a mergeable state until it is finished being reviewed and accepted.
+## Making and Submitting Changes
+
+- Base your work on the `develop` branch in [Code for Philly's fork of the `chime` repository](https://github.com/CodeForPhilly/chime).
+- Submit a pull request, also against the `develop` branch.
+- Check your pull request periodically to see if any changes have been requested or any merge conflicts have arisen.
+- If a merge conflict arises, rebase against the latest `develop` branch and force-push the new branch as early as you can. You may need to do this more than once before your changes get merged. Do your best to keep your branch in a mergeable state until it is finished being reviewed and accepted.
+
+## Review & Release
+
+<!-- Currently establishing & clarifying the release process, this is just a skeleton. -->
+
+- Maintainers will review pull requests, asking for changes as needed.
+- Once a PR has 1 approval and passes automated tests, maintainers will merge to release branches.
+  - Exception: Documentation or infrastructure support PRs can be merged directly to master.
+- Deploys to production must be signed off on by @beckerfluffle or @cchivers.
 
 ## Requesting Functionality
 
-**Stakeholders/Users** Find us on [Slack](https://codeforphilly.org/chat) in the [#covid19-chime-penn](https://codeforphilly.org/chat/covid19-chime-penn) channel to see if your need is already being addressed.
+**Stakeholders/Users**: Check the [#covid19-chime-penn](https://codeforphilly.org/chat/covid19-chime-penn) channel on [Slack](https://codeforphilly.org/chat) to see if your need is already being addressed.
