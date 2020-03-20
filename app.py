@@ -18,7 +18,7 @@ from penn_chime.presentation import (
     write_footer,
 )
 from penn_chime.utils import build_admissions_df, build_census_df
-from penn_chime.defaults import DEFAULTS
+from penn_chime.settings import DEFAULTS
 
 #   # TODO: Pull out constants, ideally this should come from config/env
 #   # Constants
@@ -72,7 +72,7 @@ hosp_rate = (
         "Hospitalization %(total infections)",
         0.0,
         100.0,
-        value=DEFAULTS.hosp_rate,
+        value=DEFAULTS.hosp.rate * 100,
         step=1.0,
         format="%f",
     )
@@ -80,21 +80,21 @@ hosp_rate = (
 )
 icu_rate = (
     st.sidebar.number_input(
-        "ICU %(total infections)", 0.0, 100.0, value=DEFAULTS.icu_rate, step=1.0, format="%f"
+        "ICU %(total infections)", 0.0, 100.0, value=DEFAULTS.icu.rate * 100, step=1.0, format="%f"
     )
     / 100.0
 )
 vent_rate = (
     st.sidebar.number_input(
-        "Ventilated %(total infections)", 0.0, 100.0, value=DEFAULTS.vent_rate, step=1.0, format="%f"
+        "Ventilated %(total infections)", 0.0, 100.0, value=DEFAULTS.vent.rate * 100, step=1.0, format="%f"
     )
     / 100.0
 )
 hosp_los = st.sidebar.number_input(
-    "Hospital Length of Stay", value=DEFAULTS.hosp_los, step=1, format="%i"
+    "Hospital Length of Stay", value=DEFAULTS.hosp.length_of_stay, step=1, format="%i"
 )
-icu_los = st.sidebar.number_input("ICU Length of Stay", value=DEFAULTS.icu_los, step=1, format="%i")
-vent_los = st.sidebar.number_input("Vent Length of Stay", value=DEFAULTS.vent_los, step=1, format="%i")
+icu_los = st.sidebar.number_input("ICU Length of Stay", value=DEFAULTS.icu.length_of_stay, step=1, format="%i")
+vent_los = st.sidebar.number_input("Vent Length of Stay", value=DEFAULTS.vent.length_of_stay, step=1, format="%i")
 market_share = (
     st.sidebar.number_input(
         "Hospital Market Share (%)", 0.0, 100.0, value=DEFAULTS.market_share, step=1.0, format="%f"
@@ -102,8 +102,9 @@ market_share = (
     / 100.0
 )
 S = st.sidebar.number_input(
-    "Regional Population", value=DEFAULTS.S_default, step=100000, format="%i"
+    "Regional Population", value=DEFAULTS.region.s, step=100000, format="%i"
 )
+
 
 initial_infections = st.sidebar.number_input(
     "Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
