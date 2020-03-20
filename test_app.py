@@ -75,12 +75,31 @@ def test_header_fail():
 def test_sir():
     """
     Someone who is good at testing, help
+
+    sir docs:
+        sir(s: float, i: float, r: float,
+            beta: float, gamma: float, n: float
+        ) -> Tuple[float, float, float]
+    s: susceptible
+    i: infected
+    r: recovered
     """
+    # importing directly in test for code clarity (not ideal, but straight forward at least)
+    from app import S, I, R, beta, gamma, n_days
+
     assert sir(100, 1, 0, 0.2, 0.5, 1) == (
         0.7920792079207921,
         0.20297029702970298,
         0.0049504950495049506,
     ), "This contrived example should work"
+
+    # This takes the active variables from app.py and makes sure the
+    # sir fx works as expected
+    sir_test = sir(S, I, R, beta, gamma, n_days)
+    assert type(sir_test) == tuple
+    for v in sir_test:
+        assert type(v) == float
+        assert v > 0
 
     # Certain things should *not* work
     with pytest.raises(TypeError) as E:
