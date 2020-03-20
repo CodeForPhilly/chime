@@ -164,6 +164,7 @@ display_header(
     doubling_time_t=doubling_time_t,
 )
 if st.checkbox("Show more info about this tool"):
+    notes = "The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)"
     show_more_info_about_this_tool(
         st=st,
         recovery_days=recovery_days,
@@ -172,11 +173,9 @@ if st.checkbox("Show more info about this tool"):
         relative_contact_rate=relative_contact_rate,
         doubling_time_t=doubling_time_t,
         r_t=r_t,
-        delaware=delaware,
-        chester=chester,
-        montgomery=montgomery,
-        bucks=bucks,
-        philly=philly,
+        inputs=DEFAULTS,
+        notes=notes
+
     )
 
 # PRESENTATION
