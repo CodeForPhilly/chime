@@ -9,19 +9,20 @@ bucks = 628341
 philly = 1581000
 
 DEFAULTS = Constants(
-    ## EDIT YOUR DEFAULTS HERE
+    # EDIT YOUR DEFAULTS HERE
     region=Regions(
         delaware=delaware,
         chester=chester,
         montgomery=montgomery,
         bucks=bucks,
         philly=philly),
-    known_infections=157,
-    known_cases=6,
+    current_hospitalized=6,
     doubling_time=6,
+    known_infected=157,
+    n_days=60,
+    market_share=0.15,
     relative_contact_rate=0,
-    hosp=RateLos(0.05, 7),
+    hospitalized=RateLos(0.05, 7),
     icu=RateLos(0.02, 9),
-    vent=RateLos(0.01, 10),
-    market_share=15.0
+    ventilated=RateLos(0.01, 10),
 )
