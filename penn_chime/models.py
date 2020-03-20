@@ -1,49 +1,93 @@
-from typing import Tuple
+from typing import Generator, Tuple
 
 import numpy as np
+import pandas as pd
 import streamlit as st
 
 
-# The SIR model, one time step
 @st.cache
-def sir(y, beta, gamma, N):
-    S, I, R = y
-    Sn = (-beta * S * I) + S
-    In = (beta * S * I - gamma * I) + I
-    Rn = gamma * I + R
-    if Sn < 0:
-        Sn = 0
-    if In < 0:
-        In = 0
-    if Rn < 0:
-        Rn = 0
+def sir(
+    s: float, i: float, r: float,
+    beta: float, gamma: float, n: float
+) -> Tuple[float, float, float]:
+    """The SIR model, one time step."""
+    s_n = (-beta * s * i) + s
+    i_n = (beta * s * i - gamma * i) + i
+    r_n = gamma * i + r
+    if s_n < 0.0:
+        s_n = 0.0
+    if i_n < 0.0:
+        i_n = 0.0
+    if r_n < 0.0:
+        r_n = 0.0
 
-    scale = N / (Sn + In + Rn)
-    return Sn * scale, In * scale, Rn * scale
+    scale = n / (s_n + i_n + r_n)
+    return s_n * scale, i_n * scale, r_n * scale
 
 
-# Run the SIR model forward in time
+def gen_sir(
+    s: float, i: float, r: float,
+    beta: float, gamma: float, n_days: int, beta_decay: float = 0.0
+) -> Generator:
+    """Simulate SIR model forward in time yielding tuples."""
+    s, i, r, beta_decay = (float(v) for v in (s, i, r, beta_decay))
+    n = s + i + r
+    for _ in range(n_days + 1):
+        yield s, i, r
+        s, i, r = sir(s, i, r, beta, gamma, n)
+        # okay even if beta_decay is 0.0
+        beta = beta * (1.0 - beta_decay)
+
+
 @st.cache
 def sim_sir(
-    S, I, R, beta, gamma, n_days, beta_decay=0
+    s: float, i: float, r: float,
+    beta: float, gamma: float, n_days: int, beta_decay: float = 0.0
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    N = S + I + R
-    s, i, r = [S], [I], [R]
+    """Simulate the SIR model forward in time."""
+    s, i, r, beta_decay = (float(v) for v in (s, i, r, beta_decay))
+    n = s + i + r
+    s_v, i_v, r_v = [s], [i], [r]
     for day in range(n_days):
-        y = S, I, R
-        S, I, R = sir(y, beta, gamma, N)
-        beta = beta * (1 - beta_decay)  # okay even if beta_decay is 0
-        s.append(S)
-        i.append(I)
-        r.append(R)
+        s, i, r = sir(s, i, r, beta, gamma, n)
+        # okay even if beta_decay is 0.0
+        beta = beta * (1.0 - beta_decay)
+        s_v.append(s)
+        i_v.append(i)
+        r_v.append(r)
 
-    s, i, r = np.array(s), np.array(i), np.array(r)
-    return s, i, r
+    return (
+        np.array(s_v),
+        np.array(i_v),
+        np.array(r_v),
+    )
+
+
+@st.cache
+def sim_sir_df(
+    s: float, i: float, r: float,
+    beta: float, gamma: float, n_days: int, beta_decay: float = 0.0
+) -> pd.DataFrame:
+    """Simulate the SIR model forward in time."""
+    return pd.DataFrame(
+        data=gen_sir(s, i, r, beta, gamma, n_days, beta_decay),
+        columns=("S", "I", "R"),
+    )
+
+
+@st.cache
+def get_hospitalizations2(
+    infected: np.ndarray, rates: Tuple[float, ...], market_share: float = 1.0
+) -> Tuple[np.ndarray, ...]:
+    """Get hopitalizations adjusted by rate and market_share."""
+    return (*(infected * rate * market_share for rate in rates),)
+
 
 @st.cache
 def get_hospitalizations(
     infected: np.ndarray, rates: Tuple[float, float, float], market_share: float
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Get hopitalizations adjusted by rate and market_share."""
     hosp_rate, icu_rate, vent_rate = rates
 
     hosp = infected * hosp_rate * market_share
