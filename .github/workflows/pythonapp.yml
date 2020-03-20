@@ -40,6 +40,6 @@ jobs:
     - name: Cypress
       uses: cypress-io/github-action@v1.16.1
       with:
-        working-directory: cypress
+        working-directory: e2e
 
 
