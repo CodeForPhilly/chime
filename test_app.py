@@ -81,6 +81,35 @@ def test_sir():
         0.0049504950495049506,
     ), "This contrived example should work"
 
+    # Certain things should *not* work
+    with pytest.raises(TypeError) as E:
+        sir(("S", 1, 0), 0.2, 0.5, 1)
+    assert str(E.value) == "can't multiply sequence by non-int of type 'float'"
+
+    with pytest.raises(TypeError) as E:
+        sir((100, "I", 0), 0.2, 0.5, 1)
+    assert str(E.value) == "can't multiply sequence by non-int of type 'float'"
+
+    with pytest.raises(TypeError) as E:
+        sir((100, 1, "R"), 0.2, 0.5, 1)
+    assert str(E.value) == "unsupported operand type(s) for +: 'float' and 'str'"
+
+    with pytest.raises(TypeError) as E:
+        sir((100, 1, 0), "beta", 0.5, 1)
+    assert str(E.value) == "bad operand type for unary -: 'str'"
+
+    with pytest.raises(TypeError) as E:
+        sir((100, 1, 0), 0.2, "gamma", 1)
+    assert str(E.value) == "unsupported operand type(s) for -: 'float' and 'str'"
+
+    with pytest.raises(TypeError) as E:
+        sir((100, 1, 0), 0.2, 0.5, "N")
+    assert str(E.value) == "unsupported operand type(s) for /: 'str' and 'float'"
+
+    # Zeros across the board should fail
+    with pytest.raises(ZeroDivisionError):
+        sir((0, 0, 0), 0, 0, 0)
+
 
 def test_sim_sir():
     """
