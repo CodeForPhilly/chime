@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-RateLos = namedtuple('RateLos', ('rate', 'length_of_stay'))
+from .defaults import RateLos
 
 
 class Parameters:
