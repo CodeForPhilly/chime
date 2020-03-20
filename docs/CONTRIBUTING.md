@@ -25,10 +25,12 @@ As of March 19, help is especially wanted in these areas:
 
 ## Making and Submitting Changes
 
-- Base your work on the `develop` branch in [Code for Philly's fork of the `chime` repository](https://github.com/CodeForPhilly/chime).
-- Submit a pull request, also against the `develop` branch.
+- [Fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) the [CodeforPhilly/chime](https://github.com/CodeForPhilly/chime) repo.
+- Base your work on the `develop` branch.
+- Submit pull requests from your fork, also against the `develop` branch of the `CodeforPhilly/chime` repo.
 - Check your pull request periodically to see if any changes have been requested or any merge conflicts have arisen.
 - If a merge conflict arises, rebase against the latest `develop` branch and force-push the new branch as early as you can. You may need to do this more than once before your changes get merged. Do your best to keep your branch in a mergeable state until it is finished being reviewed and accepted.
+- Note: Frequent contributors with write access can submit pull requests from a new branch in the `CodeforPhilly/chime` repository.
 
 ## Review & Release
 
