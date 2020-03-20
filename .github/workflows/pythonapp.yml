@@ -39,4 +39,8 @@ jobs:
         python -m pytest
     - name: Cypress
       uses: cypress-io/github-action@v1.16.1
+      with:
+        env: host=localhost,port=8000
+        spec: cypress/*
+
 
