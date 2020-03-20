@@ -32,6 +32,12 @@ def display_header(
     r_t,
     doubling_time_t,
 ):
+
+    detection_prob_str = (
+        "{detection_prob:.0%}".format(detection_prob=detection_prob)
+        if detection_prob is not None
+        else "unknown"
+    )
     st.markdown(
         """
 <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
@@ -53,7 +59,7 @@ def display_header(
 
     st.markdown(
         """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
-    confirmed cases in the region imply a **{detection_prob:.0%}** rate of detection. This is based on current inputs for
+    confirmed cases in the region imply a **{detection_prob_str}** rate of detection. This is based on current inputs for
     Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
 
@@ -65,7 +71,7 @@ outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying a
 """.format(
             total_infections=total_infections,
             initial_infections=initial_infections,
-            detection_prob=detection_prob,
+            detection_prob_str=detection_prob_str,
             current_hosp=current_hosp,
             hosp_rate=hosp_rate,
             S=S,
@@ -309,7 +315,7 @@ def draw_projected_admissions_table(st, projection_admits: pd.DataFrame):
     admits_table = admits_table.fillna(0).astype(int)
 
     st.table(admits_table)
-    return None 
+    return None
 
 def draw_census_table(st, census_df: pd.DataFrame):
     census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
