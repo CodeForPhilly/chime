@@ -1,9 +1,11 @@
 from typing import Tuple
 
 import numpy as np
+import streamlit as st
 
 
 # The SIR model, one time step
+@st.cache
 def sir(y, beta, gamma, N):
     S, I, R = y
     Sn = (-beta * S * I) + S
@@ -21,6 +23,7 @@ def sir(y, beta, gamma, N):
 
 
 # Run the SIR model forward in time
+@st.cache
 def sim_sir(
     S, I, R, beta, gamma, n_days, beta_decay=0
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -37,7 +40,7 @@ def sim_sir(
     s, i, r = np.array(s), np.array(i), np.array(r)
     return s, i, r
 
-
+@st.cache
 def get_hospitalizations(
     infected: np.ndarray, rates: Tuple[float, float, float], market_share: float
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
