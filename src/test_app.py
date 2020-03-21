@@ -7,7 +7,8 @@ import numpy as np
 from app import (projection_admits, alt)
 from penn_chime.models import sir, sim_sir, sim_sir_df
 from penn_chime.parameters import Parameters
-from penn_chime.presentation import display_header, new_admissions_chart
+from penn_chime.presentation import display_header
+from penn_chime.charts import new_admissions_chart
 from penn_chime.settings import DEFAULTS
 from penn_chime.defaults import RateLos
 
