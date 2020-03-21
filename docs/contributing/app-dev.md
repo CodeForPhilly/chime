@@ -24,7 +24,7 @@ See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_starte
 ```bash
 pipenv shell
 pipenv install
-streamlit run penn_chime/app.py
+streamlit run src/app.py
 ```
 
 ### With `conda`
@@ -33,7 +33,7 @@ streamlit run penn_chime/app.py
 conda env create -f environment.yml
 source activate chime
 pip install streamlit
-streamlit run penn_chime/app.py
+streamlit run src/app.py
 ```
 
 ### Choosing a Different Port
@@ -42,7 +42,7 @@ If you need to run the application on a different port than the default (8000), 
 
 ```bash
 export STREAMLIT_SERVER_PORT=1234
-streamlit run penn_chime/app.py
+streamlit run src/app.py
 ```
 
 ## Project Layout

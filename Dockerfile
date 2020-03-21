@@ -10,4 +10,4 @@ RUN pip install -q -r requirements.txt
 
 COPY . ./
 
-CMD ["streamlit", "run", "penn_chime/app.py"]
+CMD ["streamlit", "run", "src/app.py"]
