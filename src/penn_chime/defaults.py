@@ -1,10 +1,4 @@
-#!/usr/bin/env python
-"""Set defaults for your fork/locality here
-
-   after we merge this in we can set defaults in a `config/env` type of file
-"""
-
-from collections import namedtuple
+"""Defaults."""
 
 from .utils import RateLos
 
