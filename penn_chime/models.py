@@ -1,4 +1,3 @@
-from collections import namedtuple
 from typing import Generator, Tuple
 
 import numpy as np
@@ -48,15 +47,14 @@ class Parameters:
             for each in (hospitalized, icu, ventilated)
         )
 
-        # TODO: I tried casting this to an int but this breaks unittest comparisons (third digit)
-        # market_share > 0, hosp_rate > 0
+        # Note: this should not be an integer.
+        # We're appoximating infected from what we do know.
+        # TODO market_share > 0, hosp_rate > 0
         self.infected = infected = \
             current_hospitalized / market_share / hospitalized.rate
 
-        if infected > 1.e-7:
-            self.detection_probability = known_infected / infected
-        else:
-            self.detection_probability = None
+        self.detection_probability = \
+            known_infected / infected if infected > 1.e-7 else None
 
         # TODO missing initial recovered value
         self.recovered = 0.0
@@ -76,18 +74,15 @@ class Parameters:
         )  # {rate based on doubling time} / {initial susceptible}
 
         # r_t is r_0 after distancing
-        self.r_t = r_t = beta / gamma * susceptible
+        self.r_t = beta / gamma * susceptible
 
         # Simplify equation to avoid division by zero:
         # self.r_naught = r_t / (1.0 - relative_contact_rate)
-        self.r_naught = (intrinsic_growth_rate + gamma)  / gamma
+        self.r_naught = (intrinsic_growth_rate + gamma) / gamma
 
         # doubling time after distancing
         # TODO constrain values np.log2(...) > 0.0
         self.doubling_time_t = 1.0 / np.log2(beta * susceptible - gamma + 1)
-
-        self.beta_decay = 0.0
-
 
     @property
     def n_days(self):
@@ -108,7 +103,6 @@ class Parameters:
             self.beta,
             self.gamma,
             n_days,
-            self.beta_decay
         )
         self.susceptible_v, self.infected_v, self.recovered_v = s_v, i_v, r_v
 
@@ -140,31 +134,27 @@ def sir(
 
 def gen_sir(
     s: float, i: float, r: float,
-    beta: float, gamma: float, n_days: int, beta_decay: float = 0.0
+    beta: float, gamma: float, n_days: int
 ) -> Generator[Tuple[float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples."""
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
-    f = 1.0 - beta_decay  # okay even if beta_decay is 0.0
     for _ in range(n_days + 1):
         yield s, i, r
         s, i, r = sir(s, i, r, beta, gamma, n)
-        beta *= f
 
 
 @st.cache
 def sim_sir(
     s: float, i: float, r: float,
-    beta: float, gamma: float, n_days: int, beta_decay: float = 0.0
+    beta: float, gamma: float, n_days: int
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulate the SIR model forward in time."""
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
-    f = 1.0 - beta_decay  # okay even if beta_decay is 0.0
     s_v, i_v, r_v = [s], [i], [r]
     for day in range(n_days):
         s, i, r = sir(s, i, r, beta, gamma, n)
-        beta *= f
         s_v.append(s)
         i_v.append(i)
         r_v.append(r)
@@ -179,12 +169,12 @@ def sim_sir(
 @st.cache
 def sim_sir_df(
     s: float, i: float, r: float,
-    beta: float, gamma: float, n_days: int, beta_decay: float = 0.0
+    beta: float, gamma: float, n_days: int
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
-        data=gen_sir(s, i, r, beta, gamma, n_days, beta_decay),
-        columns=("S", "I", "R"),
+        data=gen_sir(s, i, r, beta, gamma, n_days),
+        columns=("Susceptible", "Infected", "Recovered"),
     )
 
 
@@ -194,18 +184,3 @@ def get_dispositions(
 ) -> Tuple[np.ndarray, ...]:
     """Get dispositions of infected adjusted by rate and market_share."""
     return (*(infected * rate * market_share for rate in rates),)
-
-
-@st.cache
-def get_hospitalizations(
-    infected: np.ndarray,
-    rates: Tuple[float, float, float],
-    market_share: float
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Get hopitalizations adjusted by rate and market_share."""
-    hosp_rate, icu_rate, vent_rate = rates
-
-    hosp = infected * hosp_rate * market_share
-    icu = infected * icu_rate * market_share
-    vent = infected * vent_rate * market_share
-    return hosp, icu, vent
