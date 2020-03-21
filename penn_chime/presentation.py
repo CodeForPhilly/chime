@@ -1,9 +1,11 @@
-from datetime import datetime
 import altair as alt
 import numpy as np
 import pandas as pd
 
 from .defaults import Constants
+from .utils import add_date_column
+
+DATE_FORMAT = "%b, %d" # see https://strftime.org
 
 hide_menu_style = """
         <style>
@@ -227,22 +229,18 @@ def write_footer(st):
 
 
 def new_admissions_chart(
-    alt, projection_admits: pd.DataFrame, plot_projection_days: int, as_date: bool=False
+    alt, projection_admits: pd.DataFrame, plot_projection_days: int, as_date: bool = False
 ) -> alt.Chart:
     """docstring"""
     projection_admits = projection_admits.rename(
         columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"}
     )
-    projection_admits["date"] = pd.date_range(
-        datetime.now(),
-        periods=projection_admits.shape[0],
-        freq="D"
-    )
-    x_kwargs = (
-        {"shorthand": "date:T", "title": "Date"}
-        if as_date
-        else {"shorthand": "day", "title": "Days from today"}
-    )
+
+    if as_date:
+        projection_admits = add_date_column(projection_admits)
+        x_kwargs = {"shorthand": "date:T", "title": "Date"}
+    else:
+        x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
     return (
         alt.Chart(projection_admits.head(plot_projection_days))
@@ -262,7 +260,12 @@ def new_admissions_chart(
     )
 
 
-def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int) -> alt.Chart:
+def admitted_patients_chart(
+    alt,
+    census: pd.DataFrame,
+    plot_projection_days: int,
+    as_date: bool = False
+) -> alt.Chart:
     """docstring"""
     census = census.rename(
         columns={
@@ -271,13 +274,18 @@ def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int
             "vent": "Ventilated Census",
         }
     )
+    if as_date:
+        census = add_date_column(census)
+        x_kwargs = {"shorthand": "date:T", "title": "Date"}
+    else:
+        x_kwargs ={"shorthand": "day", "title": "Days from today"}
 
     return (
         alt.Chart(census.head(plot_projection_days))
         .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
         .mark_line(point=True)
         .encode(
-            x=alt.X("day", title="Days from today"),
+            x=alt.X(**x_kwargs),
             y=alt.Y("value:Q", title="Census"),
             color="key:N",
             tooltip=[
@@ -290,15 +298,26 @@ def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int
     )
 
 
-def additional_projections_chart(alt, i: np.ndarray, r: np.ndarray) -> alt.Chart:
+def additional_projections_chart(
+    alt,
+    i: np.ndarray,
+    r: np.ndarray,
+    as_date: bool = False
+) -> alt.Chart:
     dat = pd.DataFrame({"Infected": i, "Recovered": r})
+    dat["day"] = dat.index
+    if as_date:
+        dat = add_date_column(dat)
+        x_kwargs = {"shorthand": "date:T", "title": "Date"}
+    else:
+        x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
     return (
-        alt.Chart(dat.reset_index())
+        alt.Chart(dat)
         .transform_fold(fold=["Infected", "Recovered"])
         .mark_line()
         .encode(
-            x=alt.X("index", title="Days from today"),
+            x=alt.X(**x_kwargs),
             y=alt.Y("value:Q", title="Case Volume"),
             tooltip=["key:N", "value:Q"],
             color="key:N",
@@ -307,12 +326,12 @@ def additional_projections_chart(alt, i: np.ndarray, r: np.ndarray) -> alt.Chart
     )
 
 
-def show_additional_projections(st, alt, charting_func, i, r):
+def show_additional_projections(st, alt, charting_func, i, r, as_date: bool = False):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
 
-    st.altair_chart(charting_func(alt, i, r), use_container_width=True)
+    st.altair_chart(charting_func(alt, i, r, as_date=as_date), use_container_width=True)
 
 
 ##########
@@ -320,31 +339,57 @@ def show_additional_projections(st, alt, charting_func, i, r):
 ##########
 
 
-def draw_projected_admissions_table(st, projection_admits: pd.DataFrame):
+def draw_projected_admissions_table(
+    st,
+    projection_admits: pd.DataFrame,
+    as_date: bool = False
+):
     admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
     admits_table["day"] = admits_table.index
     admits_table.index = range(admits_table.shape[0])
     admits_table = admits_table.fillna(0).astype(int)
 
+    if as_date:
+        admits_table = add_date_column(
+            admits_table,
+            drop_day_column=True,
+            date_format=DATE_FORMAT
+        )
+
     st.table(admits_table)
     return None
 
-def draw_census_table(st, census_df: pd.DataFrame):
+def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False):
     census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
     census_table.index = range(census_table.shape[0])
     census_table.loc[0, :] = 0
     census_table = census_table.dropna().astype(int)
 
+    if as_date:
+        census_table = add_date_column(
+            census_table,
+            drop_day_column=True,
+            date_format=DATE_FORMAT
+        )
+
     st.table(census_table)
     return None
 
 
-def draw_raw_sir_simulation_table(st, n_days, s, i, r):
-    days = np.array(range(0, n_days + 1))
+def draw_raw_sir_simulation_table(st, n_days, s, i, r, as_date: bool = False):
+    days = np.arange(0, n_days + 1)
     data_list = [days, s, i, r]
     data_dict = dict(zip(["day", "susceptible", "infections", "recovered"], data_list))
     projection_area = pd.DataFrame.from_dict(data_dict)
     infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
     infect_table.index = range(infect_table.shape[0])
+    infect_table["day"] = infect_table.day.astype(int)
+
+    if as_date:
+        infect_table = add_date_column(
+            infect_table,
+            drop_day_column=True,
+            date_format=DATE_FORMAT
+        )
 
     st.table(infect_table)
