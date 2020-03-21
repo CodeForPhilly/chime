@@ -205,6 +205,7 @@ p.n_days = st.slider(
     step=1,
     format="%i"
 )
+as_date = st.checkbox(label="Present result as dates instead of days", value=False)
 
 # format data
 projection_admits = build_admissions_df(p.n_days, *p.dispositions)
