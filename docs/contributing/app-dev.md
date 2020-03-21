@@ -49,8 +49,8 @@ streamlit run src/app.py
 
 ### Application files
 
-- `penn_chime/app.py`: Main source for the application
-- `penn_chime/test_app.py`: [pytest](https://docs.pytest.org/en/latest/) tests for `app.py`
+- `src/app.py`: Main source for the application
+- `src/test_app.py`: [pytest](https://docs.pytest.org/en/latest/) tests for `app.py`
 - `script/`: Developer workflow scripts following [GitHub's Scripts To Rule Them All](https://github.com/github/scripts-to-rule-them-all) pattern.
 - `.streamlit/`: [Streamlit config options](https://docs.streamlit.io/cli.html)
 - `.env`: Local environment variables to use when running application, this file is copied from `.env.example` to start you out and then ignored by git
