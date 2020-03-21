@@ -22,7 +22,8 @@ class Parameters:
         icu: RateLos,
         ventilated: RateLos,
 
-        max_y_axis: int
+        max_y_axis: int = None,
+        n_days: int = None
     ):
         self.current_hospitalized = current_hospitalized
         self.doubling_time = doubling_time
@@ -84,6 +85,13 @@ class Parameters:
         # TODO constrain values np.log2(...) > 0.0
         self.doubling_time_t = 1.0 / np.log2(beta * susceptible - gamma + 1)
 
+        self.dispositions = None
+        self.susceptible_v = self.infected_v = self.recovered_v = None
+        self.hospitalized_v = self.icu_v = self.ventilated_v = None
+
+        if n_days is not None:
+            self.n_days = n_days
+
     @property
     def n_days(self):
         return self._n_days
@@ -91,10 +99,6 @@ class Parameters:
     @n_days.setter
     def n_days(self, n_days: int):
         self._n_days = n_days
-
-        # s := Susceptible, able to be infected
-        # i := Infected, currently infected with the virus
-        # r := Recovered, no longer infected with the virus
 
         s_v, i_v, r_v = sim_sir(
             self.susceptible,
