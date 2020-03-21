@@ -1,4 +1,4 @@
-"""CLI for CHIME."""
+"""Command line interface."""
 
 from argparse import (
     Action,
@@ -8,9 +8,8 @@ from datetime import datetime
 
 from pandas import DataFrame
 
-from penn_chime.defaults import RateLos
-from penn_chime.models import Parameters
-from penn_chime.utils import build_admissions_df, build_census_df
+from penn_chime.parameters import Parameters
+from penn_chime.utils import build_admissions_df, build_census_df, RateLos
 
 
 class FromFile(Action):
