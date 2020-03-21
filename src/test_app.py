@@ -175,7 +175,7 @@ def test_sim_sir():
 
 
 def test_new_admissions_chart():
-    chart = new_admissions_chart(alt, projection_admits, PARAM)
+    chart = new_admissions_chart(alt, admissions_df, PARAM)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].Hospitalized < 1
     # assert round(chart.data.iloc[49].ICU, 0) == 43
