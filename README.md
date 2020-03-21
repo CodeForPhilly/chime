@@ -12,6 +12,7 @@ Join our [Code For Philly](https://codeforphilly.org/projects/chime) project or 
 
 ## Documentation
 
+- [User Documentation](https://code-for-philly.gitbook.io/chime/)
 - [Getting Started: Try Online](https://codeforphilly.github.io/chime/getting-started/try-online.html)
 - [Getting Started: Run Locally](https://codeforphilly.github.io/chime/getting-started/run-locally.html)
 - [Contributing: Overview](https://codeforphilly.github.io/chime/CONTRIBUTING.html)
