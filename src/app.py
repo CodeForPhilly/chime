@@ -17,9 +17,8 @@ from penn_chime.presentation import (
     write_definitions,
     write_footer,
 )
-from penn_chime.utils import build_admissions_df, build_census_df
-from penn_chime.settings import DEFAULTS
-from penn_chime.models import sim_sir_df
+from penn_chime.settings import DEFAULTS 
+from penn_chime.models import sim_sir_df, build_admissions_df, build_census_df
 from penn_chime.charts import additional_projections_chart, admitted_patients_chart, new_admissions_chart
 # This is somewhat dangerous:
 # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
@@ -61,7 +60,6 @@ st.subheader("Admitted Patients (Census)")
 st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
 )
-st.dataframe(census_df)
 st.altair_chart(
     admitted_patients_chart(alt=alt, census=census_df, parameters=p, as_date=as_date), use_container_width=True
 )
