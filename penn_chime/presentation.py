@@ -404,7 +404,9 @@ def new_admissions_chart(
     )
 
 
-def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int,
+def admitted_patients_chart(alt,
+        census: pd.DataFrame,
+        plot_projection_days: int,
         max_y_axis: int = None
 ) -> alt.Chart:
     """docstring"""
@@ -440,7 +442,8 @@ def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int
     )
 
 
-def additional_projections_chart(alt, i: np.ndarray, r: np.ndarray,
+def additional_projections_chart(alt, i: np.ndarray,
+        r: np.ndarray,
         max_y_axis: int = None
 ) -> alt.Chart:
     dat = pd.DataFrame({"Infected": i, "Recovered": r})
