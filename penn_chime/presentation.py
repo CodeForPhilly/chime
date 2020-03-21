@@ -218,7 +218,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
             "Y-axis static value",
             value=500,
             format="%i",
-            step=1,
+            step=25,
         )
 
     return Parameters(
