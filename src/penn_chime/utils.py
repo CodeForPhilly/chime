@@ -54,6 +54,11 @@ def build_census_df(
     census_df["day"] = census_df.index
     census_df = census_df[["day", "Hospitalized", "ICU", "Ventilated"]]
     census_df = census_df.head(n_days)
+    census_df = census_df.rename(
+        columns={disposition: f"{disposition} Census"
+                 for disposition
+                 in ("Hospitalized", "ICU", "Ventilated")}
+    )
     return census_df
 
 

@@ -5,17 +5,19 @@ from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
 
+from .parameters import Parameters
+from .utils import add_date_column
+
+
 def new_admissions_chart(
     alt,
     projection_admits: pd.DataFrame,
-    plot_projection_days: int,
+    parameters: Parameters,
     as_date: bool = False,
-    max_y_axis: int = None
 ) -> Chart:
     """docstring"""
-    projection_admits = projection_admits.rename(
-        columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"}
-    )
+    plot_projection_days = parameters.n_days - 10
+    max_y_axis = parameters.max_y_axis
 
     y_scale = alt.Scale()
 
@@ -51,13 +53,13 @@ def new_admissions_chart(
 def admitted_patients_chart(
     alt,
     census: pd.DataFrame,
-    plot_projection_days: int,
-    as_date: bool = False,
-    max_y_axis: Optional[int] = None
+    parameters: Parameters,
+    as_date: bool = False
 ) -> Chart:
     """docstring"""
 
-    tooltip_dict = {False: "day", True: "date:T"}
+    plot_projection_days = parameters.n_days - 10
+    max_y_axis = parameters.max_y_axis
     if as_date:
         census = add_date_column(census)
         x_kwargs = {"shorthand": "date:T", "title": "Date"}
@@ -73,8 +75,8 @@ def admitted_patients_chart(
         y_scale.clamp = True
 
     return (
-        alt.Chart(census.head(plot_projection_days))
-        .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
+        alt.Chart(census)#.head(plot_projection_days))
+        .transform_fold(fold=["Hospitalized Census", "ICU Census", "Ventilated Census"])
         .mark_line(point=True)
         .encode(
             x=alt.X(**x_kwargs),

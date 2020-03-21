@@ -25,26 +25,11 @@ hide_menu_style = """
 ########
 
 
-def display_header(
-    st,
-    total_infections,
-    initial_infections,
-    detection_prob,
-    current_hosp,
-    hosp_rate,
-    S,
-    market_share,
-    recovery_days,
-    r_naught,
-    doubling_time,
-    relative_contact_rate,
-    r_t,
-    doubling_time_t,
-):
+def display_header(st, p):
 
     detection_prob_str = (
-        "{detection_prob:.0%}".format(detection_prob=detection_prob)
-        if detection_prob is not None
+        "{detection_prob:.0%}".format(detection_prob=p.detection_probability)
+        if p.detection_probability
         else "unknown"
     )
     st.markdown(
@@ -78,19 +63,19 @@ An initial doubling time of **{doubling_time}** days and a recovery time of **{r
 **Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
 outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**.
 """.format(
-            total_infections=total_infections,
-            initial_infections=initial_infections,
+            total_infections=p.infected,
+            initial_infections=p.known_infected,
             detection_prob_str=detection_prob_str,
-            current_hosp=current_hosp,
-            hosp_rate=hosp_rate,
-            S=S,
-            market_share=market_share,
-            recovery_days=recovery_days,
-            r_naught=r_naught,
-            doubling_time=doubling_time,
-            relative_contact_rate=relative_contact_rate,
-            r_t=r_t,
-            doubling_time_t=doubling_time_t,
+            current_hosp=p.current_hospitalized,
+            hosp_rate=p.hospitalized.rate,
+            S=p.susceptible,
+            market_share=p.market_share,
+            recovery_days=p.recovery_days,
+            r_naught=p.r_naught,
+            doubling_time=p.doubling_time,
+            relative_contact_rate=p.relative_contact_rate,
+            r_t=p.r_t,
+            doubling_time_t=p.doubling_time_t,
         )
     )
 
@@ -255,12 +240,7 @@ def display_n_days_slider(st, p: Parameters, d: Constants):
 
 def show_more_info_about_this_tool(
     st,
-    recovery_days,
-    doubling_time,
-    r_naught,
-    relative_contact_rate,
-    doubling_time_t,
-    r_t,
+    parameters,
     inputs: Constants,
     notes: str = ''
 ):
@@ -332,12 +312,12 @@ We need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantit
 - $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/{recovery_days}$.
 - To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
 """.format(
-            doubling_time=doubling_time,
-            recovery_days=recovery_days,
-            r_naught=r_naught,
-            relative_contact_rate=relative_contact_rate,
-            doubling_time_t=doubling_time_t,
-            r_t=r_t,
+            doubling_time=parameters.doubling_time,
+            recovery_days=parameters.recovery_days,
+            r_naught=parameters.r_naught,
+            relative_contact_rate=parameters.relative_contact_rate,
+            doubling_time_t=parameters.doubling_time_t,
+            r_t=parameters.r_t,
         )
     )
     st.latex("g = 2^{1/T_d} - 1")
@@ -390,16 +370,21 @@ def show_additional_projections(
     st,
     alt,
     charting_func,
-    i,
-    r,
+    parameters,
     as_date: bool = False,
-    max_y_axis: int = None
 ):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
 
-    st.altair_chart(charting_func(alt, i, r, as_date=as_date, max_y_axis=max_y_axis), use_container_width=True)
+    st.altair_chart(
+        charting_func(
+            alt,
+            parameters.infected_v,
+            parameters.recovered_v,
+            as_date=as_date,
+            max_y_axis=parameters.max_y_axis),
+        use_container_width=True)
 
 
 ##########
@@ -444,10 +429,13 @@ def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False):
     return None
 
 
-def draw_raw_sir_simulation_table(st, n_days, s, i, r, as_date: bool = False):
-    days = np.arange(0, n_days + 1)
-    data_list = [days, s, i, r]
-    data_dict = dict(zip(["day", "susceptible", "infections", "recovered"], data_list))
+def draw_raw_sir_simulation_table(
+        st,
+        parameters,
+        as_date: bool = False):
+    days = np.arange(0, parameters.n_days + 1)
+    data_list = [days, parameters.susceptible_v, parameters.infected_v, parameters.recovered_v]
+    data_dict = dict(zip(["day", "Susceptible", "Infections", "Recovered"], data_list))
     projection_area = pd.DataFrame.from_dict(data_dict)
     infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
     infect_table.index = range(infect_table.shape[0])
