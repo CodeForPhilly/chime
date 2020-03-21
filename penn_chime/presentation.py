@@ -381,7 +381,7 @@ def new_admissions_chart(
     projection_admits = projection_admits.rename(
         columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"}
     )
-
+    tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
         projection_admits = add_date_column(projection_admits)
         x_kwargs = {"shorthand": "date:T", "title": "Date"}
@@ -397,7 +397,7 @@ def new_admissions_chart(
             y=alt.Y("value:Q", title="Daily admissions"),
             color="key:N",
             tooltip=[
-                "day",
+                tooltip_dict[as_date],
                 alt.Tooltip("value:Q", format=".0f", title="Admissions"),
                 "key:N",
             ],
@@ -420,6 +420,7 @@ def admitted_patients_chart(
             "vent": "Ventilated Census",
         }
     )
+    tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
         census = add_date_column(census)
         x_kwargs = {"shorthand": "date:T", "title": "Date"}
@@ -435,7 +436,7 @@ def admitted_patients_chart(
             y=alt.Y("value:Q", title="Census"),
             color="key:N",
             tooltip=[
-                "day",
+                tooltip_dict[as_date],
                 alt.Tooltip("value:Q", format=".0f", title="Census"),
                 "key:N",
             ],
