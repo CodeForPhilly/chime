@@ -1,8 +1,8 @@
 """Tests."""
 
-import pytest
-import pandas as pd
-import numpy as np
+import pytest  # type: ignore
+import pandas as pd  # type: ignore
+import numpy as np  # type: ignore
 
 from app import (projection_admits, alt)
 from penn_chime.models import sir, sim_sir, sim_sir_df
@@ -43,7 +43,7 @@ st = MockStreamlit()
 
 def test_penn_logo_in_header():
     penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
-    display_header(st, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    display_header(st, DEFAULTS)
     assert len(
         list(filter(lambda s: penn_css in s, st.render_store))
     ), "The Penn Medicine header should be printed"
@@ -65,7 +65,7 @@ def test_header_fail():
     Just proving to myself that these tests work
     """
     some_garbage = "ajskhlaeHFPIQONOI8QH34TRNAOP8ESYAW4"
-    display_header(st, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    display_header(st, DEFAULTS)
     assert len(
         list(filter(lambda s: some_garbage in s, st.render_store))
     ), "This should fail"
@@ -152,7 +152,7 @@ def test_sim_sir_df():
     Rounding to move fast past decimal place issues
     """
 
-    df = sim_sir_df(5, 6, 7, 0.1, 0.1, 40)
+    df = sim_sir_df(DEFAULTS)
     first = df.iloc[0]
     last = df.iloc[-1]
     assert round(first[0], 0) == 5
@@ -164,7 +164,7 @@ def test_sim_sir_df():
 
 
 def test_new_admissions_chart():
-    chart = new_admissions_chart(alt, projection_admits, 60 - 10)
+    chart = new_admissions_chart(alt, projection_admits, DEFAULTS)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].Hospitalized < 1
     # assert round(chart.data.iloc[49].ICU, 0) == 43
