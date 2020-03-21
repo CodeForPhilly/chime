@@ -14,3 +14,20 @@ File/Folder | Purpose
 `plotting` | Specific functions which provide plotting data
 `tmp_data` | Temp submodule for data which will be removed and actual `penn_chime` data is used
 `templates` | Specific `html` or `markdown` files
+
+## How to use
+Run
+```bash
+> python penn_chime/dash/app.py
+```
+in the project root (after installing requirements).
+
+You can also
+```bash
+> pip install [--user] [-e] .
+```
+which installs the command line script
+```bash
+> penn_chime
+```
+which launches the dash app.
