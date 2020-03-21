@@ -22,6 +22,8 @@ class Parameters:
         hospitalized: RateLos,
         icu: RateLos,
         ventilated: RateLos,
+
+        max_y_axis: int
     ):
         self.current_hospitalized = current_hospitalized
         self.doubling_time = doubling_time
@@ -34,6 +36,8 @@ class Parameters:
         self.hospitalized = hospitalized
         self.icu = icu
         self.ventilated = ventilated
+
+        self.max_y_axis = max_y_axis
 
         self.rates = tuple(
             each.rate

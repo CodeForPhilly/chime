@@ -226,19 +226,27 @@ def write_footer(st):
 
 
 def new_admissions_chart(
-    alt, projection_admits: pd.DataFrame, plot_projection_days: int
+    alt, projection_admits: pd.DataFrame, plot_projection_days: int,
+    max_y_axis: int = None
 ) -> alt.Chart:
     """docstring"""
     projection_admits = projection_admits.rename(
         columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"}
     )
+
+    y_scale = alt.Scale()
+
+    if max_y_axis is not None:
+        y_scale.domain = (0, max_y_axis)
+        y_scale.clamp = True
+
     return (
         alt.Chart(projection_admits.head(plot_projection_days))
         .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
         .mark_line(point=True)
         .encode(
             x=alt.X("day", title="Days from today"),
-            y=alt.Y("value:Q", title="Daily admissions"),
+            y=alt.Y("value:Q", title="Daily admissions", scale=y_scale),
             color="key:N",
             tooltip=[
                 "day",
@@ -250,7 +258,9 @@ def new_admissions_chart(
     )
 
 
-def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int) -> alt.Chart:
+def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int,
+        max_y_axis: int = None
+) -> alt.Chart:
     """docstring"""
     census = census.rename(
         columns={
@@ -260,13 +270,19 @@ def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int
         }
     )
 
+    y_scale = alt.Scale()
+
+    if max_y_axis is not None:
+        y_scale.domain = (0, max_y_axis)
+        y_scale.clamp = True
+
     return (
         alt.Chart(census.head(plot_projection_days))
         .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
         .mark_line(point=True)
         .encode(
             x=alt.X("day", title="Days from today"),
-            y=alt.Y("value:Q", title="Census"),
+            y=alt.Y("value:Q", title="Census", scale=y_scale),
             color="key:N",
             tooltip=[
                 "day",
@@ -278,8 +294,16 @@ def admitted_patients_chart(alt, census: pd.DataFrame, plot_projection_days: int
     )
 
 
-def additional_projections_chart(alt, i: np.ndarray, r: np.ndarray) -> alt.Chart:
+def additional_projections_chart(alt, i: np.ndarray, r: np.ndarray,
+        max_y_axis: int = None
+) -> alt.Chart:
     dat = pd.DataFrame({"Infected": i, "Recovered": r})
+
+    y_scale = alt.Scale()
+
+    if max_y_axis is not None:
+        y_scale.domain = (0, max_y_axis)
+        y_scale.clamp = True
 
     return (
         alt.Chart(dat.reset_index())
@@ -287,7 +311,7 @@ def additional_projections_chart(alt, i: np.ndarray, r: np.ndarray) -> alt.Chart
         .mark_line()
         .encode(
             x=alt.X("index", title="Days from today"),
-            y=alt.Y("value:Q", title="Case Volume"),
+            y=alt.Y("value:Q", title="Case Volume", scale=y_scale),
             tooltip=["key:N", "value:Q"],
             color="key:N",
         )
@@ -295,12 +319,12 @@ def additional_projections_chart(alt, i: np.ndarray, r: np.ndarray) -> alt.Chart
     )
 
 
-def show_additional_projections(st, alt, charting_func, i, r):
+def show_additional_projections(st, alt, charting_func, i, r, max_y_axis):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
 
-    st.altair_chart(charting_func(alt, i, r), use_container_width=True)
+    st.altair_chart(charting_func(alt, i, r, max_y_axis), use_container_width=True)
 
 
 ##########
