@@ -175,3 +175,52 @@ def test_new_admissions_chart():
 
     empty_chart = new_admissions_chart(alt, pd.DataFrame(), -1)
     assert empty_chart.data.empty
+
+
+def test_parameters():
+    from penn_chime.models import Parameters
+    from penn_chime.defaults import RateLos
+    param = Parameters(
+        current_hospitalized=100,
+        doubling_time=6.0,
+        known_infected=5000,
+        market_share=0.05,
+        relative_contact_rate=0.15,
+        susceptible=500000,
+        hospitalized=RateLos(0.05, 7),
+        icu=RateLos(0.02, 9),
+        ventilated=RateLos(0.01, 10),
+        n_days=60
+    )
+
+    # test the Parameters
+
+    # hospitalized, icu, ventilated
+    assert param.rates == (0.05, 0.02, 0.01)
+    assert param.lengths_of_stay == (7, 9, 10)
+
+    assert param.infected == 40000.0
+    assert isinstance(param.infected, float)  # based off note in models.py
+
+    # test the class-calculated attributes
+    assert param.detection_probability == 0.125
+    assert param.intrinsic_growth_rate == 0.12246204830937302
+    assert param.beta == 3.2961405355450555e-07
+    assert param.r_t == 2.307298374881539
+    assert param.r_naught == 2.7144686763312222
+    assert param.doubling_time_t == 7.764405988534983
+
+    # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
+    assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 61
+
+    assert param.susceptible_v[0] == 500000.0
+    assert round(param.susceptible_v[-1], 0) == 67202
+    assert round(param.infected_v[1], 0) == 43735
+    assert round(param.recovered_v[30], 0) == 224048
+    assert [d[0] for d in param.dispositions] == [100.0, 40.0, 20.0]
+    assert [round(d[-1], 0) for d in param.dispositions] == [115.0, 46.0, 23.0]
+
+    # change n_days, make sure it cascades
+    param.n_days = 2
+    assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 3
+
