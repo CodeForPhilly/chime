@@ -208,6 +208,16 @@ def display_sidebar(st, d: Constants) -> Parameters:
         format="%i",
     )
 
+    max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value")
+    max_y_axis = None
+    if max_y_axis_set:
+        max_y_axis = st.sidebar.number_input(
+            "Y-axis static value",
+            value=500,
+            format="%i",
+            step=1,
+        )
+
     return Parameters(
         current_hospitalized=current_hospitalized,
         doubling_time=doubling_time,
@@ -218,7 +228,8 @@ def display_sidebar(st, d: Constants) -> Parameters:
 
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
-        ventilated=RateLos(ventilated_rate, ventilated_los)
+        ventilated=RateLos(ventilated_rate, ventilated_los),
+        max_y_axis=max_y_axis
     )
 
 
