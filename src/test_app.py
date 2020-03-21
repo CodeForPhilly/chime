@@ -4,7 +4,7 @@ import pytest  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
 
-from app import (projection_admits, alt)
+from app import (admissions_df, alt)
 from penn_chime.models import sir, sim_sir, sim_sir_df
 from penn_chime.parameters import Parameters
 from penn_chime.presentation import display_header
