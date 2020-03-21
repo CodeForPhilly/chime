@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-
+import numpy as np
 
 from app import (projection_admits, alt)
 from penn_chime.models import sir, sim_sir, sim_sir_df, Parameters
@@ -81,11 +81,17 @@ def test_sir():
     """
     Someone who is good at testing, help
     """
-    assert sir(100, 1, 0, 0.2, 0.5, 1) == (
+    sir_test = sir(100, 1, 0, 0.2, 0.5, 1)
+    assert sir_test == (
         0.7920792079207921,
         0.20297029702970298,
         0.0049504950495049506,
     ), "This contrived example should work"
+
+    assert isinstance(sir_test, tuple)
+    for v in sir_test:
+        assert isinstance(v, float)
+        assert v >= 0
 
     # Certain things should *not* work
     with pytest.raises(TypeError) as error:
@@ -121,7 +127,8 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    s, i, r = sim_sir(5, 6, 7, 0.1, 0.1, 40)
+    sim_sir_test = sim_sir(5, 6, 7, 0.1, 0.1, 40)
+    s, i, r = sim_sir_test
 
     assert round(s[0], 0) == 5
     assert round(i[0], 2) == 6
@@ -129,6 +136,11 @@ def test_sim_sir():
     assert round(s[-1], 2) == 0
     assert round(i[-1], 2) == 0.18
     assert round(r[-1], 2) == 17.82
+
+    assert isinstance(sim_sir_test, tuple)
+    for v in sim_sir_test:
+        assert isinstance(v, np.ndarray)
+
 
 
 def test_sim_sir_df():
@@ -145,25 +157,6 @@ def test_sim_sir_df():
     assert round(last[0], 2) == 0
     assert round(last[1], 2) == 0.18
     assert round(last[2], 2) == 17.82
-
-
-#ef test_initial_conditions():
-#   """
-#   Note: For the rates (ie hosp_rate) - just change the value, leave the "100" alone.
-#       Easier to change whole numbers than decimals.
-#   """
-#   assert current_hosp == known_cases
-#   assert doubling_time == 6
-#   assert relative_contact_rate == 0
-#   assert hosp_rate == 5 / 100
-#   assert icu_rate == 2 / 100
-#   assert vent_rate == 1 / 100
-#   assert hosp_los == 7
-#   assert icu_los == 9
-#   assert vent_los == 10
-#   assert market_share == 15 / 100
-#   assert S == S_default
-#   assert initial_infections == known_infections
 
 
 def test_new_admissions_chart():
