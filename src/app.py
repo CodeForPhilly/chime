@@ -45,17 +45,17 @@ as_date = st.checkbox(label="Present result as dates instead of days", value=Fal
 display_n_days_slider(st, p, DEFAULTS)
 
 # begin format data
-projection_admits = build_admissions_df(p=p) # p.n_days, *p.dispositions)
-census_df = build_census_df(projection_admits, parameters=p)
+admissions_df = build_admissions_df(p=p) # p.n_days, *p.dispositions)
+census_df = build_census_df(admissions_df, parameters=p)
 # end format data
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
 st.altair_chart(
-    new_admissions_chart(alt, projection_admits, parameters=p, as_date=as_date), use_container_width=True
+    new_admissions_chart(alt, admissions_df, parameters=p, as_date=as_date), use_container_width=True
 )
 if st.checkbox("Show Projected Admissions in tabular form"):
-    draw_projected_admissions_table(st, projection_admits, as_date=as_date)
+    draw_projected_admissions_table(st, admissions_df, as_date=as_date)
 st.subheader("Admitted Patients (Census)")
 st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
