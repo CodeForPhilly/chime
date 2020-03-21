@@ -3,9 +3,10 @@ import pandas as pd
 
 
 from app import (projection_admits, alt)
-from penn_chime.models import sir, sim_sir, sim_sir_df
+from penn_chime.models import sir, sim_sir, sim_sir_df, Parameters
 from penn_chime.presentation import display_header, new_admissions_chart
 from penn_chime.settings import DEFAULTS
+from penn_chime.defaults import RateLos
 
 
 # set up
@@ -67,7 +68,7 @@ def test_header_fail():
     st.cleanup()
 
 
-def test_defaultS_repr():
+def test_defaults_repr():
     """
     Test DEFAULTS.repr
     """
@@ -87,29 +88,29 @@ def test_sir():
     ), "This contrived example should work"
 
     # Certain things should *not* work
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir("S", 1, 0, 0.2, 0.5, 1)
-    assert str(E.value) == "can't multiply sequence by non-int of type 'float'"
+    assert str(error.value) == "can't multiply sequence by non-int of type 'float'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, "I", 0, 0.2, 0.5, 1)
-    assert str(E.value) == "can't multiply sequence by non-int of type 'float'"
+    assert str(error.value) == "can't multiply sequence by non-int of type 'float'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, 1, "R", 0.2, 0.5, 1)
-    assert str(E.value) == "unsupported operand type(s) for +: 'float' and 'str'"
+    assert str(error.value) == "unsupported operand type(s) for +: 'float' and 'str'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, 1, 0, "beta", 0.5, 1)
-    assert str(E.value) == "bad operand type for unary -: 'str'"
+    assert str(error.value) == "bad operand type for unary -: 'str'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, 1, 0, 0.2, "gamma", 1)
-    assert str(E.value) == "unsupported operand type(s) for -: 'float' and 'str'"
+    assert str(error.value) == "unsupported operand type(s) for -: 'float' and 'str'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, 1, 0, 0.2, 0.5, "N")
-    assert str(E.value) == "unsupported operand type(s) for /: 'str' and 'float'"
+    assert str(error.value) == "unsupported operand type(s) for /: 'str' and 'float'"
 
     # Zeros across the board should fail
     with pytest.raises(ZeroDivisionError):
@@ -120,7 +121,7 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    s,i,r = sim_sir(5, 6, 7, 0.1, 0.1, 40)
+    s, i, r = sim_sir(5, 6, 7, 0.1, 0.1, 40)
 
     assert round(s[0], 0) == 5
     assert round(i[0], 2) == 6
@@ -167,7 +168,7 @@ def test_sim_sir_df():
 
 def test_new_admissions_chart():
     chart = new_admissions_chart(alt, projection_admits, 60 - 10)
-    assert type(chart) == alt.Chart
+    assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].Hospitalized < 1
     # assert round(chart.data.iloc[49].ICU, 0) == 43
     with pytest.raises(TypeError):
@@ -178,8 +179,6 @@ def test_new_admissions_chart():
 
 
 def test_parameters():
-    from penn_chime.models import Parameters
-    from penn_chime.defaults import RateLos
     param = Parameters(
         current_hospitalized=100,
         doubling_time=6.0,
@@ -223,4 +222,3 @@ def test_parameters():
     # change n_days, make sure it cascades
     param.n_days = 2
     assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 3
-
