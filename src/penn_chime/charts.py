@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-from typing import Optional
 
 from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
@@ -75,7 +73,7 @@ def admitted_patients_chart(
         y_scale.clamp = True
 
     return (
-        alt.Chart(census)#.head(plot_projection_days))
+        alt.Chart(census.head(plot_projection_days))
         .transform_fold(fold=["Hospitalized Census", "ICU Census", "Ventilated Census"])
         .mark_line(point=True)
         .encode(
