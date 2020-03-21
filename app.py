@@ -15,8 +15,7 @@ from penn_chime.presentation import (
     show_additional_projections,
     show_more_info_about_this_tool,
     write_definitions,
-    write_footer,
-    display_sidebar
+    write_footer
 )
 from penn_chime.utils import build_admissions_df, build_census_df
 from penn_chime.settings import DEFAULTS
