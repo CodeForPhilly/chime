@@ -12,6 +12,7 @@ from penn_chime.presentation import display_header
 from penn_chime.settings import DEFAULTS
 from penn_chime.defaults import RateLos
 
+
 PARAM = Parameters(
         current_hospitalized=100,
         doubling_time=6.0,
@@ -159,7 +160,7 @@ def test_sim_sir():
 
 
 def test_new_admissions_chart():
-    projection_admits = pd.read_csv('src/tests/projection_admits.csv')
+    projection_admits = pd.read_csv('tests/projection_admits.csv')
     chart = new_admissions_chart(alt, projection_admits, 60 - 10)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].Hospitalized < 1
@@ -174,7 +175,7 @@ def test_new_admissions_chart():
 
 
 def test_admitted_patients_chart():
-    census_df = pd.read_csv('src/tests/census_df.csv')
+    census_df = pd.read_csv('tests/census_df.csv')
     chart = admitted_patients_chart(alt, census_df, 60 - 10)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1]['Hospital Census'] == 1
