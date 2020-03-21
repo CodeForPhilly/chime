@@ -11,7 +11,18 @@ from penn_chime.presentation import display_header
 from penn_chime.charts import new_admissions_chart
 from penn_chime.settings import DEFAULTS
 from penn_chime.defaults import RateLos
-
+PARAM = Parameters(
+        current_hospitalized=100,
+        doubling_time=6.0,
+        known_infected=5000,
+        market_share=0.05,
+        relative_contact_rate=0.15,
+        susceptible=500000,
+        hospitalized=RateLos(0.05, 7),
+        icu=RateLos(0.02, 9),
+        ventilated=RateLos(0.01, 10),
+        n_days=60
+    )
 
 # set up
 
@@ -43,7 +54,7 @@ st = MockStreamlit()
 
 def test_penn_logo_in_header():
     penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
-    display_header(st, DEFAULTS)
+    display_header(st, PARAM)
     assert len(
         list(filter(lambda s: penn_css in s, st.render_store))
     ), "The Penn Medicine header should be printed"
@@ -152,7 +163,7 @@ def test_sim_sir_df():
     Rounding to move fast past decimal place issues
     """
 
-    df = sim_sir_df(DEFAULTS)
+    df = sim_sir_df(PARAM)
     first = df.iloc[0]
     last = df.iloc[-1]
     assert round(first[0], 0) == 5
@@ -164,7 +175,7 @@ def test_sim_sir_df():
 
 
 def test_new_admissions_chart():
-    chart = new_admissions_chart(alt, projection_admits, DEFAULTS)
+    chart = new_admissions_chart(alt, projection_admits, PARAM)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].Hospitalized < 1
     # assert round(chart.data.iloc[49].ICU, 0) == 43
