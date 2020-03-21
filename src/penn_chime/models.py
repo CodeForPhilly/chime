@@ -2,8 +2,8 @@
 
 from typing import Generator, Tuple
 
-import numpy as np
-import pandas as pd
+import numpy as np  # type: ignore
+import pandas as pd  # type: ignore
 
 
 def sir(
@@ -58,13 +58,13 @@ def sim_sir(
     )
 
 
-def sim_sir_df(
-    s: float, i: float, r: float,
-    beta: float, gamma: float, n_days: int
-) -> pd.DataFrame:
-    """Simulate the SIR model forward in time."""
+def sim_sir_df(p) -> pd.DataFrame:
+    """Simulate the SIR model forward in time.
+
+    p is a Parameters instance. for circuluar dependency reasons i can't annotate it.
+    """
     return pd.DataFrame(
-        data=gen_sir(s, i, r, beta, gamma, n_days),
+        data=gen_sir(p.susceptible, p.infected, p.recovered, p.beta, p.gamma, p.n_days),
         columns=("Susceptible", "Infected", "Recovered"),
     )
 
@@ -74,3 +74,51 @@ def get_dispositions(
 ) -> Tuple[np.ndarray, ...]:
     """Get dispositions of infected adjusted by rate and market_share."""
     return (*(infected * rate * market_share for rate in rates),)
+
+
+
+def build_admissions_df(p) -> pd.DataFrame:
+    """Build admissions dataframe from Parameters."""
+    days = np.array(range(0, p.n_days + 1))
+    data_dict = dict(zip(["day", "Hospitalized", "ICU", "Ventilated"],
+                         [days] + [disposition for disposition in p.dispositions]
+    ))
+    projection = pd.DataFrame.from_dict(data_dict)
+    # New cases
+    projection_admits = projection.iloc[:-1, :] - projection.shift(1)
+    projection_admits[projection_admits < 0] = 0
+    projection_admits["day"] = range(projection_admits.shape[0])
+    return projection_admits
+
+
+def build_census_df(
+        projection_admits: pd.DataFrame,
+        parameters
+) -> pd.DataFrame:
+    """ALOS for each category of COVID-19 case (total guesses)"""
+    n_days = np.shape(projection_admits)[0]
+    hosp_los, icu_los, vent_los = parameters.lengths_of_stay
+    los_dict = {
+        "Hospitalized": hosp_los,
+        "ICU": icu_los,
+        "Ventilated": vent_los,
+    }
+
+    census_dict = dict()
+    for k, los in los_dict.items():
+        census = (
+            projection_admits.cumsum().iloc[:-los, :]
+            - projection_admits.cumsum().shift(los).fillna(0)
+        ).apply(np.ceil)
+        census_dict[k] = census[k]
+
+    census_df = pd.DataFrame(census_dict)
+    census_df["day"] = census_df.index
+    census_df = census_df[["day", "Hospitalized", "ICU", "Ventilated"]]
+    census_df = census_df.head(n_days)
+    census_df = census_df.rename(
+        columns={disposition: f"{disposition} Census"
+                 for disposition
+                 in ("Hospitalized", "ICU", "Ventilated")}
+    )
+    return census_df
