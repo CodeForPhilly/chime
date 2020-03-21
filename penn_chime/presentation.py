@@ -2,10 +2,11 @@ import altair as alt
 import numpy as np
 import pandas as pd
 
-from .defaults import Constants
+from .defaults import Constants, RateLos
 from .utils import add_date_column
-
+from .models import Parameters
 DATE_FORMAT = "%b, %d" # see https://strftime.org
+
 
 hide_menu_style = """
         <style>
@@ -89,6 +90,151 @@ outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying a
     )
 
     return None
+
+
+def display_sidebar(st, d: Constants) -> Parameters:
+    # Initialize variables
+    # these functions create input elements and bind the values they are set to
+    # to the variables they are set equal to
+    # it's kindof like ember or angular if you are familiar with those
+
+    if d.known_infected < 1:
+        raise ValueError("Known cases must be larger than one to enable predictions.")
+
+    current_hospitalized = st.sidebar.number_input(
+        "Currently Hospitalized COVID-19 Patients",
+        min_value=0,
+        value=d.current_hospitalized,
+        step=1,
+        format="%i"
+    )
+
+    doubling_time = st.sidebar.number_input(
+        "Doubling time before social distancing (days)",
+        min_value=0,
+        value=d.doubling_time,
+        step=1,
+        format="%i"
+    )
+
+    relative_contact_rate = (
+        st.sidebar.number_input(
+            "Social distancing (% reduction in social contact)",
+            min_value=0,
+            max_value=100,
+            value=d.relative_contact_rate * 100,
+            step=5,
+            format="%i",
+        )
+        / 100.0
+    )
+
+    hospitalized_rate = (
+        st.sidebar.number_input(
+            "Hospitalization %(total infections)",
+            min_value=0.001,
+            max_value=100.0,
+            value=d.hospitalized.rate * 100,
+            step=1.0, format="%f",
+        )
+        / 100.0
+    )
+    icu_rate = (
+        st.sidebar.number_input(
+            "ICU %(total infections)",
+            min_value=0.0,
+            max_value=100.0,
+            value=d.icu.rate * 100,
+            step=1.0,
+            format="%f"
+        )
+        / 100.0
+    )
+    ventilated_rate = (
+        st.sidebar.number_input(
+            "Ventilated %(total infections)",
+            min_value=0.0,
+            max_value=100.0,
+            value=d.ventilated.rate * 100,
+            step=1.0,
+            format="%f"
+        )
+        / 100.0
+    )
+
+    hospitalized_los = st.sidebar.number_input(
+        "Hospital Length of Stay",
+        min_value=0,
+        value=d.hospitalized.length_of_stay,
+        step=1,
+        format="%i",
+    )
+    icu_los = st.sidebar.number_input(
+        "ICU Length of Stay",
+        min_value=0,
+        value=d.icu.length_of_stay,
+        step=1,
+        format="%i",
+    )
+    ventilated_los = st.sidebar.number_input(
+        "Vent Length of Stay",
+        min_value=0,
+        value=d.ventilated.length_of_stay,
+        step=1,
+        format="%i",
+    )
+
+    market_share = (
+        st.sidebar.number_input(
+            "Hospital Market Share (%)",
+            min_value=0.001,
+            max_value=100.0,
+            value=d.market_share * 100,
+            step=1.0,
+            format="%f"
+        )
+        / 100.0
+    )
+    susceptible = st.sidebar.number_input(
+        "Regional Population",
+        min_value=1,
+        value=d.region.susceptible,
+        step=100000,
+        format="%i"
+    )
+
+    known_infected = st.sidebar.number_input(
+        "Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
+        min_value=0,
+        value=d.known_infected,
+        step=10,
+        format="%i",
+    )
+
+    return Parameters(
+        current_hospitalized=current_hospitalized,
+        doubling_time=doubling_time,
+        known_infected=known_infected,
+        market_share=market_share,
+        relative_contact_rate=relative_contact_rate,
+        susceptible=susceptible,
+
+        hospitalized=RateLos(hospitalized_rate, hospitalized_los),
+        icu=RateLos(icu_rate, icu_los),
+        ventilated=RateLos(ventilated_rate, ventilated_los)
+    )
+
+
+def display_n_days_slider(st, p: Parameters, d: Constants):
+    """Display n_days_slider."""
+    p.n_days = st.slider(
+        "Number of days to project",
+        min_value=30,
+        max_value=200,
+        value=d.n_days,
+        step=1,
+        format="%i"
+    )
 
 
 def show_more_info_about_this_tool(
