@@ -4,10 +4,10 @@ import pytest
 import pandas as pd
 import numpy as np
 
-from app import (projection_admits, alt)
+from app import alt
 from penn_chime.models import sir, sim_sir, sim_sir_df
 from penn_chime.parameters import Parameters
-from penn_chime.presentation import display_header, new_admissions_chart
+from penn_chime.presentation import display_header, new_admissions_chart, admitted_patients_chart
 from penn_chime.settings import DEFAULTS
 from penn_chime.defaults import RateLos
 
@@ -145,7 +145,6 @@ def test_sim_sir():
         assert isinstance(v, np.ndarray)
 
 
-
 def test_sim_sir_df():
     """
     Rounding to move fast past decimal place issues
@@ -163,14 +162,32 @@ def test_sim_sir_df():
 
 
 def test_new_admissions_chart():
+    projection_admits = pd.read_csv('src/tests/projection_admits.csv')
     chart = new_admissions_chart(alt, projection_admits, 60 - 10)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].Hospitalized < 1
-    # assert round(chart.data.iloc[49].ICU, 0) == 43
+    assert round(chart.data.iloc[40].ICU, 0) == 25
+
+    # test fx call with no params
     with pytest.raises(TypeError):
         new_admissions_chart()
 
     empty_chart = new_admissions_chart(alt, pd.DataFrame(), -1)
+    assert empty_chart.data.empty
+
+
+def test_admitted_patients_chart():
+    census_df = pd.read_csv('src/tests/census_df.csv')
+    chart = admitted_patients_chart(alt, census_df, 60 - 10)
+    assert isinstance(chart, alt.Chart)
+    assert chart.data.iloc[1]['Hospital Census'] == 1
+    assert chart.data.iloc[49]['Ventilated Census'] == 203
+
+    # test fx call with no params
+    with pytest.raises(TypeError):
+        admitted_patients_chart()
+
+    empty_chart = admitted_patients_chart(alt, pd.DataFrame(), -1)
     assert empty_chart.data.empty
 
 
