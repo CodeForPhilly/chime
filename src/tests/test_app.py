@@ -3,8 +3,8 @@
 import pytest
 import pandas as pd
 import numpy as np
+import altair as alt
 
-from app import alt
 from penn_chime.models import sir, sim_sir, sim_sir_df
 from penn_chime.parameters import Parameters
 from penn_chime.presentation import display_header, new_admissions_chart, admitted_patients_chart
