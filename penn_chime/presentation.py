@@ -211,6 +211,16 @@ def display_sidebar(st, d: Constants) -> Parameters:
         format="%i",
     )
 
+    max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value")
+    max_y_axis = None
+    if max_y_axis_set:
+        max_y_axis = st.sidebar.number_input(
+            "Y-axis static value",
+            value=500,
+            format="%i",
+            step=25,
+        )
+
     return Parameters(
         current_hospitalized=current_hospitalized,
         doubling_time=doubling_time,
@@ -221,7 +231,8 @@ def display_sidebar(st, d: Constants) -> Parameters:
 
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
-        ventilated=RateLos(ventilated_rate, ventilated_los)
+        ventilated=RateLos(ventilated_rate, ventilated_los),
+        max_y_axis=max_y_axis
     )
 
 
@@ -375,12 +386,23 @@ def write_footer(st):
 
 
 def new_admissions_chart(
-    alt, projection_admits: pd.DataFrame, plot_projection_days: int, as_date: bool = False
+    alt,
+    projection_admits: pd.DataFrame,
+    plot_projection_days: int,
+    as_date: bool = False,
+    max_y_axis: int = None
 ) -> alt.Chart:
     """docstring"""
     projection_admits = projection_admits.rename(
         columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"}
     )
+
+    y_scale = alt.Scale()
+
+    if max_y_axis is not None:
+        y_scale.domain = (0, max_y_axis)
+        y_scale.clamp = True
+
     tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
         projection_admits = add_date_column(projection_admits)
@@ -394,7 +416,7 @@ def new_admissions_chart(
         .mark_line(point=True)
         .encode(
             x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Daily admissions"),
+            y=alt.Y("value:Q", title="Daily admissions", scale=y_scale),
             color="key:N",
             tooltip=[
                 tooltip_dict[as_date],
@@ -410,7 +432,8 @@ def admitted_patients_chart(
     alt,
     census: pd.DataFrame,
     plot_projection_days: int,
-    as_date: bool = False
+    as_date: bool = False,
+    max_y_axis: int = None
 ) -> alt.Chart:
     """docstring"""
     census = census.rename(
@@ -427,13 +450,19 @@ def admitted_patients_chart(
     else:
         x_kwargs ={"shorthand": "day", "title": "Days from today"}
 
+    y_scale = alt.Scale()
+
+    if max_y_axis is not None:
+        y_scale.domain = (0, max_y_axis)
+        y_scale.clamp = True
+
     return (
         alt.Chart(census.head(plot_projection_days))
         .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
         .mark_line(point=True)
         .encode(
             x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Census"),
+            y=alt.Y("value:Q", title="Census", scale=y_scale),
             color="key:N",
             tooltip=[
                 tooltip_dict[as_date],
@@ -449,7 +478,8 @@ def additional_projections_chart(
     alt,
     i: np.ndarray,
     r: np.ndarray,
-    as_date: bool = False
+    as_date: bool = False,
+    max_y_axis: int = None
 ) -> alt.Chart:
     dat = pd.DataFrame({"Infected": i, "Recovered": r})
     dat["day"] = dat.index
@@ -459,13 +489,19 @@ def additional_projections_chart(
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
+    y_scale = alt.Scale()
+
+    if max_y_axis is not None:
+        y_scale.domain = (0, max_y_axis)
+        y_scale.clamp = True
+
     return (
         alt.Chart(dat)
         .transform_fold(fold=["Infected", "Recovered"])
         .mark_line()
         .encode(
             x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Case Volume"),
+            y=alt.Y("value:Q", title="Case Volume", scale=y_scale),
             tooltip=["key:N", "value:Q"],
             color="key:N",
         )
@@ -473,12 +509,20 @@ def additional_projections_chart(
     )
 
 
-def show_additional_projections(st, alt, charting_func, i, r, as_date: bool = False):
+def show_additional_projections(
+    st,
+    alt,
+    charting_func,
+    i,
+    r,
+    as_date: bool = False,
+    max_y_axis: int = None
+):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
 
-    st.altair_chart(charting_func(alt, i, r, as_date=as_date), use_container_width=True)
+    st.altair_chart(charting_func(alt, i, r, as_date=as_date, max_y_axis=max_y_axis), use_container_width=True)
 
 
 ##########
