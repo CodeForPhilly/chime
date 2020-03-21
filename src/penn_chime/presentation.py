@@ -4,8 +4,10 @@ import pandas as pd
 
 from .defaults import Constants, RateLos
 from .utils import add_date_column
-from .models import Parameters
-DATE_FORMAT = "%b, %d" # see https://strftime.org
+from .parameters import Parameters
+
+
+DATE_FORMAT = "%b, %d"  # see https://strftime.org
 
 
 hide_menu_style = """
