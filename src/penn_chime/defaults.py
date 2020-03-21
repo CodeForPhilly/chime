@@ -1,14 +1,6 @@
-#!/usr/bin/env python
-"""Set defaults for your fork/locality here
+"""Defaults."""
 
-   after we merge this in we can set defaults in a `config/env` type of file
-"""
-
-from collections import namedtuple
-
-# (0.02, 7) is 2%, 7 days
-# be sure to multiply by 100 when using as a default to the pct widgets!
-RateLos = namedtuple('RateLos', ('rate', 'length_of_stay'))
+from .utils import RateLos
 
 
 class Regions:
@@ -54,4 +46,3 @@ class Constants:
 
     def __repr__(self) -> str:
         return f"Constants(susceptible_default: {self.region.susceptible}, known_infected: {self.known_infected})"
-

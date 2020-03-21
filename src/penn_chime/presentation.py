@@ -4,8 +4,10 @@ import pandas as pd
 
 from .defaults import Constants, RateLos
 from .utils import add_date_column
-from .models import Parameters
-DATE_FORMAT = "%b, %d" # see https://strftime.org
+from .parameters import Parameters
+
+
+DATE_FORMAT = "%b, %d"  # see https://strftime.org
 
 
 hide_menu_style = """
@@ -56,7 +58,7 @@ def display_header(
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine. For questions and comments please see our
+    Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/). For questions and comments please see our
     [contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/CodeForPhilly/chime).
     Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*"""
     )
