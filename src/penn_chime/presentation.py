@@ -1,11 +1,14 @@
-import altair as alt
-import numpy as np
-import pandas as pd
+"""effectful functions for streamlit io"""
+
+from typing import Optional
+
+import altair as alt  # type: ignore
+import numpy as np  # type: ignore
+import pandas as pd  # type: ignore
 
 from .defaults import Constants, RateLos
 from .utils import add_date_column
 from .parameters import Parameters
-
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
 
@@ -381,134 +384,6 @@ def write_footer(st):
     )
     st.markdown("© 2020, The Trustees of the University of Pennsylvania")
 
-
-##########
-# Charts #
-##########
-
-
-def new_admissions_chart(
-    alt,
-    projection_admits: pd.DataFrame,
-    plot_projection_days: int,
-    as_date: bool = False,
-    max_y_axis: int = None
-) -> alt.Chart:
-    """docstring"""
-    projection_admits = projection_admits.rename(
-        columns={"hosp": "Hospitalized", "icu": "ICU", "vent": "Ventilated"}
-    )
-
-    y_scale = alt.Scale()
-
-    if max_y_axis is not None:
-        y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = True
-
-    tooltip_dict = {False: "day", True: "date:T"}
-    if as_date:
-        projection_admits = add_date_column(projection_admits)
-        x_kwargs = {"shorthand": "date:T", "title": "Date"}
-    else:
-        x_kwargs = {"shorthand": "day", "title": "Days from today"}
-
-    return (
-        alt.Chart(projection_admits.head(plot_projection_days))
-        .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
-        .mark_line(point=True)
-        .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Daily admissions", scale=y_scale),
-            color="key:N",
-            tooltip=[
-                tooltip_dict[as_date],
-                alt.Tooltip("value:Q", format=".0f", title="Admissions"),
-                "key:N",
-            ],
-        )
-        .interactive()
-    )
-
-
-def admitted_patients_chart(
-    alt,
-    census: pd.DataFrame,
-    plot_projection_days: int,
-    as_date: bool = False,
-    max_y_axis: int = None
-) -> alt.Chart:
-    """docstring"""
-    census = census.rename(
-        columns={
-            "hosp": "Hospital Census",
-            "icu": "ICU Census",
-            "vent": "Ventilated Census",
-        }
-    )
-    tooltip_dict = {False: "day", True: "date:T"}
-    if as_date:
-        census = add_date_column(census)
-        x_kwargs = {"shorthand": "date:T", "title": "Date"}
-    else:
-        x_kwargs ={"shorthand": "day", "title": "Days from today"}
-
-    y_scale = alt.Scale()
-
-    if max_y_axis is not None:
-        y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = True
-
-    return (
-        alt.Chart(census.head(plot_projection_days))
-        .transform_fold(fold=["Hospital Census", "ICU Census", "Ventilated Census"])
-        .mark_line(point=True)
-        .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Census", scale=y_scale),
-            color="key:N",
-            tooltip=[
-                tooltip_dict[as_date],
-                alt.Tooltip("value:Q", format=".0f", title="Census"),
-                "key:N",
-            ],
-        )
-        .interactive()
-    )
-
-
-def additional_projections_chart(
-    alt,
-    i: np.ndarray,
-    r: np.ndarray,
-    as_date: bool = False,
-    max_y_axis: int = None
-) -> alt.Chart:
-    dat = pd.DataFrame({"Infected": i, "Recovered": r})
-    dat["day"] = dat.index
-    if as_date:
-        dat = add_date_column(dat)
-        x_kwargs = {"shorthand": "date:T", "title": "Date"}
-    else:
-        x_kwargs = {"shorthand": "day", "title": "Days from today"}
-
-    y_scale = alt.Scale()
-
-    if max_y_axis is not None:
-        y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = True
-
-    return (
-        alt.Chart(dat)
-        .transform_fold(fold=["Infected", "Recovered"])
-        .mark_line()
-        .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Case Volume", scale=y_scale),
-            tooltip=["key:N", "value:Q"],
-            color="key:N",
-        )
-        .interactive()
-    )
 
 
 def show_additional_projections(

@@ -4,8 +4,10 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from typing import Optional
 
-import numpy as np
-import pandas as pd
+import numpy as np  # type: ignore
+import pandas as pd  # type: ignore
+
+# from .parameters import Parameters
 
 
 # (0.02, 7) is 2%, 7 days
@@ -13,15 +15,12 @@ import pandas as pd
 RateLos = namedtuple('RateLos', ('rate', 'length_of_stay'))
 
 
-def build_admissions_df(
-    n_days,
-    hosp,
-    icu,
-    vent,
-) -> pd.DataFrame:
-    """Build admis dataframe."""
-    days = np.array(range(0, n_days + 1))
-    data_dict = dict(zip(["day", "hosp", "icu", "vent"], [days, hosp, icu, vent]))
+def build_admissions_df(p) -> pd.DataFrame:
+    """Build admissions dataframe from Parameters."""
+    days = np.array(range(0, p.n_days + 1))
+    data_dict = dict(zip(["day", "Hospitalized", "ICU", "Ventilated"],
+                         [days] + [disposition for disposition in p.dispositions]
+    ))
     projection = pd.DataFrame.from_dict(data_dict)
     # New cases
     projection_admits = projection.iloc[:-1, :] - projection.shift(1)
@@ -31,17 +30,16 @@ def build_admissions_df(
 
 
 def build_census_df(
-    projection_admits,
-    hosp_los,
-    icu_los,
-    vent_los,
+        projection_admits: pd.DataFrame,
+        parameters
 ) -> pd.DataFrame:
     """ALOS for each category of COVID-19 case (total guesses)"""
     n_days = np.shape(projection_admits)[0]
+    hosp_los, icu_los, vent_los = parameters.lengths_of_stay
     los_dict = {
-        "hosp": hosp_los,
-        "icu": icu_los,
-        "vent": vent_los,
+        "Hospitalized": hosp_los,
+        "ICU": icu_los,
+        "Ventilated": vent_los,
     }
 
     census_dict = dict()
@@ -54,7 +52,7 @@ def build_census_df(
 
     census_df = pd.DataFrame(census_dict)
     census_df["day"] = census_df.index
-    census_df = census_df[["day", "hosp", "icu", "vent"]]
+    census_df = census_df[["day", "Hospitalized", "ICU", "Ventilated"]]
     census_df = census_df.head(n_days)
     return census_df
 

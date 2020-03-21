@@ -1,6 +1,6 @@
 """Parameters."""
 
-from numpy import log2
+from numpy import log2  # type: ignore
 
 from .utils import RateLos
 from .models import (

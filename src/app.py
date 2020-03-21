@@ -1,11 +1,10 @@
 """App."""
 
-import altair as alt
-import streamlit as st
+import altair as alt  # type: ignore
+import streamlit as st  # type: ignore
 
 from penn_chime.presentation import (
-    additional_projections_chart,
-    admitted_patients_chart,
+    #additional_projections_chart,
     display_header,
     display_sidebar,
     display_n_days_slider,
@@ -13,7 +12,6 @@ from penn_chime.presentation import (
     draw_projected_admissions_table,
     draw_raw_sir_simulation_table,
     hide_menu_style,
-    new_admissions_chart,
     show_additional_projections,
     show_more_info_about_this_tool,
     write_definitions,
@@ -21,8 +19,8 @@ from penn_chime.presentation import (
 )
 from penn_chime.utils import build_admissions_df, build_census_df
 from penn_chime.settings import DEFAULTS
-
-
+from penn_chime.models import sim_sir_df
+from penn_chime.charts import additional_projections_chart, admitted_patients_chart, new_admissions_chart
 # This is somewhat dangerous:
 # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
 # This should not be hidden in prod, but removed
@@ -59,7 +57,6 @@ if st.checkbox("Show more info about this tool"):
         r_t=p.r_t,
         inputs=DEFAULTS,
         notes=notes
-
     )
 
 # PRESENTATION
@@ -68,8 +65,8 @@ as_date = st.checkbox(label="Present result as dates instead of days", value=Fal
 display_n_days_slider(st, p, DEFAULTS)
 
 # begin format data
-projection_admits = build_admissions_df(p.n_days, *p.dispositions)
-census_df = build_census_df(projection_admits, *p.lengths_of_stay)
+projection_admits = build_admissions_df(p=p) # p.n_days, *p.dispositions)
+census_df = build_census_df(projection_admits, parameters=p)
 # end format data
 
 st.subheader("New Admissions")

@@ -2,8 +2,8 @@
 
 from typing import Generator, Tuple
 
-import numpy as np
-import pandas as pd
+import numpy as np  # type: ignore
+import pandas as pd  # type: ignore
 
 
 def sir(
@@ -58,13 +58,13 @@ def sim_sir(
     )
 
 
-def sim_sir_df(
-    s: float, i: float, r: float,
-    beta: float, gamma: float, n_days: int
-) -> pd.DataFrame:
-    """Simulate the SIR model forward in time."""
+def sim_sir_df(p) -> pd.DataFrame:
+    """Simulate the SIR model forward in time.
+
+    p is a Parameters instance. for circuluar dependency reasons i can't annotate it.
+    """
     return pd.DataFrame(
-        data=gen_sir(s, i, r, beta, gamma, n_days),
+        data=gen_sir(p.susceptible, p.infected, p.recovered, p.beta, p.gamma, p.n_days),
         columns=("Susceptible", "Infected", "Recovered"),
     )
 
