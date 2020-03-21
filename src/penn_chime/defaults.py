@@ -53,5 +53,5 @@ class Constants:
         self.n_days = n_days
 
     def __repr__(self) -> str:
-        return f"Constants(susceptible_default: {self.region.s}, known_infected: {self.known_infected})"
+        return f"Constants(susceptible_default: {self.region.susceptible}, known_infected: {self.known_infected})"
 

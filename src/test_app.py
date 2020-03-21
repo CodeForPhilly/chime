@@ -5,6 +5,7 @@ import pandas as pd
 from app import (projection_admits, alt)
 from penn_chime.models import sir, sim_sir, sim_sir_df
 from penn_chime.presentation import display_header, new_admissions_chart
+from penn_chime.settings import DEFAULTS
 
 
 # set up
@@ -64,6 +65,13 @@ def test_header_fail():
         list(filter(lambda s: some_garbage in s, st.render_store))
     ), "This should fail"
     st.cleanup()
+
+
+def test_defaultS_repr():
+    """
+    Test DEFAULTS.repr
+    """
+    repr(DEFAULTS)
 
 
 # Test the math
