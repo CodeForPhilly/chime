@@ -2,12 +2,14 @@
 
 import pytest
 import pandas as pd
-
+import numpy as np
 
 from app import (projection_admits, alt)
 from penn_chime.models import sir, sim_sir, sim_sir_df
+from penn_chime.parameters import Parameters
 from penn_chime.presentation import display_header, new_admissions_chart
 from penn_chime.settings import DEFAULTS
+from penn_chime.defaults import RateLos
 
 
 # set up
@@ -69,7 +71,7 @@ def test_header_fail():
     st.cleanup()
 
 
-def test_defaultS_repr():
+def test_defaults_repr():
     """
     Test DEFAULTS.repr
     """
@@ -82,36 +84,42 @@ def test_sir():
     """
     Someone who is good at testing, help
     """
-    assert sir(100, 1, 0, 0.2, 0.5, 1) == (
+    sir_test = sir(100, 1, 0, 0.2, 0.5, 1)
+    assert sir_test == (
         0.7920792079207921,
         0.20297029702970298,
         0.0049504950495049506,
     ), "This contrived example should work"
 
+    assert isinstance(sir_test, tuple)
+    for v in sir_test:
+        assert isinstance(v, float)
+        assert v >= 0
+
     # Certain things should *not* work
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir("S", 1, 0, 0.2, 0.5, 1)
-    assert str(E.value) == "can't multiply sequence by non-int of type 'float'"
+    assert str(error.value) == "can't multiply sequence by non-int of type 'float'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, "I", 0, 0.2, 0.5, 1)
-    assert str(E.value) == "can't multiply sequence by non-int of type 'float'"
+    assert str(error.value) == "can't multiply sequence by non-int of type 'float'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, 1, "R", 0.2, 0.5, 1)
-    assert str(E.value) == "unsupported operand type(s) for +: 'float' and 'str'"
+    assert str(error.value) == "unsupported operand type(s) for +: 'float' and 'str'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, 1, 0, "beta", 0.5, 1)
-    assert str(E.value) == "bad operand type for unary -: 'str'"
+    assert str(error.value) == "bad operand type for unary -: 'str'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, 1, 0, 0.2, "gamma", 1)
-    assert str(E.value) == "unsupported operand type(s) for -: 'float' and 'str'"
+    assert str(error.value) == "unsupported operand type(s) for -: 'float' and 'str'"
 
-    with pytest.raises(TypeError) as E:
+    with pytest.raises(TypeError) as error:
         sir(100, 1, 0, 0.2, 0.5, "N")
-    assert str(E.value) == "unsupported operand type(s) for /: 'str' and 'float'"
+    assert str(error.value) == "unsupported operand type(s) for /: 'str' and 'float'"
 
     # Zeros across the board should fail
     with pytest.raises(ZeroDivisionError):
@@ -122,7 +130,8 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    s,i,r = sim_sir(5, 6, 7, 0.1, 0.1, 40)
+    sim_sir_test = sim_sir(5, 6, 7, 0.1, 0.1, 40)
+    s, i, r = sim_sir_test
 
     assert round(s[0], 0) == 5
     assert round(i[0], 2) == 6
@@ -130,6 +139,11 @@ def test_sim_sir():
     assert round(s[-1], 2) == 0
     assert round(i[-1], 2) == 0.18
     assert round(r[-1], 2) == 17.82
+
+    assert isinstance(sim_sir_test, tuple)
+    for v in sim_sir_test:
+        assert isinstance(v, np.ndarray)
+
 
 
 def test_sim_sir_df():
@@ -148,28 +162,9 @@ def test_sim_sir_df():
     assert round(last[2], 2) == 17.82
 
 
-#ef test_initial_conditions():
-#   """
-#   Note: For the rates (ie hosp_rate) - just change the value, leave the "100" alone.
-#       Easier to change whole numbers than decimals.
-#   """
-#   assert current_hosp == known_cases
-#   assert doubling_time == 6
-#   assert relative_contact_rate == 0
-#   assert hosp_rate == 5 / 100
-#   assert icu_rate == 2 / 100
-#   assert vent_rate == 1 / 100
-#   assert hosp_los == 7
-#   assert icu_los == 9
-#   assert vent_los == 10
-#   assert market_share == 15 / 100
-#   assert S == S_default
-#   assert initial_infections == known_infections
-
-
 def test_new_admissions_chart():
     chart = new_admissions_chart(alt, projection_admits, 60 - 10)
-    assert type(chart) == alt.Chart
+    assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].Hospitalized < 1
     # assert round(chart.data.iloc[49].ICU, 0) == 43
     with pytest.raises(TypeError):
@@ -177,3 +172,49 @@ def test_new_admissions_chart():
 
     empty_chart = new_admissions_chart(alt, pd.DataFrame(), -1)
     assert empty_chart.data.empty
+
+
+def test_parameters():
+    param = Parameters(
+        current_hospitalized=100,
+        doubling_time=6.0,
+        known_infected=5000,
+        market_share=0.05,
+        relative_contact_rate=0.15,
+        susceptible=500000,
+        hospitalized=RateLos(0.05, 7),
+        icu=RateLos(0.02, 9),
+        ventilated=RateLos(0.01, 10),
+        n_days=60
+    )
+
+    # test the Parameters
+
+    # hospitalized, icu, ventilated
+    assert param.rates == (0.05, 0.02, 0.01)
+    assert param.lengths_of_stay == (7, 9, 10)
+
+    assert param.infected == 40000.0
+    assert isinstance(param.infected, float)  # based off note in models.py
+
+    # test the class-calculated attributes
+    assert param.detection_probability == 0.125
+    assert param.intrinsic_growth_rate == 0.12246204830937302
+    assert param.beta == 3.2961405355450555e-07
+    assert param.r_t == 2.307298374881539
+    assert param.r_naught == 2.7144686763312222
+    assert param.doubling_time_t == 7.764405988534983
+
+    # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
+    assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 61
+
+    assert param.susceptible_v[0] == 500000.0
+    assert round(param.susceptible_v[-1], 0) == 67202
+    assert round(param.infected_v[1], 0) == 43735
+    assert round(param.recovered_v[30], 0) == 224048
+    assert [d[0] for d in param.dispositions] == [100.0, 40.0, 20.0]
+    assert [round(d[-1], 0) for d in param.dispositions] == [115.0, 46.0, 23.0]
+
+    # change n_days, make sure it cascades
+    param.n_days = 2
+    assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 3
