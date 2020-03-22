@@ -40,8 +40,12 @@ def display_sidebar(
         elif "los" in idx:
             split = idx.split("_")
             val = getattr(getattr(defaults, split[0], {}), "rate", 0) * 100
+        elif "share" in idx:
+            val = getattr(defaults, idx, form["min"]) * 100
+        elif "susceptible" in idx:
+            val = defaults.region.susceptible
         else:
-            val = getattr(defaults, idx, 0)
+            val = getattr(defaults, idx, form["min"])
         form["value"] = val
 
         children.append(form)
