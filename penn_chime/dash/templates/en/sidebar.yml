@@ -1,0 +1,82 @@
+- element: formgroup
+  children:
+      - element: label
+        html_for: current_hospitalized
+        children: Currently Hospitalized COVID-19 Patients
+      - element: input
+        id: current_hospitalized
+        type: number
+        min: 0
+        step: 1
+
+- element: formgroup
+  children:
+    - element: label
+      html_for: doubling_time
+      children: Doubling time before social distancing (days)
+    - element: input
+      id: doubling_time
+      type: number
+      min: 0
+      step: 1
+      placeholder: Doubling time before social distancing (days)
+
+- element: formgroup
+  children:
+      - element: label
+        html_for: relative_contact_rate
+        children: Social distancing (% reduction in social contact)
+      - element: input
+        id: relative_contact_rate
+        type: number
+        min: 0
+        max: 100
+        step: 5
+
+- element: formgroup
+  children:
+      - element: label
+        html_for: hospitalized_rate
+        children: Hospitalization %(total infections)
+      - element: input
+        id: hospitalized_rate
+        type: number
+        min: 0
+        max: 100
+        step: 1
+
+- element: formgroup
+  children:
+      - element: label
+        html_for: icu_rate
+        children: ICU %(total infections)
+      - element: input
+        id: icu_rate
+        type: number
+        min: 0
+        max: 100
+        step: 1
+
+- element: formgroup
+  children:
+      - element: label
+        html_for: ventilated_rate
+        children: Ventilated %(total infections)
+      - element: input
+        id: ventilated_rate
+        type: number
+        min: 0
+        max: 100
+        step: 1
+
+- element: formgroup
+  children:
+      - element: label
+        html_for: hospitalized_los
+        children: Ventilated %(total infections)
+      - element: input
+        id: hospitalized_los
+        type: number
+        min: 0
+        max: 100
+        step: 1

@@ -1,45 +1,61 @@
-from os import path
-
+"""Script which launches dash app
+"""
 from dash import Dash
-from dash_core_components import Graph, Slider, Markdown
-from dash_html_components import H1, Div
 from dash.dependencies import Input, Output
+from dash_core_components import Markdown
 
-import pandas as pd
-import numpy as np
+import dash_bootstrap_components as dbc
 
+
+from penn_chime.settings import DEFAULTS
 from penn_chime.dash.utils import (
-    df_to_html_table,
     get_md_templates,
     get_yml_templates,
     render_yml,
 )
-from penn_chime.dash.plotting import get_figure_data
-from penn_chime.dash.tmp_data import DF
+from penn_chime.dash.presentation import display_sidebar
+
 
 EXTERNAL_STYLESHEETS = [
-    "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css"
+    "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css",
+    dbc.themes.BOOTSTRAP,
 ]
 LANGUAGE = "en"
 MD_TEMPLATES = get_md_templates()
 YML_TEMPLATES = get_yml_templates()
 
+
+SIDEBAR_HTML, RENDER_KEYS = display_sidebar(LANGUAGE, DEFAULTS)
+
 APP = Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
-APP.layout = Div(
+APP.layout = dbc.Row(
     children=[
-        *render_yml(YML_TEMPLATES[LANGUAGE]["header.yml"]),
-        Markdown(MD_TEMPLATES[LANGUAGE]["intro.md"]),
-        Graph(id="example-graph"),
-        Slider(id="y-max", min=0, max=4, value=1, step=0.5),
-        df_to_html_table(DF),
-        Markdown(MD_TEMPLATES[LANGUAGE]["definitions.md"]),
-        Markdown(MD_TEMPLATES[LANGUAGE]["footer.md"]),
-    ]
+        dbc.Col(id="sidebar", children=SIDEBAR_HTML, width=4, className="mt-4",),
+        dbc.Col(
+            children=render_yml(YML_TEMPLATES[LANGUAGE]["header.yml"])
+            + [
+                Markdown(id="intro"),
+                Markdown(MD_TEMPLATES[LANGUAGE]["definitions.md"]),
+                Markdown(MD_TEMPLATES[LANGUAGE]["footer.md"]),
+            ],
+            width=8,
+            className="mt-4",
+        ),
+    ],
+    className="container",
 )
 
-APP.callback(Output("example-graph", "figure"), [Input("y-max", "value")])(
-    get_figure_data
+
+@APP.callback(
+    Output(component_id="intro", component_property="children"),
+    [Input(component_id=key, component_property="value") for key in RENDER_KEYS],
 )
+def render_intro(*args):
+    """Renders intro depending on parameter values
+    """
+    kwargs = {key: val for key, val in zip(RENDER_KEYS, args)}
+    # pars = Parameters(**kwargs)
+    return MD_TEMPLATES[LANGUAGE]["intro.md"]  # .format(**kwargs)
 
 
 def main():
