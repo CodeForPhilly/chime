@@ -2,26 +2,54 @@
 """
 from typing import Dict, List, Any
 
-from os import path, listdir, walk, sep
+from os import path, walk, sep
 
 from yaml import safe_load
 
 from pandas import DataFrame
 
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
-from dash_html_components import H1, Div, A
+from dash_html_components import H1, H2, H3, H4, H5, H6, Div, A, P, B, I
+from dash_core_components import Slider
+
+import dash_bootstrap_components as dbc
 
 TEMPLATE_DIR = path.join(path.abspath(path.dirname(__file__)), "templates")
 
 
-def df_to_html_table(df: DataFrame) -> Table:
+DASH_HTML_ELEMENTS = {
+    "div": Div,
+    "h1": H1,
+    "h2": H2,
+    "h3": H3,
+    "h4": H4,
+    "h5": H5,
+    "h6": H6,
+    "a": A,
+    "p": P,
+    "b": B,
+    "i": I,
+    "slider": Slider,
+    "input": dbc.Input,
+    "label": dbc.Label,
+    "formtext": dbc.FormText,
+    "formgroup": dbc.FormGroup,
+    "row": dbc.Row,
+    "col": dbc.Col,
+}
+
+
+def df_to_html_table(dataframe: DataFrame) -> Table:
     """Converts pandas data frame to html table
     """
     return Table(
         [
-            Thead([Tr([Th("id")] + [Th(col) for col in df.columns])]),
+            Thead([Tr([Th("id")] + [Th(col) for col in dataframe.columns])]),
             Tbody(
-                [Tr([Th(idx)] + [Td(col) for col in row]) for idx, row in df.iterrows()]
+                [
+                    Tr([Th(idx)] + [Td(col) for col in row])
+                    for idx, row in dataframe.iterrows()
+                ]
             ),
         ],
     )
@@ -33,7 +61,7 @@ def get_md_templates() -> Dict[str, Dict[str, str]]:
     File names are keys, values are the file content.
     """
     templates = dict()
-    for root, dirs, files in walk(TEMPLATE_DIR):
+    for root, _, files in walk(TEMPLATE_DIR):
         for f in files:
             if f.endswith("md"):
                 with open(path.join(root, f), "r") as inp:
@@ -42,31 +70,26 @@ def get_md_templates() -> Dict[str, Dict[str, str]]:
     return templates
 
 
-def get_yml_templates() -> Dict[str, Dict[str, str]]:
+def get_yml_templates() -> Dict[str, Dict[str, List[Dict[str, Any]]]]:
     """Finds all the templates located in the template dir (yaml)
 
     File names are keys, values are the file address.
     """
     templates = dict()
-    for root, dirs, files in walk(TEMPLATE_DIR):
+    for root, _, files in walk(TEMPLATE_DIR):
         for f in files:
             if f.endswith("yml"):
-                templates.setdefault(root.split(sep)[-1], dict())[f] = path.join(
-                    root, f
-                )
+                with open(path.join(root, f), "r") as stream:
+                    templates.setdefault(root.split(sep)[-1], dict())[f] = safe_load(
+                        stream
+                    )
 
     return templates
 
 
-DASH_HTML_ELEMENTS = {"div": Div, "h1": H1, "a": A}
-
-
-def render_yml(file: str) -> List["HtmlObjtects"]:
+def render_yml(yaml_list: List[Dict[str, Any]]) -> List["HtmlObjtects"]:
     """Reads yaml file and converts to dash html objects
     """
-    with open(file, "r") as stream:
-        yaml_list = safe_load(stream)
-
     return [_render_yml(yaml) for yaml in yaml_list]
 
 
