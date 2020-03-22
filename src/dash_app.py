@@ -53,8 +53,10 @@ APP.layout = dbc.Row(
 
 
 @APP.callback(
-    # Output(component_id="intro", component_property="children"),
-    Output(component_id="new-admissions-graph", component_property="figure"),
+    [
+        Output(component_id="intro", component_property="children"),
+        Output(component_id="new-admissions-graph", component_property="figure"),
+    ],
     [Input(component_id=key, component_property="value") for key in RENDER_KEYS],
 )
 def render_intro(*args):
@@ -108,7 +110,7 @@ def render_intro(*args):
         projection_admits, pars.n_days - 10, as_date=as_date, max_y_axis=pars.max_y_axis
     )
 
-    return new_admissions_figure
+    return (intro_md, new_admissions_figure)
 
 
 def main():

@@ -25,7 +25,7 @@ def new_admissions_chart(
                 "x": projection_admits["date"] if as_date else projection_admits["day"],
                 "y": projection_admits[col].astype(int),
                 "name": col,
-                "mode": "markers",
+                "mode": "lines+markers",
             }
             for col in ["Hospitalized", "ICU", "Ventilated"]
         ]
