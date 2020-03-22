@@ -31,8 +31,9 @@ APP.layout = Div(
         Markdown(MD_TEMPLATES[LANGUAGE]["intro.md"]),
         Graph(id="example-graph"),
         Slider(id="y-max", min=0, max=4, value=1, step=0.5),
-        Markdown(MD_TEMPLATES[LANGUAGE]["intro.md"]),
         df_to_html_table(DF),
+        Markdown(MD_TEMPLATES[LANGUAGE]["definitions.md"]),
+        Markdown(MD_TEMPLATES[LANGUAGE]["footer.md"]),
     ]
 )
 
