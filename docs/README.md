@@ -1,4 +1,4 @@
-# CHIME Documentation
+# CHIME Developer Documentation
 
 This book is the living documentation for developers and operators working on [the CHIME project](https://github.com/CodeForPhilly/chime) or running instances of it.
 
