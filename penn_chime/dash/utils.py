@@ -2,7 +2,7 @@
 """
 from typing import Dict
 
-from os import path, listdir
+from os import path, listdir, walk, sep
 
 from pandas import DataFrame
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
@@ -23,15 +23,17 @@ def df_to_html_table(df: DataFrame) -> Table:
     )
 
 
-def get_md_templates() -> Dict[str, str]:
+def get_md_templates() -> Dict[str, Dict[str, str]]:
     """Reads all the templates located in the template dir
 
     File names are keys, values are the file content.
     """
     files = [f for f in listdir(TEMPLATE_DIR) if f.endswith("md")]
     templates = dict()
-    for ff in files:
-        with open(path.join(TEMPLATE_DIR, ff), "r") as inp:
-            templates[ff] = inp.read()
+    for root, dirs, files in walk(TEMPLATE_DIR):
+        for f in files:
+            if f.endswith("md"):
+                with open(path.join(root, f), "r") as inp:
+                    templates.setdefault(root.split(sep)[-1], dict())[f] = inp.read()
 
     return templates
