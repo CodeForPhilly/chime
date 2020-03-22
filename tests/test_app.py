@@ -3,15 +3,14 @@
 import pytest  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
-import altair as alt # type: ignore
+import altair as alt  # type: ignore
 
-from penn_chime.charts import new_admissions_chart, admitted_patients_chart
-from penn_chime.models import sir, sim_sir
-from penn_chime.parameters import Parameters
-from penn_chime.presentation import display_header
-from penn_chime.settings import DEFAULTS
-from penn_chime.defaults import RateLos
-
+from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart
+from src.penn_chime.models import sir, sim_sir
+from src.penn_chime.parameters import Parameters
+from src.penn_chime.presentation import display_header
+from src.penn_chime.settings import DEFAULTS
+from src.penn_chime.defaults import RateLos
 
 PARAM = Parameters(
         current_hospitalized=100,
