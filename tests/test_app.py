@@ -160,10 +160,10 @@ def test_sim_sir():
 
 def test_new_admissions_chart():
     projection_admits = pd.read_csv('tests/projection_admits.csv')
-    chart = new_admissions_chart(alt, projection_admits, 60 - 10)
+    chart = new_admissions_chart(alt, projection_admits, PARAM)
     assert isinstance(chart, alt.Chart)
-    assert chart.data.iloc[1].Hospitalized < 1
-    assert round(chart.data.iloc[40].ICU, 0) == 25
+    assert chart.data.iloc[1].hosp < 1
+    assert round(chart.data.iloc[40].icu, 0) == 25
 
     # test fx call with no params
     with pytest.raises(TypeError):
@@ -175,16 +175,16 @@ def test_new_admissions_chart():
 
 def test_admitted_patients_chart():
     census_df = pd.read_csv('tests/census_df.csv')
-    chart = admitted_patients_chart(alt, census_df, 60 - 10)
+    chart = admitted_patients_chart(alt, census_df, PARAM)
     assert isinstance(chart, alt.Chart)
-    assert chart.data.iloc[1]['Hospital Census'] == 1
-    assert chart.data.iloc[49]['Ventilated Census'] == 203
+    assert chart.data.iloc[1].hosp == 1
+    assert chart.data.iloc[49].vent == 203
 
     # test fx call with no params
     with pytest.raises(TypeError):
         admitted_patients_chart()
 
-    empty_chart = admitted_patients_chart(alt, pd.DataFrame(), -1)
+    empty_chart = admitted_patients_chart(alt, pd.DataFrame(), PARAM)
     assert empty_chart.data.empty
 
 
