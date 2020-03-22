@@ -69,7 +69,8 @@
   caption: Hospital Market Share (%)
   id: market_share
   type: number
-  min: 0.001
+  min: 1
+  max: 100
   step: 1
 
 - element: formgroup
@@ -77,11 +78,11 @@
   id: susceptible
   type: number
   min: 1
-  step: 100000
+  step: 1
 
 - element: formgroup
   caption: Currently Known Regional Infections (only used to compute detection rate - does not change projections)
   id: known_infected
   type: number
-  min: 1
-  step: 100000
+  min: 0
+  step: 1

@@ -34,6 +34,7 @@ APP.layout = dbc.Row(
             children=render_yml(YML_TEMPLATES[LANGUAGE]["header.yml"])
             + [
                 Markdown(id="intro"),
+                Markdown(MD_TEMPLATES[LANGUAGE]["placeholder.md"]),
                 Markdown(MD_TEMPLATES[LANGUAGE]["definitions.md"]),
                 Markdown(MD_TEMPLATES[LANGUAGE]["footer.md"]),
             ],
