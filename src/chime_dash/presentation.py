@@ -3,8 +3,8 @@
 from typing import Tuple, List
 from penn_chime.defaults import Constants
 
-from penn_chime.dash.utils import render_yml
-from penn_chime.dash.utils import get_yml_templates
+from chime_dash.utils import render_yml
+from chime_dash.utils import get_yml_templates
 
 YML_TEMPLATES = get_yml_templates()
 
