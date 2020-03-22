@@ -8,7 +8,9 @@ footer = dbc.Container(
     dbc.Row(
         dbc.Col(
             html.P(
-                [# email - used the one from the contact page as a placeholder for now
+                [
+                    html.Span('', className='mr-2'),
+                    # email - used the one from the contact page as a placeholder for now
                     html.A(html.I(className='fas fa-envelope-square mr-1'),
                            href='pennsignals@uphs.upenn.edu'),
                     # github
