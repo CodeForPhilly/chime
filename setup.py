@@ -36,7 +36,6 @@ setup(
     keywords=[],
     packages=find_packages(".", exclude=["docs", "k82", "script"]),
     install_requires=REQUIREMENTS,
-    entry_points={"console_scripts": ["penn_chime=penn_chime.dash.app:main"]},
     classifiers=[],
     include_package_data=True,
 )
