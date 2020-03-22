@@ -4,30 +4,30 @@ Welcome, grab a cup of coffee, and let's roll our sleeves up! By participating i
 
 ## What should I work on?
 
-As of March 19, help is especially wanted in these areas:
+Our project work is organized by 4 main areas:
 
-- **Python wizards** for application development ([#chime-app](https://codeforphilly.org/chat?channel=chime-app))
-  - Hardening the code
-  - Making it more flexible
-  - Unit tests!
-- **DevOps heroes** for application hosting ([#chime-ops](https://codeforphilly.org/chat?channel=chime-ops))
-  - Maintaining Penn's instance
-  - Ensuring easy redeploys
-- **Math and stats friends** for model improvements ([#chime-analysis](https://codeforphilly.org/chat?channel=chime-analysis))
-- **Consulting DevOps champs** to help other public agencies set up their own instances ([#chime-help](https://codeforphilly.org/chat?channel=chime-help)
+| Area        | What type of help wanted? | Project Board                                         | Slack channel           | Maintainers |
+| --- | --- | --- | --- | --- |
+| App Platform        | Python wizards to work on application development, hardening the code, making it more flexible, and unit testing | [Board](https://github.com/CodeForPhilly/chime/projects/3) | [#chime-app](https://codeforphilly.org/chat?channel=chime-app) | @quinndougherty                      |
+| Analysis            | Epidemiologists and other math and stats friends, for model improvements | [Board](https://github.com/CodeForPhilly/chime/projects/5) | [#chime-analysis](https://codeforphilly.org/chat?channel=chime-analysis) | @sam-qordoba, @cjbayesian                   |
+| DevOps              | DevOps heroes (especially if you have Kubernetes experience) for hosting, maintenance, and ensuring easy redeploys. | [Board](https://github.com/CodeForPhilly/chime/projects/2) | [#chime-ops](https://codeforphilly.org/chat?channel=chime-ops) | @moosequest, @themightychris, @lottspot |
+| General Project Ops | Writing, documentation, and project and product management | [Board](https://github.com/CodeForPhilly/chime/projects/6) |  | @mariekers                           |
+
+As of March 21, help is especially wanted from contributors with experience in Kubernetes and Python.
 
 ## Before You Begin
 
-- Join the [#covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel, and [request write access](https://codeforphilly.slack.com/archives/CV4NGQYMP/p1584665484368300) to the `CodeforPhilly/chime` Github repository.
-- Our highest-priority work is organized in the [Github Project Management board](https://github.com/CodeForPhilly/chime/projects/2). Look for an issue matching your interests & skills in one of the "Ready" columns.
-- Assign yourself to the issue and add a comment to briefly describe your plan.
-- For new ideas, please first discuss the change(s) you wish to make via [issue](https://github.com/codeforphilly/chime/issues) or appropriate Slack channel (platform/app - #chime-app, devops - #chime-ops, modeling - #chime-analysis). 
+- Join the [#covid19-chime-penn](https://codeforphilly.org/chat?channel=covid19-chime-penn) channel for project-wide announcements.
+- Our highest-priority work is organized in [Github Project Boards](https://github.com/CodeForPhilly/chime/projects). Look for an issue matching your interests & skills in the "Ready" columns.
+- Comment on the issue to let us know you're picking it up, briefly describe your plan, and go forth!
+- For new ideas, please first discuss the change(s) you wish to make via [issue](https://github.com/codeforphilly/chime/issues) or the appropriate Slack channel (see table above).
 
 ## Making and Submitting Changes
 
 - [Fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) the [CodeforPhilly/chime](https://github.com/CodeForPhilly/chime) repo.
 - Base your work on the `develop` branch.
 - Submit pull requests from your fork, also against the `develop` branch of the `CodeforPhilly/chime` repo.
+- Request review from the relevant maintainer(s).
 - Check your pull request periodically to see if any changes have been requested or any merge conflicts have arisen.
 - If a merge conflict arises, rebase against the latest `develop` branch and force-push the new branch as early as you can. You may need to do this more than once before your changes get merged. Do your best to keep your branch in a mergeable state until it is finished being reviewed and accepted.
 - Note: Frequent contributors with write access can submit pull requests from a new branch in the `CodeforPhilly/chime` repository.
@@ -39,8 +39,8 @@ As of March 19, help is especially wanted in these areas:
 - Maintainers will review pull requests, asking for changes as needed.
 - Once a PR has 1 approval and passes automated tests, maintainers will merge to release branches.
   - Exception: Documentation or infrastructure support PRs can be merged directly to master.
-- Deploys to production must be signed off on by @beckerfluffle or @cchivers.
+- Deploys to production must be signed off by @beckerfluffle or @cchivers.
 
 ## Requesting Functionality
 
-**Stakeholders/Users**: Check the [#covid19-chime-penn](https://codeforphilly.org/chat/covid19-chime-penn) channel on [Slack](https://codeforphilly.org/chat) to see if your need is already being addressed.
+**Stakeholders/Users**: Check the [#chime-users](https://codeforphilly.org/chat/chime-users) channel on [Slack](https://codeforphilly.org/chat) to see if your need is already being addressed.

@@ -3,9 +3,9 @@ import os
 import dash_core_components as dcc
 from dash.dependencies import Input, Output
 
-from app import init_app
-from app.components.layout import layout
-from app.pages import about, chime, contact, contribute, index
+from penn_chime_dash.app import init_app
+from penn_chime_dash.app.components.layout import layout
+from penn_chime_dash.app.pages import about, chime, contact, contribute, index
 
 PENN_CHIME = init_app('dev')
 PENN_CHIME.layout = layout
