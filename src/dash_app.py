@@ -76,7 +76,8 @@ def render_intro(*args):
         hospitalized=RateLos(kwargs["hospitalized_rate"], kwargs["hospitalized_los"]),
         icu=RateLos(kwargs["icu_rate"], kwargs["icu_los"]),
         ventilated=RateLos(kwargs["ventilated_rate"], kwargs["ventilated_los"]),
-        max_y_axis=None,
+        max_y_axis=kwargs["max_y_axis"],
+        n_days=kwargs["n_days"],
     )
     detection_prob_str = (
         "{detection_probability:.0%}".format(
@@ -101,13 +102,13 @@ def render_intro(*args):
         doubling_time_t=pars.doubling_time_t,
     )
 
-    pars.n_days = 40
     projection_admits = build_admissions_df(pars.n_days, *pars.dispositions)
 
-    as_date = False
-
     new_admissions_figure = new_admissions_chart(
-        projection_admits, pars.n_days - 10, as_date=as_date, max_y_axis=pars.max_y_axis
+        projection_admits,
+        pars.n_days - 10,
+        as_date=kwargs["as_date"],
+        max_y_axis=pars.max_y_axis,
     )
 
     return (intro_md, new_admissions_figure)

@@ -34,6 +34,7 @@ DASH_HTML_ELEMENTS = {
     "slider": Slider,
     "input": dbc.Input,
     "label": dbc.Label,
+    "checklist": dbc.Checklist,
     "formtext": dbc.FormText,
     "formgroup": dbc.FormGroup,
     "row": dbc.Row,

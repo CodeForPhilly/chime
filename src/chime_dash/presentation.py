@@ -21,6 +21,13 @@ def display_sidebar(
 
     # Find id's for forms
     for el in YML_TEMPLATES[language]["sidebar-bare.yml"]:
+        idx = el["id"]
+
+        if not el["element"] == "formgroup":
+            parameter_keys.append(idx)
+            yaml.append(el)
+            continue
+
         children = []
 
         caption = el.pop("caption", None)
@@ -33,7 +40,6 @@ def display_sidebar(
         form["element"] = "input"
 
         # Get default values
-        idx = form["id"]
         if "rate" in idx:
             split = idx.split("_")
             val = getattr(getattr(defaults, split[0], {}), "rate", 0) * 100

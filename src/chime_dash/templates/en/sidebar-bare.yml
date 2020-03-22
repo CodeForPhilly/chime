@@ -86,3 +86,24 @@
   type: number
   min: 0
   step: 1
+
+- element: formgroup
+  caption: Number of days to project
+  id: n_days
+  type: number
+  min: 20
+  step: 1
+
+- element: checklist
+  id: as_date
+  switch: true
+  options:
+      - label: Present results as dates
+        value: false
+
+- element: checklist
+  id: max_y_axis
+  switch: true
+  options:
+      - label: Set the Y-axis on graphs to a static
+        value: false
