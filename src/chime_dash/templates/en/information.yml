@@ -1,0 +1,4 @@
+- element: h2
+  children: New Admissions
+- element: markdown
+  children: Projected number of *daily* COVID-19 admissions at Penn hospitals
