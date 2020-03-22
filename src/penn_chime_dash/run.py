@@ -1,10 +1,11 @@
 import os
-from app import init_app
+
 import dash_core_components as dcc
-from app.pages import index, about, chime, contact, contribute
-from app.components.layout import layout
 from dash.dependencies import Input, Output
 
+from app import init_app
+from app.components.layout import layout
+from app.pages import about, chime, contact, contribute, index
 
 PENN_CHIME = init_app('dev')
 PENN_CHIME.layout = layout
@@ -22,6 +23,8 @@ def display_page(pathname):
         return contact.layout
     elif pathname == '/contribute':
         return contribute.layout
+    elif pathname == '/about':
+        return about.layout
     else:
         return dcc.Markdown('## Page not found')
 
