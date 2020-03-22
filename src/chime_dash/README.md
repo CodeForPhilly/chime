@@ -21,18 +21,12 @@ File/Folder | Purpose
 `templates` | Specific `html` or `markdown` files
 
 ## How to use
-Run
-```bash
-> python penn_chime/dash/app.py
-```
-in the project root (after installing requirements).
-
-You can also
+Install the chime base module
 ```bash
 > pip install [--user] [-e] .
 ```
-which installs the command line script
+and run
 ```bash
-> penn_chime
+> python src/dash_app.py
 ```
-which launches the dash app.
+in the project root.
