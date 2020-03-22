@@ -7,12 +7,12 @@ from dash_core_components import Markdown
 import dash_bootstrap_components as dbc
 
 from penn_chime.settings import DEFAULTS
-from penn_chime.dash.utils import (
+from chime_dash.utils import (
     get_md_templates,
     get_yml_templates,
     render_yml,
 )
-from penn_chime.dash.presentation import display_sidebar
+from chime_dash.presentation import display_sidebar
 
 
 EXTERNAL_STYLESHEETS = [
