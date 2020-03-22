@@ -10,7 +10,7 @@ from pandas import DataFrame
 
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
 from dash_html_components import H1, H2, H3, H4, H5, H6, Div, A, P, B, I
-from dash_core_components import Slider
+from dash_core_components import Slider, Markdown, Graph
 
 import dash_bootstrap_components as dbc
 
@@ -29,6 +29,8 @@ DASH_HTML_ELEMENTS = {
     "p": P,
     "b": B,
     "i": I,
+    "markdown": Markdown,
+    "graph": Graph,
     "slider": Slider,
     "input": dbc.Input,
     "label": dbc.Label,
