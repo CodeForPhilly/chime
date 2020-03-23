@@ -12,14 +12,11 @@ import pandas as pd  # type: ignore
 
 # (0.02, 7) is 2%, 7 days
 # be sure to multiply by 100 when using as a default to the pct widgets!
-RateLos = namedtuple('RateLos', ('rate', 'length_of_stay'))
-
+RateLos = namedtuple("RateLos", ("rate", "length_of_stay"))
 
 
 def add_date_column(
-    df: pd.DataFrame,
-    drop_day_column: bool = False,
-    date_format: Optional[str] = None,
+    df: pd.DataFrame, drop_day_column: bool = False, date_format: Optional[str] = None,
 ) -> pd.DataFrame:
     """Copies input data frame and converts "day" column to "date" column
 

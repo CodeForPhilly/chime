@@ -45,6 +45,9 @@ def display_header(st, p):
         unsafe_allow_html=True,
     )
     st.markdown(
+        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports. See more about this issue [here](https://github.com/CodeForPhilly/chime/pull/190)."""
+    )
+    st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/). For questions and comments please see our
     [contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/CodeForPhilly/chime).
@@ -96,7 +99,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         min_value=0,
         value=d.current_hospitalized,
         step=1,
-        format="%i"
+        format="%i",
     )
 
     doubling_time = st.sidebar.number_input(
@@ -104,7 +107,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         min_value=0,
         value=d.doubling_time,
         step=1,
-        format="%i"
+        format="%i",
     )
 
     relative_contact_rate = (
@@ -125,7 +128,8 @@ def display_sidebar(st, d: Constants) -> Parameters:
             min_value=0.001,
             max_value=100.0,
             value=d.hospitalized.rate * 100,
-            step=1.0, format="%f",
+            step=1.0,
+            format="%f",
         )
         / 100.0
     )
@@ -136,7 +140,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
             max_value=100.0,
             value=d.icu.rate * 100,
             step=1.0,
-            format="%f"
+            format="%f",
         )
         / 100.0
     )
@@ -147,7 +151,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
             max_value=100.0,
             value=d.ventilated.rate * 100,
             step=1.0,
-            format="%f"
+            format="%f",
         )
         / 100.0
     )
@@ -181,7 +185,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
             max_value=100.0,
             value=d.market_share * 100,
             step=1.0,
-            format="%f"
+            format="%f",
         )
         / 100.0
     )
@@ -190,7 +194,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         min_value=1,
         value=d.region.susceptible,
         step=100000,
-        format="%i"
+        format="%i",
     )
 
     known_infected = st.sidebar.number_input(
@@ -205,10 +209,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
     max_y_axis = None
     if max_y_axis_set:
         max_y_axis = st.sidebar.number_input(
-            "Y-axis static value",
-            value=500,
-            format="%i",
-            step=25,
+            "Y-axis static value", value=500, format="%i", step=25,
         )
 
     return Parameters(
@@ -218,11 +219,10 @@ def display_sidebar(st, d: Constants) -> Parameters:
         market_share=market_share,
         relative_contact_rate=relative_contact_rate,
         susceptible=susceptible,
-
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
         ventilated=RateLos(ventilated_rate, ventilated_los),
-        max_y_axis=max_y_axis
+        max_y_axis=max_y_axis,
     )
 
 
@@ -234,16 +234,11 @@ def display_n_days_slider(st, p: Parameters, d: Constants):
         max_value=200,
         value=d.n_days,
         step=1,
-        format="%i"
+        format="%i",
     )
 
 
-def show_more_info_about_this_tool(
-    st,
-    parameters,
-    inputs: Constants,
-    notes: str = ''
-):
+def show_more_info_about_this_tool(st, parameters, inputs: Constants, notes: str = ""):
     """a lot of streamlit writing to screen."""
     st.subheader(
         "[Discrete-time SIR modeling](https://mathworld.wolfram.com/SIRModel.html) of infections/recovery"
@@ -331,7 +326,15 @@ $$\\beta = (g + \\gamma)$$.
 ### Initial Conditions
 
 - {notes} \n
-""".format(notes=notes) + "- " + "| \n".join(f"{key} = {value} " for key,value in inputs.region.__dict__.items() if key != '_s')
+""".format(
+            notes=notes
+        )
+        + "- "
+        + "| \n".join(
+            f"{key} = {value} "
+            for key, value in inputs.region.__dict__.items()
+            if key != "_s"
+        )
     )
     return None
 
@@ -365,13 +368,8 @@ def write_footer(st):
     st.markdown("© 2020, The Trustees of the University of Pennsylvania")
 
 
-
 def show_additional_projections(
-    st,
-    alt,
-    charting_func,
-    parameters,
-    as_date: bool = False,
+    st, alt, charting_func, parameters, as_date: bool = False,
 ):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
@@ -383,8 +381,10 @@ def show_additional_projections(
             parameters.infected_v,
             parameters.recovered_v,
             as_date=as_date,
-            max_y_axis=parameters.max_y_axis),
-        use_container_width=True)
+            max_y_axis=parameters.max_y_axis,
+        ),
+        use_container_width=True,
+    )
 
 
 ##########
@@ -393,9 +393,7 @@ def show_additional_projections(
 
 
 def draw_projected_admissions_table(
-    st,
-    projection_admits: pd.DataFrame,
-    as_date: bool = False
+    st, projection_admits: pd.DataFrame, as_date: bool = False
 ):
     admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
     admits_table["day"] = admits_table.index
@@ -404,13 +402,12 @@ def draw_projected_admissions_table(
 
     if as_date:
         admits_table = add_date_column(
-            admits_table,
-            drop_day_column=True,
-            date_format=DATE_FORMAT
+            admits_table, drop_day_column=True, date_format=DATE_FORMAT
         )
 
     st.table(admits_table)
     return None
+
 
 def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False):
     census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
@@ -420,21 +417,21 @@ def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False):
 
     if as_date:
         census_table = add_date_column(
-            census_table,
-            drop_day_column=True,
-            date_format=DATE_FORMAT
+            census_table, drop_day_column=True, date_format=DATE_FORMAT
         )
 
     st.table(census_table)
     return None
 
 
-def draw_raw_sir_simulation_table(
-        st,
-        parameters,
-        as_date: bool = False):
+def draw_raw_sir_simulation_table(st, parameters, as_date: bool = False):
     days = np.arange(0, parameters.n_days + 1)
-    data_list = [days, parameters.susceptible_v, parameters.infected_v, parameters.recovered_v]
+    data_list = [
+        days,
+        parameters.susceptible_v,
+        parameters.infected_v,
+        parameters.recovered_v,
+    ]
     data_dict = dict(zip(["day", "Susceptible", "Infections", "Recovered"], data_list))
     projection_area = pd.DataFrame.from_dict(data_dict)
     infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
@@ -443,9 +440,7 @@ def draw_raw_sir_simulation_table(
 
     if as_date:
         infect_table = add_date_column(
-            infect_table,
-            drop_day_column=True,
-            date_format=DATE_FORMAT
+            infect_table, drop_day_column=True, date_format=DATE_FORMAT
         )
 
     st.table(infect_table)

@@ -1,4 +1,3 @@
-
 from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
@@ -8,10 +7,7 @@ from .utils import add_date_column
 
 
 def new_admissions_chart(
-    alt,
-    projection_admits: pd.DataFrame,
-    parameters: Parameters,
-    as_date: bool = False,
+    alt, projection_admits: pd.DataFrame, parameters: Parameters, as_date: bool = False,
 ) -> Chart:
     """docstring"""
     plot_projection_days = parameters.n_days - 10
@@ -49,10 +45,7 @@ def new_admissions_chart(
 
 
 def admitted_patients_chart(
-    alt,
-    census: pd.DataFrame,
-    parameters: Parameters,
-    as_date: bool = False
+    alt, census: pd.DataFrame, parameters: Parameters, as_date: bool = False
 ) -> Chart:
     """docstring"""
 
@@ -63,7 +56,7 @@ def admitted_patients_chart(
         x_kwargs = {"shorthand": "date:T", "title": "Date"}
         idx = "date:T"
     else:
-        x_kwargs ={"shorthand": "day", "title": "Days from today"}
+        x_kwargs = {"shorthand": "day", "title": "Days from today"}
         idx = "day"
 
     y_scale = alt.Scale()
@@ -74,7 +67,7 @@ def admitted_patients_chart(
 
     return (
         alt.Chart(census.head(plot_projection_days))
-        .transform_fold(fold=["Hospitalized Census", "ICU Census", "Ventilated Census"])
+        .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
         .mark_line(point=True)
         .encode(
             x=alt.X(**x_kwargs),
@@ -91,11 +84,7 @@ def admitted_patients_chart(
 
 
 def additional_projections_chart(
-    alt,
-    i: np.ndarray,
-    r: np.ndarray,
-    as_date: bool = False,
-    max_y_axis: int = None
+    alt, i: np.ndarray, r: np.ndarray, as_date: bool = False, max_y_axis: int = None
 ) -> Chart:
     dat = pd.DataFrame({"Infected": i, "Recovered": r})
     dat["day"] = dat.index

@@ -7,8 +7,7 @@ import pandas as pd  # type: ignore
 
 
 def sir(
-    s: float, i: float, r: float,
-    beta: float, gamma: float, n: float
+    s: float, i: float, r: float, beta: float, gamma: float, n: float
 ) -> Tuple[float, float, float]:
     """The SIR model, one time step."""
     s_n = (-beta * s * i) + s
@@ -26,8 +25,7 @@ def sir(
 
 
 def gen_sir(
-    s: float, i: float, r: float,
-    beta: float, gamma: float, n_days: int
+    s: float, i: float, r: float, beta: float, gamma: float, n_days: int
 ) -> Generator[Tuple[float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples."""
     s, i, r = (float(v) for v in (s, i, r))
@@ -38,8 +36,7 @@ def gen_sir(
 
 
 def sim_sir(
-    s: float, i: float, r: float,
-    beta: float, gamma: float, n_days: int
+    s: float, i: float, r: float, beta: float, gamma: float, n_days: int
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulate the SIR model forward in time."""
     s, i, r = (float(v) for v in (s, i, r))
@@ -70,31 +67,29 @@ def sim_sir_df(p) -> pd.DataFrame:
 
 
 def get_dispositions(
-    infected: np.ndarray, rates: Tuple[float, ...], market_share: float = 1.0
+    patient_state: np.ndarray, rates: Tuple[float, ...], market_share: float = 1.0
 ) -> Tuple[np.ndarray, ...]:
     """Get dispositions of infected adjusted by rate and market_share."""
-    return (*(infected * rate * market_share for rate in rates),)
-
+    return (*(patient_state * rate * market_share for rate in rates),)
 
 
 def build_admissions_df(p) -> pd.DataFrame:
     """Build admissions dataframe from Parameters."""
     days = np.array(range(0, p.n_days + 1))
-    data_dict = dict(zip(["day", "Hospitalized", "ICU", "Ventilated"],
-                         [days] + [disposition for disposition in p.dispositions]
-    ))
+    data_dict = dict(
+        zip(
+            ["day", "Hospitalized", "ICU", "Ventilated"],
+            [days] + [disposition for disposition in p.dispositions],
+        )
+    )
     projection = pd.DataFrame.from_dict(data_dict)
     # New cases
     projection_admits = projection.iloc[:-1, :] - projection.shift(1)
-    projection_admits[projection_admits < 0] = 0
     projection_admits["day"] = range(projection_admits.shape[0])
     return projection_admits
 
 
-def build_census_df(
-        projection_admits: pd.DataFrame,
-        parameters
-) -> pd.DataFrame:
+def build_census_df(projection_admits: pd.DataFrame, parameters) -> pd.DataFrame:
     """ALOS for each category of COVID-19 case (total guesses)"""
     n_days = np.shape(projection_admits)[0]
     hosp_los, icu_los, vent_los = parameters.lengths_of_stay
@@ -117,8 +112,9 @@ def build_census_df(
     census_df = census_df[["day", "Hospitalized", "ICU", "Ventilated"]]
     census_df = census_df.head(n_days)
     census_df = census_df.rename(
-        columns={disposition: f"{disposition} Census"
-                 for disposition
-                 in ("Hospitalized", "ICU", "Ventilated")}
+        columns={
+            disposition: f"{disposition}"
+            for disposition in ("Hospitalized", "ICU", "Ventilated")
+        }
     )
     return census_df
