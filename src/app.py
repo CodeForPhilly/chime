@@ -4,7 +4,6 @@ import altair as alt  # type: ignore
 import streamlit as st  # type: ignore
 
 from penn_chime.presentation import (
-    # additional_projections_chart,
     display_header,
     display_sidebar,
     draw_census_table,
