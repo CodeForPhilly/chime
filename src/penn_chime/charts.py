@@ -30,6 +30,7 @@ def new_admissions_chart(
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
+    # TODO fix the fold to allow any number of dispositions
     return (
         alt.Chart(projection_admits.head(plot_projection_days))
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
@@ -70,6 +71,7 @@ def admitted_patients_chart(
         y_scale.domain = (0, max_y_axis)
         y_scale.clamp = True
 
+    # TODO fix the fold to allow any number of dispositions
     return (
         alt.Chart(census.head(plot_projection_days))
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
