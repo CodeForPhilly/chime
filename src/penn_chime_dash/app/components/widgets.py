@@ -34,8 +34,8 @@ class FeatureWidgets:
             placeholder="Social distancing % (reduction in social contact)"
         )
 
-        self.hospitilization_rate = dbc.Input(
-            id="hospitalization_rate",
+        self.hospitilized_rate = dbc.Input(
+            id="hospitaliz_rate",
             min=0.001,
             max=100.0,
             step=1.0,
@@ -113,7 +113,7 @@ class FeatureWidgets:
         )
 
         self.widget_dict = {
-            "n_hospitalized": [self.current_hospitalized],
+            "current_hospitalized": [self.current_hospitalized],
             "relative_contact_rate": [self.relative_contact_rate],
             "doubling_time": [self.doubling_time],
             "known_infected": [self.known_infected],
@@ -123,7 +123,7 @@ class FeatureWidgets:
             "icu_los": [self.icu_los],
             "ventilated_los": [self.ventilated_los],
             "ventilated_rate": [self.ventilated_rate],
-            "hostpitalized_rate": [self.hospitilization_rate],
+            "hostpitalized_rate": [self.hospitilized_rate],
             "icu_rate": [self.icu_rate]
         }
 
