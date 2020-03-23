@@ -6,7 +6,7 @@ import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
 from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart
-from src.penn_chime.models import sir, sim_sir, build_admissions_df
+from src.penn_chime.models import sir, sim_sir, build_admissions_df, build_census_df
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
@@ -246,8 +246,8 @@ def test_parameters():
 
     assert (diff.abs() < 0.1).all()
 
-    #census = build_census_df(admissions, param)
-    #assert census[
+    census = build_census_df(admissions, param)
+    assert census["Hospitalized"][0] == param.current_hospitalized
 
     # change n_days, make sure it cascades
     param.n_days = 2
