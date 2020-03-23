@@ -28,9 +28,10 @@ def setup(language: str, defaults: Constants):
             Col(
                 id="sidebar",
                 children=sidebar.setup(language, defaults),
-                width=4,
+                width=3,
                 className="mt-4",
             ),
+            Col(width=1),
             Col(
                 children=header.setup(language) + intro.setup(language)
                 # + additions.setup(language)
