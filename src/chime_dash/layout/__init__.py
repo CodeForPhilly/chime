@@ -36,9 +36,10 @@ def setup(language: str, defaults: Constants):
             ),
             Col(width=1),
             Col(
-                children=header.setup(language) + intro.setup(language)
-                # + additions.setup(language)
+                children=header.setup(language)
+                + intro.setup(language)
                 + visualizations.setup(language)
+                + additions.setup(language)
                 + definitions.setup(language)
                 + footer.setup(language),
                 width=8,
@@ -50,7 +51,11 @@ def setup(language: str, defaults: Constants):
 
 
 CALLBACK_INPUTS = sidebar.CALLBACK_INPUTS
-CALLBACK_OUTPUTS = intro.CALLBACK_OUTPUTS + visualizations.CALLBACK_OUTPUTS
+CALLBACK_OUTPUTS = (
+    intro.CALLBACK_OUTPUTS
+    + visualizations.CALLBACK_OUTPUTS
+    + additions.CALLBACK_OUTPUTS
+)
 
 
 def callback_body(*args, language="en", defaults: Constants):
@@ -64,5 +69,11 @@ def callback_body(*args, language="en", defaults: Constants):
     visualizations_data = visualizations.render(
         language, pars, as_date=kwargs["as_date"], show_tables=kwargs["show_tables"]
     )
-
-    return intro_md + visualizations_data
+    additions_data = additions.render(
+        language,
+        pars,
+        as_date=kwargs["as_date"],
+        show_tables=kwargs["show_tables"],
+        show_additions=kwargs["show_additional_projections"],
+    )
+    return intro_md + visualizations_data + additions_data

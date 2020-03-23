@@ -6,7 +6,7 @@ from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
 from dash_html_components import H2
 from dash_core_components import Markdown, Graph
-from dash_bootstrap_components import Table, Collapse
+from dash_bootstrap_components import Table
 
 from penn_chime.utils import build_census_df, build_admissions_df, add_date_column
 from penn_chime.models import Parameters
