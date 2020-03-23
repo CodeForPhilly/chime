@@ -44,14 +44,15 @@ def setup(language: str, defaults: Constants):
     )
 
 
-CALLBACK_INPUTS = []
-CALLBACK_OUTPUTS = []
+CALLBACK_INPUTS = sidebar.CALLBACK_INPUTS
+CALLBACK_OUTPUTS = intro.CALLBACK_OUTPUTS
 
 
-def callback_body(*args):
+def callback_body(*args, language="en"):
     """Glues together individual app callbacks
 
     Sidebar provides all of the inputs.
     """
     pars, as_date = sidebar.parse_form_parameters(*args)
-    return None
+    intro_md = intro.render(language, pars)
+    return (intro_md,)
