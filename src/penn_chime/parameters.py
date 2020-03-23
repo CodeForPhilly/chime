@@ -1,4 +1,8 @@
-"""Parameters."""
+"""Parameters.
+
+Changes affecting results or their presentation should also update
+`change_date`, so users can see when results have last changed
+"""
 
 from numpy import log2  # type: ignore
 
@@ -128,3 +132,11 @@ class Parameters:
             i_icu_v,
             i_ventilated_v,
         )
+
+    def change_date(self):
+        """
+        This reflects a date from which previously-run reports will no
+        longer match current results, indicating when users should
+        re-run their reports
+        """
+        return "March 23 2020"

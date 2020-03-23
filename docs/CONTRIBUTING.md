@@ -30,6 +30,7 @@ As of March 21, help is especially wanted from contributors with experience in K
 - Request review from the relevant maintainer(s).
 - Check your pull request periodically to see if any changes have been requested or any merge conflicts have arisen.
 - If a merge conflict arises, rebase against the latest `develop` branch and force-push the new branch as early as you can. You may need to do this more than once before your changes get merged. Do your best to keep your branch in a mergeable state until it is finished being reviewed and accepted.
+- If your change affects the results calculated or presented, update `change_date` in `src/penn_chime/parameters.py` when the pull request is ready for merge, so users can see when results have last changed
 - Note: Frequent contributors with write access can submit pull requests from a new branch in the `CodeforPhilly/chime` repository.
 
 ## Review & Release

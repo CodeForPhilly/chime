@@ -1,4 +1,9 @@
-"""Models."""
+"""Models.
+
+Changes affecting results or their presentation should also update
+parameters.py `change_date`, so users can see when results have last
+changed
+"""
 
 from typing import Generator, Tuple
 
