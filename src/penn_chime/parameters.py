@@ -22,7 +22,7 @@ class Parameters:
         known_infected: int,
         market_share: float,
         relative_contact_rate: float,
-        susceptible: int,
+        population: int,
         hospitalized: RateLos,
         icu: RateLos,
         ventilated: RateLos,
@@ -35,7 +35,6 @@ class Parameters:
         self.known_infected = known_infected
         self.market_share = market_share
         self.relative_contact_rate = relative_contact_rate
-        self.susceptible = susceptible
         self._n_days = 0
 
         self.hospitalized = hospitalized
@@ -57,6 +56,9 @@ class Parameters:
             current_hospitalized / market_share / hospitalized.rate
         )
 
+        # Still assuming 0 recovered at initialization
+        self.susceptible = population - infected
+
         self.detection_probability = (
             known_infected / infected if infected > 1.0e-7 else None
         )
@@ -76,12 +78,12 @@ class Parameters:
         # Contact rate, beta
         self.beta = beta = (
             (intrinsic_growth_rate + gamma)
-            / susceptible
+            / self.susceptible
             * (1.0 - relative_contact_rate)
         )  # {rate based on doubling time} / {initial susceptible}
 
         # r_t is r_0 after distancing
-        self.r_t = beta / gamma * susceptible
+        self.r_t = beta / gamma * self.susceptible
 
         # Simplify equation to avoid division by zero:
         # self.r_naught = r_t / (1.0 - relative_contact_rate)
@@ -89,7 +91,7 @@ class Parameters:
 
         # doubling time after distancing
         # TODO constrain values np.log2(...) > 0.0
-        self.doubling_time_t = 1.0 / log2(beta * susceptible - gamma + 1)
+        self.doubling_time_t = 1.0 / log2(beta * self.susceptible - gamma + 1)
 
         self.dispositions = None
         self.susceptible_v = self.infected_v = self.recovered_v = None

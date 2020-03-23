@@ -20,7 +20,7 @@ PARAM = Parameters(
     known_infected=5000,
     market_share=0.05,
     relative_contact_rate=0.15,
-    susceptible=500000,
+    population=500000,
     hospitalized=RateLos(0.05, 7),
     icu=RateLos(0.02, 9),
     ventilated=RateLos(0.01, 10),
@@ -199,7 +199,7 @@ def test_parameters():
         known_infected=5000,
         market_share=0.05,
         relative_contact_rate=0.15,
-        susceptible=500000,
+        population=500000,
         hospitalized=RateLos(0.05, 7),
         icu=RateLos(0.02, 9),
         ventilated=RateLos(0.01, 10),
@@ -218,7 +218,7 @@ def test_parameters():
     # test the class-calculated attributes
     assert param.detection_probability == 0.125
     assert param.intrinsic_growth_rate == 0.12246204830937302
-    assert param.beta == 3.2961405355450555e-07
+    assert param.beta == 3.582761451679408e-07
     assert param.r_t == 2.307298374881539
     assert param.r_naught == 2.7144686763312222
     assert param.doubling_time_t == 7.764405988534983
@@ -232,12 +232,12 @@ def test_parameters():
         == 61
     )
 
-    assert param.susceptible_v[0] == 500000.0
-    assert round(param.susceptible_v[-1], 0) == 67202
+    assert param.susceptible_v[0] == 460000.0
+    assert round(param.susceptible_v[-1], 0) == 59497
     assert round(param.infected_v[1], 0) == 43735
-    assert round(param.recovered_v[30], 0) == 224048
+    assert round(param.recovered_v[30], 0) == 216711
     assert [d[0] for d in param.dispositions] == [100.0, 40.0, 20.0]
-    assert [round(d[-1], 0) for d in param.dispositions] == [1182.0, 473.0, 236.0]
+    assert [round(d[-1], 0) for d in param.dispositions] == [1101.0, 441.0, 220.0]
 
     # change n_days, make sure it cascades
     param.n_days = 2

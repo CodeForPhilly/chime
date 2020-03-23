@@ -196,7 +196,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         )
         / 100.0
     )
-    susceptible = st.sidebar.number_input(
+    population = st.sidebar.number_input(
         "Regional Population",
         min_value=1,
         value=d.region.susceptible,
@@ -228,7 +228,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         known_infected=known_infected,
         market_share=market_share,
         relative_contact_rate=relative_contact_rate,
-        susceptible=susceptible,
+        population=population,
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
         ventilated=RateLos(ventilated_rate, ventilated_los),
