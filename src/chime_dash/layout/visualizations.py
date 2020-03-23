@@ -4,7 +4,7 @@ from typing import List, Any
 
 from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
-from dash_html_components import H2, Div
+from dash_html_components import H2
 from dash_core_components import Markdown, Graph
 
 from penn_chime.utils import build_census_df, build_admissions_df, add_date_column
@@ -43,21 +43,33 @@ def render(language: str, pars: Parameters, as_date: bool = False) -> List[Any]:
     """
     content = read_localization_yaml(LOCALIZATION_FILE, language)
 
-    # Prepare admissions data
+    # Prepare admissions data & census data
     projection_admits = build_admissions_df(pars.n_days, *pars.dispositions)
+    census_df = build_census_df(projection_admits, *pars.lengths_of_stay)
     if as_date:
         projection_admits = add_date_column(
             projection_admits, drop_day_column=True
         ).set_index("date")
+        census_df = add_date_column(census_df, drop_day_column=True).set_index("date")
     else:
         projection_admits = projection_admits.set_index("day")
+        census_df = census_df.set_index("day")
 
-    localized_columns = {key: content[key] for key in projection_admits.columns}
-    projection_admits = projection_admits.dropna().rename(columns=localized_columns)
+    projection_admits = projection_admits.dropna().rename(
+        columns={key: content[key] for key in projection_admits.columns}
+    )
+    census_df = census_df.dropna().rename(
+        columns={key: content[key] for key in census_df.columns}
+    )
 
-    # Plot admissions figure
+    # Create admissions figure
     admissions_data = plot_dataframe(
         projection_admits.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
     )
 
-    return (admissions_data, admissions_data)
+    # Create census figure
+    census_data = plot_dataframe(
+        census_df.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
+    )
+
+    return (admissions_data, census_data)
