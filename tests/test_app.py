@@ -237,6 +237,18 @@ def test_parameters():
     assert [d[0] for d in param.dispositions] == [100.0, 40.0, 20.0]
     assert [round(d[-1], 0) for d in param.dispositions] == [1182.0, 473.0, 236.0]
 
+    # test that admissions are being properly calculated
+    admissions = build_admissions_df(param)
+    cumulative_admissions = admissions.cumsum()
+
+    expected_cumulative_admissions = 0.05 * 0.05 * (param.infected_v[:-1] + param.recovered_v[:-1])
+    diff = cumulative_admissions["Hospitalized"][:-1] - expected_cumulative_admissions
+
+    assert (diff.abs() < 0.1).all()
+
+    #census = build_census_df(admissions, param)
+    #assert census[
+
     # change n_days, make sure it cascades
     param.n_days = 2
     assert (
@@ -246,11 +258,3 @@ def test_parameters():
         == param.n_days + 1
         == 3
     )
-
-    # test that admissions are being properly calculated (thanks @PhilMiller)
-    admissions = build_admissions_df(param)
-    cumulative_admissions = admissions.cumsum()
-    diff = cumulative_admissions["Hospitalized"][1:-1] - (
-        0.05 * 0.05 * (param.infected_v[1:-1] + param.recovered_v[1:-1]) - 100
-    )
-    assert (diff.abs() < 0.1).all()

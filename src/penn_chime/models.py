@@ -86,6 +86,10 @@ def build_admissions_df(p) -> pd.DataFrame:
     # New cases
     projection_admits = projection.iloc[:-1, :] - projection.shift(1)
     projection_admits["day"] = range(projection_admits.shape[0])
+
+    # Account for initial conditions
+    projection_admits.loc[0, "Hospitalized"] = p.current_hospitalized
+
     return projection_admits
 
 
