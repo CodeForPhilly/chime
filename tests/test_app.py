@@ -1,11 +1,13 @@
 """Tests."""
 
+from math import ceil  # type: ignore
+import datetime  # type: ignore
 import pytest  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
-from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart
+from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
 from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
@@ -166,7 +168,7 @@ def test_new_admissions_chart():
     projection_admits = pd.read_csv("tests/projection_admits.csv")
     chart = new_admissions_chart(alt, projection_admits, PARAM)
     assert isinstance(chart, alt.Chart)
-    assert chart.data.iloc[1].hosp < 1
+    assert chart.data.iloc[1].hospitalized < 1
     assert round(chart.data.iloc[40].icu, 0) == 25
 
     # test fx call with no params
@@ -181,8 +183,8 @@ def test_admitted_patients_chart():
     census_df = pd.read_csv("tests/census_df.csv")
     chart = admitted_patients_chart(alt, census_df, PARAM)
     assert isinstance(chart, alt.Chart)
-    assert chart.data.iloc[1].hosp == 1
-    assert chart.data.iloc[49].vent == 203
+    assert chart.data.iloc[1].hospitalized == 1
+    assert chart.data.iloc[49].ventilated == 203
 
     # test fx call with no params
     with pytest.raises(TypeError):
@@ -230,3 +232,41 @@ def test_model(model=MODEL, param=PARAM):
         0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
     )
     assert (diff.abs() < 0.1).all()
+
+
+def test_chart_descriptions():
+    # new admissions chart
+    projection_admits = pd.read_csv('tests/projection_admits.csv')
+    # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
+    chart = new_admissions_chart(alt, projection_admits, PARAM)
+    description = chart_descriptions(chart)
+
+    hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
+
+    max_hosp = chart.data['hospitalized'].max()
+    assert str(ceil(max_hosp)) in hosp
+
+    max_icu_ix = chart.data['icu'].idxmax()
+    assert max_icu_ix + 1 == len(chart.data)
+    assert "*" in icu
+
+    # test asterisk
+    param = PARAM
+    param.n_days = 600
+
+    projection_admits = pd.read_csv('tests/projection_admits.csv')
+    # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
+    chart = new_admissions_chart(alt, projection_admits, PARAM)
+    description = chart_descriptions(chart)
+    assert "*" not in description
+
+    # census chart
+    census_df = pd.read_csv('tests/census_df.csv')
+    # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
+    PARAM.as_date = True
+    chart = admitted_patients_chart(alt, census_df, PARAM)
+    description = chart_descriptions(chart)
+
+    assert str(ceil(chart.data['ventilated'].max())) in description
+    assert str(chart.data['icu'].idxmax()) not in description
+    assert datetime.datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description

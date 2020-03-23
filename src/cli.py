@@ -12,7 +12,6 @@ from penn_chime.parameters import Parameters
 from penn_chime.models import SimSirModel
 from penn_chime.utils import RateLos
 
-
 class FromFile(Action):
     """From File."""
 

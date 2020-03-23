@@ -1,4 +1,9 @@
-"""Models."""
+"""Models.
+
+Changes affecting results or their presentation should also update
+parameters.py `change_date`, so users can see when results have last
+changed
+"""
 
 from __future__ import annotations
 
@@ -31,10 +36,7 @@ class SimSirModel:
         self.intrinsic_growth_rate = intrinsic_growth_rate = \
             (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
 
-        # TODO make this configurable, or more nuanced
-        self.recovery_days = recovery_days = 14.0
-
-        self.gamma = gamma = 1.0 / recovery_days
+        self.gamma = gamma = 1.0 / p.recovery_days
 
         # Contact rate, beta
         self.beta = beta = (

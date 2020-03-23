@@ -45,7 +45,7 @@ def display_header(st, m, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports. See more about this issue [here](https://github.com/CodeForPhilly/chime/pull/190)."""
+        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + p.change_date() + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
@@ -94,12 +94,11 @@ def display_sidebar(st, d: Constants) -> Parameters:
     if d.known_infected < 1:
         raise ValueError("Known cases must be larger than one to enable predictions.")
 
-    n_days = st.sidebar.slider(
+    n_days = st.sidebar.number_input(
         "Number of days to project",
         min_value=30,
-        max_value=400,
         value=d.n_days,
-        step=1,
+        step=10,
         format="%i",
     )
 
@@ -214,6 +213,8 @@ def display_sidebar(st, d: Constants) -> Parameters:
         format="%i",
     )
 
+    as_date = st.sidebar.checkbox(label="Present result as dates instead of days", value=False)
+
     max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value")
     max_y_axis = None
     if max_y_axis_set:
@@ -222,17 +223,19 @@ def display_sidebar(st, d: Constants) -> Parameters:
         )
 
     return Parameters(
+        as_date=as_date,
         current_hospitalized=current_hospitalized,
         doubling_time=doubling_time,
         known_infected=known_infected,
         market_share=market_share,
+        max_y_axis=max_y_axis,
+        n_days=n_days,
         relative_contact_rate=relative_contact_rate,
         susceptible=susceptible,
+
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
         ventilated=RateLos(ventilated_rate, ventilated_los),
-        max_y_axis=max_y_axis,
-        n_days=n_days,
     )
 
 
@@ -367,7 +370,7 @@ def write_footer(st):
 
 
 def show_additional_projections(
-    st, alt, charting_func, model, parameters, as_date: bool = False,
+    st, alt, charting_func, model, parameters
 ):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
@@ -376,10 +379,8 @@ def show_additional_projections(
     st.altair_chart(
         charting_func(
             alt,
-            model.raw_df.infected,
-            model.raw_df.recovered,
-            as_date=as_date,
-            max_y_axis=parameters.max_y_axis,
+            model=model,
+            parameters=parameters
         ),
         use_container_width=True,
     )
@@ -402,7 +403,6 @@ def draw_projected_admissions_table(
         admits_table = add_date_column(
             admits_table, drop_day_column=True, date_format=DATE_FORMAT
         )
-
     st.table(admits_table)
     return None
 
@@ -422,7 +422,8 @@ def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False):
     return None
 
 
-def draw_raw_sir_simulation_table(st, model, parameters, as_date: bool = False):
+def draw_raw_sir_simulation_table(st, model, parameters):
+    as_date = parameters.as_date
     projection_area = model.raw_df
     infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
     infect_table.index = range(infect_table.shape[0])
