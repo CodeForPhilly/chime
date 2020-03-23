@@ -1,57 +1,83 @@
 """Initializes the  dash html
 """
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
+from collections import OrderedDict
 
+from dash.dependencies import Input as CallbackInput
 from dash.development.base_component import ComponentMeta
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
-from penn_chime.defaults import Constants
+from penn_chime.defaults import RateLos, Constants
+from penn_chime.models import Parameters
 
 from chime_dash.utils import read_localization_yaml
 
 LOCALIZATION_FILE = "sidebar.yml"
 
-INPUTS = {
-    "current_hospitalized": {"type": "number", "min": 0, "step": 1},
-    "doubling_time": {"type": "number", "min": 0, "step": 1},
-    "relative_contact_rate": {
+INPUTS = OrderedDict(
+    current_hospitalized={"type": "number", "min": 0, "step": 1},
+    doubling_time={"type": "number", "min": 0, "step": 1},
+    relative_contact_rate={
         "type": "number",
         "min": 0,
         "step": 1,
         "max": 100,
         "percent": True,
     },
-    "hospitalized_rate": {
+    hospitalized_rate={
         "type": "number",
         "min": 0,
         "step": 1,
         "max": 100,
         "percent": True,
     },
-    "icu_rate": {"type": "number", "min": 0, "step": 1, "max": 100, "percent": True},
-    "ventilated_rate": {
+    icu_rate={"type": "number", "min": 0, "step": 1, "max": 100, "percent": True},
+    ventilated_rate={
         "type": "number",
         "min": 0,
         "step": 1,
         "max": 100,
         "percent": True,
     },
-    "hospitalized_los": {"type": "number", "min": 0, "step": 1, "max": 100},
-    "icu_los": {"type": "number", "min": 0, "step": 1},
-    "ventilated_los": {"type": "number", "min": 0, "step": 1},
-    "market_share": {
-        "type": "number",
-        "min": 1,
-        "step": 1,
-        "max": 100,
-        "percent": True,
-    },
-    "susceptible": {"type": "number", "min": 1, "step": 1},
-    "known_infected": {"type": "number", "min": 0, "step": 1},
-    "n_days": {"type": "number", "min": 20, "step": 1},
-    "as_date": {"type": "switch", "value": False},
-    "max_y_axis": {"type": "switch", "value": False},
-}
+    hospitalized_los={"type": "number", "min": 0, "step": 1, "max": 100},
+    icu_los={"type": "number", "min": 0, "step": 1},
+    ventilated_los={"type": "number", "min": 0, "step": 1},
+    market_share={"type": "number", "min": 1, "step": 1, "max": 100, "percent": True,},
+    susceptible={"type": "number", "min": 1, "step": 1},
+    known_infected={"type": "number", "min": 0, "step": 1},
+    n_days={"type": "number", "min": 20, "step": 1},
+    as_date={"type": "switch", "value": False},
+    max_y_axis={"type": "switch", "value": False},
+)
+
+CALLBACK_INPUTS = [
+    CallbackInput(component_id=key, component_property="value") for key in INPUTS
+]
+
+
+def parse_form_parameters(*args) -> Tuple[Parameters, bool]:
+    """Reads html form outputs and converts them to a parameter instance
+
+    Returns Parameters and as_date argument
+    """
+    kwargs = {
+        key: val / 100 if ("rate" in key or "share" in key) else val
+        for key, val in zip(INPUTS.keys(), args)
+    }
+    pars = Parameters(
+        current_hospitalized=kwargs["current_hospitalized"],
+        doubling_time=kwargs["doubling_time"],
+        known_infected=kwargs["known_infected"],
+        market_share=kwargs["market_share"],
+        relative_contact_rate=kwargs["relative_contact_rate"],
+        susceptible=kwargs["susceptible"],
+        hospitalized=RateLos(kwargs["hospitalized_rate"], kwargs["hospitalized_los"]),
+        icu=RateLos(kwargs["icu_rate"], kwargs["icu_los"]),
+        ventilated=RateLos(kwargs["ventilated_rate"], kwargs["ventilated_los"]),
+        max_y_axis=kwargs["max_y_axis"],
+        n_days=kwargs["n_days"],
+    )
+    return pars, kwargs["as_date"]
 
 
 def setup(language: str, defaults: Constants) -> List[ComponentMeta]:
