@@ -6,7 +6,7 @@ import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
 from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart
-from src.penn_chime.models import sir, sim_sir, build_admissions_df
+from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
@@ -24,6 +24,8 @@ PARAM = Parameters(
     ventilated=RateLos(0.01, 10),
     n_days=60,
 )
+
+MODEL = SimSirModel(PARAM)
 
 
 # set up
@@ -56,7 +58,7 @@ st = MockStreamlit()
 
 def test_penn_logo_in_header():
     penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
-    display_header(st, PARAM)
+    display_header(st, MODEL, PARAM)
     assert len(
         list(filter(lambda s: penn_css in s, st.render_store))
     ), "The Penn Medicine header should be printed"
@@ -145,19 +147,19 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    sim_sir_test = sim_sir(5, 6, 7, 0.1, 0.1, 40)
-    s, i, r = sim_sir_test
+    raw_df = sim_sir_df(5, 6, 7, 0.1, 0.1, 40)
 
-    assert round(s[0], 0) == 5
-    assert round(i[0], 2) == 6
-    assert round(r[0], 0) == 7
-    assert round(s[-1], 2) == 0
-    assert round(i[-1], 2) == 0.18
-    assert round(r[-1], 2) == 17.82
+    first = raw_df.iloc[0, :]
+    last = raw_df.iloc[-1, :]
 
-    assert isinstance(sim_sir_test, tuple)
-    for v in sim_sir_test:
-        assert isinstance(v, np.ndarray)
+    assert round(first.susceptible, 0) == 5
+    assert round(first.infected, 2) == 6
+    assert round(first.recovered, 0) == 7
+    assert round(last.susceptible, 2) == 0
+    assert round(last.infected, 2) == 0.18
+    assert round(last.recovered, 2) == 17.82
+
+    assert isinstance(raw_df, pd.DataFrame)
 
 
 def test_new_admissions_chart():
@@ -190,67 +192,41 @@ def test_admitted_patients_chart():
     assert empty_chart.data.empty
 
 
-def test_parameters():
-    param = Parameters(
-        current_hospitalized=100,
-        doubling_time=6.0,
-        known_infected=5000,
-        market_share=0.05,
-        relative_contact_rate=0.15,
-        susceptible=500000,
-        hospitalized=RateLos(0.05, 7),
-        icu=RateLos(0.02, 9),
-        ventilated=RateLos(0.01, 10),
-        n_days=60,
-    )
+def test_model(model=MODEL, param=PARAM):
+    # test the Model
 
-    # test the Parameters
-
-    # hospitalized, icu, ventilated
-    assert param.rates == (0.05, 0.02, 0.01)
-    assert param.lengths_of_stay == (7, 9, 10)
-
-    assert param.infected == 40000.0
-    assert isinstance(param.infected, float)  # based off note in models.py
+    assert model.infected == 40000.0
+    assert isinstance(model.infected, float)  # based off note in models.py
 
     # test the class-calculated attributes
-    assert param.detection_probability == 0.125
-    assert param.intrinsic_growth_rate == 0.12246204830937302
-    assert param.beta == 3.2961405355450555e-07
-    assert param.r_t == 2.307298374881539
-    assert param.r_naught == 2.7144686763312222
-    assert param.doubling_time_t == 7.764405988534983
+    assert model.detection_probability == 0.125
+    assert model.intrinsic_growth_rate == 0.12246204830937302
+    assert model.beta == 3.2961405355450555e-07
+    assert model.r_t == 2.307298374881539
+    assert model.r_naught == 2.7144686763312222
+    assert model.doubling_time_t == 7.764405988534983
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
-    assert (
-        len(param.susceptible_v)
-        == len(param.infected_v)
-        == len(param.recovered_v)
-        == param.n_days + 1
-        == 61
-    )
+    assert len(model.raw_df) == param.n_days + 1 == 61
 
-    assert param.susceptible_v[0] == 500000.0
-    assert round(param.susceptible_v[-1], 0) == 67202
-    assert round(param.infected_v[1], 0) == 43735
-    assert round(param.recovered_v[30], 0) == 224048
-    assert [d[0] for d in param.dispositions] == [100.0, 40.0, 20.0]
-    assert [round(d[-1], 0) for d in param.dispositions] == [1182.0, 473.0, 236.0]
+    raw_df = model.raw_df
+    first = raw_df.iloc[0, :]
+    second = raw_df.iloc[1, :]
+    last = raw_df.iloc[-1, :]
 
-    # change n_days, make sure it cascades
-    param.n_days = 2
-    assert (
-        len(param.susceptible_v)
-        == len(param.infected_v)
-        == len(param.recovered_v)
-        == param.n_days + 1
-        == 3
-    )
+    assert first.susceptible == 500000.0
+    assert round(second.infected, 0) == 43735
+
+    assert round(last.susceptible, 0) == 67202
+    assert round(raw_df.recovered[30], 0) == 224048
+
+    assert [d[0] for d in model.dispositions.values()] == [100.0, 40.0, 20.0]
+    assert [round(d[60], 0) for d in model.dispositions.values()] == [1182.0, 473.0, 236.0]
 
     # test that admissions are being properly calculated (thanks @PhilMiller)
-    admissions = build_admissions_df(param)
+    admissions = build_admits_df(param.n_days, model.dispositions)
     cumulative_admissions = admissions.cumsum()
-    diff = cumulative_admissions["Hospitalized"][1:-1] - (
-        0.05 * 0.05 * (param.infected_v[1:-1] + param.recovered_v[1:-1]) - 100
+    diff = cumulative_admissions["hospitalized"][1:-1] - (
+        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
     )
     assert (diff.abs() < 0.1).all()

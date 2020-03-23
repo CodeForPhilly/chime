@@ -1,9 +1,90 @@
 """Models."""
 
-from typing import Generator, Tuple
+from __future__ import annotations
+
+from typing import Dict, Generator, Tuple
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
+
+from .parameters import Parameters
+
+
+class SimSirModel:
+
+    def __init__(self, p: Parameters) -> SimSirModel:
+
+        # Note: this should not be an integer.
+        # We're appoximating infected from what we do know.
+        # TODO market_share > 0, hosp_rate > 0
+        self.infected = infected = (
+            p.current_hospitalized / p.market_share / p.hospitalized.rate
+        )
+
+        self.detection_probability = (
+            p.known_infected / infected if infected > 1.0e-7 else None
+        )
+
+        # TODO missing initial recovered value
+        self.recovered = recovered = 0.0
+
+        self.intrinsic_growth_rate = intrinsic_growth_rate = \
+            (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
+
+        # TODO make this configurable, or more nuanced
+        self.recovery_days = recovery_days = 14.0
+
+        self.gamma = gamma = 1.0 / recovery_days
+
+        # Contact rate, beta
+        self.beta = beta = (
+            (intrinsic_growth_rate + gamma)
+            / p.susceptible
+            * (1.0 - p.relative_contact_rate)
+        )  # {rate based on doubling time} / {initial susceptible}
+
+        # r_t is r_0 after distancing
+        self.r_t = beta / gamma * p.susceptible
+
+        # Simplify equation to avoid division by zero:
+        # self.r_naught = r_t / (1.0 - relative_contact_rate)
+        self.r_naught = (intrinsic_growth_rate + gamma) / gamma
+
+        # doubling time after distancing
+        # TODO constrain values np.log2(...) > 0.0
+        self.doubling_time_t = 1.0 / np.log2(
+            beta * p.susceptible - gamma + 1)
+
+        self.raw_df = raw_df = sim_sir_df(
+            p.susceptible,
+            infected,
+            recovered,
+            beta,
+            gamma,
+            p.n_days,
+        )
+
+        rates = {
+            key: d.rate
+            for key, d in p.dispositions.items()
+        }
+
+        lengths_of_stay = {
+            key: d.length_of_stay
+            for key, d in p.dispositions.items()
+        }
+
+        i_dict_v = get_dispositions(raw_df.infected, rates, p.market_share)
+        r_dict_v = get_dispositions(raw_df.recovered, rates, p.market_share)
+
+        self.dispositions = {
+            key: value + r_dict_v[key]
+            for key, value in i_dict_v.items()
+        }
+
+        self.dispositions_df = pd.DataFrame(self.dispositions)
+        self.admits_df = admits_df = build_admits_df(p.n_days, self.dispositions)
+        self.census_df = build_census_df(admits_df, lengths_of_stay)
 
 
 def sir(
@@ -30,91 +111,61 @@ def gen_sir(
     """Simulate SIR model forward in time yielding tuples."""
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
-    for _ in range(n_days + 1):
-        yield s, i, r
+    for d in range(n_days + 1):
+        yield d, s, i, r
         s, i, r = sir(s, i, r, beta, gamma, n)
 
 
-def sim_sir(
-    s: float, i: float, r: float, beta: float, gamma: float, n_days: int
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def sim_sir_df(
+    s: float, i: float, r: float, beta: float, gamma: float, n_days
+) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
-    s, i, r = (float(v) for v in (s, i, r))
-    n = s + i + r
-    s_v, i_v, r_v = [s], [i], [r]
-    for day in range(n_days):
-        s, i, r = sir(s, i, r, beta, gamma, n)
-        s_v.append(s)
-        i_v.append(i)
-        r_v.append(r)
-
-    return (
-        np.array(s_v),
-        np.array(i_v),
-        np.array(r_v),
-    )
-
-
-def sim_sir_df(p) -> pd.DataFrame:
-    """Simulate the SIR model forward in time.
-
-    p is a Parameters instance. for circuluar dependency reasons i can't annotate it.
-    """
     return pd.DataFrame(
-        data=gen_sir(p.susceptible, p.infected, p.recovered, p.beta, p.gamma, p.n_days),
-        columns=("Susceptible", "Infected", "Recovered"),
+        data=gen_sir(s, i, r, beta, gamma, n_days),
+        columns=("day", "susceptible", "infected", "recovered"),
     )
 
 
 def get_dispositions(
-    patient_state: np.ndarray, rates: Tuple[float, ...], market_share: float = 1.0
-) -> Tuple[np.ndarray, ...]:
-    """Get dispositions of infected adjusted by rate and market_share."""
-    return (*(patient_state * rate * market_share for rate in rates),)
-
-
-def build_admissions_df(p) -> pd.DataFrame:
-    """Build admissions dataframe from Parameters."""
-    days = np.array(range(0, p.n_days + 1))
-    data_dict = dict(
-        zip(
-            ["day", "Hospitalized", "ICU", "Ventilated"],
-            [days] + [disposition for disposition in p.dispositions],
-        )
-    )
-    projection = pd.DataFrame.from_dict(data_dict)
-    # New cases
-    projection_admits = projection.iloc[:-1, :] - projection.shift(1)
-    projection_admits["day"] = range(projection_admits.shape[0])
-    return projection_admits
-
-
-def build_census_df(projection_admits: pd.DataFrame, parameters) -> pd.DataFrame:
-    """ALOS for each category of COVID-19 case (total guesses)"""
-    n_days = np.shape(projection_admits)[0]
-    hosp_los, icu_los, vent_los = parameters.lengths_of_stay
-    los_dict = {
-        "Hospitalized": hosp_los,
-        "ICU": icu_los,
-        "Ventilated": vent_los,
+    patients: np.ndarray,
+    rates: Dict[str, float],
+    market_share: float,
+) -> Dict[str, np.ndarray]:
+    """Get dispositions of patients adjusted by rate and market_share."""
+    return {
+        key: patients * rate * market_share
+        for key, rate in rates.items()
     }
 
-    census_dict = dict()
-    for k, los in los_dict.items():
+
+def build_admits_df(n_days, dispositions) -> pd.DataFrame:
+    """Build admits dataframe from Parameters and Model."""
+    days = np.arange(0, n_days + 1)
+    projection = pd.DataFrame({
+        "day": days,
+        **dispositions,
+    })
+    # New cases
+    admits_df = projection.iloc[:-1, :] - projection.shift(1)
+    admits_df["day"] = range(admits_df.shape[0])
+    return admits_df
+
+
+def build_census_df(
+    admits_df: pd.DataFrame, lengths_of_stay
+) -> pd.DataFrame:
+    """ALOS for each category of COVID-19 case (total guesses)"""
+    n_days = np.shape(admits_df)[0]
+    census_dict = {}
+    for key, los in lengths_of_stay.items():
         census = (
-            projection_admits.cumsum().iloc[:-los, :]
-            - projection_admits.cumsum().shift(los).fillna(0)
+            admits_df.cumsum().iloc[:-los, :]
+            - admits_df.cumsum().shift(los).fillna(0)
         ).apply(np.ceil)
-        census_dict[k] = census[k]
+        census_dict[key] = census[key]
 
     census_df = pd.DataFrame(census_dict)
     census_df["day"] = census_df.index
-    census_df = census_df[["day", "Hospitalized", "ICU", "Ventilated"]]
+    census_df = census_df[["day", *lengths_of_stay.keys()]]
     census_df = census_df.head(n_days)
-    census_df = census_df.rename(
-        columns={
-            disposition: f"{disposition}"
-            for disposition in ("Hospitalized", "ICU", "Ventilated")
-        }
-    )
     return census_df
