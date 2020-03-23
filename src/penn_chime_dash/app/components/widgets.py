@@ -124,7 +124,7 @@ class FeatureWidgets:
             "ventilated_los": [self.ventilated_los],
         }
 
-    def generate(self, feature: str) -> dcc.Input:
+    def widget(self, feature: str) -> dcc.Input:
         """Returns widget for corresponding feature
 
         Arguments:
