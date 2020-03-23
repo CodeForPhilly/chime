@@ -45,6 +45,17 @@ class Parameters:
         self.n_days = n_days
         self.recovery_days = recovery_days
 
+        self.labels = {
+            "hospitalized": "Hospitalized",
+            "icu": "ICU",
+            "ventilated": "Ventilated",
+            "day": "Day",
+            "date": "Date",
+            "susceptible": "Susceptible",
+            "infected": "Infected",
+            "recovered": "Recovered",
+        }
+
         self.dispositions = {
             "hospitalized": hospitalized,
             "icu": icu,

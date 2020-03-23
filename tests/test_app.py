@@ -234,12 +234,11 @@ def test_model(model=MODEL, param=PARAM):
     assert (diff.abs() < 0.1).all()
 
 
-def test_chart_descriptions():
+def test_chart_descriptions(p=PARAM):
     # new admissions chart
     projection_admits = pd.read_csv('tests/projection_admits.csv')
-    # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
-    chart = new_admissions_chart(alt, projection_admits, PARAM)
-    description = chart_descriptions(chart)
+    chart = new_admissions_chart(alt, projection_admits, p)
+    description = chart_descriptions(chart, p.labels)
 
     hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
 
@@ -256,16 +255,16 @@ def test_chart_descriptions():
 
     projection_admits = pd.read_csv('tests/projection_admits.csv')
     # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
-    chart = new_admissions_chart(alt, projection_admits, PARAM)
-    description = chart_descriptions(chart)
+    chart = new_admissions_chart(alt, projection_admits, p)
+    description = chart_descriptions(chart, p.labels)
     assert "*" not in description
 
     # census chart
     census_df = pd.read_csv('tests/census_df.csv')
     # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
     PARAM.as_date = True
-    chart = admitted_patients_chart(alt, census_df, PARAM)
-    description = chart_descriptions(chart)
+    chart = admitted_patients_chart(alt, census_df, p)
+    description = chart_descriptions(chart, p.labels)
 
     assert str(ceil(chart.data['ventilated'].max())) in description
     assert str(chart.data['icu'].idxmax()) not in description

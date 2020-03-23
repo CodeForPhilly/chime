@@ -48,16 +48,16 @@ st.altair_chart(
     use_container_width=True,
 )
 
-st.markdown(chart_descriptions(new_admit_chart))
+st.markdown(chart_descriptions(new_admit_chart, p.labels))
 
 if st.checkbox("Show Projected Admissions in tabular form"):
     if st.checkbox("Show Daily Counts"):
-        draw_projected_admissions_table(st, m.admits_df, as_date=p.as_date, daily_count=True)
+        draw_projected_admissions_table(st, m.admits_df, p.labels, as_date=p.as_date, daily_count=True)
     else:
-        draw_projected_admissions_table(st, m.admits_df, as_date=p.as_date, daily_count=False)
+        draw_projected_admissions_table(st, m.admits_df, p.labels, as_date=p.as_date, daily_count=False)
     build_download_link(st,
         filename="projected_admissions.csv",
-        df=admissions_df,
+        df=m.admits_df,
         parameters=p
     )
 st.subheader("Admitted Patients (Census)")
@@ -69,15 +69,15 @@ st.altair_chart(
     admitted_patients_chart(alt=alt, census=m.census_df, parameters=p),
     use_container_width=True,
 )
-st.markdown(chart_descriptions(census_chart, suffix=" Census"))
+st.markdown(chart_descriptions(census_chart, p.labels, suffix=" Census"))
 if st.checkbox("Show Projected Census in tabular form"):
     if st.checkbox("Show Daily Census Counts"):
-        draw_census_table(st, m.census_df, as_date=p.as_date, daily_count=True)
+        draw_census_table(st, m.census_df, p.labels, as_date=p.as_date, daily_count=True)
     else:
-        draw_census_table(st, m.census_df, as_date=p.as_date, daily_count=False)
+        draw_census_table(st, m.census_df, p.labels, as_date=p.as_date, daily_count=False)
     build_download_link(st,
         filename="projected_census.csv",
-        df=census_df,
+        df=m.census_df,
         parameters=p
     )
 

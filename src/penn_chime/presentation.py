@@ -391,7 +391,7 @@ def show_additional_projections(
 
 
 def draw_projected_admissions_table(
-    st, projection_admits: pd.DataFrame, as_date: bool = False, daily_count: bool = False,
+    st, projection_admits: pd.DataFrame, labels, as_date: bool = False, daily_count: bool = False,
 ):
     if daily_count == True:
         admits_table = projection_admits[np.mod(projection_admits.index, 1) == 0].copy()
@@ -405,11 +405,12 @@ def draw_projected_admissions_table(
         admits_table = add_date_column(
             admits_table, drop_day_column=True, date_format=DATE_FORMAT
         )
+    admits_table.rename(labels)
     st.table(admits_table)
     return None
 
 
-def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False, daily_count: bool = False):
+def draw_census_table(st, census_df: pd.DataFrame, labels, as_date: bool = False, daily_count: bool = False):
     if daily_count == True:
         census_table = census_df[np.mod(census_df.index, 1) == 0].copy()
     else:
@@ -423,6 +424,7 @@ def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False, daily_
             census_table, drop_day_column=True, date_format=DATE_FORMAT
         )
 
+    census_table.rename(labels)
     st.table(census_table)
     return None
 

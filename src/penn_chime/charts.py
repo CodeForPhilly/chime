@@ -129,7 +129,7 @@ def additional_projections_chart(
     )
 
 
-def chart_descriptions(chart: Chart, suffix: str = ""):
+def chart_descriptions(chart: Chart, labels, suffix: str = ""):
     """
 
     :param chart: Chart: The alt chart to be used in finding max points
@@ -156,7 +156,7 @@ def chart_descriptions(chart: Chart, suffix: str = ""):
 
         messages.append(
             "{}{} peaks at {:,} on day {}{}".format(
-                col,
+                labels[col],
                 suffix,
                 ceil(chart.data[col].max()),
                 on,
