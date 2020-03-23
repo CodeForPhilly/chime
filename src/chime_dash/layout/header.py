@@ -26,7 +26,6 @@ def setup(language: str) -> List[ComponentMeta]:
                     children=content["logo-text"],
                 ),
                 A(
-                    href="https://www.pennmedicine.org",
                     className="penn-medicine-header__title",
                     id="title",
                     children=content["title"],
