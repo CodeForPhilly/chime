@@ -4,5 +4,5 @@ numpy
 pytest
 altair
 dash
-pyyaml
 dash_bootstrap_components
+pyyaml
