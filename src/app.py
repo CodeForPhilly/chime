@@ -4,7 +4,7 @@ import altair as alt  # type: ignore
 import streamlit as st  # type: ignore
 
 from penn_chime.presentation import (
-    #additional_projections_chart,
+    # additional_projections_chart,
     display_header,
     display_sidebar,
     display_n_days_slider,
@@ -17,9 +17,14 @@ from penn_chime.presentation import (
     write_definitions,
     write_footer,
 )
-from penn_chime.settings import DEFAULTS 
+from penn_chime.settings import DEFAULTS
 from penn_chime.models import sim_sir_df, build_admissions_df, build_census_df
-from penn_chime.charts import additional_projections_chart, admitted_patients_chart, new_admissions_chart
+from penn_chime.charts import (
+    additional_projections_chart,
+    admitted_patients_chart,
+    new_admissions_chart,
+)
+
 # This is somewhat dangerous:
 # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
 # This should not be hidden in prod, but removed
@@ -32,12 +37,7 @@ display_header(st, p)
 
 if st.checkbox("Show more info about this tool"):
     notes = "The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)"
-    show_more_info_about_this_tool(
-        st=st,
-        parameters=p,
-        inputs=DEFAULTS,
-        notes=notes
-    )
+    show_more_info_about_this_tool(st=st, parameters=p, inputs=DEFAULTS, notes=notes)
 
 # PRESENTATION
 # Two more combination variable initialization / input element creation
@@ -45,14 +45,15 @@ as_date = st.checkbox(label="Present result as dates instead of days", value=Fal
 display_n_days_slider(st, p, DEFAULTS)
 
 # begin format data
-admissions_df = build_admissions_df(p=p) # p.n_days, *p.dispositions)
+admissions_df = build_admissions_df(p=p)  # p.n_days, *p.dispositions)
 census_df = build_census_df(admissions_df, parameters=p)
 # end format data
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
 st.altair_chart(
-    new_admissions_chart(alt, admissions_df, parameters=p, as_date=as_date), use_container_width=True
+    new_admissions_chart(alt, admissions_df, parameters=p, as_date=as_date),
+    use_container_width=True,
 )
 if st.checkbox("Show Projected Admissions in tabular form"):
     draw_projected_admissions_table(st, admissions_df, as_date=as_date)
@@ -61,7 +62,8 @@ st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
 )
 st.altair_chart(
-    admitted_patients_chart(alt=alt, census=census_df, parameters=p, as_date=as_date), use_container_width=True
+    admitted_patients_chart(alt=alt, census=census_df, parameters=p, as_date=as_date),
+    use_container_width=True,
 )
 if st.checkbox("Show Projected Census in tabular form"):
     draw_census_table(st, census_df, as_date=as_date)
@@ -70,10 +72,8 @@ st.markdown(
 )
 if st.checkbox("Show Additional Projections"):
     show_additional_projections(
-        st, alt,
-        additional_projections_chart,
-        parameters=p,
-        as_date=as_date)
+        st, alt, additional_projections_chart, parameters=p, as_date=as_date
+    )
     if st.checkbox("Show Raw SIR Simulation Data"):
         draw_raw_sir_simulation_table(st, parameters=p, as_date=as_date)
 write_definitions(st)
