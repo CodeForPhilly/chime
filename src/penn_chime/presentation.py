@@ -45,7 +45,7 @@ def display_header(st, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports. See more about this issue [here](https://github.com/CodeForPhilly/chime/pull/190)."""
+        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + p.change_date() + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
