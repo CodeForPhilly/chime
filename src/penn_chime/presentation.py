@@ -226,14 +226,13 @@ def display_sidebar(st, d: Constants) -> Parameters:
     )
 
 
-def display_n_days_slider(st, p: Parameters, d: Constants):
-    """Display n_days_slider."""
-    p.n_days = st.slider(
+def display_n_days_input(st, p: Parameters, d: Constants):
+    """Display n_days_input."""
+    p.n_days = st.number_input(
         "Number of days to project",
         min_value=30,
-        max_value=200,
         value=d.n_days,
-        step=1,
+        step=10,
         format="%i",
     )
 

@@ -7,7 +7,7 @@ from penn_chime.presentation import (
     # additional_projections_chart,
     display_header,
     display_sidebar,
-    display_n_days_slider,
+    display_n_days_input,
     draw_census_table,
     draw_projected_admissions_table,
     draw_raw_sir_simulation_table,
@@ -42,7 +42,7 @@ if st.checkbox("Show more info about this tool"):
 # PRESENTATION
 # Two more combination variable initialization / input element creation
 as_date = st.checkbox(label="Present result as dates instead of days", value=False)
-display_n_days_slider(st, p, DEFAULTS)
+display_n_days_input(st, p, DEFAULTS)
 
 # begin format data
 admissions_df = build_admissions_df(p=p)  # p.n_days, *p.dispositions)
