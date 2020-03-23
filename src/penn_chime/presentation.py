@@ -94,6 +94,14 @@ def display_sidebar(st, d: Constants) -> Parameters:
     if d.known_infected < 1:
         raise ValueError("Known cases must be larger than one to enable predictions.")
 
+    n_days = st.sidebar.number_input(
+        "Number of days to project",
+        min_value=30,
+        value=d.n_days,
+        step=10,
+        format="%i",
+    )
+
     current_hospitalized = st.sidebar.number_input(
         "Currently Hospitalized COVID-19 Patients",
         min_value=0,
@@ -205,6 +213,8 @@ def display_sidebar(st, d: Constants) -> Parameters:
         format="%i",
     )
 
+    as_date = st.sidebar.checkbox(label="Present result as dates instead of days", value=False)
+
     max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value")
     max_y_axis = None
     if max_y_axis_set:
@@ -213,6 +223,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         )
 
     return Parameters(
+        n_days=n_days,
         current_hospitalized=current_hospitalized,
         doubling_time=doubling_time,
         known_infected=known_infected,
@@ -223,17 +234,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         icu=RateLos(icu_rate, icu_los),
         ventilated=RateLos(ventilated_rate, ventilated_los),
         max_y_axis=max_y_axis,
-    )
-
-
-def display_n_days_input(st, p: Parameters, d: Constants):
-    """Display n_days_input."""
-    p.n_days = st.number_input(
-        "Number of days to project",
-        min_value=30,
-        value=d.n_days,
-        step=10,
-        format="%i",
+        as_date=as_date,
     )
 
 
@@ -368,7 +369,7 @@ def write_footer(st):
 
 
 def show_additional_projections(
-    st, alt, charting_func, parameters, as_date: bool = False,
+    st, alt, charting_func, parameters
 ):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
@@ -377,10 +378,7 @@ def show_additional_projections(
     st.altair_chart(
         charting_func(
             alt,
-            parameters.infected_v,
-            parameters.recovered_v,
-            as_date=as_date,
-            max_y_axis=parameters.max_y_axis,
+            parameters=parameters
         ),
         use_container_width=True,
     )
