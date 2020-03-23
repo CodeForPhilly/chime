@@ -1,6 +1,0 @@
-- element: checklist
-  id: more_infos
-  switch: true
-  options:
-      - label: Show more info about this tool
-        value: false
