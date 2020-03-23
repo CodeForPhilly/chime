@@ -74,7 +74,7 @@ def admitted_patients_chart(
 
     return (
         alt.Chart(census.head(plot_projection_days))
-        .transform_fold(fold=["Hospitalized Census", "ICU Census", "Ventilated Census"])
+        .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
         .mark_line(point=True)
         .encode(
             x=alt.X(**x_kwargs),

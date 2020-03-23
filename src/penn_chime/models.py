@@ -70,11 +70,10 @@ def sim_sir_df(p) -> pd.DataFrame:
 
 
 def get_dispositions(
-    infected: np.ndarray, rates: Tuple[float, ...], market_share: float = 1.0
+    patient_state: np.ndarray, rates: Tuple[float, ...], market_share: float = 1.0
 ) -> Tuple[np.ndarray, ...]:
     """Get dispositions of infected adjusted by rate and market_share."""
-    return (*(infected * rate * market_share for rate in rates),)
-
+    return (*(patient_state * rate * market_share for rate in rates),)
 
 
 def build_admissions_df(p) -> pd.DataFrame:
@@ -117,7 +116,7 @@ def build_census_df(
     census_df = census_df[["day", "Hospitalized", "ICU", "Ventilated"]]
     census_df = census_df.head(n_days)
     census_df = census_df.rename(
-        columns={disposition: f"{disposition} Census"
+        columns={disposition: f"{disposition}"
                  for disposition
                  in ("Hospitalized", "ICU", "Ventilated")}
     )
