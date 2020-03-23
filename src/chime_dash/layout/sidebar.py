@@ -168,7 +168,7 @@ def _get_default(
         val = getattr(getattr(defaults, split[0], {}), "rate", min_val) * 100
     elif "los" in key:
         split = key.split("_")
-        val = getattr(getattr(defaults, split[0], {}), "los", min_val) * 100
+        val = getattr(getattr(defaults, split[0], {}), "length_of_stay", min_val)
     elif "share" in key:
         val = getattr(defaults, key, min_val) * 100
     elif "susceptible" in key:
