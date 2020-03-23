@@ -408,9 +408,9 @@ def draw_projected_admissions_table(
             drop_day_column=True,
             date_format=DATE_FORMAT
         )
-
     st.table(admits_table)
     return None
+
 
 def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False):
     census_table = census_df[np.mod(census_df.index, 7) == 0].copy()

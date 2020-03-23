@@ -1,4 +1,4 @@
-
+from math import ceil
 from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
@@ -123,3 +123,26 @@ def additional_projections_chart(
         )
         .interactive()
     )
+
+
+def chart_descriptions(chart, census=False):
+    messages = []
+    cols = ["Hospitalized", "ICU", "Ventilated"]
+    if census:
+        cols = [col + " Census" for col in cols]
+    asterisk = False
+    for col in cols:
+        if chart.data[col].idxmax() + 1 == len(chart.data):
+            asterisk = True
+        messages.append(
+            "{} peaks at {:,} on day {}{}".format(
+                col,
+                ceil(chart.data[col].max()),
+                chart.data[col].idxmax() + 1,
+                "*" if asterisk else "",
+            )
+        )
+
+    if asterisk:
+        messages.append("_* The max is at the upper bound of the data, and therefore may not be the actual max_")
+    return "\n\n".join(messages)

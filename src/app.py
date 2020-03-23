@@ -19,7 +19,8 @@ from penn_chime.presentation import (
 )
 from penn_chime.settings import DEFAULTS 
 from penn_chime.models import sim_sir_df, build_admissions_df, build_census_df
-from penn_chime.charts import additional_projections_chart, admitted_patients_chart, new_admissions_chart
+from penn_chime.charts import (additional_projections_chart, admitted_patients_chart,
+                               new_admissions_chart, chart_descriptions)
 # This is somewhat dangerous:
 # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
 # This should not be hidden in prod, but removed
@@ -51,18 +52,25 @@ census_df = build_census_df(admissions_df, parameters=p)
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
+new_admit_chart = new_admissions_chart(alt, admissions_df, parameters=p, as_date=as_date)
 st.altair_chart(
-    new_admissions_chart(alt, admissions_df, parameters=p, as_date=as_date), use_container_width=True
+    new_admit_chart, use_container_width=True
 )
+
+
+st.markdown(chart_descriptions(new_admit_chart))
+
 if st.checkbox("Show Projected Admissions in tabular form"):
     draw_projected_admissions_table(st, admissions_df, as_date=as_date)
 st.subheader("Admitted Patients (Census)")
 st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
 )
+admit_chart = admitted_patients_chart(alt=alt, census=census_df, parameters=p, as_date=as_date)
 st.altair_chart(
-    admitted_patients_chart(alt=alt, census=census_df, parameters=p, as_date=as_date), use_container_width=True
+    admit_chart, use_container_width=True
 )
+st.markdown(chart_descriptions(admit_chart, True))
 if st.checkbox("Show Projected Census in tabular form"):
     draw_census_table(st, census_df, as_date=as_date)
 st.markdown(
