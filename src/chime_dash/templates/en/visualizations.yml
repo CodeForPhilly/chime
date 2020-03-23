@@ -1,0 +1,11 @@
+new-admissions-title: New Admissions
+new-admissions-text: Projected number of **daily** COVID-19 admissions at Penn hospitals
+admitted-patients-title: Admitted Patients (Census)
+admitted-patients-text: Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals
+
+# Chart labels
+day: Day
+date: Date
+hosp: Hospitalized
+icu: ICU
+vent: Ventalized
