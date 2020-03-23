@@ -1,4 +1,5 @@
 from math import ceil
+import datetime
 from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
@@ -127,18 +128,30 @@ def additional_projections_chart(
 
 def chart_descriptions(chart, census=False):
     messages = []
+
     cols = ["Hospitalized", "ICU", "Ventilated"]
     if census:
         cols = [col + " Census" for col in cols]
+
     asterisk = False
+
+    day = "date" if "date" in chart.data.columns else "day"
+
     for col in cols:
         if chart.data[col].idxmax() + 1 == len(chart.data):
             asterisk = True
+
+        on = chart.data[day][chart.data[col].idxmax()]
+        if day == "date":
+            on = datetime.datetime.strftime(on, "%b %d")  # todo: bring this to an optional arg / i18n
+        else:
+            on += 1  # 0 index issue
+
         messages.append(
             "{} peaks at {:,} on day {}{}".format(
                 col,
                 ceil(chart.data[col].max()),
-                chart.data[col].idxmax() + 1,
+                on,
                 "*" if asterisk else "",
             )
         )
