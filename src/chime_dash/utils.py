@@ -17,6 +17,52 @@ import dash_bootstrap_components as dbc
 TEMPLATE_DIR = path.join(path.abspath(path.dirname(__file__)), "templates")
 
 
+def read_localization_yaml(file: str, language: str) -> Dict[str, Any]:
+    """Reads localization template.
+
+    Arguments:
+        file: Name of the section plus `.yml`
+        langage: Localization info
+
+    Raises:
+        KeyError: If no template for file/language exists.
+    """
+    file_address = path.join(TEMPLATE_DIR, language, file)
+    if not path.exists(file_address):
+        raise KeyError(
+            "No template found for langage '{language}' and section 'file'".format(
+                file=file, language=language
+            )
+        )
+    with open(file_address, "r") as stream:
+        yaml = safe_load(stream)
+
+    return yaml
+
+
+def read_localization_markdown(file: str, language: str) -> str:
+    """Reads localization template.
+
+    Arguments:
+        file: Name of the section plus `.md`
+        langage: Localization info
+
+    Raises:
+        KeyError: If no template for file/language exists.
+    """
+    file_address = path.join(TEMPLATE_DIR, language, file)
+    if not path.exists(file_address):
+        raise KeyError(
+            "No template found for langage '{language}' and section 'file'".format(
+                file=file, language=language
+            )
+        )
+    with open(file_address, "r") as stream:
+        md = stream.read()
+
+    return md
+
+
 DASH_HTML_ELEMENTS = {
     "div": Div,
     "h1": H1,
