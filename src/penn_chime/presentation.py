@@ -1,8 +1,8 @@
 """effectful functions for streamlit io"""
 
-from typing import Optional
+# from typing import Optional
 
-import altair as alt  # type: ignore
+# import altair as alt  # type: ignore
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
@@ -45,13 +45,16 @@ def display_header(st, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports. See more about this issue [here](https://github.com/CodeForPhilly/chime/pull/190)."""
+        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**.
+        Please update your reports. See more about this issue [here]
+        (https://github.com/CodeForPhilly/chime/pull/190)."""
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/). For questions and comments please see our
-    [contact page](http://predictivehealthcare.pennmedicine.org/contact/). Code can be found on [Github](https://github.com/CodeForPhilly/chime).
-    Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*"""
+    Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/).
+    For questions and comments please see our [contact page](http://predictivehealthcare.pennmedicine.org/contact/).
+    Code can be found on [Github](https://github.com/CodeForPhilly/chime). Join our [Slack channel]
+    (https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*"""
     )
 
     st.markdown(
@@ -246,7 +249,8 @@ def show_more_info_about_this_tool(st, parameters, inputs: Constants, notes: str
     st.markdown(
         """The model consists of individuals who are either _Susceptible_ ($S$), _Infected_ ($I$), or _Recovered_ ($R$).
 
-The epidemic proceeds via a growth and decline process. This is the core model of infectious disease spread and has been in use in epidemiology for many years."""
+The epidemic proceeds via a growth and decline process. This is the core model of infectious disease spread and has been
+in use in epidemiology for many years."""
     )
     st.markdown("""The dynamics are given by the following 3 equations.""")
 
@@ -257,7 +261,8 @@ The epidemic proceeds via a growth and decline process. This is the core model o
     st.markdown(
         """To project the expected impact to Penn Medicine, we estimate the terms of the model.
 
-To do this, we use a combination of estimates from other locations, informed estimates based on logical reasoning, and best guesses from the American Hospital Association.
+To do this, we use a combination of estimates from other locations, informed estimates based on logical reasoning,
+and best guesses from the American Hospital Association.
 
 
 ### Parameters
@@ -270,12 +275,17 @@ $$\\beta$$ can be interpreted as the _effective contact rate_:
     st.latex("\\beta = \\tau \\times c")
 
     st.markdown(
-        """which is the transmissibility ($\\tau$) multiplied by the average number of people exposed ($$c$$).  The transmissibility is the basic virulence of the pathogen.  The number of people exposed $c$ is the parameter that can be changed through social distancing.
+        """which is the transmissibility ($\\tau$) multiplied by the average number of people exposed ($$c$$).
+        The transmissibility is the basic virulence of the pathogen.  The number of people exposed $c$ is the parameter
+        that can be changed through social distancing.
 
 
-$\\gamma$ is the inverse of the mean recovery time, in days.  I.e.: if $\\gamma = 1/{recovery_days}$, then the average infection will clear in {recovery_days} days.
+$\\gamma$ is the inverse of the mean recovery time, in days.  I.e.: if $\\gamma = 1/{recovery_days}$, then the average
+infection will clear in {recovery_days} days.
 
-An important descriptive parameter is the _basic reproduction number_, or $R_0$.  This represents the average number of people who will be infected by any given infected person.  When $R_0$ is greater than 1, it means that a disease will grow.  Higher $R_0$'s imply more rapid growth.  It is defined as """.format(
+An important descriptive parameter is the _basic reproduction number_, or $R_0$.  This represents the average number of
+people who will be infected by any given infected person.  When $R_0$ is greater than 1,
+it means that a disease will grow.  Higher $R_0$'s imply more rapid growth.  It is defined as """.format(
             recovery_days=int(parameters.recovery_days)
         )
     )
@@ -305,7 +315,9 @@ to {doubling_time_t:.2f} days from {doubling_time:.2f} days, with a $R_t$ of {r_
 We need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
 
 - $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/{recovery_days}$.
-- To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
+- To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know
+these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days.
+That means an early-phase rate of growth can be computed by using the doubling time formula:
 """.format(
             doubling_time=parameters.doubling_time,
             recovery_days=parameters.recovery_days,
@@ -319,7 +331,8 @@ We need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantit
 
     st.markdown(
         """
-- Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$, $\\beta$ becomes a function of the initial population size of susceptible individuals.
+- Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$,
+$\\beta$ becomes a function of the initial population size of susceptible individuals.
 $$\\beta = (g + \\gamma)$$.
 
 
@@ -342,18 +355,43 @@ $$\\beta = (g + \\gamma)$$.
 def write_definitions(st):
     st.subheader("Guidance on Selecting Inputs")
     st.markdown(
-        """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19 **at your hospital(s)**. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate the total number of infected individuals in your region.
-* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak. The American Hospital Association currently projects doubling rates between 7 and 10 days. This is the doubling time you expect under status quo conditions. To account for reduced contact and other public health interventions, modify the _Social distancing_ input.
-* **Social distancing (% reduction in person-to-person physical contact):** This parameter allows users to explore how reduction in interpersonal contact & transmission (hand-washing) might slow the rate of new infections. It is your estimate of how much social contact reduction is being achieved in your region relative to the status quo. While it is unclear how much any given policy might affect social contact (eg. school closures or remote work), this parameter lets you see how projections change with percentage reductions in social contact.
+        """* **Hospitalized COVID-19 Patients:** The number of patients currently hospitalized with COVID-19 **at your
+        hospital(s)**. This number is used in conjunction with Hospital Market Share and Hospitalization % to estimate
+        the total number of infected individuals in your region.
+
+* **Doubling Time (days):** This parameter drives the rate of new cases during the early phases of the outbreak.
+The American Hospital Association currently projects doubling rates between 7 and 10 days. This is the doubling time
+you expect under status quo conditions. To account for reduced contact and other public health interventions,
+modify the _Social distancing_ input.
+
+* **Social distancing (% reduction in person-to-person physical contact):** This parameter allows users to explore how
+reduction in interpersonal contact & transmission (hand-washing) might slow the rate of new infections.
+It is your estimate of how much social contact reduction is being achieved in your region relative to the status quo.
+While it is unclear how much any given policy might affect social contact (eg. school closures or remote work),
+this parameter lets you see how projections change with percentage reductions in social contact.
+
 * **Hospitalization %(total infections):** Percentage of **all** infected cases which will need hospitalization.
+
 * **ICU %(total infections):** Percentage of **all** infected cases which will need to be treated in an ICU.
+
 * **Ventilated %(total infections):** Percentage of **all** infected cases which will need mechanical ventilation.
+
 * **Hospital Length of Stay:** Average number of days of treatment needed for hospitalized COVID-19 patients.
+
 * **ICU Length of Stay:** Average number of days of ICU treatment needed for ICU COVID-19 patients.
+
 * **Vent Length of Stay:**  Average number of days of ventilation needed for ventilated COVID-19 patients.
-* **Hospital Market Share (%):** The proportion of patients in the region that are likely to come to your hospital (as opposed to other hospitals in the region) when they get sick. One way to estimate this is to look at all of the hospitals in your region and add up all of the beds. The number of beds at your hospital divided by the total number of beds in the region times 100 will give you a reasonable starting estimate.
+
+* **Hospital Market Share (%):** The proportion of patients in the region that are likely to come to your hospital
+(as opposed to other hospitals in the region) when they get sick. One way to estimate this is to look at all of the
+hospitals in your region and add up all of the beds. The number of beds at your hospital divided by the total number of
+beds in the region times 100 will give you a reasonable starting estimate.
+
 * **Regional Population:** Total population size of the catchment region of your hospital(s).
-* **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region. This is only used to compute detection rate - **it will not change projections**. This input is used to estimate the detection rate of infected individuals.
+
+* **Currently Known Regional Infections**: The number of infections reported in your hospital's catchment region.
+This is only used to compute detection rate - **it will not change projections**.
+This input is used to estimate the detection rate of infected individuals.
     """
     )
 
@@ -361,8 +399,11 @@ def write_definitions(st):
 def write_footer(st):
     st.subheader("References & Acknowledgements")
     st.markdown(
-        """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
-* We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
+        """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center,
+        What Healthcare Leaders Need To Know: Preparing for the COVID-19
+* We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy,
+PhD, Associate Professor of Epidemiology, Department of Biostatistics,
+Epidemiology and Informatics at the Perelman School of Medicine
     """
     )
     st.markdown("© 2020, The Trustees of the University of Pennsylvania")
