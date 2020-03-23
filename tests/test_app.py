@@ -6,24 +6,24 @@ import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
 from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart
-from src.penn_chime.models import sir, sim_sir
+from src.penn_chime.models import sir, sim_sir, build_admissions_df
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
 from src.penn_chime.defaults import RateLos
 
 PARAM = Parameters(
-        current_hospitalized=100,
-        doubling_time=6.0,
-        known_infected=5000,
-        market_share=0.05,
-        relative_contact_rate=0.15,
-        susceptible=500000,
-        hospitalized=RateLos(0.05, 7),
-        icu=RateLos(0.02, 9),
-        ventilated=RateLos(0.01, 10),
-        n_days=60
-    )
+    current_hospitalized=100,
+    doubling_time=6.0,
+    known_infected=5000,
+    market_share=0.05,
+    relative_contact_rate=0.15,
+    susceptible=500000,
+    hospitalized=RateLos(0.05, 7),
+    icu=RateLos(0.02, 9),
+    ventilated=RateLos(0.01, 10),
+    n_days=60,
+)
 
 
 # set up
@@ -94,6 +94,7 @@ def test_defaults_repr():
 
 # Test the math
 
+
 def test_sir():
     """
     Someone who is good at testing, help
@@ -160,7 +161,7 @@ def test_sim_sir():
 
 
 def test_new_admissions_chart():
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
+    projection_admits = pd.read_csv("tests/projection_admits.csv")
     chart = new_admissions_chart(alt, projection_admits, PARAM)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].hosp < 1
@@ -175,7 +176,7 @@ def test_new_admissions_chart():
 
 
 def test_admitted_patients_chart():
-    census_df = pd.read_csv('tests/census_df.csv')
+    census_df = pd.read_csv("tests/census_df.csv")
     chart = admitted_patients_chart(alt, census_df, PARAM)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].hosp == 1
@@ -200,7 +201,7 @@ def test_parameters():
         hospitalized=RateLos(0.05, 7),
         icu=RateLos(0.02, 9),
         ventilated=RateLos(0.01, 10),
-        n_days=60
+        n_days=60,
     )
 
     # test the Parameters
@@ -221,15 +222,35 @@ def test_parameters():
     assert param.doubling_time_t == 7.764405988534983
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
-    assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 61
+    assert (
+        len(param.susceptible_v)
+        == len(param.infected_v)
+        == len(param.recovered_v)
+        == param.n_days + 1
+        == 61
+    )
 
     assert param.susceptible_v[0] == 500000.0
     assert round(param.susceptible_v[-1], 0) == 67202
     assert round(param.infected_v[1], 0) == 43735
     assert round(param.recovered_v[30], 0) == 224048
     assert [d[0] for d in param.dispositions] == [100.0, 40.0, 20.0]
-    assert [round(d[-1], 0) for d in param.dispositions] == [115.0, 46.0, 23.0]
+    assert [round(d[-1], 0) for d in param.dispositions] == [1182.0, 473.0, 236.0]
 
     # change n_days, make sure it cascades
     param.n_days = 2
-    assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 3
+    assert (
+        len(param.susceptible_v)
+        == len(param.infected_v)
+        == len(param.recovered_v)
+        == param.n_days + 1
+        == 3
+    )
+
+    # test that admissions are being properly calculated (thanks @PhilMiller)
+    admissions = build_admissions_df(param)
+    cumulative_admissions = admissions.cumsum()
+    diff = cumulative_admissions["Hospitalized"][1:-1] - (
+        0.05 * 0.05 * (param.infected_v[1:-1] + param.recovered_v[1:-1]) - 100
+    )
+    assert (diff.abs() < 0.1).all()

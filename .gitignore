@@ -19,3 +19,10 @@ venv.bak/
 __pycache__/
 
 
+# Module trash
+*.egg-info
+
+# Notebooks
+devel.ipynb
+.ipynb_checkpoints
+
