@@ -40,7 +40,7 @@ def add_date_column(
     # Prepare columns for sorting
     non_date_columns = [col for col in df.columns if not col == "day"]
 
-    # Allocate (day) continous range for dates
+    # Allocate (day) continuous range for dates
     n_days = int(df.day.max())
     start = datetime.now()
     end = start + timedelta(days=n_days + 1)
