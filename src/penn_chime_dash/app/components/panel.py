@@ -53,3 +53,4 @@ horizontal = dbc.Container(dbc.Row(
     ],
 
 ),
+)

@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 
 class FeatureWidgets:
     def __init__(self):
-        self.current_hospitalized = dcc.Input(
+        self.current_hospitalized = dbc.Input(
             id="current_hospitalized",
             min=0,
             step=1,
@@ -17,7 +17,7 @@ class FeatureWidgets:
 
         )
 
-        self.doubling_time = dcc.Input(
+        self.doubling_time = dbc.Input(
             id='doubling_time',
             min=0,
             step=1,
@@ -25,7 +25,7 @@ class FeatureWidgets:
             placeholder="Doubling time before social distancing (days)"
         )
 
-        self.relative_contact_rate = dcc.Input(
+        self.relative_contact_rate = dbc.Input(
             id="relative_contact_rate",
             min=0,
             max=100,
@@ -34,7 +34,7 @@ class FeatureWidgets:
             placeholder="Social distancing % (reduction in social contact)"
         )
 
-        self.hospitilization_rate = dcc.Input(
+        self.hospitilization_rate = dbc.Input(
             id="hospitalization_rate",
             min=0.001,
             max=100.0,
@@ -43,7 +43,7 @@ class FeatureWidgets:
             placeholder="Hospitalization % (total infections)"
         )
 
-        self.icu_rate = dcc.Input(
+        self.icu_rate = dbc.Input(
             id="icu_rate",
             min=0.0,
             max=100.0,
@@ -52,7 +52,7 @@ class FeatureWidgets:
             placeholder="ICU %(total infections)"
         )
 
-        self.ventilated_rate = dcc.Input(
+        self.ventilated_rate = dbc.Input(
             id="ventilated_rate",
             min=0.0,
             max=100.0,
@@ -61,7 +61,7 @@ class FeatureWidgets:
 
         )
 
-        self.hospitalized_los = dcc.Input(
+        self.hospitalized_los = dbc.Input(
             id="hospitalized_los",
             min=0,
             step=1,
@@ -70,7 +70,7 @@ class FeatureWidgets:
 
         )
 
-        self.icu_los = dcc.Input(
+        self.icu_los = dbc.Input(
             id="icu_los",
             min=0,
             step=1,
@@ -79,7 +79,7 @@ class FeatureWidgets:
 
         )
 
-        self.ventilated_los = dcc.Input(
+        self.ventilated_los = dbc.Input(
             id="ventilated_los",
             min=0,
             step=1,
@@ -88,7 +88,7 @@ class FeatureWidgets:
 
         )
 
-        self.market_share = dcc.Input(
+        self.market_share = dbc.Input(
             id="market_share",
             min=0.001,
             max=100.0,
@@ -96,7 +96,7 @@ class FeatureWidgets:
             placeholder="Hospital Market Share (%)"
         )
 
-        self.susceptible = dcc.Input(
+        self.susceptible = dbc.Input(
             id="susceptible",
             min=1,
             step=100000,
@@ -104,7 +104,7 @@ class FeatureWidgets:
             placeholder="Regional Population"
         )
 
-        self.known_infected = dcc.Input(
+        self.known_infected = dbc.Input(
             id="known_infected",
             min=0,
             step=10,
@@ -114,14 +114,17 @@ class FeatureWidgets:
 
         self.widget_dict = {
             "n_hospitalized": [self.current_hospitalized],
+            "relative_contact_rate": [self.relative_contact_rate],
             "doubling_time": [self.doubling_time],
             "known_infected": [self.known_infected],
             "market_share": [self.market_share],
-            "relative_contact_rate": [self.relative_contact_rate],
             "susceptible": [self.susceptible],
             "hospitalized_los": [self.hospitalized_los],
             "icu_los": [self.icu_los],
             "ventilated_los": [self.ventilated_los],
+            "ventilated_rate": [self.ventilated_rate],
+            "hostpitalized_rate": [self.hospitilization_rate],
+            "icu_rate": [self.icu_rate]
         }
 
     def widget(self, feature: str) -> dcc.Input:
@@ -136,6 +139,6 @@ class FeatureWidgets:
         """
 
         try:
-            return self.widget_dict[feature].value[0]
+            return self.widget_dict[feature][0]
         except KeyError:
             print("argument must correspond to an entry in the widget dictionary")
