@@ -1,4 +1,8 @@
-"""Parameters."""
+"""Parameters.
+
+Changes affecting results or their presentation should also update
+`change_date`, so users can see when results have last changed
+"""
 
 from numpy import log2  # type: ignore
 
@@ -23,7 +27,8 @@ class Parameters:
         icu: RateLos,
         ventilated: RateLos,
         max_y_axis: int = None,
-        n_days: int = None
+        n_days: int = None,
+        as_date: bool = False
     ):
         self.current_hospitalized = current_hospitalized
         self.doubling_time = doubling_time
@@ -38,6 +43,7 @@ class Parameters:
         self.ventilated = ventilated
 
         self.max_y_axis = max_y_axis
+        self.as_date = as_date
 
         self.rates = tuple(each.rate for each in (hospitalized, icu, ventilated))
         self.lengths_of_stay = tuple(
@@ -128,3 +134,11 @@ class Parameters:
             i_icu_v,
             i_ventilated_v,
         )
+
+    def change_date(self):
+        """
+        This reflects a date from which previously-run reports will no
+        longer match current results, indicating when users should
+        re-run their reports
+        """
+        return "March 23 2020"
