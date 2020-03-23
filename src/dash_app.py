@@ -13,12 +13,12 @@ LANGUAGE = "en"
 def main():
     """Starts a dash app
     """
-    app = Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
+    app = Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS,)
     app.layout = setup(LANGUAGE, DEFAULTS)
 
     @app.callback(CALLBACK_OUTPUTS, CALLBACK_INPUTS)
     def callback(*args):  # pylint: disable=W0612
-        return callback_body(*args, language=LANGUAGE)
+        return callback_body(*args, language=LANGUAGE, defaults=DEFAULTS)
 
     app.run_server(debug=True)
 

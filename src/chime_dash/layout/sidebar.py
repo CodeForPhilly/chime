@@ -49,6 +49,8 @@ INPUTS = OrderedDict(
     as_date={"type": "switch", "value": False},
     max_y_axis={"type": "switch", "value": False},
     show_tables={"type": "switch", "value": False},
+    show_tool_details={"type": "switch", "value": False},
+    show_additional_projections={"type": "switch", "value": False},
 )
 
 CALLBACK_INPUTS = [

@@ -50,14 +50,14 @@ CALLBACK_INPUTS = sidebar.CALLBACK_INPUTS
 CALLBACK_OUTPUTS = intro.CALLBACK_OUTPUTS + visualizations.CALLBACK_OUTPUTS
 
 
-def callback_body(*args, language="en"):
+def callback_body(*args, language="en", defaults: Constants):
     """Glues together individual app callbacks
 
     Sidebar provides all of the inputs.
     """
     pars, kwargs = sidebar.parse_form_parameters(*args)
 
-    intro_md = intro.render(language, pars)
+    intro_md = intro.render(language, pars, kwargs, defaults)
     visualizations_data = visualizations.render(
         language, pars, as_date=kwargs["as_date"], show_tables=kwargs["show_tables"]
     )
