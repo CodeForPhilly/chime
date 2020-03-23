@@ -85,7 +85,6 @@ def build_admissions_df(p) -> pd.DataFrame:
     projection = pd.DataFrame.from_dict(data_dict)
     # New cases
     projection_admits = projection.iloc[:-1, :] - projection.shift(1)
-    projection_admits[projection_admits < 0] = 0
     projection_admits["day"] = range(projection_admits.shape[0])
     return projection_admits
 
