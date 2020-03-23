@@ -117,7 +117,7 @@ def additional_projections_chart(
 
     return (
         alt.Chart(dat)
-        .transform_fold(fold=["Infected", "Recovered"])
+        .transform_fold(fold=["infected", "recovered"])
         .mark_line()
         .encode(
             x=alt.X(**x_kwargs),
