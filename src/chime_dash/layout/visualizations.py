@@ -1,6 +1,6 @@
 """Initializes the  dash html
 """
-from typing import List, Any
+from typing import List, Any, Dict
 
 from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
@@ -45,34 +45,13 @@ def render(language: str, pars: Parameters, as_date: bool = False) -> List[Any]:
     """Renders the parameter dependent plots and tables
     """
     content = read_localization_yaml(LOCALIZATION_FILE, language)
-
-    # Prepare admissions data & census data
-    projection_admits = build_admissions_df(pars.n_days, *pars.dispositions)
-    census_df = build_census_df(projection_admits, *pars.lengths_of_stay)
-    if as_date:
-        projection_admits = add_date_column(
-            projection_admits, drop_day_column=True
-        ).set_index("date")
-        census_df = add_date_column(census_df, drop_day_column=True).set_index("date")
-    else:
-        projection_admits = projection_admits.set_index("day")
-        census_df = census_df.set_index("day")
-
-    projection_admits = (
-        projection_admits.dropna()
-        .rename(columns={key: content[key] for key in projection_admits.columns})
-        .astype(int)
-    )
-    census_df = (
-        census_df.dropna()
-        .rename(columns={key: content[key] for key in census_df.columns})
-        .astype(int)
-    )
+    projection_admits, census_df = _build_frames(pars, content, as_date)
 
     # Create admissions figure
     admissions_data = plot_dataframe(
         projection_admits.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
     )
+    # Create admissions table data
     if as_date:
         projection_admits.index = projection_admits.index.strftime("%b, %d")
     table_data = df_to_html_table(projection_admits, data_only=True, n_mod=7)
@@ -83,3 +62,33 @@ def render(language: str, pars: Parameters, as_date: bool = False) -> List[Any]:
     )
 
     return (admissions_data, table_data, census_data)
+
+
+def _build_frames(pars: Parameters, content: Dict[str, str], as_date: bool = False):
+
+    # Prepare admissions data & census data
+    projection_admits = build_admissions_df(pars.n_days, *pars.dispositions)
+    census_df = build_census_df(projection_admits, *pars.lengths_of_stay)
+
+    # Convert columns
+    if as_date:
+        projection_admits = add_date_column(
+            projection_admits, drop_day_column=True
+        ).set_index("date")
+        census_df = add_date_column(census_df, drop_day_column=True).set_index("date")
+    else:
+        projection_admits = projection_admits.set_index("day")
+        census_df = census_df.set_index("day")
+
+    projection_admits = (
+        projection_admits.fillna(0)
+        .rename(columns={key: content[key] for key in projection_admits.columns})
+        .astype(int)
+    )
+    census_df = (
+        census_df.fillna(0)
+        .rename(columns={key: content[key] for key in census_df.columns})
+        .astype(int)
+    )
+
+    return projection_admits, census_df
