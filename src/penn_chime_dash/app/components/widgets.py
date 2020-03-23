@@ -12,7 +12,8 @@ class FeatureWidgets:
             id="current_hospitalized",
             min=0,
             step=1,
-            type="number"
+            type="number",
+            placeholder="Currently Hospitalized COVID-19 Patients"
 
         )
 
@@ -20,7 +21,8 @@ class FeatureWidgets:
             id='doubling_time',
             min=0,
             step=1,
-            type="number"
+            type="number",
+            placeholder="Doubling time before social distancing (days)"
         )
 
         self.relative_contact_rate = dcc.Input(
@@ -28,7 +30,8 @@ class FeatureWidgets:
             min=0,
             max=100,
             step=5,
-            type="number"
+            type="number",
+            placeholder="Social distancing % (reduction in social contact)"
         )
 
         self.hospitilization_rate = dcc.Input(
@@ -36,7 +39,8 @@ class FeatureWidgets:
             min=0.001,
             max=100.0,
             step=1.0,
-            type="number"
+            type="number",
+            placeholder="Hospitalization % (total infections)"
         )
 
         self.icu_rate = dcc.Input(
@@ -44,14 +48,16 @@ class FeatureWidgets:
             min=0.0,
             max=100.0,
             step=1.0,
-            type="number"
+            type="number",
+            placeholder="ICU %(total infections)"
         )
 
         self.ventilated_rate = dcc.Input(
             id="ventilated_rate",
             min=0.0,
             max=100.0,
-            type="number"
+            type="number",
+            placeholder="Ventilated %(total infections)"
 
         )
 
@@ -59,7 +65,8 @@ class FeatureWidgets:
             id="hospitalized_los",
             min=0,
             step=1,
-            type="number"
+            type="number",
+            placeholder="Hospital Length of Stay"
 
         )
 
@@ -67,7 +74,8 @@ class FeatureWidgets:
             id="icu_los",
             min=0,
             step=1,
-            type="number"
+            type="number",
+            placeholder="ICU Length of Stay"
 
         )
 
@@ -75,7 +83,8 @@ class FeatureWidgets:
             id="ventilated_los",
             min=0,
             step=1,
-            type="number"
+            type="number",
+            placeholder="Ventilated Length of Stay"
 
         )
 
@@ -84,20 +93,23 @@ class FeatureWidgets:
             min=0.001,
             max=100.0,
             step=1.0,
+            placeholder="Hospital Market Share (%)"
         )
 
         self.susceptible = dcc.Input(
             id="susceptible",
             min=1,
             step=100000,
-            type="number"
+            type="number",
+            placeholder="Regional Population"
         )
 
         self.known_infected = dcc.Input(
             id="known_infected",
             min=0,
             step=10,
-            type="number"
+            type="number",
+            placeholder="Currently Known Regionally Infected"
         )
 
         self.widget_dict = {
