@@ -48,6 +48,7 @@ INPUTS = OrderedDict(
     n_days={"type": "number", "min": 20, "step": 1},
     as_date={"type": "switch", "value": False},
     max_y_axis={"type": "switch", "value": False},
+    show_tables={"type": "switch", "value": False},
 )
 
 CALLBACK_INPUTS = [
@@ -55,7 +56,7 @@ CALLBACK_INPUTS = [
 ]
 
 
-def parse_form_parameters(*args) -> Tuple[Parameters, bool]:
+def parse_form_parameters(*args) -> Tuple[Parameters, Dict[str, Any]]:
     """Reads html form outputs and converts them to a parameter instance
 
     Returns Parameters and as_date argument
@@ -77,7 +78,7 @@ def parse_form_parameters(*args) -> Tuple[Parameters, bool]:
         max_y_axis=kwargs["max_y_axis"],
         n_days=kwargs["n_days"],
     )
-    return pars, kwargs["as_date"]
+    return pars, kwargs
 
 
 def setup(language: str, defaults: Constants) -> List[ComponentMeta]:

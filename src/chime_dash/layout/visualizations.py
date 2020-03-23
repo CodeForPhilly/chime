@@ -6,7 +6,7 @@ from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
 from dash_html_components import H2
 from dash_core_components import Markdown, Graph
-from dash_bootstrap_components import Table
+from dash_bootstrap_components import Table, Collapse
 
 from penn_chime.utils import build_census_df, build_admissions_df, add_date_column
 from penn_chime.models import Parameters
@@ -43,7 +43,9 @@ CALLBACK_OUTPUTS = [
 ]
 
 
-def render(language: str, pars: Parameters, as_date: bool = False) -> List[Any]:
+def render(
+    language: str, pars: Parameters, as_date: bool = False, show_tables: bool = False
+) -> List[Any]:
     """Renders the parameter dependent plots and tables
     """
     content = read_localization_yaml(LOCALIZATION_FILE, language)
@@ -56,7 +58,11 @@ def render(language: str, pars: Parameters, as_date: bool = False) -> List[Any]:
     # Create admissions table data
     if as_date:
         projection_admits.index = projection_admits.index.strftime("%b, %d")
-    admissions_table_data = df_to_html_table(projection_admits, data_only=True, n_mod=7)
+    admissions_table_data = (
+        df_to_html_table(projection_admits, data_only=True, n_mod=7)
+        if show_tables
+        else None
+    )
 
     # Create census figure
     census_data = plot_dataframe(
@@ -65,7 +71,9 @@ def render(language: str, pars: Parameters, as_date: bool = False) -> List[Any]:
     # Create admissions table data
     if as_date:
         census_df.index = census_df.index.strftime("%b, %d")
-    census_table_data = df_to_html_table(census_df, data_only=True, n_mod=7)
+    census_table_data = (
+        df_to_html_table(census_df, data_only=True, n_mod=7) if show_tables else None
+    )
 
     return (admissions_data, admissions_table_data, census_data, census_table_data)
 
