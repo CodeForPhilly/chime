@@ -112,7 +112,13 @@ class Parameters:
         )
         self.susceptible_v, self.infected_v, self.recovered_v = s_v, i_v, r_v
 
-        self.dispositions = hospitalized_v, icu_v, ventilated_v = \
+        i_hospitalized_v, i_icu_v, i_ventilated_v = \
             get_dispositions(i_v, self.rates, self.market_share)
+        r_hospitalized_v, r_icu_v, r_ventilated_v = \
+            get_dispositions(r_v, self.rates, self.market_share)
+
+        self.dispositions = (i_hospitalized_v+r_hospitalized_v, 
+            i_icu_v+r_icu_v, i_ventilated_v+r_ventilated_v)
+
         self.hospitalized_v, self.icu_v, self.ventilated_v = \
-            hospitalized_v, icu_v, ventilated_v
+            i_hospitalized_v, i_icu_v, i_ventilated_v

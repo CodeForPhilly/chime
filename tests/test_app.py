@@ -6,7 +6,7 @@ import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
 from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart
-from src.penn_chime.models import sir, sim_sir
+from src.penn_chime.models import sir, sim_sir, build_admissions_df
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
@@ -228,8 +228,14 @@ def test_parameters():
     assert round(param.infected_v[1], 0) == 43735
     assert round(param.recovered_v[30], 0) == 224048
     assert [d[0] for d in param.dispositions] == [100.0, 40.0, 20.0]
-    assert [round(d[-1], 0) for d in param.dispositions] == [115.0, 46.0, 23.0]
+    assert [round(d[-1], 0) for d in param.dispositions] == [1182.0, 473.0, 236.0]
 
     # change n_days, make sure it cascades
     param.n_days = 2
     assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 3
+
+    # test that admissions are being properly calculated (thanks @PhilMiller)
+    admissions = build_admissions_df(param)
+    cumulative_admissions = admissions.cumsum()
+    diff = cumulative_admissions["Hospitalized"][1:-1] - (0.05*0.05 * (param.infected_v[1:-1] + param.recovered_v[1:-1]) - 100)
+    assert (diff.abs() < 0.1).all()
