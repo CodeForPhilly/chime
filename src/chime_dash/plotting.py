@@ -10,6 +10,11 @@ import pandas as pd
 def plot_dataframe(dataframe: pd.DataFrame, max_y_axis: int = None,) -> Dict[str, Any]:
     """
     """
+    if max_y_axis is None:
+        yaxis = {}
+    else:
+        yaxis = {"range": (0, max_y_axis), "autorange": False}
+
     return {
         "data": [
             {
@@ -19,5 +24,6 @@ def plot_dataframe(dataframe: pd.DataFrame, max_y_axis: int = None,) -> Dict[str
                 "mode": "lines+markers",
             }
             for col in dataframe.columns
-        ]
+        ],
+        "layout": {"yaxis": yaxis},
     }

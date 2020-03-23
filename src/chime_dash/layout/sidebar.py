@@ -47,7 +47,7 @@ INPUTS = OrderedDict(
     known_infected={"type": "number", "min": 0, "step": 1},
     n_days={"type": "number", "min": 20, "step": 1},
     as_date={"type": "switch", "value": False},
-    max_y_axis={"type": "switch", "value": False},
+    max_y_axis_value={"type": "number", "min": 10, "step": 10, "value": None},
     show_tables={"type": "switch", "value": False},
     show_tool_details={"type": "switch", "value": False},
     show_additional_projections={"type": "switch", "value": False},
@@ -67,6 +67,7 @@ def parse_form_parameters(*args) -> Tuple[Parameters, Dict[str, Any]]:
         key: val / 100 if ("rate" in key or "share" in key) else val
         for key, val in zip(INPUTS.keys(), args)
     }
+    max_y_axis_value = kwargs["max_y_axis_value"]
     pars = Parameters(
         current_hospitalized=kwargs["current_hospitalized"],
         doubling_time=kwargs["doubling_time"],
@@ -77,7 +78,7 @@ def parse_form_parameters(*args) -> Tuple[Parameters, Dict[str, Any]]:
         hospitalized=RateLos(kwargs["hospitalized_rate"], kwargs["hospitalized_los"]),
         icu=RateLos(kwargs["icu_rate"], kwargs["icu_los"]),
         ventilated=RateLos(kwargs["ventilated_rate"], kwargs["ventilated_los"]),
-        max_y_axis=kwargs["max_y_axis"],
+        max_y_axis=max_y_axis_value,
         n_days=kwargs["n_days"],
     )
     return pars, kwargs
@@ -120,9 +121,10 @@ def _create_number_input(
     """
     input_kwargs = data.copy()
     input_kwargs.pop("percent", None)
-    input_kwargs["value"] = _get_default(
-        idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
-    )
+    if not "value" in input_kwargs:
+        input_kwargs["value"] = _get_default(
+            idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
+        )
     return FormGroup(
         children=[
             Label(html_for=idx, children=content[idx]),
