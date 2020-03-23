@@ -7,7 +7,7 @@ import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
 from .defaults import Constants, RateLos
-from .utils import add_date_column
+from .utils import add_date_column, dataframe_to_base64
 from .parameters import Parameters
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
@@ -446,3 +446,17 @@ def draw_raw_sir_simulation_table(st, parameters):
         )
 
     st.table(infect_table)
+    build_download_link(st,
+        filename="raw_sir_simulation_data.csv",
+        df=projection_area,
+        parameters=parameters
+    )
+
+def build_download_link(st, filename: str, df: pd.DataFrame, parameters: Parameters):
+    if parameters.as_date:
+        df = add_date_column(df, drop_day_column=True, date_format="%Y-%m-%d")
+
+    csv = dataframe_to_base64(df)
+    st.markdown("""
+        <a download="{filename}" href="data:file/csv;base64,{csv}">Download full table as CSV</a>
+""".format(csv=csv,filename=filename), unsafe_allow_html=True)
