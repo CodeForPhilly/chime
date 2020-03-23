@@ -23,6 +23,7 @@ from penn_chime.charts import (additional_projections_chart,
                                admitted_patients_chart,
                                new_admissions_chart,
                                chart_descriptions)
+
 # This is somewhat dangerous:
 # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
 # This should not be hidden in prod, but removed
