@@ -5,6 +5,7 @@ from .utils import RateLos
 
 class Regions:
     """Arbitrary number of counties."""
+
     def __init__(self, **kwargs):
         susceptible = 0
         for key, value in kwargs.items():
@@ -19,18 +20,18 @@ class Regions:
 
 class Constants:
     def __init__(
-        self, *,
+        self,
+        *,
         current_hospitalized: int,
         doubling_time: int,
         known_infected: int,
         n_days: int,
         relative_contact_rate: int,
         region: Regions,
-
         hospitalized: RateLos,
         icu: RateLos,
         ventilated: RateLos,
-        market_share: float = 1.0
+        market_share: float = 1.0,
     ):
         self.region = region
         self.known_infected = known_infected

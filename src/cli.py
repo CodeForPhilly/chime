@@ -37,30 +37,63 @@ def validator(cast, min_value, max_value):
 
 def parse_args():
     """Parse args."""
-    parser = ArgumentParser(description='CHIME')
+    parser = ArgumentParser(description="CHIME")
 
-    parser.add_argument('--file', type=open, action=FromFile)
+    parser.add_argument("--file", type=open, action=FromFile)
     parser.add_argument(
-        '--prefix',
-        type=str,
-        default=datetime.now().strftime("%Y.%m.%d.%H.%M."),
+        "--prefix", type=str, default=datetime.now().strftime("%Y.%m.%d.%H.%M."),
     )
 
     for arg, cast, min_value, max_value, help in (
-        ('--current-hospitalized', int, 0, None, "Currently Hospitalized COVID-19 Patients (>= 0)"),
-        ('--doubling-time', float, 0.0, None, "Doubling time before social distancing (days)"),
-        ('--hospitalized-los', int, 0, None, "Hospitalized Length of Stay (days)"),
-        ('--hospitalized-rate', float, 0.00001, 1.0, "Hospitalized Rate: 0.00001 - 1.0"),
-        ('--icu-los', int, 0, None, "ICU Length of Stay (days)"),
-        ('--icu-rate', float, 0.0, 1.0, "ICU Rate: 0.0 - 1.0"),
-        ('--known-infected', int, 0, None,
-            "Currently Known Regional Infections (>=0) (only used to compute detection rate - does not change projections)"),
-        ('--market_share', float, 0.00001, 1.0, "Hospital Market Share (0.00001 - 1.0)"),
-        ('--n-days', int, 0, None, "Nuber of days to project >= 0"),
-        ('--relative-contact-rate', float, 0.0, 1.0, "Social Distancing Reduction Rate: 0.0 - 1.0"),
-        ('--susceptible', int, 1, None, "Regional Population >= 1"),
-        ('--ventilated-los', int, 0, None, "Hospitalized Length of Stay (days)"),
-        ('--ventilated-rate', float, 0.0, 1.0, "Ventilated Rate: 0.0 - 1.0"),
+        (
+            "--current-hospitalized",
+            int,
+            0,
+            None,
+            "Currently Hospitalized COVID-19 Patients (>= 0)",
+        ),
+        (
+            "--doubling-time",
+            float,
+            0.0,
+            None,
+            "Doubling time before social distancing (days)",
+        ),
+        ("--hospitalized-los", int, 0, None, "Hospitalized Length of Stay (days)"),
+        (
+            "--hospitalized-rate",
+            float,
+            0.00001,
+            1.0,
+            "Hospitalized Rate: 0.00001 - 1.0",
+        ),
+        ("--icu-los", int, 0, None, "ICU Length of Stay (days)"),
+        ("--icu-rate", float, 0.0, 1.0, "ICU Rate: 0.0 - 1.0"),
+        (
+            "--known-infected",
+            int,
+            0,
+            None,
+            "Currently Known Regional Infections (>=0) (only used to compute detection rate - does not change projections)",
+        ),
+        (
+            "--market_share",
+            float,
+            0.00001,
+            1.0,
+            "Hospital Market Share (0.00001 - 1.0)",
+        ),
+        ("--n-days", int, 0, None, "Nuber of days to project >= 0"),
+        (
+            "--relative-contact-rate",
+            float,
+            0.0,
+            1.0,
+            "Social Distancing Reduction Rate: 0.0 - 1.0",
+        ),
+        ("--susceptible", int, 1, None, "Regional Population >= 1"),
+        ("--ventilated-los", int, 0, None, "Hospitalized Length of Stay (days)"),
+        ("--ventilated-rate", float, 0.0, 1.0, "Ventilated Rate: 0.0 - 1.0"),
     ):
         parser.add_argument(arg, type=validator(cast, min_value, max_value))
     return parser.parse_args()
@@ -83,22 +116,24 @@ def main():
         ventilated=RateLos(a.ventilated_rate, a.ventilated_los),
     )
 
-    raw_df = DataFrame({
-        "Susceptible": p.susceptible_v,
-        "Infected": p.infected_v,
-        "Recovered": p.recovered_v,
-    })
+    raw_df = DataFrame(
+        {
+            "Susceptible": p.susceptible_v,
+            "Infected": p.infected_v,
+            "Recovered": p.recovered_v,
+        }
+    )
     admits_df = build_admissions_df(p.n_days, *p.dispositions)
     census_df = build_census_df(admits_df, *p.lengths_of_stay)
 
     prefix = a.prefix
     for df, name in (
-        (raw_df, 'raw'),
-        (admits_df, 'admits'),
-        (census_df, 'census'),
+        (raw_df, "raw"),
+        (admits_df, "admits"),
+        (census_df, "census"),
     ):
-        df.to_csv(prefix + name + '.csv')
+        df.to_csv(prefix + name + ".csv")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
