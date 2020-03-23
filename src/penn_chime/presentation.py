@@ -421,7 +421,8 @@ def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False):
     return None
 
 
-def draw_raw_sir_simulation_table(st, parameters, as_date: bool = False):
+def draw_raw_sir_simulation_table(st, parameters):
+    as_date = parameters.as_date
     days = np.arange(0, parameters.n_days + 1)
     data_list = [
         days,
