@@ -52,7 +52,10 @@ st.altair_chart(
 st.markdown(chart_descriptions(new_admit_chart))
 
 if st.checkbox("Show Projected Admissions in tabular form"):
-    draw_projected_admissions_table(st, admissions_df, as_date=p.as_date)
+    if st.checkbox("Show Daily Counts"):
+        draw_projected_admissions_table(st, admissions_df, as_date=p.as_date, daily_count=True)
+    else:
+        draw_projected_admissions_table(st, admissions_df, as_date=p.as_date, daily_count=False)
 st.subheader("Admitted Patients (Census)")
 st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
