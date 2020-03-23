@@ -4,7 +4,7 @@ from dash import Dash
 
 from penn_chime.settings import DEFAULTS
 
-from chime_dash.layout import setup, EXTERNAL_STYLESHEETS
+from chime_dash.layout import setup, EXTERNAL_STYLESHEETS, EXTERNAL_SCRIPTS
 from chime_dash.layout import CALLBACK_INPUTS, CALLBACK_OUTPUTS, callback_body
 
 LANGUAGE = "en"
@@ -13,7 +13,11 @@ LANGUAGE = "en"
 def main():
     """Starts a dash app
     """
-    app = Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS,)
+    app = Dash(
+        __name__,
+        external_stylesheets=EXTERNAL_STYLESHEETS,
+        external_scripts=EXTERNAL_SCRIPTS,
+    )
     app.layout = setup(LANGUAGE, DEFAULTS)
 
     @app.callback(CALLBACK_OUTPUTS, CALLBACK_INPUTS)
