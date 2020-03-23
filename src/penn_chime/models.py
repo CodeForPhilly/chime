@@ -89,6 +89,10 @@ def build_admissions_df(p) -> pd.DataFrame:
 
     # Account for initial conditions
     projection_admits.loc[0, "Hospitalized"] = p.current_hospitalized
+    icu_fraction = p.icu.rate / p.hospitalized.rate
+    projection_admits.loc[0, "ICU"] = icu_fraction * p.current_hospitalized
+    ventilated_fraction = p.ventilated.rate / p.hospitalized.rate
+    projection_admits.loc[0, "Ventilated"] = ventilated_fraction * p.current_hospitalized
 
     return projection_admits
 
