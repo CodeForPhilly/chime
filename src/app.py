@@ -45,7 +45,7 @@ census_df = build_census_df(admissions_df, parameters=p)
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
-new_admit_chart = new_admissions_chart(alt, admissions_df, parameters=p, as_date=as_date)
+new_admit_chart = new_admissions_chart(alt, admissions_df, parameters=p)
 st.altair_chart(
     new_admit_chart, use_container_width=True
 )
@@ -58,7 +58,7 @@ st.subheader("Admitted Patients (Census)")
 st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
 )
-census_chart = admitted_patients_chart(alt=alt, census=census_df, parameters=p, as_date=as_date)
+census_chart = admitted_patients_chart(alt=alt, census=census_df, parameters=p)
 st.altair_chart(
     census_chart, use_container_width=True
 )
