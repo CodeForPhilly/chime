@@ -42,3 +42,16 @@ def setup(language: str, defaults: Constants):
         ],
         className="container",
     )
+
+
+CALLBACK_INPUTS = []
+CALLBACK_OUTPUTS = []
+
+
+def callback_body(*args):
+    """Glues together individual app callbacks
+
+    Sidebar provides all of the inputs.
+    """
+    pars, as_date = sidebar.parse_form_parameters(*args)
+    return None
