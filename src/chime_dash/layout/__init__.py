@@ -3,6 +3,8 @@
 from dash_bootstrap_components import Row, Col
 from dash_bootstrap_components.themes import BOOTSTRAP
 
+from penn_chime.defaults import Constants
+
 from chime_dash.layout import sidebar
 from chime_dash.layout import header
 from chime_dash.layout import intro
@@ -18,14 +20,14 @@ EXTERNAL_STYLESHEETS = [
 ]
 
 
-def setup(language):
+def setup(language: str, defaults: Constants):
     """Glues individual setup components together
     """
     return Row(
         children=[
             Col(
                 id="sidebar",
-                # children=sidebar.setup(language),
+                children=sidebar.setup(language, defaults),
                 width=4,
                 className="mt-4",
             ),
