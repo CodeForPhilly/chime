@@ -401,7 +401,6 @@ def draw_projected_admissions_table(
         admits_table = add_date_column(
             admits_table, drop_day_column=True, date_format=DATE_FORMAT
         )
-
     st.table(admits_table)
     return None
 
