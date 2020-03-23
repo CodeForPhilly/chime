@@ -1,11 +1,13 @@
 """Tests."""
 
+from math import ceil  # type: ignore
+import datetime  # type: ignore
 import pytest  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
-from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart
+from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
 from src.penn_chime.models import sir, sim_sir, build_admissions_df
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
@@ -254,3 +256,41 @@ def test_parameters():
         0.05 * 0.05 * (param.infected_v[1:-1] + param.recovered_v[1:-1]) - 100
     )
     assert (diff.abs() < 0.1).all()
+    assert len(param.susceptible_v) == len(param.infected_v) == len(param.recovered_v) == param.n_days + 1 == 3
+
+
+def test_chart_descriptions():
+    # new admissions chart
+    projection_admits = pd.read_csv('tests/projection_admits.csv')
+    projection_admits = projection_admits.rename(columns={'hosp': 'Hospitalized', 'icu': 'ICU', 'vent': 'Ventilated'})
+    chart = new_admissions_chart(alt, projection_admits, PARAM)
+    description = chart_descriptions(chart)
+
+    hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
+
+    max_hosp = chart.data['Hospitalized'].max()
+    assert str(ceil(max_hosp)) in hosp
+
+    max_icu_ix = chart.data['ICU'].idxmax()
+    assert max_icu_ix + 1 == len(chart.data)
+    assert "*" in icu
+
+    # test asterisk
+    param = PARAM
+    param.n_days = 600
+
+    projection_admits = pd.read_csv('tests/projection_admits.csv')
+    projection_admits = projection_admits.rename(columns={'hosp': 'Hospitalized', 'icu': 'ICU', 'vent': 'Ventilated'})
+    chart = new_admissions_chart(alt, projection_admits, PARAM)
+    description = chart_descriptions(chart)
+    assert "*" not in description
+
+    # census chart
+    census_df = pd.read_csv('tests/census_df.csv')
+    census_df = census_df.rename(columns={'hosp': 'Hospitalized', 'icu': 'ICU', 'vent': 'Ventilated'})
+    chart = admitted_patients_chart(alt, census_df, PARAM, as_date=True)
+    description = chart_descriptions(chart)
+
+    assert str(ceil(chart.data['Ventilated'].max())) in description
+    assert str(chart.data['ICU'].idxmax()) not in description
+    assert datetime.datetime.strftime(chart.data.iloc[chart.data['ICU'].idxmax()].date, '%b %d') in description
