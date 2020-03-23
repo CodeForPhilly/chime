@@ -4,10 +4,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from typing import Optional
 
-import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
-
-# from .parameters import Parameters
 
 
 # (0.02, 7) is 2%, 7 days
@@ -34,7 +31,7 @@ def add_date_column(
         KeyError: if "day" column not in df
         ValueError: if "day" column is not of type int
     """
-    if not "day" in df:
+    if "day" not in df:
         raise KeyError("Input data frame for converting dates has no 'day column'.")
     if not pd.api.types.is_integer_dtype(df.day):
         raise KeyError("Column 'day' for dates converting data frame is not integer.")
