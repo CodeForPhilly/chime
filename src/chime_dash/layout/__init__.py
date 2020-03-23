@@ -3,6 +3,8 @@
 from dash_bootstrap_components import Row, Col
 from dash_bootstrap_components.themes import BOOTSTRAP
 
+from dash_html_components import Script
+
 from penn_chime.defaults import Constants
 
 from chime_dash.layout import sidebar
@@ -18,6 +20,7 @@ EXTERNAL_STYLESHEETS = [
     "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css",
     BOOTSTRAP,
 ]
+EXTERNAL_SCRIPTS = []
 
 
 def setup(language: str, defaults: Constants):
