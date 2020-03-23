@@ -391,9 +391,12 @@ def show_additional_projections(
 
 
 def draw_projected_admissions_table(
-    st, projection_admits: pd.DataFrame, as_date: bool = False
+    st, projection_admits: pd.DataFrame, as_date: bool = False, daily_count: bool = False,
 ):
-    admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
+    if daily_count == True:
+        admits_table = projection_admits[np.mod(projection_admits.index, 1) == 0].copy()
+    else:
+        admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
     admits_table["day"] = admits_table.index
     admits_table.index = range(admits_table.shape[0])
     admits_table = admits_table.fillna(0).astype(int)
@@ -406,8 +409,11 @@ def draw_projected_admissions_table(
     return None
 
 
-def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False):
-    census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
+def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False, daily_count: bool = False):
+    if daily_count == True:
+        census_table = census_df[np.mod(census_df.index, 1) == 0].copy()
+    else:
+        census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
     census_table.index = range(census_table.shape[0])
     census_table.loc[0, :] = 0
     census_table = census_table.dropna().astype(int)
