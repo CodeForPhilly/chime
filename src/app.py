@@ -18,7 +18,7 @@ from penn_chime.presentation import (
     write_footer,
 )
 from penn_chime.settings import DEFAULTS
-from penn_chime.models import sim_sir_df, build_admissions_df, build_census_df
+from penn_chime.models import build_admissions_df, build_census_df
 from penn_chime.charts import (
     additional_projections_chart,
     admitted_patients_chart,
@@ -36,7 +36,8 @@ p = display_sidebar(st, DEFAULTS)
 display_header(st, p)
 
 if st.checkbox("Show more info about this tool"):
-    notes = "The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)"
+    notes = "The total size of the susceptible population will be the entire catchment area for " \
+            "Penn Medicine entities (HUP, PAH, PMC, CCH)"
     show_more_info_about_this_tool(st=st, parameters=p, inputs=DEFAULTS, notes=notes)
 
 # PRESENTATION
