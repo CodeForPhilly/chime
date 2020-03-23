@@ -67,7 +67,7 @@ census_chart = admitted_patients_chart(alt=alt, census=census_df, parameters=p, 
 st.altair_chart(
     census_chart, use_container_width=True
 )
-st.markdown(chart_descriptions(census_chart, census=True))
+st.markdown(chart_descriptions(census_chart, suffix=" Census"))
 if st.checkbox("Show Projected Census in tabular form"):
     draw_census_table(st, census_df, as_date=as_date)
 st.markdown(

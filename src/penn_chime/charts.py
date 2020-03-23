@@ -117,15 +117,19 @@ def additional_projections_chart(
     )
 
 
-def chart_descriptions(chart, census=False):
+def chart_descriptions(chart: Chart, suffix: str = ""):
+    """
+
+    :param chart: Chart: The alt chart to be used in finding max points
+    :param suffix: str: The assumption is that the charts have similar column names.
+                   The census chart adds " Census" to the column names.
+                   Make sure to include a space or underscore as appropriate
+    :return: str: Returns a multi-line string description of the results
+    """
     messages = []
 
     cols = ["Hospitalized", "ICU", "Ventilated"]
-    if census:
-        cols = [col + " Census" for col in cols]
-
     asterisk = False
-
     day = "date" if "date" in chart.data.columns else "day"
 
     for col in cols:
@@ -139,8 +143,9 @@ def chart_descriptions(chart, census=False):
             on += 1  # 0 index issue
 
         messages.append(
-            "{} peaks at {:,} on day {}{}".format(
+            "{}{} peaks at {:,} on day {}{}".format(
                 col,
+                suffix,
                 ceil(chart.data[col].max()),
                 on,
                 "*" if asterisk else "",
