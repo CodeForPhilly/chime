@@ -1,11 +1,12 @@
 """Utility functions for dash frontend
 """
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from os import path
 
 from yaml import safe_load
 
+from numpy import mod
 from pandas import DataFrame
 
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
@@ -59,17 +60,19 @@ def read_localization_markdown(file: str, language: str) -> str:
     return md
 
 
-def df_to_html_table(dataframe: DataFrame) -> Table:
+def df_to_html_table(
+    dataframe: DataFrame, data_only: bool = False, n_mod: Optional[int] = None,
+) -> Table:
     """Converts pandas data frame to html table
     """
-    return Table(
-        [
-            Thead([Tr([Th("id")] + [Th(col) for col in dataframe.columns])]),
-            Tbody(
-                [
-                    Tr([Th(idx)] + [Td(col) for col in row])
-                    for idx, row in dataframe.iterrows()
-                ]
-            ),
-        ],
-    )
+    index_name = dataframe.index.name
+    tmp = dataframe.reset_index()
+    tmp = tmp[mod(tmp.index, n_mod) == 0].copy()
+    tmp = tmp.set_index(index_name)
+    data = [
+        Thead([Tr([Th(tmp.index.name)] + [Th(col) for col in tmp.columns])]),
+        Tbody(
+            [Tr([Th(idx)] + [Td(col) for col in row]) for idx, row in tmp.iterrows()]
+        ),
+    ]
+    return data if data_only else Table(data)
