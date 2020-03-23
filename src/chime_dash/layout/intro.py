@@ -7,7 +7,7 @@ from dash.development.base_component import ComponentMeta
 from dash_core_components import Markdown
 
 from penn_chime.defaults import Constants
-from penn_chime.models import Parameters
+from penn_chime.parameters import Parameters
 
 from chime_dash.utils import read_localization_markdown
 

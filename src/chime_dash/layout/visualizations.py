@@ -8,8 +8,9 @@ from dash_html_components import H2
 from dash_core_components import Markdown, Graph
 from dash_bootstrap_components import Table
 
-from penn_chime.utils import build_census_df, build_admissions_df, add_date_column
-from penn_chime.models import Parameters
+from penn_chime.models import build_admissions_df, build_census_df
+from penn_chime.utils import add_date_column
+from penn_chime.parameters import Parameters
 
 
 from chime_dash.utils import read_localization_yaml, df_to_html_table
@@ -81,8 +82,8 @@ def render(
 def _build_frames(pars: Parameters, content: Dict[str, str], as_date: bool = False):
 
     # Prepare admissions data & census data
-    projection_admits = build_admissions_df(pars.n_days, *pars.dispositions)
-    census_df = build_census_df(projection_admits, *pars.lengths_of_stay)
+    projection_admits = build_admissions_df(pars)
+    census_df = build_census_df(projection_admits, pars)
 
     # Convert columns
     if as_date:
@@ -96,13 +97,13 @@ def _build_frames(pars: Parameters, content: Dict[str, str], as_date: bool = Fal
 
     projection_admits = (
         projection_admits.fillna(0)
-        .rename(columns={key: content[key] for key in projection_admits.columns})
+        # .rename(columns={key: content[key] for key in projection_admits.columns})
         .astype(int)
     )
     census_df.iloc[0, :] = 0
     census_df = (
         census_df.dropna()
-        .rename(columns={key: content[key] for key in census_df.columns})
+        # .rename(columns={key: content[key] for key in census_df.columns})
         .astype(int)
     )
 

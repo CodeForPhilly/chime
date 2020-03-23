@@ -11,7 +11,7 @@ from dash_core_components import Graph
 from dash_bootstrap_components import Table
 
 from penn_chime.utils import add_date_column
-from penn_chime.models import Parameters
+from penn_chime.parameters import Parameters
 
 from chime_dash.utils import read_localization_yaml, df_to_html_table
 from chime_dash.plotting import plot_dataframe

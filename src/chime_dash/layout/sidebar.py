@@ -8,7 +8,7 @@ from dash.development.base_component import ComponentMeta
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
 from penn_chime.defaults import RateLos, Constants
-from penn_chime.models import Parameters
+from penn_chime.parameters import Parameters
 
 from chime_dash.utils import read_localization_yaml
 
