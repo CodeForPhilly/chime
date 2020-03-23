@@ -14,19 +14,18 @@ Plots & callbacks
 
 File/Folder | Purpose
 ---|---
-`app` | Launches the dash app
 `utils` | General function which help rendering the app
 `plotting` | Specific functions which provide plotting data
-`presentation` | More sophisticated rendering functions
-`templates` | Specific `html` or `markdown` files
+`templates` | Specific `yml` or `markdown` files which. Translage all these texts to have localized versions
+`layout` | The core of the dash app. Works modular. E.g., the `__init__` file glues all different parts together.
 
 ## How to use
 Install the chime base module
 ```bash
-> pip install [--user] [-e] .
+> pip install [--user] [-r] requirements.txt
 ```
 and run
 ```bash
 > python src/dash_app.py
 ```
-in the project root.
+in the project root and visit the local url.

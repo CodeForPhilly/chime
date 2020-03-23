@@ -1,4 +1,11 @@
 """Combines all components
+
+The `sidbar` component cobines all the inputs while other components potentially
+have callbacks.
+
+To add or remove components, adjust the `setup`.
+If callbacks are present, also adjust `CALLBACK_INPUTS`, `CALLBACK_OUTPUTS` and
+`callback_body`.
 """
 from dash_bootstrap_components import Row, Col
 from dash_bootstrap_components.themes import BOOTSTRAP
