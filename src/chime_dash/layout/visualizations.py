@@ -91,8 +91,9 @@ def _build_frames(pars: Parameters, content: Dict[str, str], as_date: bool = Fal
         .rename(columns={key: content[key] for key in projection_admits.columns})
         .astype(int)
     )
+    census_df.iloc[0, :] = 0
     census_df = (
-        census_df.fillna(0)
+        census_df.dropna()
         .rename(columns={key: content[key] for key in census_df.columns})
         .astype(int)
     )
