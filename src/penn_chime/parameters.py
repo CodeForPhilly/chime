@@ -27,7 +27,8 @@ class Parameters:
         icu: RateLos,
         ventilated: RateLos,
         max_y_axis: int = None,
-        n_days: int = None
+        n_days: int = None,
+        as_date: bool = False
     ):
         self.current_hospitalized = current_hospitalized
         self.doubling_time = doubling_time
@@ -42,6 +43,7 @@ class Parameters:
         self.ventilated = ventilated
 
         self.max_y_axis = max_y_axis
+        self.as_date = as_date
 
         self.rates = tuple(each.rate for each in (hospitalized, icu, ventilated))
         self.lengths_of_stay = tuple(

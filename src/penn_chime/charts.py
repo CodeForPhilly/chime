@@ -10,11 +10,12 @@ from .utils import add_date_column
 
 
 def new_admissions_chart(
-    alt, projection_admits: pd.DataFrame, parameters: Parameters, as_date: bool = False,
+    alt, projection_admits: pd.DataFrame, parameters: Parameters
 ) -> Chart:
     """docstring"""
     plot_projection_days = parameters.n_days - 10
     max_y_axis = parameters.max_y_axis
+    as_date = parameters.as_date
 
     y_scale = alt.Scale()
 
@@ -48,12 +49,13 @@ def new_admissions_chart(
 
 
 def admitted_patients_chart(
-    alt, census: pd.DataFrame, parameters: Parameters, as_date: bool = False
+    alt, census: pd.DataFrame, parameters: Parameters
 ) -> Chart:
     """docstring"""
 
     plot_projection_days = parameters.n_days - 10
     max_y_axis = parameters.max_y_axis
+    as_date = parameters.as_date
     if as_date:
         census = add_date_column(census)
         x_kwargs = {"shorthand": "date:T", "title": "Date"}
@@ -87,10 +89,16 @@ def admitted_patients_chart(
 
 
 def additional_projections_chart(
-    alt, i: np.ndarray, r: np.ndarray, as_date: bool = False, max_y_axis: int = None
+    alt, parameters: Parameters
 ) -> Chart:
+    i = parameters.infected_v
+    r = parameters.recovered_v
     dat = pd.DataFrame({"Infected": i, "Recovered": r})
     dat["day"] = dat.index
+
+    as_date = parameters.as_date
+    max_y_axis = parameters.max_y_axis
+
     if as_date:
         dat = add_date_column(dat)
         x_kwargs = {"shorthand": "date:T", "title": "Date"}

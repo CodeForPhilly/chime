@@ -288,7 +288,8 @@ def test_chart_descriptions():
     # census chart
     census_df = pd.read_csv('tests/census_df.csv')
     census_df = census_df.rename(columns={'hosp': 'Hospitalized', 'icu': 'ICU', 'vent': 'Ventilated'})
-    chart = admitted_patients_chart(alt, census_df, PARAM, as_date=True)
+    PARAM.as_date = True
+    chart = admitted_patients_chart(alt, census_df, PARAM)
     description = chart_descriptions(chart)
 
     assert str(ceil(chart.data['Ventilated'].max())) in description
