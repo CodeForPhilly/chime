@@ -55,9 +55,11 @@ def callback_body(*args, language="en"):
 
     Sidebar provides all of the inputs.
     """
-    pars, as_date = sidebar.parse_form_parameters(*args)
+    pars, kwargs = sidebar.parse_form_parameters(*args)
 
     intro_md = intro.render(language, pars)
-    visualizations_data = visualizations.render(language, pars, as_date=as_date)
+    visualizations_data = visualizations.render(
+        language, pars, as_date=kwargs["as_date"], show_tables=kwargs["show_tables"]
+    )
 
     return intro_md + visualizations_data
