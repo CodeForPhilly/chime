@@ -34,8 +34,9 @@ def setup(language: str, defaults: Constants):
             Col(
                 children=header.setup(language) + intro.setup(language)
                 # + additions.setup(language)
-                # + visualizations.setup(language)
-                + definitions.setup(language) + footer.setup(language),
+                + visualizations.setup(language)
+                + definitions.setup(language)
+                + footer.setup(language),
                 width=8,
                 className="mt-4",
             ),
@@ -45,7 +46,7 @@ def setup(language: str, defaults: Constants):
 
 
 CALLBACK_INPUTS = sidebar.CALLBACK_INPUTS
-CALLBACK_OUTPUTS = intro.CALLBACK_OUTPUTS
+CALLBACK_OUTPUTS = intro.CALLBACK_OUTPUTS + visualizations.CALLBACK_OUTPUTS
 
 
 def callback_body(*args, language="en"):
@@ -54,5 +55,8 @@ def callback_body(*args, language="en"):
     Sidebar provides all of the inputs.
     """
     pars, as_date = sidebar.parse_form_parameters(*args)
+
     intro_md = intro.render(language, pars)
-    return (intro_md,)
+    visualizations_data = visualizations.render(language, pars, as_date=as_date)
+
+    return intro_md + visualizations_data

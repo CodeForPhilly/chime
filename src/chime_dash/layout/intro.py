@@ -1,6 +1,6 @@
 """Initializes the  dash html
 """
-from typing import List
+from typing import List, Any
 
 from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
@@ -23,7 +23,7 @@ def setup(language: str) -> List[ComponentMeta]:  # pylint: disable=W0613
 CALLBACK_OUTPUTS = [Output(component_id="intro", component_property="children")]
 
 
-def render(language: str, pars: Parameters):
+def render(language: str, pars: Parameters) -> List[Any]:
     """Renders the parameter dependent values in the introduction markdown
     """
     content = read_localization_markdown(LOCALIZATION_FILE, language)
@@ -34,18 +34,20 @@ def render(language: str, pars: Parameters):
         if pars.detection_probability is not None
         else "?"
     )
-    return content.format(
-        total_infections=pars.infected,
-        initial_infections=pars.known_infected,
-        detection_prob_str=detection_prob_str,
-        current_hosp=pars.current_hospitalized,
-        hosp_rate=pars.hospitalized.rate,
-        S=pars.susceptible,
-        market_share=pars.market_share,
-        recovery_days=pars.recovery_days,
-        r_naught=pars.r_naught,
-        doubling_time=pars.doubling_time,
-        relative_contact_rate=pars.relative_contact_rate,
-        r_t=pars.r_t,
-        doubling_time_t=pars.doubling_time_t,
+    return (
+        content.format(
+            total_infections=pars.infected,
+            initial_infections=pars.known_infected,
+            detection_prob_str=detection_prob_str,
+            current_hosp=pars.current_hospitalized,
+            hosp_rate=pars.hospitalized.rate,
+            S=pars.susceptible,
+            market_share=pars.market_share,
+            recovery_days=pars.recovery_days,
+            r_naught=pars.r_naught,
+            doubling_time=pars.doubling_time,
+            relative_contact_rate=pars.relative_contact_rate,
+            r_t=pars.r_t,
+            doubling_time_t=pars.doubling_time_t,
+        ),
     )
