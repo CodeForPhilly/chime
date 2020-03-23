@@ -66,7 +66,7 @@ def render(
 
     # Create census figure
     census_data = plot_dataframe(
-        census_df.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
+        census_df.head(pars.n_days - 10), max_y_axis=pars.max_y_axis
     )
     # Create admissions table data
     if as_date:
