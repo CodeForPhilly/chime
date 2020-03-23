@@ -389,9 +389,12 @@ def show_additional_projections(
 
 
 def draw_projected_admissions_table(
-    st, projection_admits: pd.DataFrame, as_date: bool = False
+    st, projection_admits: pd.DataFrame, as_date: bool = False, daily_count: bool = False,
 ):
-    admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
+    if daily_count == True:
+        admits_table = projection_admits[np.mod(projection_admits.index, 1) == 0].copy()
+    else:
+        admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
     admits_table["day"] = admits_table.index
     admits_table.index = range(admits_table.shape[0])
     admits_table = admits_table.fillna(0).astype(int)
