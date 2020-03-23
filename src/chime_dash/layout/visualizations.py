@@ -31,6 +31,7 @@ def setup(language: str) -> List[ComponentMeta]:
         H2(content["admitted-patients-title"]),
         Markdown(content["admitted-patients-text"]),
         Graph(id="admitted-patients-graph"),
+        Table(id="admitted-patients-table"),
     ]
 
 
@@ -38,6 +39,7 @@ CALLBACK_OUTPUTS = [
     Output(component_id="new-admissions-graph", component_property="figure"),
     Output(component_id="new-admissions-table", component_property="children"),
     Output(component_id="admitted-patients-graph", component_property="figure"),
+    Output(component_id="admitted-patients-table", component_property="children"),
 ]
 
 
@@ -54,14 +56,18 @@ def render(language: str, pars: Parameters, as_date: bool = False) -> List[Any]:
     # Create admissions table data
     if as_date:
         projection_admits.index = projection_admits.index.strftime("%b, %d")
-    table_data = df_to_html_table(projection_admits, data_only=True, n_mod=7)
+    admissions_table_data = df_to_html_table(projection_admits, data_only=True, n_mod=7)
 
     # Create census figure
     census_data = plot_dataframe(
         census_df.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
     )
+    # Create admissions table data
+    if as_date:
+        census_df.index = census_df.index.strftime("%b, %d")
+    census_table_data = df_to_html_table(census_df, data_only=True, n_mod=7)
 
-    return (admissions_data, table_data, census_data)
+    return (admissions_data, admissions_table_data, census_data, census_table_data)
 
 
 def _build_frames(pars: Parameters, content: Dict[str, str], as_date: bool = False):
