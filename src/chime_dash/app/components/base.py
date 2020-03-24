@@ -16,12 +16,11 @@ from chime_dash.app.utils.templates import read_localization_markdown
 
 
 class Component(ABC):
-    """
+    """Base component for rendering dash html objects and callbacks
     """
 
     callback_outputs: List[Output] = []  # must be same length as callback return
-    callback_inputs: Dict[str, Input] = {}
-    callback_keys: List[str] = []
+    callback_inputs: Dict[str, Input] = {}  # Must be ordered!
 
     localization_file: str = None
 

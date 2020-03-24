@@ -20,7 +20,7 @@ def main():
     )
     app.layout = body.html
 
-    @app.callback(body.callback_outputs, body.callback_inputs)
+    @app.callback(body.callback_outputs, list(body.callback_inputs.values()))
     def callback(*args):  # pylint: disable=W0612
         return body.callback(*args)
 

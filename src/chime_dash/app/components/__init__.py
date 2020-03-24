@@ -49,12 +49,11 @@ class Body(Component):
             navbar=Navbar(language, defaults),
         )
         self.callback_outputs = []
-        self.callback_inputs = []
+        self.callback_inputs = OrderedDict()
         self.callback_keys = []
         for component in self.components.values():
             self.callback_outputs += component.callback_outputs
-            self.callback_inputs += component.callback_inputs
-            self.callback_keys += component.callback_keys
+            self.callback_inputs.update(component.callback_inputs)
 
     def get_html(self):
         """Glues individual setup components together
@@ -90,7 +89,7 @@ class Body(Component):
     def callback(self, *args, **kwargs):
         """
         """
-        kwargs = dict(zip(self.callback_keys, args))
+        kwargs = dict(zip(self.callback_inputs, args))
         pars = self.components["sidebar"].parse_form_parameters(**kwargs)
         kwargs["pars"] = pars
 

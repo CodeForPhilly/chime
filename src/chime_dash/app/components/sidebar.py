@@ -59,10 +59,10 @@ class Sidebar(Component):
 
     localization_file = "sidebar.yml"
 
-    callback_inputs = [
-        CallbackInput(component_id=key, component_property="value") for key in _INPUTS
-    ]
-    callback_keys = _INPUTS.keys()
+    callback_inputs = OrderedDict(
+        (key, CallbackInput(component_id=key, component_property="value"))
+        for key in _INPUTS
+    )
 
     @staticmethod
     def parse_form_parameters(**kwargs) -> Tuple[Parameters, Dict[str, Any]]:
