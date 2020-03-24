@@ -9,6 +9,7 @@ import pandas as pd  # type: ignore
 from .defaults import Constants, RateLos
 from .utils import add_date_column, dataframe_to_base64
 from .parameters import Parameters
+from .hc_param_import import constants_from_uploaded_file
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
 
@@ -92,6 +93,10 @@ def display_sidebar(st, d: Constants) -> Parameters:
 
     if d.known_infected < 1:
         raise ValueError("Known cases must be larger than one to enable predictions.")
+
+    uploaded_file = st.sidebar.file_uploader("Import Parameters", type=['json'])
+    if uploaded_file is not None:
+        d, raw_imported = constants_from_uploaded_file(uploaded_file)
 
     n_days = st.sidebar.number_input(
         "Number of days to project",
@@ -212,13 +217,18 @@ def display_sidebar(st, d: Constants) -> Parameters:
         format="%i",
     )
 
-    as_date = st.sidebar.checkbox(label="Present result as dates instead of days", value=False)
-
-    max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value")
+    as_date_default = False if uploaded_file is None else raw_imported["PresentResultAsDates"]
+    as_date = st.sidebar.checkbox(label="Present result as dates instead of days", value=as_date_default)
+    
+    max_y_axis_set_default = False if uploaded_file is None else raw_imported["SetYAxisToStaticValue"]
+    max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value", value=max_y_axis_set_default)
     max_y_axis = None
     if max_y_axis_set:
         max_y_axis = st.sidebar.number_input(
-            "Y-axis static value", value=500, format="%i", step=25,
+            "Y-axis static value", 
+            value=500 if uploaded_file is None else raw_imported["YAxisStaticValue"], 
+            format="%i", 
+            step=25,
         )
 
     return Parameters(
