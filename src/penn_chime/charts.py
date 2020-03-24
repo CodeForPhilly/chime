@@ -7,6 +7,7 @@ import pandas as pd  # type: ignore
 
 from .parameters import Parameters
 from .utils import add_date_column
+from .presentation import DATE_FORMAT
 
 
 def new_admissions_chart(
@@ -26,7 +27,7 @@ def new_admissions_chart(
     tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
         projection_admits = add_date_column(projection_admits)
-        x_kwargs = {"shorthand": "date:T", "title": "Date"}
+        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
@@ -59,7 +60,7 @@ def admitted_patients_chart(
     as_date = parameters.as_date
     if as_date:
         census = add_date_column(census)
-        x_kwargs = {"shorthand": "date:T", "title": "Date"}
+        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
         idx = "date:T"
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
@@ -107,7 +108,7 @@ def additional_projections_chart(
 
     if as_date:
         dat = add_date_column(dat)
-        x_kwargs = {"shorthand": "date:T", "title": "Date"}
+        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
