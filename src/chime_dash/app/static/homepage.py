@@ -9,15 +9,15 @@ LOCALIZATION_FILE_1 = "chime-intro.md"
 LOCALIZATION_FILE_2 = "latest-updates.md"
 
 
-
-def introducing_chime(language: str) -> List[ComponentMeta]:
+def introducing_chime (language: str) -> List[ComponentMeta]:
     """Initializes the header dash html
     """
     content = read_localization_markdown(LOCALIZATION_FILE_1, language)
 
     return [Markdown(content)]
 
-def latest_updates(language: str) -> List[ComponentMeta]:
+
+def latest_updates (language: str) -> List[ComponentMeta]:
     """Initializes the header dash html
     """
     content = read_localization_markdown(LOCALIZATION_FILE_2, language)

@@ -1,7 +1,7 @@
 """Navigation bar view
 """
-from typing import List, Any
-from chime_dash.app.components import header
+from typing import List
+from chime_dash.app.static import header
 from chime_dash.app.components import menu
 
 import dash_html_components as html
