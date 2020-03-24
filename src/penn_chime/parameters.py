@@ -14,7 +14,10 @@ from .models import (
 
 
 def daily_growth_helper(doubling_time):
-    return (power(2, 1.0 / doubling_time) - 1) * 100
+    result = 0
+    if doubling_time != 0:
+        result = (power(2, 1.0 / doubling_time) - 1) * 100
+    return result
 
 
 class Parameters:

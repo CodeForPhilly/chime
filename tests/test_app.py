@@ -9,7 +9,7 @@ import altair as alt  # type: ignore
 
 from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
 from src.penn_chime.models import sir, sim_sir, build_admissions_df
-from src.penn_chime.parameters import Parameters
+from src.penn_chime.parameters import Parameters, daily_growth_helper
 from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
 from src.penn_chime.defaults import RateLos
@@ -79,9 +79,31 @@ def test_daily_growth():
     assert len((list(filter(lambda s: initial_growth in s, st.render_store))))
     assert len((list(filter(lambda s: mitigated_growth in s, st.render_store))))
     st.cleanup()
+    mitigated_halving = "and daily growth rate of **-1.33%**."
+    halving_params = Parameters(
+        current_hospitalized=100,
+        doubling_time=6.0,
+        known_infected=5000,
+        market_share=0.05,
+        relative_contact_rate=0.7,
+        susceptible=500000,
+        hospitalized=RateLos(0.05, 7),
+        icu=RateLos(0.02, 9),
+        ventilated=RateLos(0.01, 10),
+        n_days=60,
+    )
+    display_header(st, halving_params)
+    assert len((list(filter(lambda s: mitigated_halving in s, st.render_store))))
+    st.cleanup()
 
 
 st.cleanup()
+
+
+def test_daily_growth_helper():
+    assert np.round(daily_growth_helper(5), decimals=4) == 14.8698
+    assert np.round(daily_growth_helper(0), decimals=4) == 0.0
+    assert np.round(daily_growth_helper(-4), decimals=4) == -15.9104
 
 
 @pytest.mark.xfail()
