@@ -9,7 +9,7 @@ from dash_core_components import Markdown
 from penn_chime.defaults import Constants
 from penn_chime.parameters import Parameters
 
-from chime_dash.utils import read_localization_markdown
+from chime_dash.app.utils.templates import read_localization_markdown
 
 LOCALIZATION_FILE_1 = "intro.md"
 LOCALIZATION_FILE_2 = "tool-details.md"

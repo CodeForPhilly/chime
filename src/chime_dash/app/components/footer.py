@@ -3,12 +3,11 @@
 from typing import List
 
 from dash.development.base_component import ComponentMeta
-
-from chime_dash.utils import read_localization_markdown
 from dash_core_components import Markdown
 
+from chime_dash.app.utils.templates import read_localization_markdown
 
-LOCALIZATION_FILE = "definitions.md"
+LOCALIZATION_FILE = "footer.md"
 
 
 def setup(language: str) -> List[ComponentMeta]:

@@ -1,6 +1,6 @@
 """Combines all components
 
-The `sidbar` component cobines all the inputs while other components potentially
+The `sidebar` component combines all the inputs while other components potentially
 have callbacks.
 
 To add or remove components, adjust the `setup`.
@@ -14,13 +14,14 @@ from dash_html_components import Script
 
 from penn_chime.defaults import Constants
 
-from chime_dash.layout import sidebar
-from chime_dash.layout import header
-from chime_dash.layout import intro
-from chime_dash.layout import additions
-from chime_dash.layout import visualizations
-from chime_dash.layout import definitions
-from chime_dash.layout import footer
+from chime_dash.app.components import sidebar
+from chime_dash.app.components import header
+from chime_dash.app.components import intro
+from chime_dash.app.components import additions
+from chime_dash.app.components import visualizations
+from chime_dash.app.components import definitions
+from chime_dash.app.components import footer
+from chime_dash.app.components import navbar
 
 
 EXTERNAL_STYLESHEETS = [

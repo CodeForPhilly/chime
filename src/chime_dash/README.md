@@ -5,7 +5,7 @@ This directory should provide the interface for a dash app.
 E.g., it contains the actual app which pieces together individual parts which could potentially live on their own.
 This makes it easier to modularize and reuse parts.
 
-![Current interface](interface.png)
+![Current interface](docs/assets/interface.png)
 
 ## Todo
 Plots & callbacks
