@@ -12,7 +12,7 @@ Try this link: https://pennchime.herokuapp.com/
 
 ### Run Your Own Copy Locally
 
-If you're comfortable working on your computer's command line, you can head over to the [Getting Started: Run Locally](getting-started/run-locally.md) guide to run a private instance on your own computer.
+If you're comfortable working on your computer's command line, you can head over to the [Getting Started: Run Locally](run-locally.md) guide to run a private instance on your own computer.
 
 ### Run a Shared Copy Online for Your Organization
 
