@@ -64,6 +64,7 @@ def add_date_column(
 
     return df
 
+
 def dataframe_to_base64(df: pd.DataFrame) -> str:
     """Converts a dataframe to a base64-encoded CSV representation of that data.
 

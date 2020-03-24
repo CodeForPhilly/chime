@@ -3,7 +3,6 @@ from math import ceil
 import datetime
 from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
-import numpy as np  # type: ignore
 
 from .parameters import Parameters
 from .utils import add_date_column

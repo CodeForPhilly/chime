@@ -60,7 +60,8 @@ if st.checkbox("Show Projected Admissions in tabular form"):
         draw_projected_admissions_table(st, admissions_df, as_date=p.as_date, daily_count=True)
     else:
         draw_projected_admissions_table(st, admissions_df, as_date=p.as_date, daily_count=False)
-    build_download_link(st,
+    build_download_link(
+        st,
         filename="projected_admissions.csv",
         df=admissions_df,
         parameters=p
@@ -79,7 +80,8 @@ if st.checkbox("Show Projected Census in tabular form"):
         draw_census_table(st, admissions_df, as_date=p.as_date, daily_count=True)
     else:
         draw_census_table(st, census_df, as_date=p.as_date, daily_count=False)
-    build_download_link(st,
+    build_download_link(
+        st,
         filename="projected_census.csv",
         df=census_df,
         parameters=p

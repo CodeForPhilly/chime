@@ -42,14 +42,14 @@ def display_header(st, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. 
-        Please update your reports generated before """ + p.change_date() + """. 
+        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**.
+        Please update your reports generated before """ + p.change_date() + """.
         See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/). 
-    Code can be found on [Github](https://github.com/CodeForPhilly/chime). 
+    Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/).
+    Code can be found on [Github](https://github.com/CodeForPhilly/chime).
     Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*"""
 
     )
@@ -430,7 +430,7 @@ def show_additional_projections(
 def draw_projected_admissions_table(
     st, projection_admits: pd.DataFrame, as_date: bool = False, daily_count: bool = False,
 ):
-    if daily_count == True:
+    if daily_count is True:
         admits_table = projection_admits[np.mod(projection_admits.index, 1) == 0].copy()
     else:
         admits_table = projection_admits[np.mod(projection_admits.index, 7) == 0].copy()
@@ -447,7 +447,7 @@ def draw_projected_admissions_table(
 
 
 def draw_census_table(st, census_df: pd.DataFrame, as_date: bool = False, daily_count: bool = False):
-    if daily_count == True:
+    if daily_count is True:
         census_table = census_df[np.mod(census_df.index, 1) == 0].copy()
     else:
         census_table = census_df[np.mod(census_df.index, 7) == 0].copy()
@@ -485,11 +485,13 @@ def draw_raw_sir_simulation_table(st, parameters):
         )
 
     st.table(infect_table)
-    build_download_link(st,
+    build_download_link(
+        st,
         filename="raw_sir_simulation_data.csv",
         df=projection_area,
         parameters=parameters
     )
+
 
 def build_download_link(st, filename: str, df: pd.DataFrame, parameters: Parameters):
     if parameters.as_date:
@@ -498,4 +500,4 @@ def build_download_link(st, filename: str, df: pd.DataFrame, parameters: Paramet
     csv = dataframe_to_base64(df)
     st.markdown("""
         <a download="{filename}" href="data:file/csv;base64,{csv}">Download full table as CSV</a>
-""".format(csv=csv,filename=filename), unsafe_allow_html=True)
+""".format(csv=csv, filename=filename), unsafe_allow_html=True)
