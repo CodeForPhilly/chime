@@ -28,6 +28,8 @@ class Parameters:
         max_y_axis: int = None,
         n_days: int = 60,
         recovery_days: int = 14,
+        author: str = "Jane Doe",
+        scenario: str = "COVID model"
     ):
         self.current_hospitalized = current_hospitalized
         self.doubling_time = doubling_time
@@ -44,6 +46,9 @@ class Parameters:
         self.max_y_axis = max_y_axis
         self.n_days = n_days
         self.recovery_days = recovery_days
+
+        self.author = author
+        self.scenario = scenario
 
         self.labels = {
             "hospitalized": "Hospitalized",

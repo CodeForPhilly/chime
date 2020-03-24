@@ -1,6 +1,7 @@
 """effectful functions for streamlit io"""
 
 from typing import Optional
+from datetime import datetime
 
 import altair as alt  # type: ignore
 import numpy as np  # type: ignore
@@ -88,6 +89,12 @@ def display_sidebar(st, d: Constants) -> Parameters:
     if uploaded_file is not None:
         d, raw_imported = constants_from_uploaded_file(uploaded_file)
 
+    author = st.sidebar.text_input("Author Name", 
+        value="Jane Doe")
+    
+    scenario = st.sidebar.text_input("Scenario Name", 
+        value="COVID Model")
+    
     n_days = st.sidebar.number_input(
         "Number of days to project",
         min_value=30,
@@ -235,6 +242,9 @@ def display_sidebar(st, d: Constants) -> Parameters:
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
         ventilated=RateLos(ventilated_rate, ventilated_los),
+
+        author = author,
+        scenario = scenario,
     )
 
 
@@ -455,3 +465,101 @@ def build_download_link(st, filename: str, df: pd.DataFrame, parameters: Paramet
     st.markdown("""
         <a download="{filename}" href="data:file/csv;base64,{csv}">Download full table as CSV</a>
 """.format(csv=csv,filename=filename), unsafe_allow_html=True)
+
+def build_data_and_params(projection_admits, census_df, model, parameters):
+    # taken from admissions table function:
+    admits_table = projection_admits[np.mod(projection_admits.index, 1) == 0].copy()
+    admits_table["day"] = admits_table.index
+    admits_table.index = range(admits_table.shape[0])
+    admits_table = admits_table.fillna(0).astype(int)
+    # Add date info
+    admits_table = add_date_column(
+        admits_table, drop_day_column=True, date_format="%Y-%m-%d"
+    )
+    admits_table.rename(parameters.labels)
+
+    # taken from census table function:
+    census_table = census_df[np.mod(census_df.index, 1) == 0].copy()
+    census_table.index = range(census_table.shape[0])
+    census_table.loc[0, :] = 0
+    census_table = census_table.dropna().astype(int)
+    census_table.rename(parameters.labels)
+    
+    # taken from raw sir table function:
+    projection_area = model.raw_df
+    infect_table = (projection_area.iloc[::1, :]).apply(np.floor)
+    infect_table.index = range(infect_table.shape[0])
+    infect_table["day"] = infect_table.day.astype(int)
+
+    # Build full dataset
+    df = admits_table.copy()
+    df = df.rename(columns = {
+        "date": "Date",
+        "hospitalized": "HospitalAdmissions", 
+        "icu": "ICUAdmissions", 
+        "ventilated": "VentilatedAdmissions"}, )
+    
+    df["HospitalCensus"] = census_table["hospitalized"]
+    df["ICUCensus"] = census_table["icu"]
+    df["VentilatedCensus"] = census_table["ventilated"]
+
+    df["Susceptible"] = infect_table["susceptible"]
+    df["Infections"] = infect_table["infected"]
+    df["Recovered"] = infect_table["recovered"]
+
+    df["Author"] = parameters.author
+    df["Scenario"] = parameters.scenario
+    df["DateGenerated"] = datetime.now().isoformat()
+
+    df["CurrentlyHospitalizedCovidPatients"] = parameters.current_hospitalized
+    df["DoublingTimeBeforeSocialDistancing"] = parameters.doubling_time
+    df["SocialDistancingPercentReduction"] = parameters.relative_contact_rate
+    
+    df["HospitalizationPercentage"] = parameters.hospitalized.rate
+    df["ICUPercentage"] = parameters.icu.rate
+    df["VentilatedPercentage"] = parameters.ventilated.rate
+
+    df["HospitalLengthOfStay"] = parameters.hospitalized.length_of_stay
+    df["ICULengthOfStay"] = parameters.icu.length_of_stay
+    df["VentLengthOfStay"] = parameters.ventilated.length_of_stay
+
+    df["HospitalMarketShare"] = parameters.market_share
+    df["RegionalPopulation"] = parameters.relative_contact_rate
+    df["CurrentlyKnownRegionalInfections"] = parameters.known_infected
+    
+    # Reorder columns
+    df = df[[
+        "Author", 
+        "Scenario", 
+        "DateGenerated",
+
+        "CurrentlyHospitalizedCovidPatients",
+        "DoublingTimeBeforeSocialDistancing",
+        "SocialDistancingPercentReduction",
+
+        "HospitalizationPercentage",
+        "ICUPercentage",
+        "VentilatedPercentage",
+
+        "HospitalLengthOfStay",
+        "ICULengthOfStay",
+        "VentLengthOfStay",
+
+        "HospitalMarketShare",
+        "RegionalPopulation",
+        "CurrentlyKnownRegionalInfections",
+
+        "Date",
+        "HospitalAdmissions", 
+        "ICUAdmissions", 
+        "VentilatedAdmissions",
+
+        "HospitalCensus",
+        "ICUCensus",
+        "VentilatedCensus",
+
+        "Susceptible",
+        "Infections",
+        "Recovered"
+        ]]
+    return(df)
