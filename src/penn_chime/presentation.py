@@ -76,9 +76,9 @@ outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effect
             r_naught=m.r_naught,
             doubling_time=p.doubling_time,
             relative_contact_rate=p.relative_contact_rate,
-            r_t=p.r_t,
-            doubling_time_t=abs(p.doubling_time_t),
-            impact_statement=("halves the infections every" if p.r_t < 1 else "reduces the doubling time to")
+            r_t=m.r_t,
+            doubling_time_t=abs(m.doubling_time_t),
+            impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to")
         )
     )
 

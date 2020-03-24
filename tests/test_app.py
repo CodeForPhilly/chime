@@ -76,7 +76,7 @@ def test_the_rest_of_header_shows_up():
 def test_mitigation_statement():
     st.cleanup()
     expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
-    display_header(st, PARAM)
+    display_header(st, MODEL, PARAM)
     assert len((list(filter(lambda s: expected_doubling in s, st.render_store))))
     st.cleanup()
     expected_halving = "outbreak **halves the infections every 51.9** days"
@@ -92,7 +92,7 @@ def test_mitigation_statement():
         ventilated=RateLos(0.01, 10),
         n_days=60,
     )
-    display_header(st, halving_params)
+    display_header(st, MODEL, halving_params)
     assert len((list(filter(lambda s: expected_halving in s, st.render_store))))
     st.cleanup()
 
