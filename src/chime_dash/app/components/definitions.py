@@ -4,16 +4,19 @@ from typing import List
 
 from dash.development.base_component import ComponentMeta
 
-from chime_dash.app.utils.templates import read_localization_markdown
 from dash_core_components import Markdown
 
+from chime_dash.app.components.base import Component
 
-LOCALIZATION_FILE = "definitions.md"
 
-
-def setup(language: str) -> List[ComponentMeta]:
-    """Initializes the header dash html
+class Definitions(Component):
     """
-    content = read_localization_markdown(LOCALIZATION_FILE, language)
+    """
 
-    return [Markdown(content)]
+    localization_file = "definitions.md"
+
+    def get_html(self) -> List[ComponentMeta]:
+        """Initializes the header dash html
+        """
+
+        return [Markdown(self.content)]

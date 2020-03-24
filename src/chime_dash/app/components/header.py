@@ -5,31 +5,36 @@ from typing import List
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Div, A
 
-from chime_dash.app.utils.templates import read_localization_yaml
+from chime_dash.app.components.base import Component
 
 LOCALIZATION_FILE = "header.yml"
 
 
-def setup(language: str) -> List[ComponentMeta]:
-    """Initializes the header dash html
+class Header(Component):
     """
-    content = read_localization_yaml(LOCALIZATION_FILE, language)
+    """
 
-    return [
-        Div(
-            className="penn-medicine-header__content",
-            children=[
-                A(
-                    href="https://www.pennmedicine.org",
-                    className="penn-medicine-header__logo",
-                    title=content["logo-title"],
-                    children=content["logo-text"],
-                ),
-                A(
-                    className="penn-medicine-header__title",
-                    id="title",
-                    children=content["title"],
-                ),
-            ],
-        )
-    ]
+    localization_file = "header.yml"
+
+    def get_html(self) -> List[ComponentMeta]:
+        """Initializes the header dash html
+        """
+        content = self.content
+        return [
+            Div(
+                className="penn-medicine-header__content",
+                children=[
+                    A(
+                        href="https://www.pennmedicine.org",
+                        className="penn-medicine-header__logo",
+                        title=content["logo-title"],
+                        children=content["logo-text"],
+                    ),
+                    A(
+                        className="penn-medicine-header__title",
+                        id="title",
+                        children=content["title"],
+                    ),
+                ],
+            )
+        ]

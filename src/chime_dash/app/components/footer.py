@@ -5,14 +5,13 @@ from typing import List
 from dash.development.base_component import ComponentMeta
 from dash_core_components import Markdown
 
-from chime_dash.app.utils.templates import read_localization_markdown
-
-LOCALIZATION_FILE = "footer.md"
+from chime_dash.app.components.base import Component
 
 
-def setup(language: str) -> List[ComponentMeta]:
-    """Initializes the header dash html
-    """
-    content = read_localization_markdown(LOCALIZATION_FILE, language)
+class Footer(Component):
+    localization_file = "footer.md"
 
-    return [Markdown(content)]
+    def get_html(self) -> List[ComponentMeta]:
+        """Initializes the header dash html
+        """
+        return [Markdown(self.content)]
