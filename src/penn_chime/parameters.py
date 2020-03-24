@@ -103,7 +103,7 @@ class Parameters:
             self.n_days = n_days
 
         self.daily_growth = daily_growth_helper(self.doubling_time)
-        self.daily_growth_t = power(2, 1.9 / self.doubling_time_t)
+        self.daily_growth_t = daily_growth_helper(self.doubling_time_t)
 
     @property
     def n_days(self):
