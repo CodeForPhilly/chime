@@ -10,7 +10,7 @@ from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 from penn_chime.defaults import RateLos, Constants
 from penn_chime.parameters import Parameters
 
-from chime_dash.app.utils import read_localization_yaml
+from chime_dash.app.utils.templates import read_localization_yaml
 
 LOCALIZATION_FILE = "sidebar.yml"
 

@@ -11,7 +11,7 @@ from pandas import DataFrame
 
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
 
-TEMPLATE_DIR = path.join(path.abspath(path.dirname(__file__)), "static")
+TEMPLATE_DIR = path.join(path.abspath(path.dirname(__file__)), "templates")
 
 
 def read_localization_yaml(file: str, language: str) -> Dict[str, Any]:
@@ -19,7 +19,7 @@ def read_localization_yaml(file: str, language: str) -> Dict[str, Any]:
 
     Arguments:
         file: Name of the section plus `.yml`
-        langage: Localization info
+        language: Localization info
 
     Raises:
         KeyError: If no template for file/language exists.
@@ -27,7 +27,7 @@ def read_localization_yaml(file: str, language: str) -> Dict[str, Any]:
     file_address = path.join(TEMPLATE_DIR, language, file)
     if not path.exists(file_address):
         raise KeyError(
-            "No template found for langage '{language}' and section '{file}'".format(
+            "No template found for language '{language}' and section '{file}'".format(
                 file=file, language=language
             )
         )
@@ -42,7 +42,7 @@ def read_localization_markdown(file: str, language: str) -> str:
 
     Arguments:
         file: Name of the section plus `.md`
-        langage: Localization info
+        language: Localization info
 
     Raises:
         KeyError: If no template for file/language exists.
