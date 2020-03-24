@@ -14,7 +14,7 @@ However, these 2 types of issue reports are very welcome:
 - Bugs causing this model to produce invalid results. In this case, please include details and a suggested fix.
 - If this model is producing a significantly different result than another well-known epidemiological model. In this case, please include proof of this difference and a suggested fix to our approach.
 
-For questions or early discussion, please join us in #chime-analysis in Slack instead.
+For questions or early discussion, please join us in [#chime-analysis](https://codeforphilly.org/chat?channel=chime-analysis) in Slack instead.
 -->
 
 ### Summary
