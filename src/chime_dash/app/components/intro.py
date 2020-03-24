@@ -76,11 +76,11 @@ class ToolDetails(Component):
             Markdown(id="more-intro", dangerously_allow_html=True),
         ]
 
-    def callback(self, pars: Parameters, **kwargs) -> List[Any]:
+    def callback(self, *args, **kwargs) -> List[Any]:
         """Renders the parameter dependent values in the introduction markdown
         """
+        pars = kwargs["pars"]
         tool_details = read_localization_markdown(LOCALIZATION_FILE_2, self.language)
-
         regions = "- " + "| \n".join(
             f"{key} = {value} "
             for key, value in self.defaults.region.__dict__.items()

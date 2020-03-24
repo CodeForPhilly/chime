@@ -15,7 +15,7 @@ from dash_html_components import Script, Div
 
 from penn_chime.defaults import Constants
 
-from chime_dash.app.components.base import Component
+from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.sidebar import Sidebar
 from chime_dash.app.components.intro import Intro, ToolDetails
 from chime_dash.app.components.additions import Additions
@@ -96,6 +96,9 @@ class Body(Component):
 
         callback_returns = []
         for component in self.components.values():
-            callback_returns += component.callback(**kwargs)
+            try:
+                callback_returns += component.callback(**kwargs)
+            except Exception as error:
+                raise HTMLComponentError(component, error)
 
         return callback_returns
