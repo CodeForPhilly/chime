@@ -1,6 +1,6 @@
 """Initializes the  dash html
 """
-from typing import List, Any, Dict
+from typing import List, Any
 
 from pandas import DataFrame
 
@@ -13,85 +13,81 @@ from dash_bootstrap_components import Table
 from penn_chime.utils import add_date_column
 from penn_chime.parameters import Parameters
 
-from chime_dash.app.utils.templates import read_localization_yaml, df_to_html_table
+from chime_dash.app.utils.templates import df_to_html_table
 from chime_dash.app.services.plotting import plot_dataframe
 
+from chime_dash.app.components.base import Component
 
-LOCALIZATION_FILE = "additions.yml"
 
-
-def setup(language: str) -> List[ComponentMeta]:
-    """Initializes the header dash html
+class Additions(Component):
     """
-    return [Div(id="additions")]
-
-
-CALLBACK_OUTPUTS = [Output(component_id="additions", component_property="children")]
-
-
-def render(
-    language: str,
-    pars: Parameters,
-    as_date: bool = False,
-    show_tables: bool = False,
-    show_additions: bool = False,
-) -> List[Any]:
-    """Renders the parameter dependent plots and tables
     """
-    if show_additions:
-        content = read_localization_yaml(LOCALIZATION_FILE, language)
-        title = content["infected-v-revovered-title"]
 
-        time_evolution = _build_frame(pars, content, as_date)
+    localization_file = "additions.yml"
+    callback_outputs = [Output(component_id="additions", component_property="children")]
 
-        time_evolution_data = plot_dataframe(
-            time_evolution.drop(columns=content["susceptible"]),
-            max_y_axis=pars.max_y_axis,
+    def get_html(self) -> List[ComponentMeta]:
+        """Initializes the header dash html
+        """
+        return [Div(id="additions")]
+
+    def callback(self, *args, **kwargs) -> List[Any]:
+        """Renders the parameter dependent plots and tables
+        """
+        pars = kwargs["pars"]
+
+        if kwargs["show_additional_projections"]:
+            title = self.content["infected-v-revovered-title"]
+
+            time_evolution = self._build_frame(pars, kwargs["as_date"])
+
+            time_evolution_data = plot_dataframe(
+                time_evolution.drop(columns=self.content["susceptible"]),
+                max_y_axis=pars.max_y_axis,
+            )
+
+            children = [
+                H4(title, id="infected-v-revovered-title"),
+                Graph(figure=time_evolution_data, id="infected-v-revovered-graph"),
+            ]
+
+            if kwargs["show_tables"]:
+                if kwargs["as_date"]:
+                    time_evolution.index = time_evolution.index.strftime("%b, %d")
+                time_evolution_table_data = (
+                    df_to_html_table(time_evolution, data_only=True, n_mod=7)
+                    if kwargs["show_tables"]
+                    else {}
+                )
+                children.append(
+                    Table(time_evolution_table_data, id="infected-v-revovered-table")
+                )
+
+        else:
+            children = []
+
+        return [children]
+
+    def _build_frame(self, pars: Parameters, as_date: bool = False):
+
+        # Prepare admissions data & census data
+        time_evolution = DataFrame(
+            {
+                "susceptible": pars.susceptible_v,
+                "infected": pars.infected_v,
+                "recovered": pars.recovered_v,
+            }
         )
+        time_evolution["day"] = time_evolution.index
 
-        children = [
-            H4(title, id="infected-v-revovered-title"),
-            Graph(figure=time_evolution_data, id="infected-v-revovered-graph"),
-        ]
+        # Convert columns
+        if as_date:
+            time_evolution = add_date_column(
+                time_evolution, drop_day_column=True
+            ).set_index("date")
+        else:
+            time_evolution = time_evolution.set_index("day")
 
-        if show_tables:
-            if as_date:
-                time_evolution.index = time_evolution.index.strftime("%b, %d")
-            time_evolution_table_data = (
-                df_to_html_table(time_evolution, data_only=True, n_mod=7)
-                if show_tables
-                else {}
-            )
-            children.append(
-                Table(time_evolution_table_data, id="infected-v-revovered-table")
-            )
-
-    else:
-        children = []
-
-    return (children,)
-
-
-def _build_frame(pars: Parameters, content: Dict[str, str], as_date: bool = False):
-
-    # Prepare admissions data & census data
-    time_evolution = DataFrame(
-        {
-            "susceptible": pars.susceptible_v,
-            "infected": pars.infected_v,
-            "recovered": pars.recovered_v,
-        }
-    )
-    time_evolution["day"] = time_evolution.index
-
-    # Convert columns
-    if as_date:
-        time_evolution = add_date_column(
-            time_evolution, drop_day_column=True
-        ).set_index("date")
-    else:
-        time_evolution = time_evolution.set_index("day")
-
-    return time_evolution.rename(
-        columns={key: content[key] for key in time_evolution.columns}
-    ).astype(int)
+        return time_evolution.rename(
+            columns={key: self.content[key] for key in time_evolution.columns}
+        ).astype(int)

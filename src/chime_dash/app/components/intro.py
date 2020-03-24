@@ -30,9 +30,10 @@ class Intro(Component):
             Markdown(id="intro", dangerously_allow_html=True, dedent=True),
         ]
 
-    def callback(self, pars: Parameters, **kwargs):
+    def callback(self, *args, **kwargs):
         """
         """
+        pars = kwargs["pars"]
         intro = read_localization_markdown(LOCALIZATION_FILE_1, self.language)
         detection_prob_str = (
             "{detection_probability:.0%}".format(

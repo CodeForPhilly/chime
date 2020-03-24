@@ -79,7 +79,8 @@ class Visualizations(Component):
 
         return (admissions_data, admissions_table_data, census_data, census_table_data)
 
-    def _build_frames(self, pars: Parameters, as_date: bool = False):
+    @staticmethod
+    def _build_frames(pars: Parameters, as_date: bool = False):
 
         # Prepare admissions data & census data
         projection_admits = build_admissions_df(pars)

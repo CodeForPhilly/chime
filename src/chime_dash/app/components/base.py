@@ -35,12 +35,14 @@ class Component(ABC):
         self.defaults = defaults
         self._content = None
 
-    def callback(self, *args, **kwargs) -> List[Dict[str, Any]]:
+    def callback(  # pylint: disable=W0613, R0201
+        self, *args, **kwargs
+    ) -> List[Dict[str, Any]]:
         """
         """
         return []
 
-    def get_html(self) -> List[ComponentMeta]:
+    def get_html(self) -> List[ComponentMeta]:  # pylint: disable=R0201
         """
         """
         return Div("")
