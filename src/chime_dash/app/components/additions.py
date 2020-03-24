@@ -39,7 +39,7 @@ class Additions(Component):
         if kwargs["show_additional_projections"]:
             title = self.content["infected-v-revovered-title"]
 
-            time_evolution = self._build_frame(pars, kwargs["as_date"])
+            time_evolution = self._build_frame(**kwargs)
 
             time_evolution_data = plot_dataframe(
                 time_evolution.drop(columns=self.content["susceptible"]),
@@ -68,20 +68,14 @@ class Additions(Component):
 
         return [children]
 
-    def _build_frame(self, pars: Parameters, as_date: bool = False):
+    def _build_frame(self, **kwargs):
 
         # Prepare admissions data & census data
-        time_evolution = DataFrame(
-            {
-                "susceptible": pars.susceptible_v,
-                "infected": pars.infected_v,
-                "recovered": pars.recovered_v,
-            }
-        )
+        time_evolution = kwargs["model"].raw_df
         time_evolution["day"] = time_evolution.index
 
         # Convert columns
-        if as_date:
+        if kwargs["as_date"]:
             time_evolution = add_date_column(
                 time_evolution, drop_day_column=True
             ).set_index("date")

@@ -8,7 +8,6 @@ from dash_html_components import H2
 from dash_core_components import Markdown, Graph
 from dash_bootstrap_components import Table
 
-from penn_chime.models import build_admissions_df, build_census_df
 from penn_chime.utils import add_date_column
 from penn_chime.parameters import Parameters
 
@@ -49,7 +48,7 @@ class Visualizations(Component):
         """Renders the parameter dependent plots and tables
         """
         pars = kwargs.get("pars")
-        projection_admits, census_df = self._build_frames(pars, kwargs["as_date"])
+        projection_admits, census_df = self._build_frames(**kwargs)
 
         # Create admissions figure
         admissions_data = plot_dataframe(
@@ -80,14 +79,14 @@ class Visualizations(Component):
         return (admissions_data, admissions_table_data, census_data, census_table_data)
 
     @staticmethod
-    def _build_frames(pars: Parameters, as_date: bool = False):
+    def _build_frames(**kwargs):
 
         # Prepare admissions data & census data
-        projection_admits = build_admissions_df(pars)
-        census_df = build_census_df(projection_admits, pars)
+        projection_admits = kwargs["model"].admits_df.copy()
+        census_df = kwargs["model"].census_df.copy()
 
         # Convert columns
-        if as_date:
+        if kwargs["as_date"]:
             projection_admits = add_date_column(
                 projection_admits, drop_day_column=True
             ).set_index("date")

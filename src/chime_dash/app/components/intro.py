@@ -37,14 +37,14 @@ class Intro(Component):
         intro = read_localization_markdown(LOCALIZATION_FILE_1, self.language)
         detection_prob_str = (
             "{detection_probability:.0%}".format(
-                detection_probability=pars.detection_probability
+                detection_probability=kwargs["model"].detection_probability
             )
-            if pars.detection_probability is not None
+            if kwargs["model"].detection_probability is not None
             else "?"
         )
         return [
             intro.format(
-                total_infections=pars.infected,
+                total_infections=kwargs["model"].infected,
                 initial_infections=pars.known_infected,
                 detection_prob_str=detection_prob_str,
                 current_hosp=pars.current_hospitalized,
@@ -52,11 +52,11 @@ class Intro(Component):
                 S=pars.susceptible,
                 market_share=pars.market_share,
                 recovery_days=pars.recovery_days,
-                r_naught=pars.r_naught,
-                doubling_time=pars.doubling_time,
+                r_naught=kwargs["model"].r_naught,
+                doubling_time=kwargs["pars"].doubling_time,
                 relative_contact_rate=pars.relative_contact_rate,
-                r_t=pars.r_t,
-                doubling_time_t=pars.doubling_time_t,
+                r_t=kwargs["model"].r_t,
+                doubling_time_t=kwargs["model"].doubling_time_t,
             )
         ]
 
@@ -91,10 +91,10 @@ class ToolDetails(Component):
                 regions=regions,
                 recovery_days=int(pars.doubling_time),
                 doubling_time=pars.doubling_time,
-                r_naught=pars.r_naught,
+                r_naught=kwargs["model"].r_naught,
                 relative_contact_rate=pars.relative_contact_rate,
-                doubling_time_t=pars.doubling_time_t,
-                r_t=pars.r_t,
+                doubling_time_t=kwargs["model"].doubling_time_t,
+                r_t=kwargs["model"].r_t,
             )
             if kwargs["show_tool_details"]
             else ""

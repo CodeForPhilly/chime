@@ -14,6 +14,8 @@ from dash_bootstrap_components.themes import BOOTSTRAP
 from dash_html_components import Script, Div
 
 from penn_chime.defaults import Constants
+from penn_chime.models import SimSirModel
+
 
 from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.sidebar import Sidebar
@@ -94,6 +96,7 @@ class Body(Component):
         """
         kwargs = dict(zip(self.callback_inputs, args))
         pars = self.components["sidebar"].parse_form_parameters(**kwargs)
+        kwargs["model"] = SimSirModel(pars)
         kwargs["pars"] = pars
 
         callback_returns = []
