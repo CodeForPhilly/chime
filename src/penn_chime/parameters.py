@@ -4,13 +4,17 @@ Changes affecting results or their presentation should also update
 `change_date`, so users can see when results have last changed
 """
 
-from numpy import log2  # type: ignore
+from numpy import log2, power  # type: ignore
 
 from .utils import RateLos
 from .models import (
     get_dispositions,
     sim_sir,
 )
+
+
+def daily_growth_helper(doubling_time):
+    return (power(2, 1.0 / doubling_time) - 1) * 100
 
 
 class Parameters:
@@ -97,6 +101,9 @@ class Parameters:
 
         if n_days is not None:
             self.n_days = n_days
+
+        self.daily_growth = daily_growth_helper(self.doubling_time)
+        self.daily_growth_t = power(2, 1.9 / self.doubling_time_t)
 
     @property
     def n_days(self):
