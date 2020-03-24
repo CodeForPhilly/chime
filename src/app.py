@@ -15,6 +15,7 @@ from penn_chime.presentation import (
     show_more_info_about_this_tool,
     write_definitions,
     write_footer,
+    build_data_and_params
 )
 from penn_chime.settings import DEFAULTS
 from penn_chime.models import SimSirModel
@@ -90,5 +91,14 @@ if st.checkbox("Show Additional Projections"):
     )
     if st.checkbox("Show Raw SIR Simulation Data"):
         draw_raw_sir_simulation_table(st, model=m, parameters=p)
+
+
+# st.markdown("params: {n}".format(n=p))
+df = build_data_and_params(projection_admits = m.admits_df, 
+                           census_df = m.census_df, 
+                           model = m, 
+                           parameters = p)
+st.table(df)
+
 write_definitions(st)
 write_footer(st)

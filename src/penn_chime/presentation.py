@@ -456,3 +456,64 @@ def build_download_link(st, filename: str, df: pd.DataFrame, parameters: Paramet
     st.markdown("""
         <a download="{filename}" href="data:file/csv;base64,{csv}">Download full table as CSV</a>
 """.format(csv=csv,filename=filename), unsafe_allow_html=True)
+
+def build_data_and_params(projection_admits, census_df, model, parameters):
+    # taken from admissions table function:
+    admits_table = projection_admits[np.mod(projection_admits.index, 1) == 0].copy()
+    admits_table["day"] = admits_table.index
+    admits_table.index = range(admits_table.shape[0])
+    admits_table = admits_table.fillna(0).astype(int)
+    # Add date info
+    admits_table = add_date_column(
+        admits_table, drop_day_column=True, date_format=DATE_FORMAT
+    )
+    admits_table.rename(parameters.labels)
+
+    # taken from census table function:
+    census_table = census_df[np.mod(census_df.index, 1) == 0].copy()
+    census_table.index = range(census_table.shape[0])
+    census_table.loc[0, :] = 0
+    census_table = census_table.dropna().astype(int)
+    census_table.rename(parameters.labels)
+    
+    # taken from raw sir table function:
+    projection_area = model.raw_df
+    infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
+    infect_table.index = range(infect_table.shape[0])
+    infect_table["day"] = infect_table.day.astype(int)
+
+    # Build full dataset
+    df = admits_table.copy()
+    df = df.rename(columns = {
+        "hospitalized": "hospital_admissions", 
+        "icu": "icu_admissions", 
+        "ventilated": "ventilated_admissions"}, )
+    
+    df["hospital_census"] = census_table["hospitalized"]
+    df["icu_census"] = census_table["icu"]
+    df["ventilated_census"] = census_table["ventilated"]
+
+    df["susceptible"] = infect_table["susceptible"]
+    df["infections"] = infect_table["infected"]
+    df["recovered"] = infect_table["recovered"]
+
+    df["Author"] = "Jane Doe"
+    df["DateGenerated"] = "today"
+
+    df["CurrentlyHospitalizedCovidPatients"] = parameters.current_hospitalized
+    df["DoublingTimeBeforeSocialDistancing"] = parameters.doubling_time
+    df["SocialDistancingPercentReduction"] = "todo"
+    
+    df["HospitalizationPercentage"] = parameters.known_infected
+    df["ICUPercentage"] = parameters.relative_contact_rate
+    df["VentilatedPercentage"] = parameters.susceptible
+
+    df["HospitalLengthOfStay"] = parameters.known_infected
+    df["ICULengthOfStay"] = parameters.relative_contact_rate
+    df["VentLengthOfStay"] = parameters.susceptible
+
+    df["HospitalMarketShare"] = parameters.market_share
+    df["RegionalPopulation"] = parameters.relative_contact_rate
+    df["CurrentlyKnownRegionalInfections"] = parameters.susceptible
+
+    return(df)
