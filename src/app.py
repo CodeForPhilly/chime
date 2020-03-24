@@ -23,8 +23,9 @@ from penn_chime.charts import (
     additional_projections_chart,
     admitted_patients_chart,
     new_admissions_chart,
-    chart_descriptions
+    chart_descriptions,
 )
+from penn_chime.utils import dataframe_to_base64
 
 # This is somewhat dangerous:
 # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
@@ -93,12 +94,24 @@ if st.checkbox("Show Additional Projections"):
         draw_raw_sir_simulation_table(st, model=m, parameters=p)
 
 
-# st.markdown("params: {n}".format(n=p))
+st.header("Export Full Data and Parameters")
 df = build_data_and_params(projection_admits = m.admits_df, 
                            census_df = m.census_df, 
                            model = m, 
                            parameters = p)
-st.table(df)
+
+if st.checkbox("Show full data and parameters to be exported"):
+    st.dataframe(df)
+
+if p.author == "Jane Doe" or p.scenario == "COVID Model":
+    st.markdown("""
+    **Enter a unique author name and scenario name to enable downloading.**""")
+else:
+    filename = p.author + "_" + p.scenario + "_" + df.loc[0, "Date"] + ".csv"
+    csv = dataframe_to_base64(df)
+    st.markdown("""
+            <a download="{filename}" href="data:file/csv;base64,{csv}">Download full table as CSV</a>
+    """.format(csv=csv,filename=filename), unsafe_allow_html=True)
 
 write_definitions(st)
 write_footer(st)

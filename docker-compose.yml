@@ -5,4 +5,4 @@ services:
     build: .
     restart: always
     ports:
-      - "${PORT}:8000"
+      - "${PORT}:80"

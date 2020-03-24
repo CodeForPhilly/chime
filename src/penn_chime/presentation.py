@@ -1,6 +1,7 @@
 """effectful functions for streamlit io"""
 
 from typing import Optional
+from datetime import datetime
 
 import altair as alt  # type: ignore
 import numpy as np  # type: ignore
@@ -98,6 +99,12 @@ def display_sidebar(st, d: Constants) -> Parameters:
     if uploaded_file is not None:
         d, raw_imported = constants_from_uploaded_file(uploaded_file)
 
+    author = st.sidebar.text_input("Author Name", 
+        value="Jane Doe")
+    
+    scenario = st.sidebar.text_input("Scenario Name", 
+        value="COVID Model")
+    
     n_days = st.sidebar.number_input(
         "Number of days to project",
         min_value=30,
@@ -245,6 +252,9 @@ def display_sidebar(st, d: Constants) -> Parameters:
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
         ventilated=RateLos(ventilated_rate, ventilated_los),
+
+        author = author,
+        scenario = scenario,
     )
 
 
@@ -475,7 +485,7 @@ def build_data_and_params(projection_admits, census_df, model, parameters):
     admits_table = admits_table.fillna(0).astype(int)
     # Add date info
     admits_table = add_date_column(
-        admits_table, drop_day_column=True, date_format=DATE_FORMAT
+        admits_table, drop_day_column=True, date_format="%Y-%m-%d"
     )
     admits_table.rename(parameters.labels)
 
@@ -488,42 +498,79 @@ def build_data_and_params(projection_admits, census_df, model, parameters):
     
     # taken from raw sir table function:
     projection_area = model.raw_df
-    infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
+    infect_table = (projection_area.iloc[::1, :]).apply(np.floor)
     infect_table.index = range(infect_table.shape[0])
     infect_table["day"] = infect_table.day.astype(int)
 
     # Build full dataset
     df = admits_table.copy()
     df = df.rename(columns = {
-        "hospitalized": "hospital_admissions", 
-        "icu": "icu_admissions", 
-        "ventilated": "ventilated_admissions"}, )
+        "date": "Date",
+        "hospitalized": "HospitalAdmissions", 
+        "icu": "ICUAdmissions", 
+        "ventilated": "VentilatedAdmissions"}, )
     
-    df["hospital_census"] = census_table["hospitalized"]
-    df["icu_census"] = census_table["icu"]
-    df["ventilated_census"] = census_table["ventilated"]
+    df["HospitalCensus"] = census_table["hospitalized"]
+    df["ICUCensus"] = census_table["icu"]
+    df["VentilatedCensus"] = census_table["ventilated"]
 
-    df["susceptible"] = infect_table["susceptible"]
-    df["infections"] = infect_table["infected"]
-    df["recovered"] = infect_table["recovered"]
+    df["Susceptible"] = infect_table["susceptible"]
+    df["Infections"] = infect_table["infected"]
+    df["Recovered"] = infect_table["recovered"]
 
-    df["Author"] = "Jane Doe"
-    df["DateGenerated"] = "today"
+    df["Author"] = parameters.author
+    df["Scenario"] = parameters.scenario
+    df["DateGenerated"] = datetime.now().isoformat()
 
     df["CurrentlyHospitalizedCovidPatients"] = parameters.current_hospitalized
     df["DoublingTimeBeforeSocialDistancing"] = parameters.doubling_time
-    df["SocialDistancingPercentReduction"] = "todo"
+    df["SocialDistancingPercentReduction"] = parameters.relative_contact_rate
     
-    df["HospitalizationPercentage"] = parameters.known_infected
-    df["ICUPercentage"] = parameters.relative_contact_rate
-    df["VentilatedPercentage"] = parameters.susceptible
+    df["HospitalizationPercentage"] = parameters.hospitalized.rate
+    df["ICUPercentage"] = parameters.icu.rate
+    df["VentilatedPercentage"] = parameters.ventilated.rate
 
-    df["HospitalLengthOfStay"] = parameters.known_infected
-    df["ICULengthOfStay"] = parameters.relative_contact_rate
-    df["VentLengthOfStay"] = parameters.susceptible
+    df["HospitalLengthOfStay"] = parameters.hospitalized.length_of_stay
+    df["ICULengthOfStay"] = parameters.icu.length_of_stay
+    df["VentLengthOfStay"] = parameters.ventilated.length_of_stay
 
     df["HospitalMarketShare"] = parameters.market_share
     df["RegionalPopulation"] = parameters.relative_contact_rate
-    df["CurrentlyKnownRegionalInfections"] = parameters.susceptible
+    df["CurrentlyKnownRegionalInfections"] = parameters.known_infected
+    
+    # Reorder columns
+    df = df[[
+        "Author", 
+        "Scenario", 
+        "DateGenerated",
 
+        "CurrentlyHospitalizedCovidPatients",
+        "DoublingTimeBeforeSocialDistancing",
+        "SocialDistancingPercentReduction",
+
+        "HospitalizationPercentage",
+        "ICUPercentage",
+        "VentilatedPercentage",
+
+        "HospitalLengthOfStay",
+        "ICULengthOfStay",
+        "VentLengthOfStay",
+
+        "HospitalMarketShare",
+        "RegionalPopulation",
+        "CurrentlyKnownRegionalInfections",
+
+        "Date",
+        "HospitalAdmissions", 
+        "ICUAdmissions", 
+        "VentilatedAdmissions",
+
+        "HospitalCensus",
+        "ICUCensus",
+        "VentilatedCensus",
+
+        "Susceptible",
+        "Infections",
+        "Recovered"
+        ]]
     return(df)
