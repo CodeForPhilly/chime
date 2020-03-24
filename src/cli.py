@@ -9,8 +9,8 @@ from datetime import datetime
 from pandas import DataFrame
 
 from penn_chime.parameters import Parameters
-from penn_chime.utils import build_admissions_df, build_census_df, RateLos
-
+from penn_chime.utils import RateLos
+from penn_chime.models import build_admissions_df, build_census_df
 
 class FromFile(Action):
     """From File."""
@@ -123,8 +123,9 @@ def main():
             "Recovered": p.recovered_v,
         }
     )
-    admits_df = build_admissions_df(p.n_days, *p.dispositions)
-    census_df = build_census_df(admits_df, *p.lengths_of_stay)
+
+    admits_df = build_admissions_df(p)
+    census_df = build_census_df(admits_df, p)
 
     prefix = a.prefix
     for df, name in (
