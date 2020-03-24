@@ -1,4 +1,5 @@
 [server]
 headless = true
 enableCORS = false
-port = 8000
+port = 80
+baseUrlPath = "/chime"
