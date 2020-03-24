@@ -13,8 +13,8 @@ from dash_bootstrap_components import Table
 from penn_chime.utils import add_date_column
 from penn_chime.parameters import Parameters
 
-from chime_dash.utils import read_localization_yaml, df_to_html_table
-from chime_dash.plotting import plot_dataframe
+from chime_dash.app.utils import read_localization_yaml, df_to_html_table
+from chime_dash.app.services.plotting import plot_dataframe
 
 
 LOCALIZATION_FILE = "additions.yml"

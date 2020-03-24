@@ -5,7 +5,7 @@ from typing import List
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Div, A
 
-from chime_dash.utils import read_localization_yaml
+from chime_dash.app.utils import read_localization_yaml
 
 LOCALIZATION_FILE = "header.yml"
 

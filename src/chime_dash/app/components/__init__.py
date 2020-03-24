@@ -14,13 +14,13 @@ from dash_html_components import Script
 
 from penn_chime.defaults import Constants
 
-from chime_dash.layout import sidebar
-from chime_dash.layout import header
-from chime_dash.layout import intro
-from chime_dash.layout import additions
-from chime_dash.layout import visualizations
-from chime_dash.layout import definitions
-from chime_dash.layout import footer
+from chime_dash.app.components import sidebar
+from chime_dash.app.components import header
+from chime_dash.app.components import intro
+from chime_dash.app.components import additions
+from chime_dash.app.components import visualizations
+from chime_dash.app.components import definitions
+from chime_dash.app.components import footer
 
 
 EXTERNAL_STYLESHEETS = [
