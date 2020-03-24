@@ -10,13 +10,17 @@ from numpy import mod
 from pandas import DataFrame
 
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
+from dash_bootstrap_components import FormGroup, Label, Input, Checklist
+
+from penn_chime.defaults import Constants
+
 
 TEMPLATE_DIR = path.join(
     path.abspath(path.dirname(path.dirname(__file__))), "templates"
 )
 
 
-def read_localization_yaml(file: str, language: str) -> Dict[str, Any]:
+def read_localization_yml(file: str, language: str) -> Dict[str, Any]:
     """Reads localization template.
 
     Arguments:
@@ -78,3 +82,79 @@ def df_to_html_table(
         ),
     ]
     return data if data_only else Table(data)
+
+
+def create_number_input(
+    idx: str, data: Dict[str, Any], content: Dict[str, str], defaults: Constants
+):
+    """Returns number formgroup for given form data.
+
+    Arguments:
+        idx: The name of the varibale (html id)
+        data: Input form kwargs.
+        content: Localization text
+        defaults: Constants to infer defaults
+    """
+    input_kwargs = data.copy()
+    input_kwargs.pop("percent", None)
+    if not "value" in input_kwargs:
+        input_kwargs["value"] = _get_default_values(
+            idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
+        )
+    return FormGroup(
+        children=[
+            Label(html_for=idx, children=content[idx]),
+            Input(id=idx, **input_kwargs),
+        ]
+    )
+
+
+def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str]):
+    """Returns switch for given form data.
+
+    Arguments:
+        idx: The name of the varibale (html id)
+        data: Input form kwargs.
+        content: Localization text
+        defaults: Constants to infer defaults
+    """
+    return Checklist(
+        id=idx,
+        switch=True,
+        options=[{"label": content[idx], "value": data.get("value", False)}],
+    )
+
+
+def _get_default_values(
+    key: str,
+    defaults: Constants,
+    min_val: Optional[float] = None,
+    max_val: Optional[float] = None,
+) -> float:
+    """Tries to infer default values given parameters.
+
+    Ensures that value is between min and max.
+    Min defaults to zero if not given. Max will be ignored if not given.
+
+    Arguments:
+        key: The name of the varibale (html id)
+        defaults: Constants to infer defaults
+        min_val: Min boundary of form
+        max_val: Max boundary of form
+    """
+    min_val = 0 if min_val is None else min_val
+
+    if "rate" in key:
+        split = key.split("_")
+        val = getattr(getattr(defaults, split[0], {}), "rate", min_val) * 100
+    elif "los" in key:
+        split = key.split("_")
+        val = getattr(getattr(defaults, split[0], {}), "length_of_stay", min_val)
+    elif "share" in key:
+        val = getattr(defaults, key, min_val) * 100
+    elif "susceptible" in key:
+        val = defaults.region.susceptible
+    else:
+        val = getattr(defaults, key, min_val)
+
+    return min(max_val, val) if max_val is not None else val

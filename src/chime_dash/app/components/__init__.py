@@ -7,6 +7,8 @@ To add or remove components, adjust the `setup`.
 If callbacks are present, also adjust `CALLBACK_INPUTS`, `CALLBACK_OUTPUTS` and
 `callback_body`.
 """
+from collections import OrderedDict
+
 from dash_bootstrap_components import Row, Col
 from dash_bootstrap_components.themes import BOOTSTRAP
 
@@ -14,74 +16,86 @@ from dash_html_components import Script
 
 from penn_chime.defaults import Constants
 
-from chime_dash.app.components import sidebar
-from chime_dash.app.components import header
-from chime_dash.app.components import intro
-from chime_dash.app.components import additions
-from chime_dash.app.components import visualizations
-from chime_dash.app.components import definitions
-from chime_dash.app.components import footer
-from chime_dash.app.components import navbar
+from chime_dash.app.components.base import Component
+from chime_dash.app.components.sidebar import Sidebar
+
+# from chime_dash.app.components.header import Header
+from chime_dash.app.components.intro import Intro, ToolDetails
+
+# from chime_dash.app.components.additions import Additions
+# from chime_dash.app.components.visualizations import Visualizations
+# from chime_dash.app.components.definitions import Definitions
+# from chime_dash.app.components.footer import Footer
+# from chime_dash.app.components.navbar import Navbar
 
 
-EXTERNAL_STYLESHEETS = [
-    "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css",
-    BOOTSTRAP,
-]
-EXTERNAL_SCRIPTS = []
-
-
-def setup(language: str, defaults: Constants):
-    """Glues individual setup components together
+class Body(Component):
     """
-    return Row(
-        children=[
-            Col(
-                id="sidebar",
-                children=sidebar.setup(language, defaults),
-                width=3,
-                className="mt-4",
-            ),
-            Col(width=1),
-            Col(
-                children=header.setup(language)
-                + intro.setup(language)
-                + visualizations.setup(language)
-                + additions.setup(language)
-                + definitions.setup(language)
-                + footer.setup(language),
-                width=8,
-                className="mt-4",
-            ),
-        ],
-        className="container",
-    )
-
-
-CALLBACK_INPUTS = sidebar.CALLBACK_INPUTS
-CALLBACK_OUTPUTS = (
-    intro.CALLBACK_OUTPUTS
-    + visualizations.CALLBACK_OUTPUTS
-    + additions.CALLBACK_OUTPUTS
-)
-
-
-def callback_body(*args, language="en", defaults: Constants):
-    """Glues together individual app callbacks
-
-    Sidebar provides all of the inputs.
     """
-    pars, kwargs = sidebar.parse_form_parameters(*args)
 
-    intro_md = intro.render(language, pars, kwargs, defaults)
-    visualizations_data = visualizations.render(
-        language, pars, as_date=kwargs["as_date"], show_tables=kwargs["show_tables"]
-    )
-    additions_data = additions.render(
-        language,
-        pars,
-        as_date=kwargs["as_date"],
-        show_tables=kwargs["show_tables"],
-        show_additions=kwargs["show_additional_projections"],
-    )
-    return intro_md + visualizations_data + additions_data
+    external_stylesheets = [
+        "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css",
+        BOOTSTRAP,
+    ]
+
+    def __init__(self, language, defaults):
+        """
+        """
+        super().__init__(language, defaults)
+        self.components = OrderedDict(
+            sidebar=Sidebar(language, defaults),
+            # header=Header(language, defaults),
+            intro=Intro(language, defaults),
+            tool_details=ToolDetails(language, defaults),
+            # visualizations=Visualizations(language, defaults),
+            # definitions=Definitions(language, defaults),
+            # footer=Footer(language, defaults),
+            # navbar=Navbar(language, defaults),
+        )
+        self.callback_outputs = []
+        self.callback_inputs = []
+        self.callback_keys = []
+        for component in self.components.values():
+            self.callback_outputs += component.callback_outputs
+            self.callback_inputs += component.callback_inputs
+            self.callback_keys += component.callback_keys
+
+    def get_html(self):
+        """Glues individual setup components together
+        """
+        return Row(
+            children=[
+                Col(
+                    id="sidebar",
+                    children=self.components["sidebar"].html,
+                    width=3,
+                    className="mt-4",
+                ),
+                Col(width=1),
+                Col(
+                    # children=self.components["header"].html
+                    self.components["intro"].html
+                    + self.components["tool_details"].html,
+                    # + self.components["visualizations"].html
+                    # + self.components["additions"].html
+                    # + self.components["definitions"].html
+                    # + self.components["footer"].html,
+                    width=8,
+                    className="mt-4",
+                ),
+            ],
+            className="container",
+        )
+
+    def callback(self, *args, **kwargs):
+        """
+        """
+        kwargs = dict(zip(self.callback_keys, args))
+        pars = self.components["sidebar"].parse_form_parameters(**kwargs)
+        kwargs["pars"] = pars
+
+        callback_returns = []
+        for component in self.components.values():
+            callback_returns += component.callback(**kwargs)
+
+        return callback_returns

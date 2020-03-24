@@ -1,12 +1,10 @@
 """Script which launches dash app
 """
 from dash import Dash
-from flask import Flask
 
 from penn_chime.settings import DEFAULTS
 
-from chime_dash.app.components import setup, EXTERNAL_STYLESHEETS, EXTERNAL_SCRIPTS
-from chime_dash.app.components import CALLBACK_INPUTS, CALLBACK_OUTPUTS, callback_body
+from chime_dash.app.components import Body
 
 LANGUAGE = "en"
 
@@ -14,16 +12,17 @@ LANGUAGE = "en"
 def main():
     """Starts a dash app
     """
+    body = Body(LANGUAGE, DEFAULTS)
     app = Dash(
         __name__,
-        external_stylesheets=EXTERNAL_STYLESHEETS,
-        external_scripts=EXTERNAL_SCRIPTS,
+        external_stylesheets=body.external_stylesheets,
+        external_scripts=body.external_scripts,
     )
-    app.layout = setup(LANGUAGE, DEFAULTS)
+    app.layout = body.html
 
-    @app.callback(CALLBACK_OUTPUTS, CALLBACK_INPUTS)
+    @app.callback(body.callback_outputs, body.callback_inputs)
     def callback(*args):  # pylint: disable=W0612
-        return callback_body(*args, language=LANGUAGE, defaults=DEFAULTS)
+        return body.callback(*args)
 
     app.run_server(debug=True)
 
