@@ -7,8 +7,6 @@ from dash_html_components import Div, A
 
 from chime_dash.app.components.base import Component
 
-LOCALIZATION_FILE = "header.yml"
-
 
 class Header(Component):
     """

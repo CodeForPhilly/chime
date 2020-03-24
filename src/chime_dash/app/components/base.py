@@ -101,7 +101,7 @@ class Component(ABC):
         Raises:
             Key error if unknown
         """
-        if self._content is not None:
+        if self._content is None:
             if self.localization_file is None:
                 self._content = {}
             else:
