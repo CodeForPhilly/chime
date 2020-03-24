@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # script/server: Launch the application and any extra required processes
 #                locally.
