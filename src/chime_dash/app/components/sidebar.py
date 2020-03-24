@@ -80,7 +80,7 @@ class Sidebar(Component):
             hospitalized=RateLos(
                 kwargs["hospitalized_rate"] / 100, kwargs["hospitalized_los"]
             ),
-            icu=RateLos(kwargs["icu_rate"], kwargs["icu_los"]),
+            icu=RateLos(kwargs["icu_rate"] / 100, kwargs["icu_los"]),
             ventilated=RateLos(
                 kwargs["ventilated_rate"] / 100, kwargs["ventilated_los"]
             ),
