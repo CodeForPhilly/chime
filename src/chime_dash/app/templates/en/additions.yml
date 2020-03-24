@@ -1,0 +1,8 @@
+infected-v-revovered-title: The number of infected and recovered individuals in the hospital catchment region at any given moment
+
+# Chart labels
+day: Day
+date: Date
+susceptible: Susceptible
+infected: Infected
+recovered: Recovered
