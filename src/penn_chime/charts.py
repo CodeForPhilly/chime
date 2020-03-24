@@ -1,9 +1,9 @@
 
 from math import ceil
 import datetime
+
 from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
-import numpy as np  # type: ignore
 
 from .parameters import Parameters
 from .utils import add_date_column
@@ -31,9 +31,10 @@ def new_admissions_chart(
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
+    # TODO fix the fold to allow any number of dispositions
     return (
         alt.Chart(projection_admits.head(plot_projection_days))
-        .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
+        .transform_fold(fold=["hospitalized", "icu", "ventilated"])
         .mark_line(point=True)
         .encode(
             x=alt.X(**x_kwargs),
@@ -71,9 +72,10 @@ def admitted_patients_chart(
         y_scale.domain = (0, max_y_axis)
         y_scale.clamp = True
 
+    # TODO fix the fold to allow any number of dispositions
     return (
         alt.Chart(census.head(plot_projection_days))
-        .transform_fold(fold=["Hospitalized", "ICU", "Ventilated"])
+        .transform_fold(fold=["hospitalized", "icu", "ventilated"])
         .mark_line(point=True)
         .encode(
             x=alt.X(**x_kwargs),
@@ -90,11 +92,15 @@ def admitted_patients_chart(
 
 
 def additional_projections_chart(
-    alt, parameters: Parameters
+    alt, model, parameters
 ) -> Chart:
-    i = parameters.infected_v
-    r = parameters.recovered_v
-    dat = pd.DataFrame({"Infected": i, "Recovered": r})
+
+    # TODO use subselect of df_raw instead of creating a new df
+    raw_df = model.raw_df
+    dat = pd.DataFrame({
+        "infected": raw_df.infected,
+        "recovered": raw_df.recovered
+    })
     dat["day"] = dat.index
 
     as_date = parameters.as_date
@@ -114,7 +120,7 @@ def additional_projections_chart(
 
     return (
         alt.Chart(dat)
-        .transform_fold(fold=["Infected", "Recovered"])
+        .transform_fold(fold=["infected", "recovered"])
         .mark_line()
         .encode(
             x=alt.X(**x_kwargs),
@@ -126,7 +132,7 @@ def additional_projections_chart(
     )
 
 
-def chart_descriptions(chart: Chart, suffix: str = ""):
+def chart_descriptions(chart: Chart, labels, suffix: str = ""):
     """
 
     :param chart: Chart: The alt chart to be used in finding max points
@@ -137,7 +143,7 @@ def chart_descriptions(chart: Chart, suffix: str = ""):
     """
     messages = []
 
-    cols = ["Hospitalized", "ICU", "Ventilated"]
+    cols = ["hospitalized", "icu", "ventilated"]
     asterisk = False
     day = "date" if "date" in chart.data.columns else "day"
 
@@ -153,7 +159,7 @@ def chart_descriptions(chart: Chart, suffix: str = ""):
 
         messages.append(
             "{}{} peaks at {:,} on day {}{}".format(
-                col,
+                labels[col],
                 suffix,
                 ceil(chart.data[col].max()),
                 on,
