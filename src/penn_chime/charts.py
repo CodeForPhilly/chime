@@ -21,7 +21,6 @@ def new_admissions_chart(
 
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = False
 
     tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
@@ -68,7 +67,6 @@ def admitted_patients_chart(
 
     if max_y_axis:
         y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = False
 
     return (
         alt.Chart(census.head(plot_projection_days))
@@ -109,7 +107,6 @@ def additional_projections_chart(
 
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = False
 
     return (
         alt.Chart(dat)
