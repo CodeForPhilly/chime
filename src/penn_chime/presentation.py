@@ -38,20 +38,10 @@ def display_header(st, m, p):
 <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
 
 <div class="penn-medicine-header__content">
-    <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
-        title="Go to the Penn Medicine home page">Penn Medicine</a>
-    <a id="title" class="penn-medicine-header__title">Penn Medicine - COVID-19 Hospital Impact Model for Epidemics</a>
+    <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics</a>
 </div>
     """,
         unsafe_allow_html=True,
-    )
-    st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + p.change_date() + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
-    )
-    st.markdown(
-        """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/). Code can be found on [Github](https://github.com/CodeForPhilly/chime).
-    Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*"""
     )
 
     st.markdown(
@@ -371,11 +361,10 @@ def write_definitions(st):
 def write_footer(st):
     st.subheader("References & Acknowledgements")
     st.markdown(
-        """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
-* We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
-    """
+        """* This application is based on the work that is developed and made freely available (under MIT license) by Penn Medicine (https://github.com/CodeForPhilly/chime). 
+        """
     )
-    st.markdown("© 2020, The Trustees of the University of Pennsylvania")
+    st.markdown("© 2020, Health Catalyst Inc.")
 
 
 def show_additional_projections(
