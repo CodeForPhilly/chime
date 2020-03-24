@@ -1,11 +1,12 @@
 """Script which launches dash app
 """
 from dash import Dash
+from flask import Flask
 
 from penn_chime.settings import DEFAULTS
 
-from chime_dash.layout import setup, EXTERNAL_STYLESHEETS, EXTERNAL_SCRIPTS
-from chime_dash.layout import CALLBACK_INPUTS, CALLBACK_OUTPUTS, callback_body
+from chime_dash.components import setup, EXTERNAL_STYLESHEETS, EXTERNAL_SCRIPTS
+from chime_dash.components import CALLBACK_INPUTS, CALLBACK_OUTPUTS, callback_body
 
 LANGUAGE = "en"
 
