@@ -40,6 +40,12 @@ if st.checkbox("Show more info about this tool"):
     notes = "The total size of the susceptible population will be the entire catchment area"
     show_more_info_about_this_tool(st=st, model=m, parameters=p, defaults=DEFAULTS, notes=notes)
 
+st.markdown("""This chart presents the projected number of new admissions for COVID-19 to the health system 
+per day by patient category. Each line describes a non-overlapping group. For example, if we expect 25 new 
+patients requiring hospitalization (blue line), 10 new patients requiring intensive care (orange line), and 
+3 new patients requiring ventilation (red line), the total number of expected new admissions is 38 (25 + 10 + 3). 
+This does not count patients who are presenting at the hospital unrelated to COVID-19.""")
+
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions")
 new_admit_chart = new_admissions_chart(alt, m.admits_df, parameters=p)
