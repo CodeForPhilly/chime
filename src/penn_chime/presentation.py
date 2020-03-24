@@ -122,7 +122,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
             "Social distancing (% reduction in social contact)",
             min_value=0,
             max_value=100,
-            value=d.relative_contact_rate * 100,
+            value=int(d.relative_contact_rate * 100),
             step=5,
             format="%i",
         )
