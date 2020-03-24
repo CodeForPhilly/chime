@@ -10,7 +10,6 @@ from penn_chime.defaults import Constants
 from penn_chime.settings import DEFAULTS
 
 from chime_dash.app.components.base import Component
-from chime_dash.app.components.header import Header
 from chime_dash.app.components.menu import Menu
 
 
@@ -22,7 +21,6 @@ class Navbar(Component):
         """Sets up self, menue and header
         """
         super().__init__(language, defaults=defaults)
-        self.header = Header(language, defaults=defaults)
         self.menu = Menu(language, defaults=defaults)
 
     def get_html(self) -> List[ComponentMeta]:
@@ -34,7 +32,6 @@ class Navbar(Component):
                     html.A(
                         dbc.Row(
                             children=[
-                                dbc.Col(self.header.html),
                                 dbc.Col(
                                     dbc.NavbarBrand(
                                         children="Penn Medicine CHIME", href="/"
