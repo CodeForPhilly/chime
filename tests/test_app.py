@@ -73,6 +73,33 @@ def test_the_rest_of_header_shows_up():
     ), "The whole header should render"
 
 
+def test_mitigation_statement():
+    st.cleanup()
+    expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
+    display_header(st, MODEL, PARAM)
+    assert [s for s in st.render_store if expected_doubling in s]
+    # assert len((list(filter(lambda s: expected_doubling in s, st.render_store))))
+    st.cleanup()
+    expected_halving = "outbreak **halves the infections every 51.9** days"
+    halving_params = Parameters(
+        current_hospitalized=100,
+        doubling_time=6.0,
+        known_infected=5000,
+        market_share=0.05,
+        relative_contact_rate=0.7,
+        susceptible=500000,
+        hospitalized=RateLos(0.05, 7),
+        icu=RateLos(0.02, 9),
+        ventilated=RateLos(0.01, 10),
+        n_days=60,
+    )
+    halving_model = SimSirModel(halving_params)
+    display_header(st, halving_model, halving_params)
+    assert [s for s in st.render_store if expected_halving in s]
+    #assert len((list(filter(lambda s: expected_halving in s, st.render_store))))
+    st.cleanup()
+
+
 st.cleanup()
 
 

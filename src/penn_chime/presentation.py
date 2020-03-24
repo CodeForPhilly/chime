@@ -63,7 +63,7 @@ An initial doubling time of **{doubling_time}** days and a recovery time of **{r
 **{r_naught:.2f}**.
 
 **Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
-outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**.
+outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**.
 """.format(
             total_infections=m.infected,
             initial_infections=p.known_infected,
@@ -77,7 +77,8 @@ outbreak reduces the doubling time to **{doubling_time_t:.1f}** days, implying a
             doubling_time=p.doubling_time,
             relative_contact_rate=p.relative_contact_rate,
             r_t=m.r_t,
-            doubling_time_t=m.doubling_time_t,
+            doubling_time_t=abs(m.doubling_time_t),
+            impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to")
         )
     )
 
