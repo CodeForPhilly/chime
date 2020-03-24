@@ -9,8 +9,8 @@ from datetime import datetime
 from pandas import DataFrame
 
 from penn_chime.parameters import Parameters
+from penn_chime.models import SimSirModel
 from penn_chime.utils import RateLos
-from penn_chime.models import build_admissions_df, build_census_df
 
 class FromFile(Action):
     """From File."""
@@ -108,30 +108,22 @@ def main():
         doubling_time=a.doubling_time,
         known_infected=a.known_infected,
         market_share=a.market_share,
+        n_days=a.n_days,
         relative_contact_rate=a.relative_contact_rate,
         susceptible=a.susceptible,
-        n_days=a.n_days,
+
         hospitalized=RateLos(a.hospitalized_rate, a.hospitalized_los),
         icu=RateLos(a.icu_rate, a.icu_los),
         ventilated=RateLos(a.ventilated_rate, a.ventilated_los),
     )
 
-    raw_df = DataFrame(
-        {
-            "Susceptible": p.susceptible_v,
-            "Infected": p.infected_v,
-            "Recovered": p.recovered_v,
-        }
-    )
-
-    admits_df = build_admissions_df(p)
-    census_df = build_census_df(admits_df, p)
+    m = SimSirModel(p)
 
     prefix = a.prefix
     for df, name in (
-        (raw_df, "raw"),
-        (admits_df, "admits"),
-        (census_df, "census"),
+        (m.raw_df, "raw"),
+        (m.admits_df, "admits"),
+        (m.census_df, "census"),
     ):
         df.to_csv(prefix + name + ".csv")
 
