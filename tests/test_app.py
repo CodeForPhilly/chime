@@ -103,7 +103,7 @@ def test_mitigation_statement():
 def test_daily_growth():
     st.cleanup()
     initial_growth = "and daily growth rate of **12.25%**."
-    mitigated_growth = "and daily growth rate of **1.18%**."
+    mitigated_growth = "and daily growth rate of **9.34%**."
     display_header(st, PARAM)
     assert len((list(filter(lambda s: initial_growth in s, st.render_store))))
     assert len((list(filter(lambda s: mitigated_growth in s, st.render_store))))
