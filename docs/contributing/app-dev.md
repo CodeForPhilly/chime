@@ -24,7 +24,7 @@ See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_starte
 ```bash
 pipenv shell
 pipenv install
-streamlit run app.py
+streamlit run src/app.py
 ```
 
 ### With `conda`
@@ -33,7 +33,7 @@ streamlit run app.py
 conda env create -f environment.yml
 source activate chime
 pip install streamlit
-streamlit run app.py
+streamlit run src/app.py
 ```
 
 ### Choosing a Different Port
@@ -42,17 +42,19 @@ If you need to run the application on a different port than the default (8000), 
 
 ```bash
 export STREAMLIT_SERVER_PORT=1234
-streamlit run app.py
+streamlit run src/app.py
 ```
 
 ## Project Layout
 
 ### Application files
 
+- `src/app.py`: Main source for the application
+- `src/test_app.py`: [pytest](https://docs.pytest.org/en/latest/) tests for `app.py`
 - `script/`: Developer workflow scripts following [GitHub's Scripts To Rule Them All](https://github.com/github/scripts-to-rule-them-all) pattern.
-- `app.py`: Main source for the application
 - `.streamlit/`: [Streamlit config options](https://docs.streamlit.io/cli.html)
 - `.env`: Local environment variables to use when running application, this file is copied from `.env.example` to start you out and then ignored by git
+- `pytest.ini`: Configuration for [pytest](https://docs.pytest.org/en/latest/)
 - `Pipfile`
 - `Pipfile.lock`
 - `environment.yml`
@@ -74,7 +76,14 @@ streamlit run app.py
 
 ## Testing
 
-*No testing routine is available yet. If you have thoughts on how to add one, please contribute!*
+The project is set up for testing with [pytest](https://docs.pytest.org/en/latest/), and the GitHub repository is configured to execute `pytest` against all pull requests automatically.
+
+To run tests locally, enter an environment first with `pipenv` or `conda` as indicated above in [Running CHIME Locally](#running-chime-locally), and then run:
+
+```bash
+pip install pytest
+pytest
+```
 
 ## Validating CHIME
 
