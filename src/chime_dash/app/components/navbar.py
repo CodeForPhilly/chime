@@ -46,8 +46,8 @@ class Navbar(Component):
                         ),
                         href="https://www.pennmedicine.org/",
                     ),
-                    self.menu.html,
                 ]
+                + self.menu.html
             )
         )
         return [nav]

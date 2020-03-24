@@ -17,7 +17,6 @@ from penn_chime.defaults import Constants
 
 from chime_dash.app.components.base import Component
 from chime_dash.app.components.sidebar import Sidebar
-from chime_dash.app.components.header import Header
 from chime_dash.app.components.intro import Intro, ToolDetails
 from chime_dash.app.components.additions import Additions
 from chime_dash.app.components.visualizations import Visualizations
@@ -41,7 +40,6 @@ class Body(Component):
         super().__init__(language, defaults)
         self.components = OrderedDict(
             sidebar=Sidebar(language, defaults),
-            header=Header(language, defaults),
             intro=Intro(language, defaults),
             tool_details=ToolDetails(language, defaults),
             visualizations=Visualizations(language, defaults),
@@ -62,7 +60,8 @@ class Body(Component):
         """Glues individual setup components together
         """
         return Div(
-            children=[  # self.components["navbar"].html
+            children=self.components["navbar"].html
+            + [
                 Row(
                     children=[
                         Col(
@@ -73,8 +72,7 @@ class Body(Component):
                         ),
                         Col(width=1),
                         Col(
-                            children=self.components["header"].html
-                            + self.components["intro"].html
+                            self.components["intro"].html
                             + self.components["tool_details"].html
                             + self.components["visualizations"].html
                             + self.components["additions"].html
