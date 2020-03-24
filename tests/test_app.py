@@ -77,7 +77,8 @@ def test_mitigation_statement():
     st.cleanup()
     expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
     display_header(st, MODEL, PARAM)
-    assert len((list(filter(lambda s: expected_doubling in s, st.render_store))))
+    assert [s for s in st.render_store if expected_doubling in s]
+    # assert len((list(filter(lambda s: expected_doubling in s, st.render_store))))
     st.cleanup()
     expected_halving = "outbreak **halves the infections every 51.9** days"
     halving_params = Parameters(
@@ -92,8 +93,10 @@ def test_mitigation_statement():
         ventilated=RateLos(0.01, 10),
         n_days=60,
     )
-    display_header(st, MODEL, halving_params)
-    assert len((list(filter(lambda s: expected_halving in s, st.render_store))))
+    halving_model = SimSirModel(halving_params)
+    display_header(st, halving_model, halving_params)
+    assert [s for s in st.render_store if expected_halving in s]
+    #assert len((list(filter(lambda s: expected_halving in s, st.render_store))))
     st.cleanup()
 
 
