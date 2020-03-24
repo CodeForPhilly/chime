@@ -11,7 +11,9 @@ from pandas import DataFrame
 
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
 
-TEMPLATE_DIR = path.join(path.abspath(path.dirname(__file__)), "templates")
+TEMPLATE_DIR = path.join(
+    path.abspath(path.dirname(path.dirname(__file__))), "templates"
+)
 
 
 def read_localization_yaml(file: str, language: str) -> Dict[str, Any]:
