@@ -1,5 +1,6 @@
 """effectful functions for streamlit io"""
 
+import os
 from typing import Optional
 from datetime import datetime
 
@@ -91,7 +92,11 @@ def display_how_to_use(st):
         and running totals of (i.e. census) inpatient hospitalizations, ICU admissions, and patients requiring ventilation.
 
         This tool has the ability to load and save parameters, as well as save parameters and calculations. Enable
-        these features by changing the *Author Name* and *Scenario Name* to values of your choosing. 
+        these features by changing the *Author Name* and *Scenario Name* to values of your choosing. Rather than create the parameter file
+        from scratch we highly recommend using the "Save Parameters" button to create a parameter file which can then be edited by hand
+        if desired. Please note however that it is easy to inadvertently produce an invalid JSON file when editing by hand. If you wish
+        to update a set of existing parameters we recommend loading in the parameters, editing them in the UI, and re-exporting a new
+        version of the parameters.
         
         **Saving Parameters:** At the bottom
         of the left sidebar, a download link will appear to save your parameters as a file. Click to save the file. This file is .json and 
@@ -249,11 +254,11 @@ def display_sidebar(st, d: Constants) -> Parameters:
     
     max_y_axis_set_default = False if uploaded_file is None else raw_imported["MaxYAxisSet"]
     max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value", value=max_y_axis_set_default)
-    y_axis_static_value = 500 if uploaded_file is None else raw_imported["YAxisStaticValue"]
+    max_y_axis = 500 if uploaded_file is None else raw_imported["MaxYAxis"]
     if max_y_axis_set:
         max_y_axis = st.sidebar.number_input(
             "Y-axis static value", 
-            value=y_axis_static_value, 
+            value=max_y_axis, 
             format="%i", 
             step=25,
         )
@@ -281,7 +286,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         parameters, 
         as_date=as_date, 
         max_y_axis_set=max_y_axis_set, 
-        y_axis_static_value=y_axis_static_value
+        max_y_axis=max_y_axis
     )
     return parameters
 
@@ -401,6 +406,8 @@ def write_footer(st):
         """* This application is based on the work that is developed and made freely available (under MIT license) by Penn Medicine (https://github.com/CodeForPhilly/chime). 
         """
     )
+    BUILD_TIME = os.environ['BUILD_TIME'] # == "`date`"
+    st.markdown(f"""Last Changed: **{BUILD_TIME}**""")
     st.markdown("© 2020, Health Catalyst Inc.")
 
 
