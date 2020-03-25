@@ -247,14 +247,13 @@ def display_sidebar(st, d: Constants) -> Parameters:
     as_date_default = False if uploaded_file is None else raw_imported["PresentResultAsDates"]
     as_date = st.sidebar.checkbox(label="Present result as dates instead of days", value=as_date_default)
     
-    max_y_axis_set_default = False if uploaded_file is None else raw_imported["SetYAxisToStaticValue"]
+    max_y_axis_set_default = False if uploaded_file is None else raw_imported["MaxYAxisSet"]
     max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value", value=max_y_axis_set_default)
-    max_y_axis = 500
+    y_axis_static_value = 500 if uploaded_file is None else raw_imported["YAxisStaticValue"]
     if max_y_axis_set:
-        y_axis_limit = 500 if uploaded_file is None else raw_imported["YAxisStaticValue"]
         max_y_axis = st.sidebar.number_input(
             "Y-axis static value", 
-            value=y_axis_limit, 
+            value=y_axis_static_value, 
             format="%i", 
             step=25,
         )
@@ -282,7 +281,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         parameters, 
         as_date=as_date, 
         max_y_axis_set=max_y_axis_set, 
-        y_axis_limit=max_y_axis
+        y_axis_static_value=y_axis_static_value
     )
     return parameters
 

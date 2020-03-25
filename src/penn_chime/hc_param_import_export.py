@@ -27,7 +27,7 @@ def constants_from_uploaded_file(file: io.StringIO) -> Tuple[Constants, dict]:
     )
     return constants, imported_params
 
-def param_download_widget(st, parameters, as_date, max_y_axis_set, y_axis_limit):
+def param_download_widget(st, parameters, as_date, max_y_axis_set, y_axis_static_value):
     if parameters.author == "Jane Doe" or parameters.scenario == "COVID Model":
         st.sidebar.markdown("""
         **Enter a unique author name and scenario name to enable parameter download.**""")
@@ -50,7 +50,7 @@ def param_download_widget(st, parameters, as_date, max_y_axis_set, y_axis_limit)
             "RegionalPopulation": parameters.susceptible,
             "CurrentlyKnownRegionalInfections": parameters.known_infected,
             "PresentResultAsDates": as_date,
-            "SetYAxisToStaticValue":max_y_axis_set,
+            "MaxYAxisSet":max_y_axis_set,
             "YAxisStaticValue":y_axis_limit,
         }
         out_json = json.dumps(out_obj)
