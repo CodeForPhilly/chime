@@ -7,13 +7,7 @@ on:
       - v*
 
   # Run tests for any PRs.
-  # Deploy builds
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - closed
 
 env:
   IMAGE_NAME: penn-chime
@@ -25,7 +19,6 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
     runs-on: ubuntu-latest
-    if: "! ( github.event_name == 'pull_request' && github.event.pull_request.state == 'closed' )"
 
     steps:
       - uses: actions/checkout@v2
