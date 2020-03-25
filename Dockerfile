@@ -10,6 +10,8 @@ RUN pip install -q -r requirements.txt
 
 COPY src src 
 
+EXPOSE 8050
+
 # CMD ["streamlit", "run", "src/app.py"]
 CMD ["gunicorn", "src.dash_app:server"]
 #CMD ["sh"]
