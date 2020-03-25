@@ -1,9 +1,8 @@
 FROM python:3.7.7-slim-buster
 
-COPY ./requirements.txt /code/requirements.txt
+WORKDIR /code 
 
-WORKDIR code
-
+COPY requirements.txt requirements.txt
 RUN pip install -q -r requirements.txt
 
 COPY src src 
