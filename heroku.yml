@@ -1,3 +1,5 @@
 build:
   docker:
     web: Dockerfile
+run: 
+  web: gunicorn src.dash_app:app --bind 0.0.0.0:8050
