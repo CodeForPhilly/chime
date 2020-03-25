@@ -10,4 +10,8 @@ RUN pip install -q -r requirements.txt
 
 COPY . ./
 
+ARG BUILD_TIME
+ENV BUILD_TIME=$BUILD_TIME
+RUN echo $BUILD_TIME
+
 CMD ["streamlit", "run", "src/app.py"]
