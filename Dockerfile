@@ -8,7 +8,7 @@ WORKDIR /app
 
 RUN pip install -q -r requirements.txt
 
-COPY src src 
+COPY . . 
 
 EXPOSE 8050
 
