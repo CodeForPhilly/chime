@@ -10,7 +10,10 @@ import pandas as pd  # type: ignore
 from .defaults import Constants, RateLos
 from .utils import add_date_column, dataframe_to_base64
 from .parameters import Parameters
-from .hc_param_import import constants_from_uploaded_file
+from .hc_param_import_export import (
+    constants_from_uploaded_file,
+    param_download_widget,
+)
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
 
@@ -90,10 +93,10 @@ def display_sidebar(st, d: Constants) -> Parameters:
         d, raw_imported = constants_from_uploaded_file(uploaded_file)
 
     author = st.sidebar.text_input("Author Name", 
-        value="Jane Doe")
+        value="Jane Doe" if uploaded_file is None else raw_imported["Author"])
     
     scenario = st.sidebar.text_input("Scenario Name", 
-        value="COVID Model")
+        value="COVID Model" if uploaded_file is None else raw_imported["Scenario"])
     
     n_days = st.sidebar.number_input(
         "Number of days to project",
@@ -122,11 +125,11 @@ def display_sidebar(st, d: Constants) -> Parameters:
     relative_contact_rate = (
         st.sidebar.number_input(
             "Social distancing (% reduction in social contact)",
-            min_value=0,
-            max_value=100,
+            min_value=0.0,
+            max_value=100.0,
             value=d.relative_contact_rate * 100,
-            step=5,
-            format="%i",
+            step=5.0,
+            format="%f",
         )
         / 100.0
     )
@@ -221,14 +224,15 @@ def display_sidebar(st, d: Constants) -> Parameters:
     max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value", value=max_y_axis_set_default)
     max_y_axis = None
     if max_y_axis_set:
+        y_axis_limit = 500 if uploaded_file is None else raw_imported["YAxisStaticValue"]
         max_y_axis = st.sidebar.number_input(
             "Y-axis static value", 
-            value=500 if uploaded_file is None else raw_imported["YAxisStaticValue"], 
+            value=y_axis_limit, 
             format="%i", 
             step=25,
         )
 
-    return Parameters(
+    parameters = Parameters(
         as_date=as_date,
         current_hospitalized=current_hospitalized,
         doubling_time=doubling_time,
@@ -246,6 +250,14 @@ def display_sidebar(st, d: Constants) -> Parameters:
         author = author,
         scenario = scenario,
     )
+    param_download_widget(
+        st,
+        parameters, 
+        as_date=as_date, 
+        max_y_axis_set=max_y_axis_set, 
+        y_axis_limit=max_y_axis
+    )
+    return parameters
 
 
 def show_more_info_about_this_tool(st, model, parameters, defaults, notes: str = ""):
