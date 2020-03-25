@@ -25,7 +25,7 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
     runs-on: ubuntu-latest
-    if: github.event_type == 'pull_request' && github.event.pull_request.state == 'open'
+    if: github.event_name == 'pull_request' && github.event.pull_request.state == 'open'
 
     steps:
       - uses: actions/checkout@v2
