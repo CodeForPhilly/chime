@@ -1,0 +1,35 @@
+name: Deploy to production
+
+on:
+  pull_request:
+    branches:
+      - releases/v1
+    types:
+      - closed
+
+env:
+  # Required for action steebchen/kubectl
+  KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_prod }}
+
+jobs:
+  deploy-prod:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy to prod
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: apply -f k8s/app.yaml
+
+      - name: Wait for deploy to complete
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: -n chime rollout status deployment.v1.apps/chime
+
+      - name: Show completed deployment
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: -n chime get deployment chime -o yaml
