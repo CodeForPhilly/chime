@@ -2,7 +2,7 @@
 """
 from dash import Dash
 
-from .penn_chime.settings import DEFAULTS
+from penn_chime.settings import DEFAULTS
 
 from chime_dash.app.components import Body
 
