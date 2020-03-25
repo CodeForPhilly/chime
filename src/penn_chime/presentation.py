@@ -42,14 +42,16 @@ def display_header(st, m, p):
 <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
 
 <div class="penn-medicine-header__content">
-    <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics</a>
-</div>
+    <a id="title" class="penn-medicine-header__title" style="font-size:24pt;color:#00aeff">COVID-19 Hospital Impact Model for Epidemics</a>
+</div> 
+<br>
     """,
         unsafe_allow_html=True,
     )
 
     st.markdown(
-        """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
+        """
+        The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
     confirmed cases in the region imply a **{detection_prob_str}** rate of detection. This is based on current inputs for
     Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
@@ -79,6 +81,30 @@ outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effect
 
     return None
 
+def display_how_to_use(st):
+    st.subheader("How to Use This Tool")
+    st.markdown(
+        """
+        **This app is based on the [CHIME](https://github.com/CodeForPhilly/chime) app, developed by Penn Medicine.**
+        It is designed to assist hospitals and public health officials with understanding hospital capacity needs as 
+        they relate to the COVID-19 pandemic. CHIME enables capacity planning by providing estimates of total daily (i.e. new) 
+        and running totals of (i.e. census) inpatient hospitalizations, ICU admissions, and patients requiring ventilation.
+
+        This tool has the ability to load and save parameters, as well as save parameters and calculations. Enable
+        these features by changing the *Author Name* and *Scenario Name* to values of your choosing. 
+        
+        **Saving Parameters:** At the bottom
+        of the left sidebar, a download link will appear to save your parameters as a file. Click to save the file. This file is .json and 
+        can be opened in a text editor.
+
+        **Loading Parameters:** At the top of the left sidebar, browse for a parameter file (in the same format as the exported parameters)
+        or drag and drop. Parameter values will update.
+
+        **Saving Calculations**: At the bottom of the main page, a link will appear to save all model parameters and calculations as a .csv
+        file. Click the link to save the file.
+        <br><br>
+        """,
+        unsafe_allow_html=True,)
 
 def display_sidebar(st, d: Constants) -> Parameters:
     # Initialize variables
