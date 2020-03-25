@@ -89,7 +89,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
     if d.known_infected < 1:
         raise ValueError("Known cases must be larger than one to enable predictions.")
 
-    uploaded_file = st.sidebar.file_uploader("Import Parameters", type=['json'])
+    uploaded_file = st.sidebar.file_uploader("Load Parameters", type=['json'])
     if uploaded_file is not None:
         d, raw_imported = constants_from_uploaded_file(uploaded_file)
 
