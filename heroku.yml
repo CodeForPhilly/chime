@@ -1,5 +1,5 @@
 build:
   docker:
     web: Dockerfile.dash
-    #  config: 
-    #    PORT: ${PORT}
+  config: 
+    PORT: ${PORT}
