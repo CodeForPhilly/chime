@@ -2,7 +2,7 @@
 """
 from typing import Dict, Any
 
-from src.penn_chime.utils import add_date_column
+from penn_chime.utils import add_date_column
 
 import pandas as pd
 

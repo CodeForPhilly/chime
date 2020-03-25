@@ -13,19 +13,19 @@ from dash_bootstrap_components import Row, Col
 from dash_bootstrap_components.themes import BOOTSTRAP
 from dash_html_components import Script, Div
 
-from src.penn_chime.defaults import Constants
-from src.penn_chime.models import SimSirModel
+from penn_chime.defaults import Constants
+from penn_chime.models import SimSirModel
 
 
-from src.chime_dash.app.components.base import Component, HTMLComponentError
-from src.chime_dash.app.components.sidebar import Sidebar
-from src.chime_dash.app.components.header import Header
-from src.chime_dash.app.components.intro import Intro, ToolDetails
-from src.chime_dash.app.components.additions import Additions
-from src.chime_dash.app.components.visualizations import Visualizations
-from src.chime_dash.app.components.definitions import Definitions
-from src.chime_dash.app.components.footer import Footer
-from src.chime_dash.app.components.navbar import Navbar
+from chime_dash.app.components.base import Component, HTMLComponentError
+from chime_dash.app.components.sidebar import Sidebar
+from chime_dash.app.components.header import Header
+from chime_dash.app.components.intro import Intro, ToolDetails
+from chime_dash.app.components.additions import Additions
+from chime_dash.app.components.visualizations import Visualizations
+from chime_dash.app.components.definitions import Definitions
+from chime_dash.app.components.footer import Footer
+from chime_dash.app.components.navbar import Navbar
 
 
 class Body(Component):
