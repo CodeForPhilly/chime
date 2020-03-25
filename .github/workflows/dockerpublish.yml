@@ -78,6 +78,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Needed for proper rebase
       - name: Update application manifest
         run: |
           # Strip git ref prefix from version
