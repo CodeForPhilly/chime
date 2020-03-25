@@ -87,6 +87,8 @@ class SimSirModel:
         self.dispositions_df = pd.DataFrame(self.dispositions)
         self.admits_df = admits_df = build_admits_df(p.n_days, self.dispositions)
         self.census_df = build_census_df(admits_df, lengths_of_stay)
+        self.daily_growth = daily_growth_helper(p.doubling_time)
+        self.daily_growth_t = daily_growth_helper(self.doubling_time_t)
 
 
 def sir(
@@ -171,3 +173,10 @@ def build_census_df(
     census_df = census_df[["day", *lengths_of_stay.keys()]]
     census_df = census_df.head(n_days)
     return census_df
+
+
+def daily_growth_helper(doubling_time):
+    result = 0
+    if doubling_time != 0:
+        result = (np.power(2, 1.0 / doubling_time) - 1) * 100
+    return result

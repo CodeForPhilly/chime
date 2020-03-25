@@ -8,7 +8,7 @@ import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
 from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
-from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df
+from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df, daily_growth_helper
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
@@ -27,7 +27,21 @@ PARAM = Parameters(
     n_days=60,
 )
 
+HALVING_PARAM = Parameters(
+    current_hospitalized=100,
+    doubling_time=6.0,
+    known_infected=5000,
+    market_share=0.05,
+    relative_contact_rate=0.7,
+    susceptible=500000,
+    hospitalized=RateLos(0.05, 7),
+    icu=RateLos(0.02, 9),
+    ventilated=RateLos(0.01, 10),
+    n_days=60,
+)
+
 MODEL = SimSirModel(PARAM)
+HALVING_MODEL = SimSirModel(HALVING_PARAM)
 
 
 # set up
@@ -58,56 +72,38 @@ st = MockStreamlit()
 # test presentation
 
 
+def header_test_helper(expected_str, model, param):
+    st.cleanup()
+    display_header(st, model, param)
+    assert [s for s in st.render_store if expected_str in s],\
+        "Expected the string '{expected}' in the display header".format(expected=expected_str)
+    st.cleanup()
+
+
 def test_penn_logo_in_header():
     penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
-    display_header(st, MODEL, PARAM)
-    assert len(
-        list(filter(lambda s: penn_css in s, st.render_store))
-    ), "The Penn Medicine header should be printed"
+    header_test_helper(penn_css, MODEL, PARAM)
 
 
 def test_the_rest_of_header_shows_up():
     random_part_of_header = "implying an effective $R_t$ of"
-    assert len(
-        list(filter(lambda s: random_part_of_header in s, st.render_store))
-    ), "The whole header should render"
+    header_test_helper(random_part_of_header, MODEL, PARAM)
 
 
 def test_mitigation_statement():
-    st.cleanup()
     expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
-    display_header(st, MODEL, PARAM)
-    assert [s for s in st.render_store if expected_doubling in s]
-    # assert len((list(filter(lambda s: expected_doubling in s, st.render_store))))
-    st.cleanup()
     expected_halving = "outbreak **halves the infections every 51.9** days"
-    halving_params = Parameters(
-        current_hospitalized=100,
-        doubling_time=6.0,
-        known_infected=5000,
-        market_share=0.05,
-        relative_contact_rate=0.7,
-        susceptible=500000,
-        hospitalized=RateLos(0.05, 7),
-        icu=RateLos(0.02, 9),
-        ventilated=RateLos(0.01, 10),
-        n_days=60,
-    )
-    halving_model = SimSirModel(halving_params)
-    display_header(st, halving_model, halving_params)
-    assert [s for s in st.render_store if expected_halving in s]
-    #assert len((list(filter(lambda s: expected_halving in s, st.render_store))))
-    st.cleanup()
+    header_test_helper(expected_doubling, MODEL, PARAM)
+    header_test_helper(expected_halving, HALVING_MODEL, HALVING_PARAM)
 
 
-def test_daily_growth():
-    st.cleanup()
+def test_daily_growth_presentation():
     initial_growth = "and daily growth rate of **12.25%**."
     mitigated_growth = "and daily growth rate of **9.34%**."
-    display_header(st, PARAM)
-    assert len((list(filter(lambda s: initial_growth in s, st.render_store))))
-    assert len((list(filter(lambda s: mitigated_growth in s, st.render_store))))
-    st.cleanup()
+    mitigated_halving = "and daily growth rate of **-1.33%**."
+    header_test_helper(initial_growth, MODEL, PARAM)
+    header_test_helper(mitigated_growth, MODEL, PARAM)
+    header_test_helper(mitigated_halving, HALVING_MODEL, HALVING_PARAM)
 
 
 st.cleanup()
@@ -269,6 +265,12 @@ def test_model(model=MODEL, param=PARAM):
         0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
     )
     assert (diff.abs() < 0.1).all()
+
+
+def test_daily_growth_helper():
+    assert np.round(daily_growth_helper(5), decimals=4) == 14.8698
+    assert np.round(daily_growth_helper(0), decimals=4) == 0.0
+    assert np.round(daily_growth_helper(-4), decimals=4) == -15.9104
 
 
 def test_chart_descriptions(p=PARAM):
