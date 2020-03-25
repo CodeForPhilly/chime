@@ -9,6 +9,7 @@
   - [Data Analysis](contributing/data-analysis.md)
   - [Operations Support](contributing/operations-support.md)
 - Operations
+  - [Release Process](./operations/release-process.md)
   - [The `chime-live` Cluster](./operations/chime-live-cluster.md)
   - [Deploy to Heroku](./operations/heroku.md)
   - [Deploy to Your Own Cluster](./operations/byok8s.md)

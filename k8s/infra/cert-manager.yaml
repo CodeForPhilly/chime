@@ -1,293 +1,3 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: nginx-configuration
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: tcp-services
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: udp-services
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: nginx-ingress-serviceaccount
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  name: nginx-ingress-clusterrole
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-      - endpoints
-      - nodes
-      - pods
-      - secrets
-    verbs:
-      - list
-      - watch
-  - apiGroups:
-      - ""
-    resources:
-      - nodes
-    verbs:
-      - get
-  - apiGroups:
-      - ""
-    resources:
-      - services
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - ""
-    resources:
-      - events
-    verbs:
-      - create
-      - patch
-  - apiGroups:
-      - "extensions"
-      - "networking.k8s.io"
-    resources:
-      - ingresses
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - "extensions"
-      - "networking.k8s.io"
-    resources:
-      - ingresses/status
-    verbs:
-      - update
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: Role
-metadata:
-  name: nginx-ingress-role
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-      - pods
-      - secrets
-      - namespaces
-    verbs:
-      - get
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    resourceNames:
-      # Defaults to "<election-id>-<ingress-class>"
-      # Here: "<ingress-controller-leader>-<nginx>"
-      # This has to be adapted if you change either parameter
-      # when launching the nginx-ingress-controller.
-      - "ingress-controller-leader-nginx"
-    verbs:
-      - get
-      - update
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - create
-  - apiGroups:
-      - ""
-    resources:
-      - endpoints
-    verbs:
-      - get
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
-metadata:
-  name: nginx-ingress-role-nisa-binding
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: nginx-ingress-role
-subjects:
-  - kind: ServiceAccount
-    name: nginx-ingress-serviceaccount
-    namespace: ingress-nginx
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: nginx-ingress-clusterrole-nisa-binding
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: nginx-ingress-clusterrole
-subjects:
-  - kind: ServiceAccount
-    name: nginx-ingress-serviceaccount
-    namespace: ingress-nginx
-
----
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-ingress-controller
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: ingress-nginx
-      app.kubernetes.io/part-of: ingress-nginx
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: ingress-nginx
-        app.kubernetes.io/part-of: ingress-nginx
-      annotations:
-        prometheus.io/port: "10254"
-        prometheus.io/scrape: "true"
-    spec:
-      serviceAccountName: nginx-ingress-serviceaccount
-      containers:
-        - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.25.0
-          args:
-            - /nginx-ingress-controller
-            - --configmap=$(POD_NAMESPACE)/nginx-configuration
-            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
-            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
-            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
-            - --annotations-prefix=nginx.ingress.kubernetes.io
-          securityContext:
-            allowPrivilegeEscalation: true
-            capabilities:
-              drop:
-                - ALL
-              add:
-                - NET_BIND_SERVICE
-            # www-data -> 33
-            runAsUser: 33
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          ports:
-            - name: http
-              containerPort: 80
-            - name: https
-              containerPort: 443
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 10
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 10
-
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  name: ingress-nginx
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  externalTrafficPolicy: Local
-  type: LoadBalancer
-  selector:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-  ports:
-    - name: http
-      port: 80
-      targetPort: http
-    - name: https
-      port: 443
-      targetPort: https
-
 ---
 
 apiVersion: apiextensions.k8s.io/v1beta1
@@ -8735,3 +8445,159 @@ spec:
     - http01:
         ingress:
           class: nginx
+
+---
+# Metrics server
+# This allows you to run `kubectl top nodes` and `kubectl top pods -A`
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: system:aggregated-metrics-reader
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+rules:
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: metrics-server:system:auth-delegator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: metrics-server
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metrics-server-auth-reader
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: extension-apiserver-authentication-reader
+subjects:
+- kind: ServiceAccount
+  name: metrics-server
+  namespace: kube-system
+---
+apiVersion: apiregistration.k8s.io/v1beta1
+kind: APIService
+metadata:
+  name: v1beta1.metrics.k8s.io
+spec:
+  service:
+    name: metrics-server
+    namespace: kube-system
+  group: metrics.k8s.io
+  version: v1beta1
+  insecureSkipTLSVerify: true
+  groupPriorityMinimum: 100
+  versionPriority: 100
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: metrics-server
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-server
+  namespace: kube-system
+  labels:
+    k8s-app: metrics-server
+spec:
+  selector:
+    matchLabels:
+      k8s-app: metrics-server
+  template:
+    metadata:
+      name: metrics-server
+      labels:
+        k8s-app: metrics-server
+    spec:
+      serviceAccountName: metrics-server
+      volumes:
+      # Mount in tmp so we can safely use from-scratch images and/or read-only containers
+      - name: tmp-dir
+        emptyDir: {}
+      containers:
+      - name: metrics-server
+        image: k8s.gcr.io/metrics-server-amd64:v0.3.6
+        imagePullPolicy: Always
+        command:
+          - /metrics-server
+          # metrics-server connects to kubelet, which is signed by the this cluster's CA
+          #
+          # TODO: Mount the cluster's CA cert into this pod, which is available on the
+          # local filesystem.
+          - --kubelet-insecure-tls
+          # NOTE: This flag is needed on clusters which use a CCM
+          - --kubelet-preferred-address-types=InternalIP
+        volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-server
+  namespace: kube-system
+  labels:
+    kubernetes.io/name: "Metrics-server"
+spec:
+  selector:
+    k8s-app: metrics-server
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 443
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:metrics-server
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - nodes
+  - nodes/stats
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - "extensions"
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:metrics-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:metrics-server
+subjects:
+- kind: ServiceAccount
+  name: metrics-server
+  namespace: kube-system
+---

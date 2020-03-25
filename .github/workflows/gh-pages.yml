@@ -3,7 +3,7 @@ name: Publish GitBook to GH Pages
 on:
   push:
     branches:
-      - 'master'
+      - 'develop'
 
 
 jobs:
@@ -25,6 +25,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         HAB_LICENSE: accept
       with:
-        ref: master
+        ref: develop
         holobranch: gh-pages
         commit-to: gh-pages
