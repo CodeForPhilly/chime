@@ -60,9 +60,3 @@ def param_download_widget(st, parameters, as_date, max_y_axis_set, y_axis_limit)
             .format(b64_json=b64_json,filename=filename), 
             unsafe_allow_html=True,
         )
-        
-        # st.sidebar.markdown(
-        #     """<a download="{filename}" href="data:text/plain;base64,{b64_json}">Save parameters</a>"""
-        #     .format(b64_json=b64_json,filename=filename), 
-        #     unsafe_allow_html=True,
-        # )
