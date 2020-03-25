@@ -59,9 +59,6 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # Pass version number to subsequent jobs
-          echo "::set-env name=VERSION::$VERSION"
-
           # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=latest
 
@@ -83,19 +80,33 @@ jobs:
       - uses: actions/checkout@v2
       - name: Update application manifest
         run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Update image version in application manifest
           sed -Ei "s/(- image: .*):(.*)/\1:$VERSION/" k8s/app.yaml
+
+          # Show updated manifest file
+          cat k8s/app.yaml
+
       - name: Deploy to preprod
         uses: steebchen/kubectl@v1.0.0
         with:
           args: apply -f k8s/app.yaml
+
       - name: Wait for deploy to complete
         uses: steebchen/kubectl@v1.0.0
         with:
           args: -n chime rollout status deployment.v1.apps/chime
+
       - name: Show completed deployment
         uses: steebchen/kubectl@v1.0.0
         with:
           args: -n chime get deployment chime -o yaml
+
       - name: Push manifest update
         uses: github-actions-x/commit@v2.5
         with:
