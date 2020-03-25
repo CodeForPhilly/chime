@@ -1,4 +1,4 @@
-name: Deploy application to production kubernetes cluster
+name: Deploy to production
 
 on:
   pull_request:
