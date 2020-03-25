@@ -1,7 +1,11 @@
 import setuptools
 
+from os import path
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
+
+CWD = path.abspath(path.dirname(__file__))
 
 with open(path.join(CWD, "requirements.txt"), encoding="utf-8") as inp:
     REQUIREMENTS = [el.strip() for el in inp.read().split(",")]
