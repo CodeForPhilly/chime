@@ -111,6 +111,6 @@ jobs:
         uses: github-actions-x/commit@v2.5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          push-branch: ${DEPLOY_PUSH_BRANCH}
+          push-branch: ${{ env.DEPLOY_PUSH_BRANCH }}
           commit-message: Deploy version ${VERSION} to preprod
           rebase: 'true'
