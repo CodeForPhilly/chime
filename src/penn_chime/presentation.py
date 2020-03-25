@@ -1,6 +1,7 @@
 """effectful functions for streamlit io"""
 
 from typing import Optional
+from datetime import datetime
 
 import altair as alt  # type: ignore
 import numpy as np  # type: ignore
@@ -9,6 +10,10 @@ import pandas as pd  # type: ignore
 from .defaults import Constants, RateLos
 from .utils import add_date_column, dataframe_to_base64
 from .parameters import Parameters
+from .hc_param_import_export import (
+    constants_from_uploaded_file,
+    param_download_widget,
+)
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
 
@@ -37,20 +42,10 @@ def display_header(st, m, p):
 <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
 
 <div class="penn-medicine-header__content">
-    <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
-        title="Go to the Penn Medicine home page">Penn Medicine</a>
-    <a id="title" class="penn-medicine-header__title">Penn Medicine - COVID-19 Hospital Impact Model for Epidemics</a>
+    <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics</a>
 </div>
     """,
         unsafe_allow_html=True,
-    )
-    st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + p.change_date() + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
-    )
-    st.markdown(
-        """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/). Code can be found on [Github](https://github.com/CodeForPhilly/chime).
-    Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*"""
     )
 
     st.markdown(
@@ -94,6 +89,16 @@ def display_sidebar(st, d: Constants) -> Parameters:
     if d.known_infected < 1:
         raise ValueError("Known cases must be larger than one to enable predictions.")
 
+    uploaded_file = st.sidebar.file_uploader("Import Parameters", type=['json'])
+    if uploaded_file is not None:
+        d, raw_imported = constants_from_uploaded_file(uploaded_file)
+
+    author = st.sidebar.text_input("Author Name", 
+        value="Jane Doe" if uploaded_file is None else raw_imported["Author"])
+    
+    scenario = st.sidebar.text_input("Scenario Name", 
+        value="COVID Model" if uploaded_file is None else raw_imported["Scenario"])
+    
     n_days = st.sidebar.number_input(
         "Number of days to project",
         min_value=30,
@@ -213,16 +218,22 @@ def display_sidebar(st, d: Constants) -> Parameters:
         format="%i",
     )
 
-    as_date = st.sidebar.checkbox(label="Present result as dates instead of days", value=False)
-
-    max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value")
+    as_date_default = False if uploaded_file is None else raw_imported["PresentResultAsDates"]
+    as_date = st.sidebar.checkbox(label="Present result as dates instead of days", value=as_date_default)
+    
+    max_y_axis_set_default = False if uploaded_file is None else raw_imported["SetYAxisToStaticValue"]
+    max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value", value=max_y_axis_set_default)
     max_y_axis = None
     if max_y_axis_set:
+        y_axis_limit = 500 if uploaded_file is None else raw_imported["YAxisStaticValue"]
         max_y_axis = st.sidebar.number_input(
-            "Y-axis static value", value=500, format="%i", step=25,
+            "Y-axis static value", 
+            value=y_axis_limit, 
+            format="%i", 
+            step=25,
         )
 
-    return Parameters(
+    parameters = Parameters(
         as_date=as_date,
         current_hospitalized=current_hospitalized,
         doubling_time=doubling_time,
@@ -236,7 +247,18 @@ def display_sidebar(st, d: Constants) -> Parameters:
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
         ventilated=RateLos(ventilated_rate, ventilated_los),
+
+        author = author,
+        scenario = scenario,
     )
+    param_download_widget(
+        st,
+        parameters, 
+        as_date=as_date, 
+        max_y_axis_set=max_y_axis_set, 
+        y_axis_limit=max_y_axis
+    )
+    return parameters
 
 
 def show_more_info_about_this_tool(st, model, parameters, defaults, notes: str = ""):
@@ -351,11 +373,10 @@ def write_definitions(st):
 def write_footer(st):
     st.subheader("References & Acknowledgements")
     st.markdown(
-        """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
-* We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
-    """
+        """* This application is based on the work that is developed and made freely available (under MIT license) by Penn Medicine (https://github.com/CodeForPhilly/chime). 
+        """
     )
-    st.markdown("© 2020, The Trustees of the University of Pennsylvania")
+    st.markdown("© 2020, Health Catalyst Inc.")
 
 
 def show_additional_projections(
@@ -446,3 +467,101 @@ def build_download_link(st, filename: str, df: pd.DataFrame, parameters: Paramet
     st.markdown("""
         <a download="{filename}" href="data:file/csv;base64,{csv}">Download full table as CSV</a>
 """.format(csv=csv,filename=filename), unsafe_allow_html=True)
+
+def build_data_and_params(projection_admits, census_df, model, parameters):
+    # taken from admissions table function:
+    admits_table = projection_admits[np.mod(projection_admits.index, 1) == 0].copy()
+    admits_table["day"] = admits_table.index
+    admits_table.index = range(admits_table.shape[0])
+    admits_table = admits_table.fillna(0).astype(int)
+    # Add date info
+    admits_table = add_date_column(
+        admits_table, drop_day_column=True, date_format="%Y-%m-%d"
+    )
+    admits_table.rename(parameters.labels)
+
+    # taken from census table function:
+    census_table = census_df[np.mod(census_df.index, 1) == 0].copy()
+    census_table.index = range(census_table.shape[0])
+    census_table.loc[0, :] = 0
+    census_table = census_table.dropna().astype(int)
+    census_table.rename(parameters.labels)
+    
+    # taken from raw sir table function:
+    projection_area = model.raw_df
+    infect_table = (projection_area.iloc[::1, :]).apply(np.floor)
+    infect_table.index = range(infect_table.shape[0])
+    infect_table["day"] = infect_table.day.astype(int)
+
+    # Build full dataset
+    df = admits_table.copy()
+    df = df.rename(columns = {
+        "date": "Date",
+        "hospitalized": "HospitalAdmissions", 
+        "icu": "ICUAdmissions", 
+        "ventilated": "VentilatedAdmissions"}, )
+    
+    df["HospitalCensus"] = census_table["hospitalized"]
+    df["ICUCensus"] = census_table["icu"]
+    df["VentilatedCensus"] = census_table["ventilated"]
+
+    df["Susceptible"] = infect_table["susceptible"]
+    df["Infections"] = infect_table["infected"]
+    df["Recovered"] = infect_table["recovered"]
+
+    df["Author"] = parameters.author
+    df["Scenario"] = parameters.scenario
+    df["DateGenerated"] = datetime.now().isoformat()
+
+    df["CurrentlyHospitalizedCovidPatients"] = parameters.current_hospitalized
+    df["DoublingTimeBeforeSocialDistancing"] = parameters.doubling_time
+    df["SocialDistancingPercentReduction"] = parameters.relative_contact_rate
+    
+    df["HospitalizationPercentage"] = parameters.hospitalized.rate
+    df["ICUPercentage"] = parameters.icu.rate
+    df["VentilatedPercentage"] = parameters.ventilated.rate
+
+    df["HospitalLengthOfStay"] = parameters.hospitalized.length_of_stay
+    df["ICULengthOfStay"] = parameters.icu.length_of_stay
+    df["VentLengthOfStay"] = parameters.ventilated.length_of_stay
+
+    df["HospitalMarketShare"] = parameters.market_share
+    df["RegionalPopulation"] = parameters.relative_contact_rate
+    df["CurrentlyKnownRegionalInfections"] = parameters.known_infected
+    
+    # Reorder columns
+    df = df[[
+        "Author", 
+        "Scenario", 
+        "DateGenerated",
+
+        "CurrentlyHospitalizedCovidPatients",
+        "DoublingTimeBeforeSocialDistancing",
+        "SocialDistancingPercentReduction",
+
+        "HospitalizationPercentage",
+        "ICUPercentage",
+        "VentilatedPercentage",
+
+        "HospitalLengthOfStay",
+        "ICULengthOfStay",
+        "VentLengthOfStay",
+
+        "HospitalMarketShare",
+        "RegionalPopulation",
+        "CurrentlyKnownRegionalInfections",
+
+        "Date",
+        "HospitalAdmissions", 
+        "ICUAdmissions", 
+        "VentilatedAdmissions",
+
+        "HospitalCensus",
+        "ICUCensus",
+        "VentilatedCensus",
+
+        "Susceptible",
+        "Infections",
+        "Recovered"
+        ]]
+    return(df)
