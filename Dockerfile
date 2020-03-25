@@ -10,8 +10,5 @@ RUN pip install -q -r requirements.txt
 
 COPY . . 
 
-EXPOSE 8050
-
 CMD ["streamlit", "run", "src/app.py"]
-#CMD gunicorn src.dash_app:server --bind 0.0.0.0:8050
-#CMD ["sh"]
+
