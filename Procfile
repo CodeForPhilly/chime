@@ -1,1 +1,1 @@
-web: python src/dash_app.py
+web: gunicorn src/dash_app:app
