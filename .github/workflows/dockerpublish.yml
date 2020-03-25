@@ -114,3 +114,5 @@ jobs:
           push-branch: ${{ env.DEPLOY_PUSH_BRANCH }}
           commit-message: Deploy version ${VERSION} to preprod
           rebase: 'true'
+          name: Chime CI
+          email: services@codeforphilly.com
