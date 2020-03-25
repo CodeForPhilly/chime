@@ -18,53 +18,10 @@ from .parameters import Parameters
 class SimSirModel:
 
     def __init__(self, p: Parameters) -> SimSirModel:
-
-        # Note: this should not be an integer.
-        # We're appoximating infected from what we do know.
-        # TODO market_share > 0, hosp_rate > 0
-        self.infected = infected = (
-            p.current_hospitalized / p.market_share / p.hospitalized.rate
-        )
-
-        self.detection_probability = (
-            p.known_infected / infected if infected > 1.0e-7 else None
-        )
-
         # TODO missing initial recovered value
-        self.recovered = recovered = 0.0
-
-        self.intrinsic_growth_rate = intrinsic_growth_rate = \
-            (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
-
-        self.gamma = gamma = 1.0 / p.recovery_days
-
-        # Contact rate, beta
-        self.beta = beta = (
-            (intrinsic_growth_rate + gamma)
-            / p.susceptible
-            * (1.0 - p.relative_contact_rate)
-        )  # {rate based on doubling time} / {initial susceptible}
-
-        # r_t is r_0 after distancing
-        self.r_t = beta / gamma * p.susceptible
-
-        # Simplify equation to avoid division by zero:
-        # self.r_naught = r_t / (1.0 - relative_contact_rate)
-        self.r_naught = (intrinsic_growth_rate + gamma) / gamma
-
-        # doubling time after distancing
-        # TODO constrain values np.log2(...) > 0.0
-        self.doubling_time_t = 1.0 / np.log2(
-            beta * p.susceptible - gamma + 1)
-
-        self.raw_df = raw_df = sim_sir_df(
-            p.susceptible,
-            infected,
-            recovered,
-            beta,
-            gamma,
-            p.n_days,
-        )
+        susceptible = p.susceptible
+        recovered = 0.0
+        recovery_days = p.recovery_days
 
         rates = {
             key: d.rate
@@ -76,19 +33,66 @@ class SimSirModel:
             for key, d in p.dispositions.items()
         }
 
-        # i_dict_v = get_dispositions(raw_df.infected, rates, p.market_share)
-        # r_dict_v = get_dispositions(raw_df.recovered, rates, p.market_share)
+        # Note: this should not be an integer.
+        # We're appoximating infected from what we do know.
+        # TODO market_share > 0, hosp_rate > 0
+        infected = (
+            p.current_hospitalized / p.market_share / p.hospitalized.rate
+        )
 
-        #self.dispositions = {
-        #    key: value + r_dict_v[key]
-        #    for key, value in i_dict_v.items()
-        #}
+        detection_probability = (
+            p.known_infected / infected if infected > 1.0e-7 else None
+        )
 
-        #self.dispositions_df = pd.DataFrame(self.dispositions)
+        intrinsic_growth_rate = \
+            (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
 
-        self.dispositions_df = dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
-        self.admits_df = admits_df = build_admits_df(dispositions_df)
-        self.census_df = build_census_df(admits_df, lengths_of_stay)
+        gamma = 1.0 / recovery_days
+
+        # Contact rate, beta
+        beta = (
+            (intrinsic_growth_rate + gamma)
+            / susceptible
+            * (1.0 - p.relative_contact_rate)
+        )  # {rate based on doubling time} / {initial susceptible}
+
+        # r_t is r_0 after distancing
+        r_t = beta / gamma * susceptible
+
+        # Simplify equation to avoid division by zero:
+        # self.r_naught = r_t / (1.0 - relative_contact_rate)
+        r_naught = (intrinsic_growth_rate + gamma) / gamma
+        doubling_time_t = 1.0 / np.log2(
+            beta * p.susceptible - gamma + 1)
+
+        raw_df = sim_sir_df(
+            p.susceptible,
+            infected,
+            recovered,
+            beta,
+            gamma,
+            p.n_days,
+        )
+        dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
+        admits_df = build_admits_df(dispositions_df)
+        census_df = build_census_df(admits_df, lengths_of_stay)
+
+        self.susceptible = susceptible
+        self.infected = infected
+        self.recovered = recovered
+
+        self.detection_probability = detection_probability
+        self.recovered = recovered
+        self.intrinsic_growth_rate = intrinsic_growth_rate
+        self.gamma = gamma
+        self.beta = beta
+        self.r_t = r_t
+        self.r_naught = r_naught
+        self.doubling_time_t = doubling_time_t
+        self.raw_df = raw_df
+        self.dispositions_df = dispositions_df
+        self.admits_df = admits_df
+        self.census_df = census_df
 
 
 def sir(
@@ -146,7 +150,7 @@ def build_dispositions_df(
 
 
 def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
-    """Build admits dataframe from Parameters and Model."""
+    """Build admits dataframe from dispositions."""
     admits_df = dispositions_df.iloc[:-1, :] - dispositions_df.shift(1)
     admits_df.day = dispositions_df.day
     return admits_df
@@ -156,7 +160,7 @@ def build_census_df(
     admits_df: pd.DataFrame,
     lengths_of_stay: Dict[str, int],
 ) -> pd.DataFrame:
-    """ALOS for each category of COVID-19 case (total guesses)"""
+    """ALOS for each disposition of COVID-19 case (total guesses)"""
     return pd.DataFrame({
         'day': admits_df.day,
         **{
