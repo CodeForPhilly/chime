@@ -1,1 +1,1 @@
-web: gunicorn src.dash_app:server
+web: gunicorn -w -b 0.0.0.0:8050 src.dash_app:server

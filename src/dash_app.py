@@ -2,9 +2,9 @@
 """
 from dash import Dash
 
-from penn_chime.settings import DEFAULTS
+from src.penn_chime.settings import DEFAULTS
 
-from chime_dash.app.components import Body
+from src.chime_dash.app.components import Body
 
 LANGUAGE = "en"
 

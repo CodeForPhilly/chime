@@ -10,13 +10,13 @@ from dash_html_components import H4, Div
 from dash_core_components import Graph
 from dash_bootstrap_components import Table
 
-from penn_chime.utils import add_date_column
-from penn_chime.parameters import Parameters
+from src.penn_chime.utils import add_date_column
+from src.penn_chime.parameters import Parameters
 
-from chime_dash.app.utils.templates import df_to_html_table
-from chime_dash.app.services.plotting import plot_dataframe
+from src.chime_dash.app.utils.templates import df_to_html_table
+from src.chime_dash.app.services.plotting import plot_dataframe
 
-from chime_dash.app.components.base import Component
+from src.chime_dash.app.components.base import Component
 
 
 class Additions(Component):

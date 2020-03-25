@@ -5,7 +5,7 @@ from typing import List
 from dash.development.base_component import ComponentMeta
 import dash_bootstrap_components as dbc
 
-from chime_dash.app.components.base import Component
+from src.chime_dash.app.components.base import Component
 
 
 class Menu(Component):

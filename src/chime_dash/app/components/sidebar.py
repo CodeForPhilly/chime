@@ -6,11 +6,11 @@ from collections import OrderedDict
 from dash.dependencies import Input as CallbackInput
 from dash.development.base_component import ComponentMeta
 
-from penn_chime.defaults import RateLos
-from penn_chime.parameters import Parameters
+from src.penn_chime.defaults import RateLos
+from src.penn_chime.parameters import Parameters
 
-from chime_dash.app.components.base import Component
-from chime_dash.app.utils.templates import create_switch_input, create_number_input
+from src.chime_dash.app.components.base import Component
+from src.chime_dash.app.utils.templates import create_switch_input, create_number_input
 
 
 _INPUTS = OrderedDict(

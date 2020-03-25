@@ -12,7 +12,7 @@ from pandas import DataFrame
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
-from penn_chime.defaults import Constants
+from src.penn_chime.defaults import Constants
 
 
 TEMPLATE_DIR = path.join(
