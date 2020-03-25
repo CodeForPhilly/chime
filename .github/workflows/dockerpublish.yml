@@ -12,6 +12,8 @@ on:
 env:
   IMAGE_NAME: penn-chime
   DEPLOY_PUSH_BRANCH: develop
+  # Required for action steebchen/kubectl
+  KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_preprod }}
 
 jobs:
   # Run tests.
@@ -73,8 +75,6 @@ jobs:
     needs: push
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    env:
-      KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_preprod }}
 
     steps:
       - uses: actions/checkout@v2
