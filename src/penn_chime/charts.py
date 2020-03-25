@@ -16,11 +16,12 @@ def new_admissions_chart(
     """docstring"""
     plot_projection_days = parameters.n_days - 10
     max_y_axis = parameters.max_y_axis
+    max_y_axis_set = parameters.max_y_axis_set
     as_date = parameters.as_date
 
     y_scale = alt.Scale()
 
-    if max_y_axis is not None:
+    if max_y_axis_set and max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
         y_scale.clamp = True
 
@@ -57,6 +58,7 @@ def admitted_patients_chart(
 
     plot_projection_days = parameters.n_days - 10
     max_y_axis = parameters.max_y_axis
+    max_y_axis_set = parameters.max_y_axis_set
     as_date = parameters.as_date
     if as_date:
         census = add_date_column(census)
@@ -68,7 +70,7 @@ def admitted_patients_chart(
 
     y_scale = alt.Scale()
 
-    if max_y_axis:
+    if max_y_axis_set and max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
         y_scale.clamp = True
 
@@ -105,6 +107,7 @@ def additional_projections_chart(
 
     as_date = parameters.as_date
     max_y_axis = parameters.max_y_axis
+    max_y_axis_set = parameters.max_y_axis_set
 
     if as_date:
         dat = add_date_column(dat)
@@ -114,7 +117,7 @@ def additional_projections_chart(
 
     y_scale = alt.Scale()
 
-    if max_y_axis is not None:
+    if max_y_axis_set and max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
         y_scale.clamp = True
 

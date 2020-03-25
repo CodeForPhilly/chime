@@ -26,6 +26,7 @@ class Parameters:
         as_date: bool = False,
         market_share: float = 1.0,
         max_y_axis: int = None,
+        max_y_axis_set: bool = False,
         n_days: int = 60,
         recovery_days: int = 14,
         author: str = "Jane Doe",
@@ -44,6 +45,7 @@ class Parameters:
         self.as_date = as_date
         self.market_share = market_share
         self.max_y_axis = max_y_axis
+        self.max_y_axis_set = max_y_axis_set
         self.n_days = n_days
         self.recovery_days = recovery_days
 

@@ -270,6 +270,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         known_infected=known_infected,
         market_share=market_share,
         max_y_axis=max_y_axis,
+        max_y_axis_set=max_y_axis_set,
         n_days=n_days,
         relative_contact_rate=relative_contact_rate,
         susceptible=susceptible,
