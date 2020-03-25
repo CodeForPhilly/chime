@@ -6,7 +6,7 @@ from dash.development.base_component import ComponentMeta
 
 from dash_core_components import Markdown
 
-from src.chime_dash.app.components.base import Component
+from chime_dash.app.components.base import Component
 
 
 class Definitions(Component):

@@ -6,10 +6,10 @@ from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
 from dash_core_components import Markdown
 
-from src.penn_chime.parameters import Parameters
+from penn_chime.parameters import Parameters
 
-from src.chime_dash.app.utils.templates import read_localization_markdown
-from src.chime_dash.app.components.base import Component
+from chime_dash.app.utils.templates import read_localization_markdown
+from chime_dash.app.components.base import Component
 
 LOCALIZATION_FILE_1 = "intro.md"
 LOCALIZATION_FILE_2 = "tool-details.md"

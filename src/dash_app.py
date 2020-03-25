@@ -1,11 +1,8 @@
 """Script which launches dash app
 """
 from dash import Dash
-
-from src.penn_chime.settings import DEFAULTS
-
-from src.chime_dash.app.components import Body
-
+from penn_chime.settings import DEFAULTS
+from chime_dash.app.components import Body
 LANGUAGE = "en"
 
 

@@ -6,11 +6,11 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.development.base_component import ComponentMeta
 
-from src.penn_chime.defaults import Constants
-from src.penn_chime.settings import DEFAULTS
+from penn_chime.defaults import Constants
+from penn_chime.settings import DEFAULTS
 
-from src.chime_dash.app.components.base import Component
-from src.chime_dash.app.components.menu import Menu
+from chime_dash.app.components.base import Component
+from chime_dash.app.components.menu import Menu
 
 
 class Navbar(Component):

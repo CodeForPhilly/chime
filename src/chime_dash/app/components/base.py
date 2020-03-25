@@ -8,11 +8,11 @@ from dash.dependencies import Output, Input
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Div
 
-from src.penn_chime.defaults import Constants
-from src.penn_chime.settings import DEFAULTS
+from penn_chime.defaults import Constants
+from penn_chime.settings import DEFAULTS
 
-from src.chime_dash.app.utils.templates import read_localization_yml
-from src.chime_dash.app.utils.templates import read_localization_markdown
+from chime_dash.app.utils.templates import read_localization_yml
+from chime_dash.app.utils.templates import read_localization_markdown
 
 
 class Component(ABC):
