@@ -7,16 +7,25 @@ on:
       - v*
 
   # Run tests for any PRs.
+  # Deploy builds
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 env:
   IMAGE_NAME: penn-chime
+  DEPLOY_PUSH_BRANCH: develop
+  DEPLOY_KUBECONFIG_DATA: ${{ secrets.kubeconfig_data_preprod }}
 
 jobs:
   # Run tests.
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
     runs-on: ubuntu-latest
+    if: github.event_type == 'pull_request' && github.event.pull_request.state == 'open'
 
     steps:
       - uses: actions/checkout@v2
@@ -58,6 +67,9 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
+          # Pass version number to subsequent jobs
+          echo "::set-env name=VERSION::$VERSION"
+
           # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=latest
 
@@ -66,3 +78,36 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+
+  deploy:
+
+    needs: push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      KUBE_CONFIG_DATA: ${DEPLOY_KUBECONFIG_DATA}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update application manifest
+        run: |
+          sed -Ei "s/(- image: .*):(.*)/\1:$VERSION/" k8s/app.yaml
+      - name: Deploy to preprod
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: apply -f k8s/app.yaml
+      - name: Wait for deploy to complete
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: -n chime rollout status deployment.v1.apps/chime
+      - name: Show completed deployment
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: -n chime get deployment chime -o yaml
+      - name: Push manifest update
+        uses: github-actions-x/commit@v2.5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          push-branch: ${DEPLOY_PUSH_BRANCH}
+          commit-message: Deploy version ${VERSION} to preprod
+          rebase: 'true'
