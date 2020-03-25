@@ -25,7 +25,9 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.pull_request.state == 'open'
+    if: >
+      ( github.event_name == 'pull_request' && github.event.pull_request.state == 'open' ) ||
+        github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
@@ -79,7 +81,7 @@ jobs:
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-  deploy:
+  deploy-preprod:
 
     needs: push
     if: github.event_name == 'push'
