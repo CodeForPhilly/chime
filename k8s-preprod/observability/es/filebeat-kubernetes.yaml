@@ -8,27 +8,27 @@ metadata:
     k8s-app: filebeat
 data:
   filebeat.yml: |-
-    filebeat.inputs:
-    - type: container
-      paths:
-        - /var/log/containers/*.log
-      processors:
-        - add_kubernetes_metadata:
-            host: ${NODE_NAME}
-            matchers:
-            - logs_path:
-                logs_path: "/var/log/containers/"
-
-    # To enable hints based autodiscover, remove `filebeat.inputs` configuration and uncomment this:
-    #filebeat.autodiscover:
-    #  providers:
-    #    - type: kubernetes
-    #      node: ${NODE_NAME}
-    #      hints.enabled: true
-    #      hints.default_config:
-    #        type: container
-    #        paths:
-    #          - /var/log/containers/*${data.kubernetes.container.id}.log
+    # filebeat.inputs:
+    #   - type: container
+    #     paths:
+    #       - /var/log/containers/*.log
+    #     processors:
+    #       - add_kubernetes_metadata:
+    #           host: ${NODE_NAME}
+    #           matchers:
+    #           - logs_path:
+    #               logs_path: "/var/log/containers/"
+    filebeat.autosdiscover: 
+      providers:
+        - type: kubernetes
+          node: ${NODE_NAME}
+            hints.enabled: true
+            hints.default_config:
+          type: container
+            paths:
+            - /var/log/containers/*${data.kubernetes.container.id}.log
+       
+        
 
     processors:
       - add_cloud_metadata:
@@ -64,7 +64,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:8.0.0
+        image: docker.elastic.co/beats/filebeat:7.6.1
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
@@ -77,7 +77,7 @@ spec:
         - name: ELASTICSEARCH_USERNAME
           value: elastic
         - name: ELASTICSEARCH_PASSWORD
-          value: changeme
+          value: "w94cd5wps8jtxhqt8zvw8k9p"
         - name: ELASTIC_CLOUD_ID
           value:
         - name: ELASTIC_CLOUD_AUTH
