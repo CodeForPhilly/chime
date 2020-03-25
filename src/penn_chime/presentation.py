@@ -249,7 +249,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
     
     max_y_axis_set_default = False if uploaded_file is None else raw_imported["SetYAxisToStaticValue"]
     max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value", value=max_y_axis_set_default)
-    max_y_axis = None
+    max_y_axis = 500
     if max_y_axis_set:
         y_axis_limit = 500 if uploaded_file is None else raw_imported["YAxisStaticValue"]
         max_y_axis = st.sidebar.number_input(
