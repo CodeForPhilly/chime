@@ -76,16 +76,18 @@ class SimSirModel:
             for key, d in p.dispositions.items()
         }
 
-        i_dict_v = get_dispositions(raw_df.infected, rates, p.market_share)
-        r_dict_v = get_dispositions(raw_df.recovered, rates, p.market_share)
+        # i_dict_v = get_dispositions(raw_df.infected, rates, p.market_share)
+        # r_dict_v = get_dispositions(raw_df.recovered, rates, p.market_share)
 
-        self.dispositions = {
-            key: value + r_dict_v[key]
-            for key, value in i_dict_v.items()
-        }
+        #self.dispositions = {
+        #    key: value + r_dict_v[key]
+        #    for key, value in i_dict_v.items()
+        #}
 
-        self.dispositions_df = pd.DataFrame(self.dispositions)
-        self.admits_df = admits_df = build_admits_df(p.n_days, self.dispositions)
+        #self.dispositions_df = pd.DataFrame(self.dispositions)
+
+        self.dispositions_df = dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
+        self.admits_df = admits_df = build_admits_df(dispositions_df)
         self.census_df = build_census_df(admits_df, lengths_of_stay)
 
 
@@ -119,7 +121,7 @@ def gen_sir(
 
 
 def sim_sir_df(
-    s: float, i: float, r: float, beta: float, gamma: float, n_days
+    s: float, i: float, r: float, beta: float, gamma: float, n_days: int
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
@@ -127,47 +129,41 @@ def sim_sir_df(
         columns=("day", "susceptible", "infected", "recovered"),
     )
 
-
-def get_dispositions(
-    patients: np.ndarray,
+def build_dispositions_df(
+    sim_sir_df: pd.DataFrame,
     rates: Dict[str, float],
     market_share: float,
-) -> Dict[str, np.ndarray]:
+) -> pd.DataFrame:
     """Get dispositions of patients adjusted by rate and market_share."""
-    return {
-        key: patients * rate * market_share
-        for key, rate in rates.items()
-    }
-
-
-def build_admits_df(n_days, dispositions) -> pd.DataFrame:
-    """Build admits dataframe from Parameters and Model."""
-    days = np.arange(0, n_days + 1)
-    projection = pd.DataFrame({
-        "day": days,
-        **dispositions,
+    patients = sim_sir_df.infected + sim_sir_df.recovered
+    return pd.DataFrame({
+        "day": sim_sir_df.day,
+        **{
+            key: patients * rate * market_share
+            for key, rate in rates.items()
+        }
     })
-    # New cases
-    admits_df = projection.iloc[:-1, :] - projection.shift(1)
-    admits_df["day"] = range(admits_df.shape[0])
+
+
+def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
+    """Build admits dataframe from Parameters and Model."""
+    admits_df = dispositions_df.iloc[:-1, :] - dispositions_df.shift(1)
+    admits_df.day = dispositions_df.day
     return admits_df
 
 
 def build_census_df(
-    admits_df: pd.DataFrame, lengths_of_stay
+    admits_df: pd.DataFrame,
+    lengths_of_stay: Dict[str, int],
 ) -> pd.DataFrame:
     """ALOS for each category of COVID-19 case (total guesses)"""
-    n_days = np.shape(admits_df)[0]
-    census_dict = {}
-    for key, los in lengths_of_stay.items():
-        census = (
-            admits_df.cumsum().iloc[:-los, :]
-            - admits_df.cumsum().shift(los).fillna(0)
-        ).apply(np.ceil)
-        census_dict[key] = census[key]
-
-    census_df = pd.DataFrame(census_dict)
-    census_df["day"] = census_df.index
-    census_df = census_df[["day", *lengths_of_stay.keys()]]
-    census_df = census_df.head(n_days)
-    return census_df
+    return pd.DataFrame({
+        'day': admits_df.day,
+        **{
+            key: (
+                admits_df[key].cumsum().iloc[:-los]
+                - admits_df[key].cumsum().shift(los).fillna(0)
+            ).apply(np.ceil)
+            for key, los in lengths_of_stay.items()
+        }
+    })
