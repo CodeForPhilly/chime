@@ -1,0 +1,28 @@
+name: Deploy working development app to Heroku staging project
+
+on:
+  push:
+    branches:
+      - 'develop'
+
+env:
+  HEROKU_USER: 32dd7c8d-eb68-4420-bfe2-9ed047ef8fb0
+  HEROKU_SECRET: ${{ secrets.heroku_secret_key }}
+  HEROKU_APP: cfp-ci-chime
+  HEROKU_EMAIL: services@codeforphilly.org
+
+jobs:
+  deploy-heroku-stg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy app
+        id: deploy_stg_job
+        uses: akhileshns/heroku-deploy@v3.0.0
+        with:
+          heroku_api_key: ${HEROKU_SECRET}
+          heroku_app_name: ${HEROKU_APP}
+          heroku_email: ${HEROKU_EMAIL}
+      - name: Return app URL
+        run: |
+          echo "Deployed to: https://${HEROKU_APP}.herokuapp.com/"
