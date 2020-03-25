@@ -18,6 +18,7 @@ DEFAULTS = Constants(
         philly=philly,
     ),
     current_hospitalized=14,
+    new_admissions=4,
     doubling_time=4,
     known_infected=510,
     n_days=60,

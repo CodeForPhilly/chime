@@ -14,6 +14,7 @@ class Parameters:
         self,
         *,
         current_hospitalized: int,
+        new_admissions: int,
         doubling_time: float,
         known_infected: int,
         relative_contact_rate: float,
@@ -30,6 +31,7 @@ class Parameters:
         recovery_days: int = 14,
     ):
         self.current_hospitalized = current_hospitalized
+        self.new_admissions = new_admissions
         self.doubling_time = doubling_time
         self.known_infected = known_infected
         self.relative_contact_rate = relative_contact_rate

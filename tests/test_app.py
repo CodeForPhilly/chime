@@ -16,6 +16,7 @@ from src.penn_chime.defaults import RateLos
 
 PARAM = Parameters(
     current_hospitalized=100,
+    new_admissions=18,
     doubling_time=6.0,
     known_infected=5000,
     market_share=0.05,

@@ -23,6 +23,7 @@ class Constants:
         self,
         *,
         current_hospitalized: int,
+        new_admissions: int,
         doubling_time: int,
         known_infected: int,
         relative_contact_rate: int,
@@ -40,6 +41,7 @@ class Constants:
     ):
         self.region = region
         self.current_hospitalized = current_hospitalized
+        self.new_admissions = new_admissions
         self.known_infected = known_infected
         self.doubling_time = doubling_time
         self.relative_contact_rate = relative_contact_rate

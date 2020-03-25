@@ -53,6 +53,13 @@ def parse_args():
             "Currently Hospitalized COVID-19 Patients (>= 0)",
         ),
         (
+            "--new-admissions",
+            int,
+            0,
+            None,
+            "New admissions in most recent 24-hour period (>= 0)",
+        ),
+        (
             "--doubling-time",
             float,
             0.0,
@@ -105,6 +112,7 @@ def main():
 
     p = Parameters(
         current_hospitalized=a.current_hospitalized,
+        new_admissions=a.new_admissions,
         doubling_time=a.doubling_time,
         known_infected=a.known_infected,
         market_share=a.market_share,

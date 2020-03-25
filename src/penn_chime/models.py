@@ -38,8 +38,17 @@ class SimSirModel:
 
         self.gamma = gamma = 1.0 / p.recovery_days
 
-        # Contact rate, beta
+        # from the timestep function sir(), we derive:
+        # new_infections = beta * s * i
+        # new_admissions = new_infections * market_share * hospitalized.rate
+        # Substitute and rearrange to obtain:
         self.beta = beta = (
+            p.new_admissions
+            / ( susceptible * infected*p.market_share * p.hospitalized.rate )
+        )
+
+        # Contact rate, beta
+        self.beta_old = (
             (intrinsic_growth_rate + gamma)
             / p.susceptible
             * (1.0 - p.relative_contact_rate)
@@ -93,8 +102,9 @@ def sir(
     s: float, i: float, r: float, beta: float, gamma: float, n: float
 ) -> Tuple[float, float, float]:
     """The SIR model, one time step."""
-    s_n = (-beta * s * i) + s
-    i_n = (beta * s * i - gamma * i) + i
+    new_infections = beta * s * i
+    s_n = (-new_infections) + s
+    i_n = (new_infections - gamma * i) + i
     r_n = gamma * i + r
     if s_n < 0.0:
         s_n = 0.0

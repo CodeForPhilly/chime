@@ -110,6 +110,14 @@ def display_sidebar(st, d: Constants) -> Parameters:
         format="%i",
     )
 
+    new_admissions = st.sidebar.number_input(
+        "New admissions in most recent 24-hour period (>= 0)",
+        min_value=1,
+        value=d.new_admissions,
+        step=1,
+        format="%i",
+    )
+
     doubling_time = st.sidebar.number_input(
         "Doubling time before social distancing (days)",
         min_value=0,
