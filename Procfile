@@ -1,1 +1,1 @@
-web: STREAMLIT_SERVER_PORT=$PORT streamlit run src/app.py
+web: python src/dash_app.py
