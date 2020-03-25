@@ -87,7 +87,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           # Update image version in application manifest
-          sed -Ei "s/(- image: .*):(.*)/\1:$VERSION/" k8s/app.yaml
+          sed -Ei "s,(- image: docker.pkg.github.com)(.*),\1/${{ github.repository }}/$IMAGE_NAME:$VERSION," k8s/app.yaml
 
           # Show updated manifest file
           cat k8s/app.yaml
