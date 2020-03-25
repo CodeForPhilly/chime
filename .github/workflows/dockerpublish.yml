@@ -79,7 +79,7 @@ jobs:
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-  deploy:
+  deploy-preprod:
 
     needs: push
     if: github.event_name == 'push'
