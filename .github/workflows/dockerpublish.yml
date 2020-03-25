@@ -12,7 +12,6 @@ on:
 env:
   IMAGE_NAME: penn-chime
   DEPLOY_PUSH_BRANCH: develop
-  DEPLOY_KUBECONFIG_SECRET: kubeconfig_data_preprod
 
 jobs:
   # Run tests.
@@ -78,7 +77,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
-      KUBE_CONFIG_DATA: ${{ secrets[env.DEPLOY_KUBECONFIG_SECRET] }}
+      KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_preprod }}
 
     steps:
       - uses: actions/checkout@v2
