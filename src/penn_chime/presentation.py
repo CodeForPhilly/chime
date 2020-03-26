@@ -64,8 +64,8 @@ def display_header(st, m, p):
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine to assist hospitals and public health officials with hospital capacity planning, 
-    but can be used anywhere in the world. 
+    Penn Medicine to assist hospitals and public health officials with hospital capacity planning,
+    but can be used anywhere in the world.
     Customize it for your region by modifying data inputs in the left panel.
     For questions on how to use this tool see the [User docs]({docs_url}). Code can be found on [Github](https://github.com/CodeForPhilly/chime)*.
     """.format(docs_url=DOCS_URL)
@@ -76,15 +76,15 @@ def display_header(st, m, p):
     confirmed cases in the region imply a **{detection_prob_str}** rate of detection. This is based on current inputs for
     Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
-    
-{infection_warning_str} 
+
+{infection_warning_str}
 {infected_population_warning_str}
 
 An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
- **{r_naught:.2f}** and daily growth rate of **{daily_growth:.2f}%**. 
- 
+ **{r_naught:.2f}** and daily growth rate of **{daily_growth:.2f}%**.
+
 **Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
-outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$** 
+outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**
 and daily growth rate of **{daily_growth_t:.2f}%**.
 """.format(
             total_infections=m.infected,
@@ -120,7 +120,7 @@ class InputWrapper:
         self.value = value
         self.kwargs = kwargs
 
-    def build(self):
+    def __call__(self):
         return self.st_obj(self.label, value=self.value, **self.kwargs)
 
 
@@ -145,7 +145,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
     if d.known_infected < 1:
         raise ValueError("Known cases must be larger than one to enable predictions.")
     st_obj = st.sidebar
-    current_hospitalized = NumberInputWrapper(
+    current_hospitalized_input = NumberInputWrapper(
         st_obj,
         "Currently Hospitalized COVID-19 Patients",
         min_value=0,
@@ -153,7 +153,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1,
         format="%i",
     )
-    n_days = NumberInputWrapper(
+    n_days_input = NumberInputWrapper(
         st_obj,
         "Number of days to project",
         min_value=30,
@@ -161,7 +161,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=10,
         format="%i",
     )
-    doubling_time = NumberInputWrapper(
+    doubling_time_input = NumberInputWrapper(
         st_obj,
         "Doubling time before social distancing (days)",
         min_value=0,
@@ -169,7 +169,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1,
         format="%i",
     )
-    relative_contact_rate = NumberInputWrapper(
+    relative_contact_rate_input = NumberInputWrapper(
         st_obj,
         "Social distancing (% reduction in social contact)",
         min_value=0,
@@ -178,7 +178,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=5,
         format="%i",
     )
-    hospitalized_rate = NumberInputWrapper(
+    hospitalized_rate_input = NumberInputWrapper(
         st_obj,
         "Hospitalization %(total infections)",
         min_value=0.001,
@@ -187,7 +187,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1.0,
         format="%f",
     )
-    icu_rate = NumberInputWrapper(
+    icu_rate_input = NumberInputWrapper(
         st_obj,
         "ICU %(total infections)",
         min_value=0.0,
@@ -196,7 +196,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1.0,
         format="%f",
     )
-    ventilated_rate = NumberInputWrapper(
+    ventilated_rate_input = NumberInputWrapper(
         st_obj,
         "Ventilated %(total infections)",
         min_value=0.0,
@@ -205,7 +205,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1.0,
         format="%f",
     )
-    hospitalized_los = NumberInputWrapper(
+    hospitalized_los_input = NumberInputWrapper(
         st_obj,
         "Hospital Length of Stay",
         min_value=0,
@@ -213,7 +213,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1,
         format="%i",
     )
-    icu_los = NumberInputWrapper(
+    icu_los_input = NumberInputWrapper(
         st_obj,
         "ICU Length of Stay",
         min_value=0,
@@ -221,7 +221,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1,
         format="%i",
     )
-    ventilated_los = NumberInputWrapper(
+    ventilated_los_input = NumberInputWrapper(
         st_obj,
         "Vent Length of Stay",
         min_value=0,
@@ -229,7 +229,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1,
         format="%i",
     )
-    market_share = NumberInputWrapper(
+    market_share_input = NumberInputWrapper(
         st_obj,
         "Hospital Market Share (%)",
         min_value=0.001,
@@ -238,7 +238,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1.0,
         format="%f",
     )
-    susceptible = NumberInputWrapper(
+    susceptible_input = NumberInputWrapper(
         st_obj,
         "Regional Population",
         min_value=1,
@@ -246,7 +246,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=100000,
         format="%i",
     )
-    known_infected = NumberInputWrapper(
+    known_infected_input = NumberInputWrapper(
         st_obj,
         "Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
         min_value=0,
@@ -254,53 +254,55 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=10,
         format="%i",
     )
-    as_date = CheckboxWrapper(st_obj, "Present result as dates instead of days", value=False)
-    max_y_axis_set = CheckboxWrapper(st_obj, "Set the Y-axis on graphs to a static value")
+    as_date_input = CheckboxWrapper(st_obj, "Present result as dates instead of days", value=False)
+    max_y_axis_set_input = CheckboxWrapper(st_obj, "Set the Y-axis on graphs to a static value")
+    max_y_axis_input = NumberInputWrapper(st_obj, "Y-axis static value", value=500, format="%i", step=25)
 
-    max_y_axis = None
-    if max_y_axis_set:
-        max_y_axis = NumberInputWrapper(st_obj, "Y-axis static value", value=500, format="%i", step=25)
 
     # Build in desired order
     st.sidebar.markdown("### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
-    susceptible.build()
-    market_share.build()
-    known_infected.build()
-    current_hospitalized.build()
+    susceptible = susceptible_input()
+    market_share = market_share_input()
+    known_infected = known_infected_input()
+    current_hospitalized = current_hospitalized_input()
 
     st.sidebar.markdown("### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)"
                         .format(docs_url=DOCS_URL))
-    doubling_time.build()
-    relative_contact_rate.build()
+    doubling_time = doubling_time_input()
+    relative_contact_rate = relative_contact_rate_input()
 
     st.sidebar.markdown("### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
-    hospitalized_rate.build()
-    icu_rate.build()
-    ventilated_rate.build()
-    hospitalized_los.build()
-    icu_los.build()
-    ventilated_los.build()
+    hospitalized_rate = hospitalized_rate_input()
+    icu_rate = icu_rate_input()
+    ventilated_rate = ventilated_rate_input()
+    hospitalized_los = hospitalized_los_input()
+    icu_los = icu_los_input()
+    ventilated_los = ventilated_los_input()
 
     st.sidebar.markdown("### Display Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
-    n_days.build()
-    max_y_axis.build()
-    as_date.build()
+    n_days = n_days_input()
+    max_y_axis_set = max_y_axis_set_input()
+    as_date = as_date_input()
+
+    max_y_axis = None
+    if max_y_axis_set:
+        max_y_axis = max_y_axis_input()
 
     return Parameters(
-        as_date=as_date.value,
-        current_hospitalized=current_hospitalized.value,
-        market_share=market_share.value,
-        known_infected=known_infected.value,
-        doubling_time=doubling_time.value,
+        as_date=as_date,
+        current_hospitalized=current_hospitalized,
+        market_share=market_share,
+        known_infected=known_infected,
+        doubling_time=doubling_time,
 
-        max_y_axis=max_y_axis.value,
-        n_days=n_days.value,
-        relative_contact_rate=relative_contact_rate.value / 100.0,
-        susceptible=susceptible.value,
+        max_y_axis=max_y_axis,
+        n_days=n_days,
+        relative_contact_rate=relative_contact_rate / 100.0,
+        susceptible=susceptible,
 
-        hospitalized=RateLos(hospitalized_rate.value / 100.0, hospitalized_los.value),
-        icu=RateLos(icu_rate.value / 100.0, icu_los.value),
-        ventilated=RateLos(ventilated_rate.value / 100.0, ventilated_los.value),
+        hospitalized=RateLos(hospitalized_rate/ 100.0, hospitalized_los),
+        icu=RateLos(icu_rate/ 100.0, icu_los),
+        ventilated=RateLos(ventilated_rate/ 100.0, ventilated_los),
     )
 
 
@@ -408,7 +410,7 @@ $$\\beta = (g + \\gamma)$$.
 def write_definitions(st):
     st.subheader("Guidance on Selecting Inputs")
     st.markdown(
-        """**This information has been moved to the 
+        """**This information has been moved to the
 [User Documentation]({docs_url}/what-is-chime/parameters#guidance-on-selecting-inputs)**""".format(docs_url=DOCS_URL)
     )
 
