@@ -93,6 +93,8 @@ class SimSirModel:
         self.dispositions_df = dispositions_df
         self.admits_df = admits_df
         self.census_df = census_df
+        self.daily_growth = daily_growth_helper(p.doubling_time)
+        self.daily_growth_t = daily_growth_helper(doubling_time_t)
 
 
 def sir(
@@ -171,3 +173,11 @@ def build_census_df(
             for key, los in lengths_of_stay.items()
         }
     })
+
+  
+def daily_growth_helper(doubling_time):
+    """Calculates average daily growth rate from doubling time"""
+    result = 0
+    if doubling_time != 0:
+        result = (np.power(2, 1.0 / doubling_time) - 1) * 100
+    return result

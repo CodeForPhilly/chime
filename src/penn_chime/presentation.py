@@ -81,10 +81,11 @@ def display_header(st, m, p):
 {infected_population_warning_str}
 
 An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
-**{r_naught:.2f}**.
-
+ **{r_naught:.2f}** and daily growth rate of **{daily_growth:.2f}%**. 
+ 
 **Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
-outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**.
+outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$** 
+and daily growth rate of **{daily_growth_t:.2f}%**.
 """.format(
             total_infections=m.infected,
             initial_infections=p.known_infected,
@@ -100,6 +101,8 @@ outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effect
             r_t=m.r_t,
             doubling_time_t=abs(m.doubling_time_t),
             impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to"),
+            daily_growth=m.daily_growth,
+            daily_growth_t=m.daily_growth_t,
             docs_url=DOCS_URL,
             infection_warning_str=infection_warning_str,
             infected_population_warning_str=infected_population_warning_str
