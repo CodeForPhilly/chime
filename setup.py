@@ -23,7 +23,8 @@ setuptools.setup(
         "streamlit",
         "pandas",
         "numpy",
-        "altair"
+        "altair",
+        "pytest"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
