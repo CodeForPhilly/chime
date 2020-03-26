@@ -32,6 +32,19 @@ def display_header(st, m, p):
         if m.detection_probability
         else "unknown"
     )
+
+    infection_warning_str = (
+        """(Warning: The number of known infections is greater than the estimate of infected patients based on inputs for current hospitalization, market share, and hospitalization rate. Please verify the market share value in the sidebar, and see if the hospitalization rate needs to be lowered.)"""
+        if p.known_infected > m.infected
+        else ""
+    )
+
+    infected_population_warning_str = (
+        """(Warning: The number of estimated infections is greater than the total regional population. Please verify the values entered in the sidebar.)"""
+        if m.infected > p.susceptible
+        else ""
+    )
+
     st.markdown(
         """
 <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
@@ -58,6 +71,9 @@ def display_header(st, m, p):
     confirmed cases in the region imply a **{detection_prob_str}** rate of detection. This is based on current inputs for
     Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
+    
+{infection_warning_str} 
+{infected_population_warning_str}
 
 An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
 **{r_naught:.2f}**.
@@ -78,7 +94,9 @@ outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effect
             relative_contact_rate=p.relative_contact_rate,
             r_t=m.r_t,
             doubling_time_t=abs(m.doubling_time_t),
-            impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to")
+            impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to"),
+            infection_warning_str=infection_warning_str,
+            infected_population_warning_str=infected_population_warning_str
         )
     )
 
