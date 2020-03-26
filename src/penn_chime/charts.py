@@ -22,7 +22,6 @@ def new_admissions_chart(
 
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = True
 
     tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
@@ -70,7 +69,6 @@ def admitted_patients_chart(
 
     if max_y_axis:
         y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = True
 
     # TODO fix the fold to allow any number of dispositions
     return (
@@ -116,7 +114,6 @@ def additional_projections_chart(
 
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
-        y_scale.clamp = True
 
     return (
         alt.Chart(dat)
