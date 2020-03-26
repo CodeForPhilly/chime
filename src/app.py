@@ -55,8 +55,11 @@ if st.checkbox("Show Projected Admissions in tabular form"):
         draw_projected_admissions_table(st, m.admits_df, p.labels, 1, as_date=p.as_date)
     else:
         admissions_day_range = st.slider(
-            'Interval of Days for Projected Admissions',
-            1, 10, 7
+            label="Interval of Days",
+            key="admissions_day_range_slider",
+            min_value=1,
+            max_value=10,
+            value=7 
         )
         draw_projected_admissions_table(st, m.admits_df, p.labels, admissions_day_range, as_date=p.as_date)
     build_download_link(st,
@@ -79,8 +82,11 @@ if st.checkbox("Show Projected Census in tabular form"):
         draw_census_table(st, m.census_df, p.labels, 1, as_date=p.as_date)
     else:
         census_day_range = st.slider(
-            'Interval of Days for Projected Census',
-            1, 10, 7
+            label='Interval of Days',
+            key="census_day_range_slider",
+            min_value=1,
+            max_value=10,
+            value=7 
         )
         draw_census_table(st, m.census_df, p.labels, census_day_range, as_date=p.as_date)
     build_download_link(st,
