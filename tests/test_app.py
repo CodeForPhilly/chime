@@ -267,6 +267,17 @@ def test_model(model=MODEL, param=PARAM):
     )
     assert (diff.abs() < 0.1).all()
 
+    hosp_rate = param.dispositions["hospitalized"].rate
+    icu_rate = param.dispositions["icu"].rate
+    vent_rate = param.dispositions["ventilated"].rate
+
+    assert model.census_df.loc[0, "hospitalized"] == param.current_hospitalized
+    assert model.census_df.loc[0, "icu"] == param.current_hospitalized * (icu_rate / hosp_rate)
+    assert model.census_df.loc[0, "ventilated"] == param.current_hospitalized * (vent_rate / hosp_rate)
+
+    assert model.census_df.loc[0, "icu"] == first.infected * icu_rate * param.market_share
+    assert model.census_df.loc[0, "ventilated"] == first.infected * vent_rate * param.market_share
+
 
 def test_daily_growth_helper():
     assert np.round(daily_growth_helper(5), decimals=4) == 14.8698
