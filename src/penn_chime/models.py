@@ -63,10 +63,10 @@ class SimSirModel:
         # self.r_naught = r_t / (1.0 - relative_contact_rate)
         r_naught = (intrinsic_growth_rate + gamma) / gamma
         doubling_time_t = 1.0 / np.log2(
-            beta * p.susceptible - gamma + 1)
+            beta * susceptible - gamma + 1)
 
         raw_df = sim_sir_df(
-            p.susceptible,
+            susceptible,
             infected,
             recovered,
             beta,
@@ -174,7 +174,7 @@ def build_census_df(
         }
     })
 
-  
+
 def daily_growth_helper(doubling_time):
     """Calculates average daily growth rate from doubling time"""
     result = 0
