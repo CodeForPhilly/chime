@@ -35,11 +35,6 @@ def display_header(st, m, p):
     st.markdown(
         """
 <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
-
-    st.markdown(
-        """[Documentation](https://code-for-philly.gitbook.io/chime/) | [Github](https://github.com/CodeForPhilly/chime/) | [Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)"""
-    )
-
 <div class="penn-medicine-header__content">
     <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
         title="Go to the Penn Medicine home page">Penn Medicine</a>
@@ -47,6 +42,9 @@ def display_header(st, m, p):
 </div>
     """,
         unsafe_allow_html=True,
+    )
+    st.markdown(
+        """[Documentation](https://code-for-philly.gitbook.io/chime/) | [Github](https://github.com/CodeForPhilly/chime/) | [Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)"""
     )
     st.markdown(
         """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + p.change_date() + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
