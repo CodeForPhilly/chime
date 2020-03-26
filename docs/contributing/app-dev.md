@@ -86,6 +86,12 @@ pip install pytest
 pytest
 ```
 
+You can also run `pytest` in the docker container by running:
+
+```bash
+scripts/unittest
+```
+
 ## Validating CHIME
 
 *No validation routine is available yet. If you have thoughts on how to add one, please contribute!*

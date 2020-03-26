@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do SOURCE="$(readlink "$SOURCE")"; done
+PROJECT_ROOT="$(cd -P "$(dirname "$SCRIPTS_DIR")" && pwd)"
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Run unit tests with pytest inside the docker container.
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    docker-compose run \
+                   -v ${PROJECT_ROOT}:/opt/src \
+                   -w /opt/src \
+                   app \
+                   pytest
+fi
