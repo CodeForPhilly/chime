@@ -1,56 +1,3 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: chime
-
----
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: chime
-  namespace: chime
-  labels:
-    app: chime
-spec:
-  replicas: 15
-  strategy:
-    type: Recreate
-  selector:
-    matchLabels:
-      app: chime
-  template:
-    metadata:
-      labels:
-        app: chime
-    spec:
-      containers:
-      - image: docker.pkg.github.com/codeforphilly/chime/penn-chime:0.4.1
-        name: chime
-        ports:
-        - containerPort: 8000
-          name: http
-          protocol: TCP
-      imagePullSecrets:
-      - name: regcred
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: chime
-  namespace: chime
-  labels:
-    app: chime
-spec:
-  selector:
-    app: chime
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: 8000
-
 ---
 
 apiVersion: extensions/v1beta1
@@ -63,12 +10,12 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    # allow requests larger than 1MiB
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   tls:
   - hosts:
     - penn-chime.bus.phl.io
-    - penn-chime-alt.bus.phl.io
     secretName: tls-secret
   rules:
   - host: penn-chime.bus.phl.io
@@ -78,6 +25,25 @@ spec:
         backend:
           serviceName: chime
           servicePort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: chime-alt
+  namespace: chime
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    # allow requests larger than 1MiB
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  tls:
+  - hosts:
+    - penn-chime-alt.bus.phl.io
+    secretName: tls-chime-alt
+  rules:
   - host: penn-chime-alt.bus.phl.io
     http:
       paths:

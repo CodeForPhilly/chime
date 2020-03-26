@@ -99,6 +99,11 @@ jobs:
         with:
           args: apply -f k8s/app.yaml
 
+      - name: Sync preprod resources
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: apply -Rf k8s.preprod
+
       - name: Wait for deploy to complete
         uses: steebchen/kubectl@v1.0.0
         with:
