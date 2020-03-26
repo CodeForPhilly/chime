@@ -249,13 +249,12 @@ def test_model(model=MODEL, param=PARAM):
     assert round(last.susceptible, 0) == 67202
     assert round(raw_df.recovered[30], 0) == 224048
 
-    assert [d[0] for d in model.dispositions.values()] == [100.0, 40.0, 20.0]
-    assert [round(d[60], 0) for d in model.dispositions.values()] == [1182.0, 473.0, 236.0]
+    assert list(model.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
+    assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [60, 1182.0, 473.0, 236.0]
 
     # test that admissions are being properly calculated (thanks @PhilMiller)
-    admissions = build_admits_df(param.n_days, model.dispositions)
-    cumulative_admissions = admissions.cumsum()
-    diff = cumulative_admissions["hospitalized"][1:-1] - (
+    cumulative_admits = model.admits_df.cumsum()
+    diff = cumulative_admits.hospitalized[1:-1] - (
         0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
     )
     assert (diff.abs() < 0.1).all()
