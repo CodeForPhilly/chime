@@ -100,7 +100,7 @@ outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effect
             r_t=m.r_t,
             doubling_time_t=abs(m.doubling_time_t),
             impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to"),
-            docs_url=DOCS_URL
+            docs_url=DOCS_URL,
             infection_warning_str=infection_warning_str,
             infected_population_warning_str=infected_population_warning_str
         )
