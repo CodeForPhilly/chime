@@ -263,7 +263,7 @@ def test_model(model=MODEL, param=PARAM):
     # test that admissions are being properly calculated (thanks @PhilMiller)
     cumulative_admits = model.admits_df.cumsum()
     diff = cumulative_admits.hospitalized[1:-1] - (
-        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
+        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1])
     )
     assert (diff.abs() < 0.1).all()
 

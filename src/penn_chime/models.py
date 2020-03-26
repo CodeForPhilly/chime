@@ -161,11 +161,11 @@ def build_admits_df(
     admits_df.day = dispositions_df.day
 
     # Account for initial conditions
-    admits_df.loc[0, "Hospitalized"] = current_hospitalized
+    admits_df.loc[0, "hospitalized"] = current_hospitalized
     icu_fraction = rates["icu"] / rates["hospitalized"]
-    admits_df.loc[0, "ICU"] = icu_fraction * current_hospitalized
+    admits_df.loc[0, "icu"] = icu_fraction * current_hospitalized
     ventilated_fraction = rates["ventilated"] / rates["hospitalized"]
-    admits_df.loc[0, "Ventilated"] = ventilated_fraction * current_hospitalized
+    admits_df.loc[0, "ventilated"] = ventilated_fraction * current_hospitalized
 
     return admits_df
 
