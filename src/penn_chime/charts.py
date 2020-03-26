@@ -4,6 +4,7 @@ import datetime
 
 from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
+import numpy as np
 
 from .parameters import Parameters
 from .utils import add_date_column
@@ -31,8 +32,15 @@ def new_admissions_chart(
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
     # TODO fix the fold to allow any number of dispositions
+
+    ceiled_admits = projection_admits.copy()
+
+    ceiled_admits.hospitalized = np.ceil(ceiled_admits.hospitalized)
+    ceiled_admits.icu = np.ceil(ceiled_admits.icu)
+    ceiled_admits.ventilated = np.ceil(ceiled_admits.ventilated)
+
     return (
-        alt.Chart(projection_admits.head(plot_projection_days))
+        alt.Chart(ceiled_admits.head(plot_projection_days))
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
         .mark_line(point=True)
         .encode(
