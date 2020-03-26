@@ -19,6 +19,7 @@ DEFAULTS = Constants(
     ),
     current_hospitalized=14,
     doubling_time=4,
+    n_days_since_first_hospitalized=17,
     known_infected=510,
     n_days=60,
     market_share=0.15,

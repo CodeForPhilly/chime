@@ -1,4 +1,5 @@
 """Defaults."""
+from typing import Optional
 
 from .utils import RateLos
 
@@ -32,9 +33,10 @@ class Constants:
         icu: RateLos,
         ventilated: RateLos,
 
+        n_days_since_first_hospitalized: Optional[int] = None,
         as_date: bool = False,
         market_share: float = 1.0,
-        max_y_axis: int = None,
+        max_y_axis: Optional[int] = None,
         n_days: int = 60,
         recovery_days: int = 14,
     ):
@@ -48,6 +50,7 @@ class Constants:
         self.icu = icu
         self.ventilated = ventilated
 
+        self.n_days_since_first_hospitalized = n_days_since_first_hospitalized
         self.as_date = as_date
         self.market_share = market_share
         self.max_y_axis = max_y_axis

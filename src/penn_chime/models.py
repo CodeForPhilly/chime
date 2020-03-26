@@ -17,7 +17,7 @@ from .parameters import Parameters
 
 class SimSirModel:
 
-    def __init__(self, p: Parameters) -> SimSirModel:
+    def __init__(self, p: Parameters):
         # TODO missing initial recovered value
         susceptible = p.susceptible
         recovered = 0.0
@@ -43,6 +43,14 @@ class SimSirModel:
         detection_probability = (
             p.known_infected / infected if infected > 1.0e-7 else None
         )
+
+
+        #self.hospitalized_t = p.current_hospitalized
+        #self.n_days_since_first_hospitalized = p.n_days_since_first_hospitalized
+        if p.n_days_since_first_hospitalized is not None:
+            # do not shorten this to `if foo:` form. if you do and n_days_since_first_hospitalized is 0,
+            # program will crash.
+            p.doubling_time = self.argmin_dt(np.linspace(1, 15, 29), p)
 
         intrinsic_growth_rate = \
             (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
@@ -77,6 +85,7 @@ class SimSirModel:
         admits_df = build_admits_df(dispositions_df)
         census_df = build_census_df(admits_df, lengths_of_stay)
 
+
         self.susceptible = susceptible
         self.infected = infected
         self.recovered = recovered
@@ -97,6 +106,27 @@ class SimSirModel:
         self.daily_growth_t = daily_growth_helper(doubling_time_t)
 
 
+    def observed_predicted_loss(self, doubling_time: float, p: Parameters) -> float:
+        """Squared error between predicted value and actual value
+
+        Won't be run if n_days_since_first_hospitalized is None
+        """
+        ## get the predicted number hospitalized today
+        pred_current_hospitalized = self.census_df['hospitalized'].loc[p.n_days_since_first_hospitalized]
+
+        ## compare against the actual (user inputed) number
+        ## squared difference is the loss to be optimized
+        return (p.current_hospitalized - pred_current_hospitalized)**2
+
+    def argmin_dt(self, doubling_times: np.ndarray, p: Parameters) -> float:
+        """Argmin of the loss function with respect to doubling time."""
+        loss = np.array([self.observed_predicted_loss(dt, p) for dt in doubling_times])
+        fitted_doubling_time = doubling_times[loss.argmin()]
+        return fitted_doubling_time
+
+###################
+##  MODEL FUNCS  ##
+###################
 def sir(
     s: float, i: float, r: float, beta: float, gamma: float, n: float
 ) -> Tuple[float, float, float]:
@@ -117,7 +147,7 @@ def sir(
 
 def gen_sir(
     s: float, i: float, r: float, beta: float, gamma: float, n_days: int
-) -> Generator[Tuple[float, float, float], None, None]:
+) -> Generator[Tuple[int, float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples."""
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
@@ -162,7 +192,7 @@ def build_census_df(
     admits_df: pd.DataFrame,
     lengths_of_stay: Dict[str, int],
 ) -> pd.DataFrame:
-    """ALOS for each disposition of COVID-19 case (total guesses)"""
+    """Average Length of Stay for each disposition of COVID-19 case (total guesses)"""
     return pd.DataFrame({
         'day': admits_df.day,
         **{
@@ -175,7 +205,10 @@ def build_census_df(
     })
 
 
-def daily_growth_helper(doubling_time):
+###########
+## UTILS ##
+###########
+def daily_growth_helper(doubling_time: float) -> float:
     """Calculates average daily growth rate from doubling time"""
     result = 0
     if doubling_time != 0:

@@ -169,6 +169,14 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1,
         format="%i",
     )
+    n_days_since_first_hospitalized_input = NumberInputWrapper(
+        st_obj,
+        "Number of days since first hospitalized case",
+        min_value=0,
+        value=d.n_days_since_first_hospitalized,
+        step=1,
+        format="%i",
+    )
     relative_contact_rate_input = NumberInputWrapper(
         st_obj,
         "Social distancing (% reduction in social contact)",
@@ -268,7 +276,12 @@ def display_sidebar(st, d: Constants) -> Parameters:
 
     st.sidebar.markdown("### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)"
                         .format(docs_url=DOCS_URL))
-    doubling_time = doubling_time_input()
+    if st.sidebar.checkbox("I know the number of days since first hospitalized case"):
+        n_days_since_first_hospitalized = n_days_since_first_hospitalized_input()
+        doubling_time = None
+    else:
+        n_days_since_first_hospitalized = None
+        doubling_time = doubling_time_input()
     relative_contact_rate = relative_contact_rate_input()
 
     st.sidebar.markdown("### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
@@ -294,6 +307,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         market_share=market_share,
         known_infected=known_infected,
         doubling_time=doubling_time,
+        n_days_since_first_hospitalized=n_days_since_first_hospitalized,
 
         max_y_axis=max_y_axis,
         n_days=n_days,

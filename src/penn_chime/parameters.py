@@ -4,6 +4,8 @@ Changes affecting results or their presentation should also update
 `change_date`, so users can see when results have last changed
 """
 
+from typing import Optional
+
 from .utils import RateLos
 
 
@@ -25,7 +27,8 @@ class Parameters:
 
         as_date: bool = False,
         market_share: float = 1.0,
-        max_y_axis: int = None,
+        n_days_since_first_hospitalized: Optional[int] = None,
+        max_y_axis: Optional[int] = None,
         n_days: int = 60,
         recovery_days: int = 14,
     ):
@@ -44,6 +47,7 @@ class Parameters:
         self.max_y_axis = max_y_axis
         self.n_days = n_days
         self.recovery_days = recovery_days
+        self.n_days_since_first_hospitalized = n_days_since_first_hospitalized
 
         self.labels = {
             "hospitalized": "Hospitalized",
