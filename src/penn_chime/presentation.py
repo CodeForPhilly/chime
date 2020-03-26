@@ -32,25 +32,38 @@ def display_header(st, m, p):
         if m.detection_probability
         else "unknown"
     )
+
+    infection_warning_str = (
+        """(Warning: The number of known infections is greater than the estimate of infected patients based on inputs for current hospitalization, market share, and hospitalization rate. Please verify the market share value in the sidebar, and see if the hospitalization rate needs to be lowered.)"""
+        if p.known_infected > m.infected
+        else ""
+    )
+
+    infected_population_warning_str = (
+        """(Warning: The number of estimated infections is greater than the total regional population. Please verify the values entered in the sidebar.)"""
+        if m.infected > p.susceptible
+        else ""
+    )
+
     st.markdown(
         """
 <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
-
 <div class="penn-medicine-header__content">
     <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
         title="Go to the Penn Medicine home page">Penn Medicine</a>
-    <a id="title" class="penn-medicine-header__title">Penn Medicine - COVID-19 Hospital Impact Model for Epidemics</a>
+    <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics (CHIME)</a>
 </div>
     """,
         unsafe_allow_html=True,
     )
     st.markdown(
+        """[Documentation](https://code-for-philly.gitbook.io/chime/) | [Github](https://github.com/CodeForPhilly/chime/) | [Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)"""
+    )
+    st.markdown(
         """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + p.change_date() + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
     )
     st.markdown(
-        """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine. For questions on how to use this tool see the [User docs](https://code-for-philly.gitbook.io/chime/). Code can be found on [Github](https://github.com/CodeForPhilly/chime).
-    Join our [Slack channel](https://codeforphilly.org/chat?channel=covid19-chime-penn) if you would like to get involved!*"""
+        """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at [Penn Medicine](https://www.pennmedicine.org) to assist hospitals and public health officials with hospital capacity planning, but can be used anywhere in the world. Customize it for your region by modifying data inputs in the left pane, or read the [User Documentation](https://code-for-philly.gitbook.io/chime/) to learn more.*"""
     )
 
     st.markdown(
@@ -58,6 +71,9 @@ def display_header(st, m, p):
     confirmed cases in the region imply a **{detection_prob_str}** rate of detection. This is based on current inputs for
     Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
+    
+{infection_warning_str} 
+{infected_population_warning_str}
 
 An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
 **{r_naught:.2f}**.
@@ -78,7 +94,9 @@ outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effect
             relative_contact_rate=p.relative_contact_rate,
             r_t=m.r_t,
             doubling_time_t=abs(m.doubling_time_t),
-            impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to")
+            impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to"),
+            infection_warning_str=infection_warning_str,
+            infected_population_warning_str=infected_population_warning_str
         )
     )
 
