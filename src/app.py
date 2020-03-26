@@ -69,7 +69,13 @@ if st.checkbox("Show Projected Admissions in tabular form"):
     )
 st.subheader("Admitted Patients (Census)")
 st.markdown(
-    "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
+    """Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals
+
+    Note: If you see sharp drops here, it's because the code currently
+    computes the census forecast as if all hospitalized patients were
+    admitted on day 0, and so fall off the census lines together at
+    exactly the given lengths of stay.
+    """
 )
 census_chart = admitted_patients_chart(alt=alt, census=m.census_df, parameters=p)
 st.altair_chart(
