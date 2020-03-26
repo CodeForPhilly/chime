@@ -7,7 +7,7 @@ changed
 
 from __future__ import annotations
 
-from typing import Dict, Generator, Tuple
+from typing import Dict, Generator, Tuple, Optional
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
@@ -44,16 +44,11 @@ class SimSirModel:
             p.known_infected / infected if infected > 1.0e-7 else None
         )
 
-
-        #self.hospitalized_t = p.current_hospitalized
-        #self.n_days_since_first_hospitalized = p.n_days_since_first_hospitalized
-        if p.n_days_since_first_hospitalized is not None:
-            # do not shorten this to `if foo:` form. if you do and n_days_since_first_hospitalized is 0,
-            # program will crash.
-            p.doubling_time = self.argmin_dt(np.linspace(1, 15, 29), p)
-
-        intrinsic_growth_rate = \
-            (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
+        if p.doubling_time is not None:
+           intrinsic_growth_rate = \
+                (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
+        else:
+           intrinsic_growth_rate = 0
 
         gamma = 1.0 / recovery_days
 
@@ -104,13 +99,14 @@ class SimSirModel:
         self.census_df = census_df
         self.daily_growth = daily_growth_helper(p.doubling_time)
         self.daily_growth_t = daily_growth_helper(doubling_time_t)
-
+        return None
 
     def observed_predicted_loss(self, doubling_time: float, p: Parameters) -> float:
         """Squared error between predicted value and actual value
 
         Won't be run if n_days_since_first_hospitalized is None
         """
+        census_df = self.run_projection(p, dt=doubling_time)
         ## get the predicted number hospitalized today
         pred_current_hospitalized = self.census_df['hospitalized'].loc[p.n_days_since_first_hospitalized]
 

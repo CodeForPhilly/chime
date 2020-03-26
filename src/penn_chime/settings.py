@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from datetime import date
+
 from .defaults import Constants, Regions, RateLos
 
 delaware = 564696
@@ -19,7 +21,7 @@ DEFAULTS = Constants(
     ),
     current_hospitalized=14,
     doubling_time=4,
-    n_days_since_first_hospitalized=17,
+    date_first_hospitalized=date(2020,3,9),
     known_infected=510,
     n_days=60,
     market_share=0.15,

@@ -5,6 +5,7 @@ Changes affecting results or their presentation should also update
 """
 
 from typing import Optional
+from datetime import date
 
 from .utils import RateLos
 
@@ -27,7 +28,7 @@ class Parameters:
 
         as_date: bool = False,
         market_share: float = 1.0,
-        n_days_since_first_hospitalized: Optional[int] = None,
+        date_first_hospitalized: Optional[date] = None,
         max_y_axis: Optional[int] = None,
         n_days: int = 60,
         recovery_days: int = 14,
@@ -47,7 +48,10 @@ class Parameters:
         self.max_y_axis = max_y_axis
         self.n_days = n_days
         self.recovery_days = recovery_days
-        self.n_days_since_first_hospitalized = n_days_since_first_hospitalized
+        if date_first_hospitalized:
+            self.n_days_since_first_hospitalized = (date.today() - date_first_hospitalized).days
+        else:
+            self.n_days_since_first_hospitalized = None
 
         self.labels = {
             "hospitalized": "Hospitalized",

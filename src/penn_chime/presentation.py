@@ -1,6 +1,7 @@
 """effectful functions for streamlit io"""
 
 from typing import Optional
+from datetime import date
 
 import altair as alt  # type: ignore
 import numpy as np  # type: ignore
@@ -129,6 +130,10 @@ class NumberInputWrapper(InputWrapper):
         kwargs = dict(min_value=min_value, max_value=max_value, step=step, format=format, key=key)
         super().__init__(st_obj.number_input, label, value, kwargs)
 
+class DateInputWrapper(InputWrapper):
+    def __init__(self, st_obj, label, value=None, key=None):
+        kwargs = dict(key=key)
+        super().__init__(st_obj.date_input, label, value, kwargs)
 
 class CheckboxWrapper(InputWrapper):
     def __init__(self, st_obj, label, value=None, key=None):
@@ -169,13 +174,10 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1,
         format="%i",
     )
-    n_days_since_first_hospitalized_input = NumberInputWrapper(
+    date_first_hospitalized_input = DateInputWrapper(
         st_obj,
-        "Number of days since first hospitalized case",
-        min_value=0,
-        value=d.n_days_since_first_hospitalized,
-        step=1,
-        format="%i",
+        "Date of first hospitalized case",
+        value=d.date_first_hospitalized,
     )
     relative_contact_rate_input = NumberInputWrapper(
         st_obj,
@@ -276,11 +278,11 @@ def display_sidebar(st, d: Constants) -> Parameters:
 
     st.sidebar.markdown("### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)"
                         .format(docs_url=DOCS_URL))
-    if st.sidebar.checkbox("I know the number of days since first hospitalized case"):
-        n_days_since_first_hospitalized = n_days_since_first_hospitalized_input()
+    if st.sidebar.checkbox("I know the number of date of the first hospitalized case in the region."):
+        date_first_hospitalized = date_first_hospitalized_input()
         doubling_time = None
     else:
-        n_days_since_first_hospitalized = None
+        date_first_hospitalized = None
         doubling_time = doubling_time_input()
     relative_contact_rate = relative_contact_rate_input()
 
@@ -307,7 +309,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         market_share=market_share,
         known_infected=known_infected,
         doubling_time=doubling_time,
-        n_days_since_first_hospitalized=n_days_since_first_hospitalized,
+        date_first_hospitalized=date_first_hospitalized,
 
         max_y_axis=max_y_axis,
         n_days=n_days,
