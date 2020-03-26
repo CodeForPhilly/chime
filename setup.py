@@ -1,14 +1,8 @@
+import io
 import setuptools
 
-from os import path
-
-with open("README.md", "r") as fh:
+with io.open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
-
-CWD = path.abspath(path.dirname(__file__))
-
-with open(path.join(CWD, "requirements.txt"), encoding="utf-8") as inp:
-    REQUIREMENTS = [el.strip() for el in inp.read().split(",")]
 
 setuptools.setup(
     name="penn_chime",
@@ -25,7 +19,12 @@ setuptools.setup(
     },
     package_dir={'': 'src'},
     packages=setuptools.find_namespace_packages(where='src', exclude=('tests')),
-    install_requires=REQUIREMENTS,
+    install_requires=[
+        "streamlit",
+        "pandas",
+        "numpy",
+        "altair"
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
