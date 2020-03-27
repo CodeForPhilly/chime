@@ -30,6 +30,7 @@ app = Dash(
     external_scripts=body.external_scripts,
 )
 app.layout = body.html
+app.title = 'Penn Medicine CHIME'
 server = app.server
 
 @app.callback(body.callback_outputs, list(body.callback_inputs.values()))
