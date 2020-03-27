@@ -98,9 +98,13 @@ class SimSirModel:
         self.admits_df = admits_df
         self.census_df = census_df
 
-        #if p.n_days_since_first_hospitalized is None:
-        #    p.n_days_since_first_hospitalized = int(self.argmin_ds(p))
-        #    p.date_first_hospitalized = date.today() - timedelta(days=p.n_days_since_first_hospitalized)
+        if p.n_days_since_first_hospitalized is None and p.doubling_time is not None:
+            p.n_days_since_first_hospitalized = int(self.argmin_ds(p))
+            p.date_first_hospitalized = date.today() - timedelta(days=p.n_days_since_first_hospitalized)
+            admits_df = build_admits_df(dispositions_df, p.n_days_since_first_hospitalized)
+            census_df = build_census_df(admits_df, lengths_of_stay, p.n_days_since_first_hospitalized)
+            self.admits_df = admits_df
+            self.census_df = census_df
         if p.n_days_since_first_hospitalized is not None and p.doubling_time is None:
             # optimize doubling_time
             argmin_dt = None
