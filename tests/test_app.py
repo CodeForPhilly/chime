@@ -263,7 +263,7 @@ def test_model(model=MODEL, param=PARAM):
     assert list(model.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
     assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [60, 1101.0, 441.0, 220.0]
 
-    # test that admissions are being properly calculated (thanks @PhilMiller)
+    # test that admissions are being properly calculated
     cumulative_admits = model.admits_df.cumsum()
     diff = cumulative_admits.hospitalized[1:-1] - (
         0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
