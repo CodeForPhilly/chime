@@ -137,14 +137,12 @@ def test_sir():
     Someone who is good at testing, help
     """
     sir_test = sir(100, 1, 0, 0.2, 0.5, 1)
-    assert sir_test == (
-        0.7920792079207921,
-        0.20297029702970298,
-        0.0049504950495049506,
-    ), "This contrived example should work"
+    s, i, r, i_n = sir_test
+    assert s == 0.7920792079207921, "This contrived example should work"
+    assert i == 0.20297029702970298, "This contrived example should work"
+    assert r == 0.0049504950495049506, "This contrived example should work"
 
-    assert isinstance(sir_test, tuple)
-    for v in sir_test:
+    for v in (sir_test):
         assert isinstance(v, float)
         assert v >= 0
 

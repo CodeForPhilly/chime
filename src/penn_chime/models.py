@@ -100,7 +100,7 @@ class SimSirModel:
 
 def sir(
     s: float, i: float, r: float, beta: float, gamma: float, n: float
-) -> Tuple[float, float, float]:
+) -> Tuple[float, float, float, float]:
     """The SIR model, one time step."""
 
     potential_new_infections = beta * s * i
@@ -119,18 +119,18 @@ def sir(
         r_n = 0.0
 
     scale = n / (s_n + i_n + r_n)
-    return s_n * scale, i_n * scale, r_n * scale
+    return s_n * scale, i_n * scale, r_n * scale, new_infections * scale
 
 
 def gen_sir(
     s: float, i: float, r: float, beta: float, gamma: float, n_days: int
-) -> Generator[Tuple[float, float, float], None, None]:
+) -> Generator[Tuple[float, float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples."""
-    s, i, r = (float(v) for v in (s, i, r))
+    s, i, r, new_infections = (float(v) for v in (s, i, r, 0.0))
     n = s + i + r
     for d in range(n_days + 1):
-        yield d, s, i, r
-        s, i, r = sir(s, i, r, beta, gamma, n)
+        yield d, s, i, r, new_infections
+        s, i, r, new_infections = sir(s, i, r, beta, gamma, n)
 
 
 def sim_sir_df(
@@ -139,7 +139,7 @@ def sim_sir_df(
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
         data=gen_sir(s, i, r, beta, gamma, n_days),
-        columns=("day", "susceptible", "infected", "recovered"),
+        columns=("day", "susceptible", "infected", "recovered", "new_infections"),
     )
 
 def build_dispositions_df(
