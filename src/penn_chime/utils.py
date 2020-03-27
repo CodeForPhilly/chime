@@ -16,23 +16,6 @@ import pandas as pd  # type: ignore
 RateLos = namedtuple("RateLos", ("rate", "length_of_stay"))
 
 
-SimSirModelAttributes = namedtuple(
-    "SimSirModelAttributes",
-    (
-        "doubling_time",
-        "intrinsic_growth_rate",
-        "gamma",
-        "beta",
-        "r_t",
-        "r_0",
-        "doubling_time_t",
-        "raw_df",
-        "dispositions_df",
-        "admits_df",
-        "census_df"
-    )
-)
-
 
 
 def add_date_column(
@@ -72,7 +55,7 @@ def add_date_column(
         start = today - delta
     else:
         start = today
-    end = start + timedelta(days=n_days + 1)
+    end = start + timedelta(days=n_days + 1) + delta # the +delta part is a hypothesis by phil
     # And pick dates present in frame
     dates = pd.date_range(start=start, end=end, freq="D")[df.day.tolist()]
 

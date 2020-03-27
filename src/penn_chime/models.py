@@ -13,7 +13,6 @@ import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
 from .parameters import Parameters
-from .utils import SimSirModelAttributes
 
 class SimSirModel:
 
@@ -98,6 +97,9 @@ class SimSirModel:
         self.admits_df = admits_df
         self.census_df = census_df
 
+        #if p.n_days_since_first_hospitalized is None:
+        #    continue
+
         if p.n_days_since_first_hospitalized is not None and p.doubling_time is None:
             # optimize doubling_time
             argmin_dt = None
@@ -130,12 +132,13 @@ class SimSirModel:
                 recovered,
                 beta,
                 gamma,
-                p.n_days #+ p.n_days_since_first_hospitalized
+                p.n_days # + p.n_days_since_first_hospitalized
             )
             dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
             admits_df = build_admits_df(dispositions_df, p.n_days_since_first_hospitalized)
             census_df = build_census_df(admits_df, lengths_of_stay, p.n_days_since_first_hospitalized)
 
+            self.population = p.population
             self.infected = current_infected
             self.intrinsic_growth_rate = intrinsic_growth_rate
             self.gamma = gamma
@@ -160,7 +163,7 @@ class SimSirModel:
         market_share = p.market_share
         initial_i = 1 / p.hospitalized.rate / market_share
 
-        S, I, R = self.susceptible, initial_i, self.recovered
+        S, I, R = p.population - initial_i, initial_i, self.recovered
 
         # mean recovery rate (inv_recovery_days)
         gamma = 1 / recovery_days
@@ -203,6 +206,9 @@ class SimSirModel:
         # we shall optimize squared distance
         return (p.current_hospitalized - predicted_current_hospitalized) ** 2
 
+    def loss_ds(self, p: Parameters) -> float:
+        pass
+    
 
     @staticmethod
     def _intrinsic_growth_rate(doubling_time: Optional[float]) -> float:
