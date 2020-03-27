@@ -26,7 +26,7 @@ def new_admissions_chart(
 
     tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
-        projection_admits = add_date_column(projection_admits)
+        projection_admits = add_date_column(projection_admits, parameters.date_first_hospitalized)
         x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
@@ -66,7 +66,7 @@ def admitted_patients_chart(
     max_y_axis = parameters.max_y_axis
     as_date = parameters.as_date
     if as_date:
-        census = add_date_column(census)
+        census = add_date_column(census, parameters.date_first_hospitalized)
         x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
         idx = "date:T"
     else:
@@ -113,7 +113,7 @@ def additional_projections_chart(
     max_y_axis = parameters.max_y_axis
 
     if as_date:
-        dat = add_date_column(dat)
+        dat = add_date_column(dat, parameters.date_first_hospitalized)
         x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}

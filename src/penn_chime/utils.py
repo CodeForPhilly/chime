@@ -1,7 +1,7 @@
 """Utils."""
 
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Optional
 from base64 import b64encode
 
@@ -36,7 +36,7 @@ SimSirModelAttributes = namedtuple(
 
 
 def add_date_column(
-    df: pd.DataFrame, drop_day_column: bool = False, date_format: Optional[str] = None,
+    df: pd.DataFrame, date_first_hospitalized: Optional[date], drop_day_column: bool = False, date_format: Optional[str] = None,
 ) -> pd.DataFrame:
     """Copies input data frame and converts "day" column to "date" column
 
@@ -65,7 +65,13 @@ def add_date_column(
 
     # Allocate (day) continous range for dates
     n_days = int(df.day.max())
-    start = datetime.now()
+
+    today = date.today()
+    if date_first_hospitalized:
+        delta = today - date_first_hospitalized
+        start = today - delta
+    else:
+        start = today
     end = start + timedelta(days=n_days + 1)
     # And pick dates present in frame
     dates = pd.date_range(start=start, end=end, freq="D")[df.day.tolist()]

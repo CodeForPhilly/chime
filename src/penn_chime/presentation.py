@@ -464,7 +464,12 @@ def show_additional_projections(
 
 
 def draw_projected_admissions_table(
-    st, projection_admits: pd.DataFrame, labels, day_range, as_date: bool = False
+        st,
+        projection_admits: pd.DataFrame,
+        labels,
+        day_range,
+        date_first_hospitalized: Optional[date] = None,
+        as_date: bool = False
 ):
     admits_table = projection_admits[np.mod(projection_admits.index, day_range) == 0].copy()
     admits_table["day"] = admits_table.index
@@ -473,7 +478,7 @@ def draw_projected_admissions_table(
 
     if as_date:
         admits_table = add_date_column(
-            admits_table, drop_day_column=True, date_format=DATE_FORMAT
+            admits_table, date_first_hospitalized, drop_day_column=True, date_format=DATE_FORMAT
         )
     admits_table.rename(labels)
     st.table(admits_table)

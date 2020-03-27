@@ -78,8 +78,8 @@ class SimSirModel:
             p.n_days,
         )
         dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
-        admits_df = build_admits_df(dispositions_df)
-        census_df = build_census_df(admits_df, lengths_of_stay)
+        admits_df = build_admits_df(dispositions_df, p.n_days_since_first_hospitalized)
+        census_df = build_census_df(admits_df, lengths_of_stay, p.n_days_since_first_hospitalized)
 
         self.susceptible = susceptible
         self.infected = infected
@@ -112,8 +112,8 @@ class SimSirModel:
                     argmin_dt = dt
             self.census_df = censes[dt]
             p.doubling_time = argmin_dt
-            #
-            # update all state dependent on doubling time.
+
+            # update all state that is dependent on doubling time.
             intrinsic_growth_rate = self._intrinsic_growth_rate(p.doubling_time)
             gamma = 1 / recovery_days
             beta = self._beta(intrinsic_growth_rate, gamma, susceptible, p.relative_contact_rate)
@@ -129,8 +129,8 @@ class SimSirModel:
                 p.n_days
             )
             dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
-            admits_df = build_admits_df(dispositions_df)
-            census_df = build_census_df(admits_df, lengths_of_stay)
+            admits_df = build_admits_df(dispositions_df, p.n_days_since_first_hospitalized)
+            census_df = build_census_df(admits_df, lengths_of_stay, p.n_days_since_first_hospitalized)
 
             self.intrinsic_growth_rate = intrinsic_growth_rate
             self.gamma = gamma
@@ -167,9 +167,21 @@ class SimSirModel:
 
         raw_df = sim_sir_df(S,I,R,beta,gamma,n_days)
 
-        dispositions_df = build_dispositions_df(raw_df, self._rates, p.market_share)
-        admits_df = build_admits_df(dispositions_df)
-        census_df = build_census_df(admits_df, self._lengths_of_stay)
+        # dispositions_df = build_dispositions_df(raw_df, self._rates, p.market_share)
+
+        i_dict_v = get_dispositions(raw_df.infected, self._rates, market_share)
+        r_dict_v = get_dispositions(raw_df.recovered, self._rates, market_share)
+
+        dispositions = {
+            key: value + r_dict_v[key]
+            for key, value in i_dict_v.items()
+        }
+
+        dispositions_df = pd.DataFrame(dispositions)
+        dispositions_df = dispositions_df.assign(day=dispositions_df.index)
+
+        admits_df = build_admits_df(dispositions_df, p.n_days_since_first_hospitalized)
+        census_df = build_census_df(admits_df, self._lengths_of_stay, p.n_days_since_first_hospitalized)
         return census_df
 
     def loss_dt(self, p: Parameters) -> float:
@@ -245,6 +257,19 @@ def sim_sir_df(
         columns=("day", "susceptible", "infected", "recovered"),
     )
 
+
+def get_dispositions(
+    patients: np.ndarray,
+    rates: Dict[str, float],
+    market_share: float,
+) -> Dict[str, np.ndarray]:
+    """Get dispositions of patients adjusted by rate and market_share."""
+    return {
+        key: patients * rate * market_share
+        for key, rate in rates.items()
+    }
+
+
 def build_dispositions_df(
     sim_sir_df: pd.DataFrame,
     rates: Dict[str, float],
@@ -261,16 +286,20 @@ def build_dispositions_df(
     })
 
 
-def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
+def build_admits_df(dispositions_df: pd.DataFrame, n_days_since_first_hospitalized: int) -> pd.DataFrame:
     """Build admits dataframe from dispositions."""
     admits_df = dispositions_df.iloc[:-1, :] - dispositions_df.shift(1)
-    admits_df.day = dispositions_df.day
+    if n_days_since_first_hospitalized is not None:
+        admits_df.day = dispositions_df.day - n_days_since_first_hospitalized
+    else:
+        admits_df.day = dispositions_df.day
     return admits_df
 
 
 def build_census_df(
     admits_df: pd.DataFrame,
     lengths_of_stay: Dict[str, int],
+    n_days_since_first_hospitalized: int
 ) -> pd.DataFrame:
     """Average Length of Stay for each disposition of COVID-19 case (total guesses)"""
     return pd.DataFrame({
@@ -284,30 +313,6 @@ def build_census_df(
         }
     })
 
-
-############################
-##  ARGMIN DOUBLING_TIME  ##
-############################
-
-
-def observed_predicted_loss(self, doubling_time: float, p: Parameters) -> float:
-    """Squared error between predicted value and actual value
-
-    Won't be run if n_days_since_first_hospitalized is None
-    """
-    census_df = self.run_projection(p, dt=doubling_time)
-    ## get the predicted number hospitalized today
-    pred_current_hospitalized = self.census_df['hospitalized'].loc[p.n_days_since_first_hospitalized]
-
-    ## compare against the actual (user inputed) number
-    ## squared difference is the loss to be optimized
-    return (p.current_hospitalized - pred_current_hospitalized)**2
-
-def argmin_dt(self, doubling_times: np.ndarray, p: Parameters) -> float:
-    """Argmin of the loss function with respect to doubling time."""
-    loss = np.array([self.observed_predicted_loss(dt, p) for dt in doubling_times])
-    fitted_doubling_time = doubling_times[loss.argmin()]
-    return fitted_doubling_time
 
 
 #############

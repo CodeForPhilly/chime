@@ -49,8 +49,10 @@ class Parameters:
         self.n_days = n_days
         self.recovery_days = recovery_days
         if date_first_hospitalized:
+            self.date_first_hospitalized = date_first_hospitalized # needed for utils.add_date_column
             self.n_days_since_first_hospitalized = (date.today() - date_first_hospitalized).days
         else:
+            self.date_first_hospitalized = None # needed for utils.add_date_column
             self.n_days_since_first_hospitalized = None
 
         self.labels = {
