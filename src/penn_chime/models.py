@@ -103,16 +103,20 @@ class SimSirModel:
             argmin_dt = None
             min_loss = 2.0**99
             censes = dict()
+            current_infecteds = dict()
             for dt in np.linspace(1,15,29):
-                censes[dt] = self.run_projection(p, dt)
+                censes[dt], current_infecteds[dt] = self.run_projection(p, dt)
+                # self.current_infected = current_infecteds[dt] # log it into state for no reason really
                 self.census_df = censes[dt] # log it into state for loss
                 loss_dt = self.loss_dt(p)
                 if loss_dt < min_loss:
                     min_loss = loss_dt
                     argmin_dt = dt
-            self.census_df = censes[dt]
+            self.census_df = censes[argmin_dt]
             p.doubling_time = argmin_dt
+            current_infected = current_infecteds[argmin_dt]
 
+            infected = 1 / p.hospitalized.rate / p.market_share
             # update all state that is dependent on doubling time.
             intrinsic_growth_rate = self._intrinsic_growth_rate(p.doubling_time)
             gamma = 1 / recovery_days
@@ -126,12 +130,13 @@ class SimSirModel:
                 recovered,
                 beta,
                 gamma,
-                p.n_days
+                p.n_days + p.n_days_since_first_hospitalized
             )
             dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
             admits_df = build_admits_df(dispositions_df, p.n_days_since_first_hospitalized)
             census_df = build_census_df(admits_df, lengths_of_stay, p.n_days_since_first_hospitalized)
 
+            self.infected = current_infected
             self.intrinsic_growth_rate = intrinsic_growth_rate
             self.gamma = gamma
             self.beta = beta
@@ -148,14 +153,14 @@ class SimSirModel:
 
         return None
 
-    def run_projection(self, p: Parameters, doubling_time: float) -> pd.DataFrame:
+    def run_projection(self, p: Parameters, doubling_time: float) -> Tuple[pd.DataFrame, float]:
         intrinsic_growth_rate = self._intrinsic_growth_rate(doubling_time)
 
         recovery_days = p.recovery_days
         market_share = p.market_share
         initial_i = 1 / p.hospitalized.rate / market_share
 
-        S, I, R = self.susceptible, self.infected, self.recovered
+        S, I, R = self.susceptible, initial_i, self.recovered
 
         # mean recovery rate (inv_recovery_days)
         gamma = 1 / recovery_days
@@ -167,22 +172,23 @@ class SimSirModel:
 
         raw_df = sim_sir_df(S,I,R,beta,gamma,n_days)
 
-        # dispositions_df = build_dispositions_df(raw_df, self._rates, p.market_share)
+        current_infected = raw_df.infected.loc[p.n_days_since_first_hospitalized]
+        dispositions_df = build_dispositions_df(raw_df, self._rates, p.market_share)
 
-        i_dict_v = get_dispositions(raw_df.infected, self._rates, market_share)
-        r_dict_v = get_dispositions(raw_df.recovered, self._rates, market_share)
-
-        dispositions = {
-            key: value + r_dict_v[key]
-            for key, value in i_dict_v.items()
-        }
-
-        dispositions_df = pd.DataFrame(dispositions)
-        dispositions_df = dispositions_df.assign(day=dispositions_df.index)
+#       i_dict_v = get_dispositions(raw_df.infected, self._rates, market_share)
+#       r_dict_v = get_dispositions(raw_df.recovered, self._rates, market_share)
+#
+#       dispositions = {
+#           key: value + r_dict_v[key]
+#           for key, value in i_dict_v.items()
+#       }
+#
+#       dispositions_df = pd.DataFrame(dispositions)
+#       dispositions_df = dispositions_df.assign(day=dispositions_df.index)
 
         admits_df = build_admits_df(dispositions_df, p.n_days_since_first_hospitalized)
         census_df = build_census_df(admits_df, self._lengths_of_stay, p.n_days_since_first_hospitalized)
-        return census_df
+        return census_df, current_infected
 
     def loss_dt(self, p: Parameters) -> float:
         """Squared error: predicted_current_hospitalized vs. actual current hospitalized
