@@ -18,7 +18,7 @@ DEFAULTS = Constants(
         philly=philly,
     ),
     current_hospitalized=14,
-    doubling_time=4,
+    doubling_time=4.0,
     known_infected=510,
     n_days=60,
     market_share=0.15,
