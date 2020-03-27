@@ -278,7 +278,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
 
     st.sidebar.markdown("### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)"
                         .format(docs_url=DOCS_URL))
-    if st.sidebar.checkbox("I know the number of date of the first hospitalized case in the region."):
+    if st.sidebar.checkbox("I know the date of the first hospitalized case in the region."):
         date_first_hospitalized = date_first_hospitalized_input()
         doubling_time = None
     else:
