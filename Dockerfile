@@ -1,7 +1,7 @@
 FROM python:3.7.7-slim-buster
 RUN mkdir /app
 WORKDIR /app
-COPY .streamlit ~/
+COPY .streamlit .streamlit
 COPY README.md .
 COPY setup.py .
 COPY settings.cfg .
