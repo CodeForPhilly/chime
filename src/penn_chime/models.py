@@ -75,8 +75,7 @@ class SimSirModel:
             p.n_days,
         )
         dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
-        admits_df = build_admits_df(dispositions_df)
-        census_df = build_census_df(admits_df, lengths_of_stay)
+        census_df = build_census_df(dispositions_df, lengths_of_stay)
 
         self.susceptible = susceptible
         self.infected = infected
@@ -92,7 +91,7 @@ class SimSirModel:
         self.doubling_time_t = doubling_time_t
         self.raw_df = raw_df
         self.dispositions_df = dispositions_df
-        self.admits_df = admits_df
+        self.admits_df = dispositions_df
         self.census_df = census_df
         self.daily_growth = daily_growth_helper(p.doubling_time)
         self.daily_growth_t = daily_growth_helper(doubling_time_t)
@@ -148,7 +147,7 @@ def build_dispositions_df(
     market_share: float,
 ) -> pd.DataFrame:
     """Get dispositions of patients adjusted by rate and market_share."""
-    patients = sim_sir_df.infected + sim_sir_df.recovered
+    patients = sim_sir_df.new_infections
     return pd.DataFrame({
         "day": sim_sir_df.day,
         **{
@@ -156,13 +155,6 @@ def build_dispositions_df(
             for key, rate in rates.items()
         }
     })
-
-
-def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
-    """Build admits dataframe from dispositions."""
-    admits_df = dispositions_df.iloc[:-1, :] - dispositions_df.shift(1)
-    admits_df.day = dispositions_df.day
-    return admits_df
 
 
 def build_census_df(
