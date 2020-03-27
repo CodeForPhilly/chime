@@ -20,7 +20,7 @@ PARAM = Parameters(
     known_infected=5000,
     market_share=0.05,
     relative_contact_rate=0.15,
-    susceptible=500000,
+    population=500000,
     hospitalized=RateLos(0.05, 7),
     icu=RateLos(0.02, 9),
     ventilated=RateLos(0.01, 10),
@@ -33,7 +33,7 @@ HALVING_PARAM = Parameters(
     known_infected=5000,
     market_share=0.05,
     relative_contact_rate=0.7,
-    susceptible=500000,
+    population=500000,
     hospitalized=RateLos(0.05, 7),
     icu=RateLos(0.02, 9),
     ventilated=RateLos(0.01, 10),
@@ -238,7 +238,7 @@ def test_model(model=MODEL, param=PARAM):
     # test the class-calculated attributes
     assert model.detection_probability == 0.125
     assert model.intrinsic_growth_rate == 0.12246204830937302
-    assert model.beta == 3.2961405355450555e-07
+    assert model.beta == 3.582761451679408e-07
     assert model.r_t == 2.307298374881539
     assert model.r_naught == 2.7144686763312222
     assert model.doubling_time_t == 7.764405988534983
@@ -251,14 +251,17 @@ def test_model(model=MODEL, param=PARAM):
     second = raw_df.iloc[1, :]
     last = raw_df.iloc[-1, :]
 
-    assert first.susceptible == 500000.0
+    assert first.susceptible + first.infected + first.recovered == param.population
+    assert last.susceptible + last.infected + last.recovered == param.population
+
+    assert first.susceptible == 460000.0
     assert round(second.infected, 0) == 43735
 
-    assert round(last.susceptible, 0) == 67202
-    assert round(raw_df.recovered[30], 0) == 224048
+    assert round(last.susceptible, 0) == 59497
+    assert round(raw_df.recovered[30], 0) == 216711
 
     assert list(model.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
-    assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [60, 1182.0, 473.0, 236.0]
+    assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [60, 1101.0, 441.0, 220.0]
 
     # test that admissions are being properly calculated (thanks @PhilMiller)
     cumulative_admits = model.admits_df.cumsum()

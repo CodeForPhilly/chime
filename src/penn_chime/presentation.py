@@ -41,7 +41,7 @@ def display_header(st, m, p):
 
     infected_population_warning_str = (
         """(Warning: The number of estimated infections is greater than the total regional population. Please verify the values entered in the sidebar.)"""
-        if m.infected > p.susceptible
+        if m.infected > p.population
         else ""
     )
 
@@ -92,7 +92,7 @@ and daily growth rate of **{daily_growth_t:.2f}%**.
             detection_prob_str=detection_prob_str,
             current_hosp=p.current_hospitalized,
             hosp_rate=p.hospitalized.rate,
-            S=p.susceptible,
+            S=p.population,
             market_share=p.market_share,
             recovery_days=p.recovery_days,
             r_naught=m.r_naught,
@@ -238,11 +238,11 @@ def display_sidebar(st, d: Constants) -> Parameters:
         step=1.0,
         format="%f",
     )
-    susceptible_input = NumberInputWrapper(
+    population_input = NumberInputWrapper(
         st_obj,
         "Regional Population",
         min_value=1,
-        value=d.region.susceptible,
+        value=d.region.population,
         step=100000,
         format="%i",
     )
@@ -261,7 +261,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
 
     # Build in desired order
     st.sidebar.markdown("### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
-    susceptible = susceptible_input()
+    population = population_input()
     market_share = market_share_input()
     known_infected = known_infected_input()
     current_hospitalized = current_hospitalized_input()
@@ -298,7 +298,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         max_y_axis=max_y_axis,
         n_days=n_days,
         relative_contact_rate=relative_contact_rate / 100.0,
-        susceptible=susceptible,
+        population=population,
 
         hospitalized=RateLos(hospitalized_rate/ 100.0, hospitalized_los),
         icu=RateLos(icu_rate/ 100.0, icu_los),

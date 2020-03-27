@@ -91,7 +91,7 @@ def parse_args():
             1.0,
             "Social Distancing Reduction Rate: 0.0 - 1.0",
         ),
-        ("--susceptible", int, 1, None, "Regional Population >= 1"),
+        ("--population", int, 1, None, "Regional Population >= 1"),
         ("--ventilated-los", int, 0, None, "Ventilated Length of Stay (days)"),
         ("--ventilated-rate", float, 0.0, 1.0, "Ventilated Rate: 0.0 - 1.0"),
     ):
@@ -110,7 +110,7 @@ def main():
         market_share=a.market_share,
         n_days=a.n_days,
         relative_contact_rate=a.relative_contact_rate,
-        susceptible=a.susceptible,
+        population=a.population,
 
         hospitalized=RateLos(a.hospitalized_rate, a.hospitalized_los),
         icu=RateLos(a.icu_rate, a.icu_los),
