@@ -276,7 +276,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
     else:
         date_first_hospitalized = None
         doubling_time = doubling_time_input()
-    relative_contact_rate = relative_contact_rate_input()
+    relative_contact_rate = relative_contact_pct_input()
 
     st.sidebar.markdown("### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
     hospitalized_rate = hospitalized_pct_input()
