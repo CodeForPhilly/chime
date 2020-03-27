@@ -14,6 +14,9 @@ from .parameters import Parameters
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
 DOCS_URL = "https://code-for-philly.gitbook.io/chime"
 
+FLOAT_INPUT_MIN = 0.001
+FLOAT_INPUT_STEP = FLOAT_INPUT_MIN
+
 hide_menu_style = """
         <style>
         #MainMenu {visibility: hidden;}
@@ -163,16 +166,16 @@ def display_sidebar(st, d: Constants) -> Parameters:
         "Number of days to project",
         min_value=30,
         value=d.n_days,
-        step=10,
+        step=1,
         format="%i",
     )
     doubling_time_input = NumberInputWrapper(
         st_obj,
         "Doubling time before social distancing (days)",
-        min_value=0,
+        min_value=FLOAT_INPUT_MIN,
         value=d.doubling_time,
-        step=1,
-        format="%i",
+        step=FLOAT_INPUT_STEP,
+        format="%f",
     )
     date_first_hospitalized_input = DateInputWrapper(
         st_obj,
@@ -182,19 +185,19 @@ def display_sidebar(st, d: Constants) -> Parameters:
     relative_contact_rate_input = NumberInputWrapper(
         st_obj,
         "Social distancing (% reduction in social contact)",
-        min_value=0,
-        max_value=100,
-        value=int(d.relative_contact_rate * 100),
-        step=5,
-        format="%i",
+        min_value=0.0,
+        max_value=100.0,
+        value=d.relative_contact_rate * 100.0,
+        step=FLOAT_INPUT_STEP,
+        format="%f",
     )
     hospitalized_rate_input = NumberInputWrapper(
         st_obj,
         "Hospitalization %(total infections)",
-        min_value=0.001,
+        min_value=0.0,
         max_value=100.0,
         value=d.hospitalized.rate * 100,
-        step=1.0,
+        step=FLOAT_INPUT_STEP,
         format="%f",
     )
     icu_rate_input = NumberInputWrapper(
@@ -203,7 +206,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         min_value=0.0,
         max_value=100.0,
         value=d.icu.rate * 100,
-        step=1.0,
+        step=FLOAT_INPUT_STEP,
         format="%f",
     )
     ventilated_rate_input = NumberInputWrapper(
@@ -212,7 +215,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         min_value=0.0,
         max_value=100.0,
         value=d.ventilated.rate * 100,
-        step=1.0,
+        step=FLOAT_INPUT_STEP,
         format="%f",
     )
     hospitalized_los_input = NumberInputWrapper(
@@ -242,10 +245,10 @@ def display_sidebar(st, d: Constants) -> Parameters:
     market_share_input = NumberInputWrapper(
         st_obj,
         "Hospital Market Share (%)",
-        min_value=0.001,
+        min_value=FLOAT_INPUT_MIN,
         max_value=100.0,
         value=d.market_share * 100,
-        step=1.0,
+        step=FLOAT_INPUT_STEP,
         format="%f",
     )
     population_input = NumberInputWrapper(
@@ -253,7 +256,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         "Regional Population",
         min_value=1,
         value=d.region.population,
-        step=100000,
+        step=1,
         format="%i",
     )
     known_infected_input = NumberInputWrapper(
@@ -261,13 +264,12 @@ def display_sidebar(st, d: Constants) -> Parameters:
         "Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
         min_value=0,
         value=d.known_infected,
-        step=10,
+        step=1,
         format="%i",
     )
     as_date_input = CheckboxWrapper(st_obj, "Present result as dates instead of days", value=False)
     max_y_axis_set_input = CheckboxWrapper(st_obj, "Set the Y-axis on graphs to a static value")
     max_y_axis_input = NumberInputWrapper(st_obj, "Y-axis static value", value=500, format="%i", step=25)
-
 
     # Build in desired order
     st.sidebar.markdown("### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
@@ -306,7 +308,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
     return Parameters(
         as_date=as_date,
         current_hospitalized=current_hospitalized,
-        market_share=market_share,
+        market_share=market_share / 100.0,
         known_infected=known_infected,
         doubling_time=doubling_time,
         date_first_hospitalized=date_first_hospitalized,
@@ -316,9 +318,9 @@ def display_sidebar(st, d: Constants) -> Parameters:
         relative_contact_rate=relative_contact_rate / 100.0,
         population=population,
 
-        hospitalized=RateLos(hospitalized_rate/ 100.0, hospitalized_los),
-        icu=RateLos(icu_rate/ 100.0, icu_los),
-        ventilated=RateLos(ventilated_rate/ 100.0, ventilated_los),
+        hospitalized=RateLos(hospitalized_rate / 100.0, hospitalized_los),
+        icu=RateLos(icu_rate / 100.0, icu_los),
+        ventilated=RateLos(ventilated_rate / 100.0, ventilated_los),
     )
 
 
