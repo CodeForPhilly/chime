@@ -27,7 +27,7 @@ class Navbar(Component):
         """Initialize the navigation bar
         """
         nav = dbc.Navbar(
-            dbc.Container(
+            children=dbc.Container(
                 [
                     html.A(
                         dbc.Row(
@@ -45,6 +45,9 @@ class Navbar(Component):
                     ),
                 ]
                 + self.menu.html
-            )
+            ),
+            dark=True,
+            fixed="top",
+            color="dark"
         )
         return [nav]
