@@ -1,0 +1,12 @@
+version: '3.1'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dash
+      args:
+        - PORT=${PORT}
+    restart: always
+    ports:
+      - "${PORT}:8000"

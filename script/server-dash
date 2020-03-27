@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# script/server: Launch the application and any extra required processes
+#                locally.
+
+set -e
+cd "$(dirname "$0")/.."
+
+
+script/bootstrap
+
+if [ ! -f ".env" ]; then
+    echo
+    echo "==> Initializing .env…"
+    cp .env.example .env
+fi
+
+echo
+echo "==> Loading .env…"
+set -o allexport; source .env; set +o allexport
+
+echo
+echo "==> Starting containers with docker-compose…"
+docker-compose -f docker-compose-dash.yml up -d --build
+
+echo
+echo "==> App is now ready to go!"
+echo "    *Open http://localhost:${PORT}"
+echo
