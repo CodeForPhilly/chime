@@ -485,7 +485,8 @@ def draw_projected_admissions_table(
     return None
 
 
-def draw_census_table(st, census_df: pd.DataFrame, labels, day_range, as_date: bool = False):
+def draw_census_table(
+        st, census_df: pd.DataFrame, labels, day_range, date_first_hospitalized: Optional[date] = None, as_date: bool = False):
     census_table = census_df[np.mod(census_df.index, day_range) == 0].copy()
     census_table.index = range(census_table.shape[0])
     census_table.loc[0, :] = 0
@@ -493,7 +494,7 @@ def draw_census_table(st, census_df: pd.DataFrame, labels, day_range, as_date: b
 
     if as_date:
         census_table = add_date_column(
-            census_table, drop_day_column=True, date_format=DATE_FORMAT
+            census_table, date_first_hospitalized, drop_day_column=True, date_format=DATE_FORMAT
         )
 
     census_table.rename(labels)
@@ -510,7 +511,7 @@ def draw_raw_sir_simulation_table(st, model, parameters):
 
     if as_date:
         infect_table = add_date_column(
-            infect_table, drop_day_column=True, date_format=DATE_FORMAT
+            infect_table, parameters.date_first_hospitalized, drop_day_column=True, date_format=DATE_FORMAT
         )
 
     st.table(infect_table)
@@ -522,7 +523,7 @@ def draw_raw_sir_simulation_table(st, model, parameters):
 
 def build_download_link(st, filename: str, df: pd.DataFrame, parameters: Parameters):
     if parameters.as_date:
-        df = add_date_column(df, drop_day_column=True, date_format="%Y-%m-%d")
+        df = add_date_column(df, parameters.date_first_hospitalized, drop_day_column=True, date_format="%Y-%m-%d")
 
     csv = dataframe_to_base64(df)
     st.markdown("""
