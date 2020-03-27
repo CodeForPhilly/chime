@@ -8,6 +8,7 @@ changed
 from __future__ import annotations
 
 from typing import Dict, Generator, Tuple, Optional
+from datetime import date, timedelta
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
@@ -98,8 +99,8 @@ class SimSirModel:
         self.census_df = census_df
 
         #if p.n_days_since_first_hospitalized is None:
-        #    continue
-
+        #    p.n_days_since_first_hospitalized = int(self.argmin_ds(p))
+        #    p.date_first_hospitalized = date.today() - timedelta(days=p.n_days_since_first_hospitalized)
         if p.n_days_since_first_hospitalized is not None and p.doubling_time is None:
             # optimize doubling_time
             argmin_dt = None
@@ -107,7 +108,7 @@ class SimSirModel:
             censes = dict()
             current_infecteds = dict()
             for dt in np.linspace(1,15,29):
-                censes[dt], current_infecteds[dt] = self.run_projection(p, dt)
+                censes[dt], current_infecteds[dt] = self.run_projection_dt(p, dt)
                 # self.current_infected = current_infecteds[dt] # log it into state for no reason really
                 self.census_df = censes[dt] # log it into state for loss
                 loss_dt = self.loss_dt(p)
@@ -156,7 +157,7 @@ class SimSirModel:
 
         return None
 
-    def run_projection(self, p: Parameters, doubling_time: float) -> Tuple[pd.DataFrame, float]:
+    def run_projection_dt(self, p: Parameters, doubling_time: float) -> Tuple[pd.DataFrame, float]:
         intrinsic_growth_rate = self._intrinsic_growth_rate(doubling_time)
 
         recovery_days = p.recovery_days
@@ -207,8 +208,18 @@ class SimSirModel:
         return (p.current_hospitalized - predicted_current_hospitalized) ** 2
 
     def loss_ds(self, p: Parameters) -> float:
-        pass
-    
+        """loss with respect to days_since """
+
+        ## get the predicted number hospitalized today
+        pred_current_hospitalized = self.census_df['hospitalized'].loc[p.n_days_since_first_hospitalized]
+
+        ## compare against the actual (user inputed) number
+        ## squared difference is the loss to be optimized
+        return (p.current_hospitalized - pred_current_hospitalized)**2
+
+    def argmin_ds(self, p: Parameters) -> float:
+        losses_df = (self.census_df.hospitalized - p.current_hospitalized) ** 2
+        return losses_df.argmin()
 
     @staticmethod
     def _intrinsic_growth_rate(doubling_time: Optional[float]) -> float:
@@ -264,10 +275,11 @@ def sim_sir_df(
     s: float, i: float, r: float, beta: float, gamma: float, n_days: int
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
-    return pd.DataFrame(
+    dat = pd.DataFrame(
         data=gen_sir(s, i, r, beta, gamma, n_days),
         columns=("day", "susceptible", "infected", "recovered"),
     )
+    return dat
 
 
 def get_dispositions(

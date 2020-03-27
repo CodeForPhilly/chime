@@ -109,6 +109,9 @@ def additional_projections_chart(
     })
     dat["day"] = dat.index
 
+    if parameters.n_days_since_first_hospitalized:
+        dat["day"] = dat.day - parameters.n_days_since_first_hospitalized
+
     as_date = parameters.as_date
     max_y_axis = parameters.max_y_axis
 

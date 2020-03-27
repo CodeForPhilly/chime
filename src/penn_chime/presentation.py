@@ -497,6 +497,8 @@ def draw_census_table(
 def draw_raw_sir_simulation_table(st, model, parameters):
     as_date = parameters.as_date
     projection_area = model.raw_df
+    if parameters.n_days_since_first_hospitalized is not None:
+        projection_area.loc[:, "day"] = projection_area.day - parameters.n_days_since_first_hospitalized
     infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
     infect_table.index = range(infect_table.shape[0])
     infect_table["day"] = infect_table.day.astype(int)

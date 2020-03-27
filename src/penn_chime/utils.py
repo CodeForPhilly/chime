@@ -53,11 +53,17 @@ def add_date_column(
     if date_first_hospitalized:
         delta = today - date_first_hospitalized
         start = today - delta
+        delta_days = delta.days
     else:
         start = today
-    end = start + timedelta(days=n_days + 1) # + delta # the +delta part is a hypothesis by phil
+        delta_days = 0
+        delta = timedelta(days=0)
+    end = start + timedelta(days=n_days + 1) + delta
+
     # And pick dates present in frame
-    dates = pd.date_range(start=start, end=end, freq="D")[df.day.tolist()]
+    dates = pd.date_range(
+        start=start, end=end, freq="D", closed="right"
+    )[[x + delta_days for x in df.day.tolist()]]
 
     if date_format is not None:
         dates = dates.strftime(date_format)
@@ -72,7 +78,6 @@ def add_date_column(
 
     # sort columns
     df = df[date_columns + non_date_columns]
-
     return df
 
 def dataframe_to_base64(df: pd.DataFrame) -> str:
