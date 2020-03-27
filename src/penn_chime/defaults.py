@@ -20,9 +20,9 @@ class Constants:
         self,
         *,
         current_hospitalized: int,
-        doubling_time: int,
+        doubling_time: float,
         known_infected: int,
-        relative_contact_rate: int,
+        relative_contact_rate: float,
         region: Regions,
 
         hospitalized: RateLos,
