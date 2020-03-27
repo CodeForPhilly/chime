@@ -1,13 +1,11 @@
 FROM python:3.7.7-slim-buster
-
-COPY .streamlit ~/
-
-COPY ./requirements.txt /app/requirements.txt
-
+RUN mkdir /app
 WORKDIR /app
+COPY .streamlit .streamlit
+COPY README.md .
+COPY setup.py .
+COPY settings.cfg .
+COPY src src
+RUN pip install -q .
 
-RUN pip install -q -r requirements.txt
-
-COPY . ./
-
-CMD ["streamlit", "run", "app.py"]
+CMD ["streamlit", "run", "src/app.py"]
