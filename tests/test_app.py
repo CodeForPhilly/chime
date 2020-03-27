@@ -163,7 +163,7 @@ def test_sir():
 
     with pytest.raises(TypeError) as error:
         sir(100, 1, 0, "beta", 0.5, 1)
-    assert str(error.value) == "bad operand type for unary -: 'str'"
+    assert str(error.value) == "'<' not supported between instances of 'str' and 'int'"
 
     with pytest.raises(TypeError) as error:
         sir(100, 1, 0, 0.2, "gamma", 1)

@@ -102,11 +102,17 @@ def sir(
     s: float, i: float, r: float, beta: float, gamma: float, n: float
 ) -> Tuple[float, float, float]:
     """The SIR model, one time step."""
-    s_n = (-beta * s * i) + s
-    i_n = (beta * s * i - gamma * i) + i
+
+    potential_new_infections = beta * s * i
+    # Can't infect more people than there are left to become infected
+    new_infections = min(s, potential_new_infections)
+
+    s_n = s - new_infections
+    i_n = (new_infections - gamma * i) + i
     r_n = gamma * i + r
-    if s_n < 0.0:
-        s_n = 0.0
+
+    assert s_n >= 0.0
+
     if i_n < 0.0:
         i_n = 0.0
     if r_n < 0.0:
