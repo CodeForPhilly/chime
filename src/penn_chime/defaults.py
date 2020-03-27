@@ -7,15 +7,12 @@ class Regions:
     """Arbitrary number of counties."""
 
     def __init__(self, **kwargs):
-        susceptible = 0
+        population = 0
         for key, value in kwargs.items():
             setattr(self, key, value)
-            susceptible += value
-        self._susceptible = susceptible
+            population += value
+        self.population = population
 
-    @property
-    def susceptible(self):
-        return self._susceptible
 
 
 class Constants:
@@ -55,4 +52,4 @@ class Constants:
         self.recovery_days = recovery_days
 
     def __repr__(self) -> str:
-        return f"Constants(susceptible_default: {self.region.susceptible}, known_infected: {self.known_infected})"
+        return f"Constants(population_default: {self.region.population}, known_infected: {self.known_infected})"

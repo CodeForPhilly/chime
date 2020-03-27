@@ -18,8 +18,7 @@ from .parameters import Parameters
 class SimSirModel:
 
     def __init__(self, p: Parameters) -> SimSirModel:
-        # TODO missing initial recovered value
-        susceptible = p.susceptible
+        # TODO missing initial non-zero 'recovered' value
         recovered = 0.0
         recovery_days = p.recovery_days
 
@@ -39,6 +38,8 @@ class SimSirModel:
         infected = (
             p.current_hospitalized / p.market_share / p.hospitalized.rate
         )
+
+        susceptible = p.population - infected
 
         detection_probability = (
             p.known_infected / infected if infected > 1.0e-7 else None
