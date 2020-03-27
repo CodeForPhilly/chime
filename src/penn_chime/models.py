@@ -126,11 +126,11 @@ class SimSirModel:
             doubling_time_t = 1.0 / np.log2(beta * susceptible - gamma + 1)
             raw_df = sim_sir_df(
                 susceptible,
-                infected,
+                current_infected,
                 recovered,
                 beta,
                 gamma,
-                p.n_days + p.n_days_since_first_hospitalized
+                p.n_days #+ p.n_days_since_first_hospitalized
             )
             dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
             admits_df = build_admits_df(dispositions_df, p.n_days_since_first_hospitalized)
