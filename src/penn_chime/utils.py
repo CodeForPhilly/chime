@@ -55,7 +55,7 @@ def add_date_column(
         start = today - delta
     else:
         start = today
-    end = start + timedelta(days=n_days + 1) + delta # the +delta part is a hypothesis by phil
+    end = start + timedelta(days=n_days + 1) # + delta # the +delta part is a hypothesis by phil
     # And pick dates present in frame
     dates = pd.date_range(start=start, end=end, freq="D")[df.day.tolist()]
 
