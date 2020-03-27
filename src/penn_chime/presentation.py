@@ -290,7 +290,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
     return Parameters(
         as_date=as_date,
         current_hospitalized=current_hospitalized,
-        market_share=market_share,
+        market_share=market_share / 100.0,
         known_infected=known_infected,
         doubling_time=doubling_time,
 
