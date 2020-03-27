@@ -16,6 +16,25 @@ import pandas as pd  # type: ignore
 RateLos = namedtuple("RateLos", ("rate", "length_of_stay"))
 
 
+SimSirModelAttributes = namedtuple(
+    "SimSirModelAttributes",
+    (
+        "doubling_time",
+        "intrinsic_growth_rate",
+        "gamma",
+        "beta",
+        "r_t",
+        "r_0",
+        "doubling_time_t",
+        "raw_df",
+        "dispositions_df",
+        "admits_df",
+        "census_df"
+    )
+)
+
+
+
 def add_date_column(
     df: pd.DataFrame, drop_day_column: bool = False, date_format: Optional[str] = None,
 ) -> pd.DataFrame:

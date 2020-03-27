@@ -13,7 +13,7 @@ import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
 from .parameters import Parameters
-
+from .utils import SimSirModelAttributes
 
 class SimSirModel:
 
@@ -43,12 +43,8 @@ class SimSirModel:
         detection_probability = (
             p.known_infected / infected if infected > 1.0e-7 else None
         )
-
-        if p.doubling_time is not None:
-           intrinsic_growth_rate = \
-                (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
-        else:
-           intrinsic_growth_rate = 0
+        intrinsic_growth_rate = \
+            (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
 
         gamma = 1.0 / recovery_days
 
@@ -99,26 +95,8 @@ class SimSirModel:
         self.census_df = census_df
         self.daily_growth = daily_growth_helper(p.doubling_time)
         self.daily_growth_t = daily_growth_helper(doubling_time_t)
+
         return None
-
-    def observed_predicted_loss(self, doubling_time: float, p: Parameters) -> float:
-        """Squared error between predicted value and actual value
-
-        Won't be run if n_days_since_first_hospitalized is None
-        """
-        census_df = self.run_projection(p, dt=doubling_time)
-        ## get the predicted number hospitalized today
-        pred_current_hospitalized = self.census_df['hospitalized'].loc[p.n_days_since_first_hospitalized]
-
-        ## compare against the actual (user inputed) number
-        ## squared difference is the loss to be optimized
-        return (p.current_hospitalized - pred_current_hospitalized)**2
-
-    def argmin_dt(self, doubling_times: np.ndarray, p: Parameters) -> float:
-        """Argmin of the loss function with respect to doubling time."""
-        loss = np.array([self.observed_predicted_loss(dt, p) for dt in doubling_times])
-        fitted_doubling_time = doubling_times[loss.argmin()]
-        return fitted_doubling_time
 
 ###################
 ##  MODEL FUNCS  ##
@@ -201,12 +179,37 @@ def build_census_df(
     })
 
 
-###########
-## UTILS ##
-###########
+############################
+##  ARGMIN DOUBLING_TIME  ##
+############################
+
+
+def observed_predicted_loss(self, doubling_time: float, p: Parameters) -> float:
+    """Squared error between predicted value and actual value
+
+    Won't be run if n_days_since_first_hospitalized is None
+    """
+    census_df = self.run_projection(p, dt=doubling_time)
+    ## get the predicted number hospitalized today
+    pred_current_hospitalized = self.census_df['hospitalized'].loc[p.n_days_since_first_hospitalized]
+
+    ## compare against the actual (user inputed) number
+    ## squared difference is the loss to be optimized
+    return (p.current_hospitalized - pred_current_hospitalized)**2
+
+def argmin_dt(self, doubling_times: np.ndarray, p: Parameters) -> float:
+    """Argmin of the loss function with respect to doubling time."""
+    loss = np.array([self.observed_predicted_loss(dt, p) for dt in doubling_times])
+    fitted_doubling_time = doubling_times[loss.argmin()]
+    return fitted_doubling_time
+
+
+#############
+##  UTILS  ##
+#############
 def daily_growth_helper(doubling_time: float) -> float:
     """Calculates average daily growth rate from doubling time"""
     result = 0
-    if doubling_time != 0:
+    if doubling_time != 0 and doubling_time is not None:
         result = (np.power(2, 1.0 / doubling_time) - 1) * 100
     return result
