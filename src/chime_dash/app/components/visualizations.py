@@ -1,4 +1,8 @@
-"""Initializes the  dash html
+"""components/visualizations
+
+Initializes the visual components of the interactive model
+
+localization file can be found in app/templates/en
 """
 from typing import List, Any
 
@@ -76,7 +80,7 @@ class Visualizations(Component):
             else None
         )
 
-        return (admissions_data, admissions_table_data, census_data, census_table_data)
+        return [admissions_data, admissions_table_data, census_data, census_table_data]
 
     @staticmethod
     def _build_frames(**kwargs):

@@ -17,7 +17,7 @@ class Parameters:
         doubling_time: float,
         known_infected: int,
         relative_contact_rate: float,
-        population: int,
+        susceptible: int,
 
         hospitalized: RateLos,
         icu: RateLos,
@@ -33,7 +33,7 @@ class Parameters:
         self.doubling_time = doubling_time
         self.known_infected = known_infected
         self.relative_contact_rate = relative_contact_rate
-        self.population = population
+        self.susceptible = susceptible
 
         self.hospitalized = hospitalized
         self.icu = icu
