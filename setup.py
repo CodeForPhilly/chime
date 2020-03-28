@@ -7,20 +7,8 @@ import io
 from os import path
 from setuptools import setup, find_packages, find_namespace_packages
 
-CWD = path.abspath(path.dirname(__file__))
-
-#with io.open(path.join(CWD, "README.md"), encoding="utf-8") as inp:
-#    LONG_DESCRIPTION = inp.read()
-
-#with io.open(path.join(CWD, "requirements.txt"), encoding="utf-8") as inp:
-#    REQUIREMENTS = [el.strip() for el in inp.read().split(",")]
-
 with io.open("README.md", "r") as inp:
     LONG_DESCRIPTION = inp.read()
-
-with io.open("requirements.txt", "r") as inp:
-    REQUIREMENTS = [el.strip() for el in inp.read().split(",")]
-
     
 setup(
     name="penn_chime",
@@ -37,7 +25,7 @@ setup(
         "Documentation": "https://codeforphilly.github.io/chime/",
     },
     package_dir={'': 'src'},
-    #packages=find_namespace_packages(where='src', exclude=('tests')),
+    packages=find_namespace_packages(where='src', exclude=('tests')),
     install_requires=[
         "streamlit",
         "pandas",
@@ -59,7 +47,5 @@ setup(
         'console_scripts': ['penn_chime=penn_chime.cli:main'],
     },
     keywords=[],
-    packages=find_packages(".", exclude=["docs", "k82", "script", "tests"]),
-    #install_requires=REQUIREMENTS,
     include_package_data=True,
 )
