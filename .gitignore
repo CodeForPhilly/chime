@@ -1,9 +1,5 @@
 # Editors
-.vscode/
 .idea/
-
-# Byte-compiled / optimized / DLL files
-__pycache__/
 
 # Environments
 .env
@@ -17,6 +13,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 __pycache__/
+
+# pytest
+.cache/
 
 # Module trash
 *.egg-info
