@@ -1,0 +1,4 @@
+[server]
+enableCORS = false
+headless = true
+port = 8000
