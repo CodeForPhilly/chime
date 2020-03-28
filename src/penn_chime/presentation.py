@@ -9,6 +9,7 @@ import pandas as pd  # type: ignore
 
 from .utils import dataframe_to_base64
 from .parameters import Parameters, RateLos
+from .models import SimSirModel as Model
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
 DOCS_URL = "https://code-for-philly.gitbook.io/chime"
@@ -333,7 +334,13 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
 
 
-def show_more_info_about_this_tool(st, model, parameters, defaults, notes: str = ""):
+def display_more_info(
+    st,
+    model: Model,
+    parameters: Parameters,
+    defaults: Parameters,
+    notes: str = "",
+):
     """a lot of streamlit writing to screen."""
     st.subheader(
         "[Discrete-time SIR modeling](https://mathworld.wolfram.com/SIRModel.html) of infections/recovery"
@@ -371,7 +378,7 @@ $$\\beta$$ can be interpreted as the _effective contact rate_:
 $\\gamma$ is the inverse of the mean recovery time, in days.  I.e.: if $\\gamma = 1/{recovery_days}$, then the average infection will clear in {recovery_days} days.
 
 An important descriptive parameter is the _basic reproduction number_, or $R_0$.  This represents the average number of people who will be infected by any given infected person.  When $R_0$ is greater than 1, it means that a disease will grow.  Higher $R_0$'s imply more rapid growth.  It is defined as """.format(
-            recovery_days=int(parameters.recovery_days)
+            recovery_days=int(parameters.infectious_days)
         )
     )
     st.latex("R_0 = \\beta /\\gamma")

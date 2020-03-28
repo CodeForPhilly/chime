@@ -6,11 +6,11 @@ import streamlit as st  # type: ignore
 from penn_chime.presentation import (
     display_download_link,
     display_header,
+    display_more_info,
     display_sidebar,
     draw_raw_sir_simulation_table,
     hide_menu_style,
     show_additional_projections,
-    show_more_info_about_this_tool,
     write_definitions,
     write_footer,
 )
@@ -38,7 +38,7 @@ display_header(st, m, p)
 
 if st.checkbox("Show more info about this tool"):
     notes = "The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)"
-    show_more_info_about_this_tool(st=st, model=m, parameters=p, defaults=DEFAULTS, notes=notes)
+    display_more_info(st=st, model=m, parameters=p, defaults=DEFAULTS, notes=notes)
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
