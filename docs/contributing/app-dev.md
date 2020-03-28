@@ -59,6 +59,7 @@ streamlit run src/app.py
 - `Pipfile.lock`
 - `environment.yml`
 - `requirements.txt`
+- `setup.py`
 
 ### Documentation
 
