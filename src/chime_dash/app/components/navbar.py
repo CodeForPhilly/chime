@@ -2,15 +2,13 @@
 """
 from typing import List
 
-import dash_html_components as html
 import dash_bootstrap_components as dbc
-from dash.development.base_component import ComponentMeta
-
-from penn_chime.defaults import Constants
-from penn_chime.settings import DEFAULTS
-
+import dash_html_components as html
 from chime_dash.app.components.base import Component
 from chime_dash.app.components.menu import Menu
+from dash.development.base_component import ComponentMeta
+from penn_chime.defaults import Constants
+from penn_chime.settings import DEFAULTS
 
 
 class Navbar(Component):
@@ -29,20 +27,21 @@ class Navbar(Component):
         nav = dbc.Navbar(
             children=dbc.Container(
                 [
-                    html.A(
-                        dbc.Row(
-                            children=[
-                                dbc.Col(
-                                    dbc.NavbarBrand(
-                                        children="Penn Medicine CHIME", href="/"
-                                    )
-                                ),
-                            ],
-                            align="center",
-                            no_gutters=True,
-                        ),
-                        href="https://www.pennmedicine.org/",
+                    dbc.Row(
+                        children=[
+                            html.A(
+                                href="https://www.pennmedicine.org",
+                                className="penn-medicine-header__logo",
+                                title="Go to the Penn Medicine home page",
+                            ),
+                            dbc.NavbarBrand(
+                                children="CHIME", href="/"
+                            ),
+                        ],
+                        align="center",
+                        no_gutters=True,
                     ),
+
                 ]
                 + self.menu.html
             ),

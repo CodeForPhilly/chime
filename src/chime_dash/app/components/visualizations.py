@@ -76,7 +76,7 @@ class Visualizations(Component):
             else None
         )
 
-        return (admissions_data, admissions_table_data, census_data, census_table_data)
+        return [admissions_data, admissions_table_data, census_data, census_table_data]
 
     @staticmethod
     def _build_frames(**kwargs):

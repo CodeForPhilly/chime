@@ -119,7 +119,7 @@ class Sidebar(Component):
                 className="p-4",
                 style={
                     "height": "calc(100vh - 48px)",
-                    "overflow-y": "auto",
+                    "overflowY": "auto",
                 },
             ),
             className="col-md-3",
@@ -128,8 +128,8 @@ class Sidebar(Component):
                 "top": "48px",
                 "bottom": 0,
                 "left": 0,
-                "z-index": 100,
-                "box-shadow": "inset -1px 0 0 rgba(0, 0, 0, .1)"
+                "zIndex": 100,
+                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)"
             }
         )
 
