@@ -4,7 +4,8 @@
 from typing import List
 
 from dash.development.base_component import ComponentMeta
-from dash_html_components import H1
+from dash_html_components import Div, H1
+from dash_core_components import Markdown
 
 from chime_dash.app.components.base import Component
 
@@ -19,4 +20,9 @@ class Header(Component):
         """Initializes the header dash html
         """
         content = self.content
-        return [H1(className="penn-medicine-header__title", id="title", children=content["title"])]
+        return [Div(
+            children=[
+                H1(className="penn-medicine-header__title", id="title", children=content["title"]),
+                Markdown(content["description"])
+          ]
+        )]
