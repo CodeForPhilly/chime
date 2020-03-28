@@ -51,13 +51,7 @@ display_download_link(
 if st.checkbox("Show Projected Admissions in tabular form"):
     admits_modulo = 1
     if not st.checkbox("Show Daily Counts"):
-        admits_modulo = st.slider(
-            label="Interval of Days",
-            key="admissions_day_range_slider",
-            min_value=1,
-            max_value=10,
-            value=7
-        )
+        admits_modulo = 7
     table_df = build_table(
         df=m.admits_df,
         labels=p.labels,
@@ -79,13 +73,7 @@ display_download_link(
 if st.checkbox("Show Projected Census in tabular form"):
     census_modulo = 1
     if not st.checkbox("Show Daily Census Counts"):
-        census_modulo = st.slider(
-            label='Interval of Days',
-            key="census_day_range_slider",
-            min_value=1,
-            max_value=10,
-            value=7
-        )
+        census_modulo = 7
     table_df = build_table(
         df=m.census_df,
         labels=p.labels,
