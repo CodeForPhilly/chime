@@ -1,17 +1,53 @@
 """Tests."""
 
 from math import ceil  # type: ignore
-import datetime  # type: ignore
+from datetime import datetime  # type: ignore
 import pytest  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
-from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
-from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df, get_growth_rate
-from src.penn_chime.parameters import Parameters, RateLos
+from src.penn_chime.charts import (
+    build_admits_chart,
+    build_census_chart,
+    build_descriptions,
+)
+from src.penn_chime.models import (
+    SimSirModel as Model,
+    sir,
+    sim_sir_df,
+    build_admits_df,
+    get_growth_rate,
+)
+from src.penn_chime.parameters import (
+    Parameters,
+    RateLos,
+    Regions,
+)
 from src.penn_chime.presentation import display_header
-from src.penn_chime.settings import DEFAULTS
+
+
+# The defaults in settings will change and break the tests
+DEFAULTS = Parameters(
+    region=Regions(
+        delaware=564696,
+        chester=519293,
+        montgomery=826075,
+        bucks=628341,
+        philly=1581000,
+    ),
+    current_date=datetime(year=2020, month=3, day=28),
+    current_hospitalized=14,
+    date_first_hospitalized=datetime(year=2020, month=3, day=7),
+    doubling_time=4.0,
+    known_infected=510,
+    n_days=60,
+    market_share=0.15,
+    relative_contact_rate=0.3,
+    hospitalized=RateLos(0.025, 7),
+    icu=RateLos(0.0075, 9),
+    ventilated=RateLos(0.005, 10),
+)
 
 PARAM = Parameters(
     current_hospitalized=100,
@@ -39,8 +75,8 @@ HALVING_PARAM = Parameters(
     n_days=60,
 )
 
-MODEL = SimSirModel(PARAM)
-HALVING_MODEL = SimSirModel(HALVING_PARAM)
+MODEL = Model(PARAM)
+HALVING_MODEL = Model(HALVING_PARAM)
 
 
 # set up
@@ -196,36 +232,27 @@ def test_sim_sir():
     assert isinstance(raw_df, pd.DataFrame)
 
 
-def test_new_admissions_chart():
-    projection_admits = pd.read_csv("tests/projection_admits.csv")
-    chart = new_admissions_chart(alt, projection_admits, PARAM)
+def test_admits_chart():
+    admits_df = pd.read_csv("tests/projection_admits.csv")
+    chart = build_admits_chart(alt=alt, admits_df=admits_df)
     assert isinstance(chart, alt.Chart)
-    # COMMENTING OUT because chart tests oughtn't bother with numeric info anyway
-    # assert chart.data.iloc[1].hospitalized < 1
     assert round(chart.data.iloc[40].icu, 0) == 25
 
     # test fx call with no params
     with pytest.raises(TypeError):
-        new_admissions_chart()
-
-    # unnecessary
-    # empty_chart = new_admissions_chart(alt, pd.DataFrame(), PARAM)
-    # assert empty_chart.data.empty
+        build_admits_chart()
 
 
-def test_admitted_patients_chart():
+def test_census_chart():
     census_df = pd.read_csv("tests/census_df.csv")
-    chart = admitted_patients_chart(alt, census_df, PARAM)
+    chart = build_census_chart(alt=alt, census_df=census_df)
     assert isinstance(chart, alt.Chart)
     assert chart.data.iloc[1].hospitalized == 1
     assert chart.data.iloc[49].ventilated == 203
 
     # test fx call with no params
     with pytest.raises(TypeError):
-        admitted_patients_chart()
-
-    empty_chart = admitted_patients_chart(alt, pd.DataFrame(), PARAM)
-    assert empty_chart.data.empty
+        build_census_chart()
 
 
 def test_model(model=MODEL, param=PARAM):
@@ -276,11 +303,11 @@ def test_growth_rate():
     assert np.round(get_growth_rate(-4) * 100.0, decimals=4) == -15.9104
 
 
-def test_chart_descriptions(p=PARAM):
+def test_build_descriptions(p=PARAM):
     # new admissions chart
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
-    chart = new_admissions_chart(alt, projection_admits, p)
-    description = chart_descriptions(chart, p.labels)
+    admits_df = pd.read_csv('tests/projection_admits.csv')
+    chart = build_admits_chart(alt=alt, admits_df=admits_df)
+    description = build_descriptions(chart=chart, labels=p.labels)
 
     hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
 
@@ -295,10 +322,10 @@ def test_chart_descriptions(p=PARAM):
     param = PARAM
     param.n_days = 600
 
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
+    admits_df = pd.read_csv('tests/projection_admits.csv')
     # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
-    chart = new_admissions_chart(alt, projection_admits, p)
-    description = chart_descriptions(chart, p.labels)
+    chart = build_admits_chart(alt=alt, admits_df=admits_df)
+    description = build_descriptions(chart, p.labels)
     assert "*" not in description
 
     # census chart
@@ -306,8 +333,8 @@ def test_chart_descriptions(p=PARAM):
     # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
     PARAM.as_date = True
     chart = admitted_patients_chart(alt, census_df, p)
-    description = chart_descriptions(chart, p.labels)
+    description = chart_descriptions(chart=chart, labels=p.labels)
 
     assert str(ceil(chart.data['ventilated'].max())) in description
     assert str(chart.data['icu'].idxmax()) not in description
-    assert datetime.datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
+    assert datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
