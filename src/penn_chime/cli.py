@@ -8,9 +8,9 @@ from datetime import datetime
 
 from pandas import DataFrame
 
-from penn_chime.parameters import Parameters
+from penn_chime.parameters import Parameters, RateLos
 from penn_chime.models import SimSirModel
-from penn_chime.utils import RateLos
+
 
 class FromFile(Action):
     """From File."""
@@ -20,11 +20,19 @@ class FromFile(Action):
             parser.parse_args(f.read().split(), namespace)
 
 
-def validator(cast, min_value, max_value):
+def cast_date(string):
+    return datetime.strptime(string, '%Y-%m-%d').date()
+
+
+def validator(arg, cast, min_value, max_value, required=True):
     """Validator."""
 
     def validate(string):
         """Validate."""
+        if string == '' and cast != str:
+            if required:
+                raise AssertionError('%s is required.')
+            return None
         value = cast(string)
         if min_value is not None:
             assert value >= min_value
@@ -38,19 +46,24 @@ def validator(cast, min_value, max_value):
 def parse_args():
     """Parse args."""
     parser = ArgumentParser(description="CHIME")
-
     parser.add_argument("--file", type=open, action=FromFile)
-    parser.add_argument(
-        "--prefix", type=str, default=datetime.now().strftime("%Y.%m.%d.%H.%M."),
-    )
 
-    for arg, cast, min_value, max_value, help in (
+    for arg, cast, min_value, max_value, help, required in (
         (
             "--current-hospitalized",
             int,
             0,
             None,
             "Currently Hospitalized COVID-19 Patients (>= 0)",
+            True,
+        ),
+        (
+            "--date-first-hospitalized",
+            cast_date,
+            None,
+            None,
+            "Current date",
+            False,
         ),
         (
             "--doubling-time",
@@ -58,23 +71,26 @@ def parse_args():
             0.0,
             None,
             "Doubling time before social distancing (days)",
+            True,
         ),
-        ("--hospitalized-los", int, 0, None, "Hospitalized Length of Stay (days)"),
+        ("--hospitalized-los", int, 0, None, "Hospitalized Length of Stay (days)", True),
         (
             "--hospitalized-rate",
             float,
             0.00001,
             1.0,
             "Hospitalized Rate: 0.00001 - 1.0",
+            True,
         ),
-        ("--icu-los", int, 0, None, "ICU Length of Stay (days)"),
-        ("--icu-rate", float, 0.0, 1.0, "ICU Rate: 0.0 - 1.0"),
+        ("--icu-los", int, 0, None, "ICU Length of Stay (days)", True),
+        ("--icu-rate", float, 0.0, 1.0, "ICU Rate: 0.0 - 1.0", True),
         (
             "--known-infected",
             int,
             0,
             None,
             "Currently Known Regional Infections (>=0) (only used to compute detection rate - does not change projections)",
+            True,
         ),
         (
             "--market_share",
@@ -82,20 +98,23 @@ def parse_args():
             0.00001,
             1.0,
             "Hospital Market Share (0.00001 - 1.0)",
+            True,
         ),
-        ("--n-days", int, 0, None, "Nuber of days to project >= 0"),
+        ("--infectious-days", float, 0.0, None, "Infectious days", True),
+        ("--n-days", int, 0, None, "Number of days to project >= 0", True),
         (
             "--relative-contact-rate",
             float,
             0.0,
             1.0,
             "Social Distancing Reduction Rate: 0.0 - 1.0",
+            True,
         ),
-        ("--population", int, 1, None, "Regional Population >= 1"),
-        ("--ventilated-los", int, 0, None, "Ventilated Length of Stay (days)"),
-        ("--ventilated-rate", float, 0.0, 1.0, "Ventilated Rate: 0.0 - 1.0"),
+        ("--population", int, 1, None, "Regional Population >= 1", True),
+        ("--ventilated-los", int, 0, None, "Ventilated Length of Stay (days)", True),
+        ("--ventilated-rate", float, 0.0, 1.0, "Ventilated Rate: 0.0 - 1.0", True),
     ):
-        parser.add_argument(arg, type=validator(cast, min_value, max_value))
+        parser.add_argument(arg, type=validator(arg, cast, min_value, max_value, required))
     return parser.parse_args()
 
 
@@ -105,7 +124,9 @@ def main():
 
     p = Parameters(
         current_hospitalized=a.current_hospitalized,
+        date_first_hospitalized=a.date_first_hospitalized,
         doubling_time=a.doubling_time,
+        infectious_days=a.infectious_days,
         known_infected=a.known_infected,
         market_share=a.market_share,
         n_days=a.n_days,
@@ -119,13 +140,12 @@ def main():
 
     m = SimSirModel(p)
 
-    prefix = a.prefix
     for df, name in (
-        (m.raw_df, "raw"),
-        (m.admits_df, "admits"),
-        (m.census_df, "census"),
+        (m.sim_sir_w_date_df, "sim_sir_w_date"),
+        (m.admits_df, "projected_admits"),
+        (m.census_df, "projected_census"),
     ):
-        df.to_csv(prefix + name + ".csv")
+        df.to_csv(f"{p.current_date}_{name}.csv")
 
 
 if __name__ == "__main__":
