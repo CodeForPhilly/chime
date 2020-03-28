@@ -121,11 +121,11 @@ class SimSirModel:
             dt = census_df = current_infected = None
             for i_dt in np.linspace(1,15,29):
                 i_census_df, i_current_infected = get_census_and_infected_projection(
-                    rates,
-                    lengths_of_stay,
-                    n_days_since,
-                    i_dt,
-                    p)
+                    rates=rates,
+                    lengths_of_stay=lengths_of_stay,
+                    n_days_since=n_days_since,
+                    doubling_time=i_dt,
+                    p=p)
                 loss = get_loss(i_census_df, p.current_hospitalized, n_days_since)
                 if loss < min_loss:
                     min_loss = loss
@@ -176,6 +176,7 @@ class SimSirModel:
 
 
 def get_census_and_infected_projection(
+    *,
     rates: Dict[str: float],
     lengths_of_stay: Dict[str: int],
     n_days_since: int,
