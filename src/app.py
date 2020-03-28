@@ -41,7 +41,7 @@ if st.checkbox("Show more info about this tool"):
     show_more_info_about_this_tool(st=st, model=m, parameters=p, defaults=DEFAULTS, notes=notes)
 
 st.subheader("New Admissions")
-st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
+st.markdown("Projected number of **daily** COVID-19 admissions")
 new_admit_chart = new_admissions_chart(alt, m.admits_df, parameters=p)
 st.altair_chart(
     new_admissions_chart(alt, m.admits_df, parameters=p),
@@ -69,7 +69,7 @@ if st.checkbox("Show Projected Admissions in tabular form"):
     )
 st.subheader("Admitted Patients (Census)")
 st.markdown(
-    "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
+    "Projected **census** of COVID-19 patients, accounting for arrivals and discharges"
 )
 census_chart = admitted_patients_chart(alt=alt, census=m.census_df, parameters=p)
 st.altair_chart(
