@@ -1,7 +1,7 @@
 """Tests."""
 
 from math import ceil  # type: ignore
-from datetime import datetime  # type: ignore
+from datetime import date, datetime  # type: ignore
 import pytest  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
@@ -233,10 +233,10 @@ def test_sim_sir():
 
 
 def test_admits_chart():
-    admits_df = pd.read_csv("tests/projection_admits.csv")
+    admits_df = pd.read_csv("tests/by_doubling_time/2020-03-28_projected_admits.csv")
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
     assert isinstance(chart, alt.Chart)
-    assert round(chart.data.iloc[40].icu, 0) == 25
+    assert round(chart.data.iloc[40].icu, 0) == 39
 
     # test fx call with no params
     with pytest.raises(TypeError):
@@ -244,11 +244,11 @@ def test_admits_chart():
 
 
 def test_census_chart():
-    census_df = pd.read_csv("tests/census_df.csv")
+    census_df = pd.read_csv("tests/by_doubling_time/2020-03-28_projected_census.csv")
     chart = build_census_chart(alt=alt, census_df=census_df)
     assert isinstance(chart, alt.Chart)
-    assert chart.data.iloc[1].hospitalized == 1
-    assert chart.data.iloc[49].ventilated == 203
+    assert chart.data.iloc[1].hospitalized == 3
+    assert chart.data.iloc[49].ventilated == 365
 
     # test fx call with no params
     with pytest.raises(TypeError):
@@ -269,27 +269,38 @@ def test_model(model=MODEL, param=PARAM):
     assert model.r_naught == 2.7144686763312222
     assert model.doubling_time_t == 7.764405988534983
 
-    # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
-    assert len(model.raw_df) == param.n_days + model.n_days_since + 1 == 61
 
+def test_model_raw_start(model=MODEL, param=PARAM):
     raw_df = model.raw_df
+
+    # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
+    assert len(raw_df) == (param.n_days + model.n_days_since + 1) == 99
+
     first = raw_df.iloc[0, :]
     second = raw_df.iloc[1, :]
-    last = raw_df.iloc[-1, :]
 
     assert first.susceptible + first.infected + first.recovered == param.population
-    assert last.susceptible + last.infected + last.recovered == param.population
-
     assert first.susceptible == 460000.0
     assert round(second.infected, 0) == 43735
-
-    assert round(last.susceptible, 0) == 59497
+    assert list(model.dispositions_df.iloc[0, :]) == [-38, date(year=2020, month=2, day=19), 100.0, 40.0, 20.0]
     assert round(raw_df.recovered[30], 0) == 216711
 
-    assert list(model.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
-    assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [60, 1101.0, 441.0, 220.0]
+    d, dt, s, i, r = list(model.dispositions_df.iloc[60, :])
+    assert dt == date(year=2020, month=4, day=19)
+    assert [round(v, 0) for v in (d, s, i, r)] == [22, 1101.0, 441.0, 220.0]
 
+
+def test_model_raw_end(model=MODEL, param=PARAM):
+    raw_df = model.raw_df
+
+    last = raw_df.iloc[-1, :]
+    assert last.susceptible + last.infected + last.recovered == param.population
+    assert round(last.susceptible, 0) == 46683.0
+
+
+def test_model_cumulative_census(model=MODEL):
     # test that admissions are being properly calculated
+    raw_df = model.raw_df
     cumulative_admits = model.admits_df.cumsum()
     diff = cumulative_admits.hospitalized[1:-1] - (
         0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
@@ -305,7 +316,7 @@ def test_growth_rate():
 
 def test_build_descriptions(p=PARAM):
     # new admissions chart
-    admits_df = pd.read_csv('tests/projection_admits.csv')
+    admits_df = pd.read_csv('tests/by_doubling_time/2020-03-28_projected_admits.csv')
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
     description = build_descriptions(chart=chart, labels=p.labels)
 
@@ -322,14 +333,14 @@ def test_build_descriptions(p=PARAM):
     param = PARAM
     param.n_days = 600
 
-    admits_df = pd.read_csv('tests/projection_admits.csv')
+    admits_df = pd.read_csv('tests/by_doubling_time/2020-03-28_projected_admits.csv')
     # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
     description = build_descriptions(chart, p.labels)
     assert "*" not in description
 
     # census chart
-    census_df = pd.read_csv('tests/census_df.csv')
+    census_df = pd.read_csv('tests/by_doubling_time/2020-03-28_projected_census.csv')
     # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
     PARAM.as_date = True
     chart = admitted_patients_chart(alt, census_df, p)
