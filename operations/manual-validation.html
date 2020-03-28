@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Data Analysis · GitBook</title>
+        <title>Manual Validation · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -57,10 +57,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="operations-support.html" />
+    <link rel="next" href="limited-kubeconfigs/limited-kubeconfigs.html" />
     
     
-    <link rel="prev" href="app-dev.html" />
+    <link rel="prev" href="byok8s.html" />
     
 
     </head>
@@ -161,9 +161,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.3.1" data-path="app-dev.html">
+        <li class="chapter " data-level="1.3.1" data-path="../contributing/app-dev.html">
             
-                <a href="app-dev.html">
+                <a href="../contributing/app-dev.html">
             
                     
                     Application Development
@@ -174,9 +174,9 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.3.2" data-path="data-analysis.html">
+        <li class="chapter " data-level="1.3.2" data-path="../contributing/data-analysis.html">
             
-                <a href="data-analysis.html">
+                <a href="../contributing/data-analysis.html">
             
                     
                     Data Analysis
@@ -187,9 +187,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.3.3" data-path="operations-support.html">
+        <li class="chapter " data-level="1.3.3" data-path="../contributing/operations-support.html">
             
-                <a href="operations-support.html">
+                <a href="../contributing/operations-support.html">
             
                     
                     Operations Support
@@ -219,9 +219,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.4.1" data-path="../operations/release-process.html">
+        <li class="chapter " data-level="1.4.1" data-path="release-process.html">
             
-                <a href="../operations/release-process.html">
+                <a href="release-process.html">
             
                     
                     Release Process
@@ -232,9 +232,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.2" data-path="../operations/chime-live-cluster.html">
+        <li class="chapter " data-level="1.4.2" data-path="chime-live-cluster.html">
             
-                <a href="../operations/chime-live-cluster.html">
+                <a href="chime-live-cluster.html">
             
                     
                     The chime-live Cluster
@@ -245,9 +245,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.3" data-path="../operations/heroku.html">
+        <li class="chapter " data-level="1.4.3" data-path="heroku.html">
             
-                <a href="../operations/heroku.html">
+                <a href="heroku.html">
             
                     
                     Deploy to Heroku
@@ -258,9 +258,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.4" data-path="../operations/byok8s.html">
+        <li class="chapter " data-level="1.4.4" data-path="byok8s.html">
             
-                <a href="../operations/byok8s.html">
+                <a href="byok8s.html">
             
                     
                     Deploy to Your Own Cluster
@@ -271,9 +271,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.5" data-path="../operations/manual-validation.html">
+        <li class="chapter active" data-level="1.4.5" data-path="manual-validation.html">
             
-                <a href="../operations/manual-validation.html">
+                <a href="manual-validation.html">
             
                     
                     Manual Validation
@@ -284,9 +284,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.6" data-path="../operations/limited-kubeconfigs/limited-kubeconfigs.html">
+        <li class="chapter " data-level="1.4.6" data-path="limited-kubeconfigs/limited-kubeconfigs.html">
             
-                <a href="../operations/limited-kubeconfigs/limited-kubeconfigs.html">
+                <a href="limited-kubeconfigs/limited-kubeconfigs.html">
             
                     
                     Limited Cluster Access for Deployment
@@ -371,7 +371,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Data Analysis</a>
+        <a href=".." >Manual Validation</a>
     </h1>
 </div>
 
@@ -386,8 +386,23 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="contributing-data-analysis">Contributing: Data Analysis</h1>
-<p><em>Coming soon</em></p>
+                                <h1 id="manual-testing-procedure">Manual Testing Procedure</h1>
+<p><a href="https://docs.google.com/document/d/19wl9BHUE5PXYQdSiljIGkWTPfYzHXqlyht8yIpCXukg/edit#" target="_blank">Source</a></p>
+<ol>
+<li>Open up the live (production) app at <a href="http://penn-chime.phl.io/" target="_blank">http://penn-chime.phl.io/</a>
+ a. Refresh the page to make sure no inputs are cached</li>
+<li>In a second tab/window run the app locally (e.g. <a href="http://127.0.0.1:8000/" target="_blank">http://127.0.0.1:8000/</a>)</li>
+<li>Verify one by one that each of the inputs in the sidebar have not moved (unless this was an explicit part of the issue being addressed). If the issue changed the input on purpose, make sure the rest of the inputs are in the same order as they were before</li>
+<li>Line up the main frame of the app (the right hand side)</li>
+<li>Go through the live and local version of the app one page at a time, keeping them in line so you can easily see if there are differences.
+ a. Click all the check boxes and carefully inspect that the results are the same
+ b. Look at all graphs and verify that the scale on the y-axis matches and that the scale on the x-axis matches. Verify that the values match
+ c. Look at each of the data tables and verify that the data in the matches
+ d. Pay special attention to the bold numbers at the top of the app and the various numbers in &quot;Show more info about this tool&quot; section near the top</li>
+<li>Change the values for &quot;<a href="../GLOSSARY.html#currently-hospitalized-covid-19-patients" class="glossary-term" title="This variable represents the number of inpatient hospitalizations within the hospital of interest (your hospital).  /&quot;note this is what I&apos;m seeing in the python code&quot; - natehscha / ">Currently Hospitalized COVID-19 Patients</a>&quot;, &quot;Doubling time before social distancing (days)&quot; and &quot;Number of days to project&quot; (slider on the right hand panel) to new values.
+ a. Make sure these values are exactly the same in both the live (production) app and in the local app</li>
+<li>Repeat steps 3-5</li>
+</ol>
 
                                 
                                 </section>
@@ -415,12 +430,12 @@
 
             
                 
-                <a href="app-dev.html" class="navigation navigation-prev " aria-label="Previous page: Application Development">
+                <a href="byok8s.html" class="navigation navigation-prev " aria-label="Previous page: Deploy to Your Own Cluster">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="operations-support.html" class="navigation navigation-next " aria-label="Next page: Operations Support">
+                <a href="limited-kubeconfigs/limited-kubeconfigs.html" class="navigation navigation-next " aria-label="Next page: Limited Cluster Access for Deployment">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -431,7 +446,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Data Analysis","level":"1.3.2","depth":2,"next":{"title":"Operations Support","level":"1.3.3","depth":2,"path":"contributing/operations-support.md","ref":"contributing/operations-support.md","articles":[]},"previous":{"title":"Application Development","level":"1.3.1","depth":2,"path":"contributing/app-dev.md","ref":"contributing/app-dev.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"contributing/data-analysis.md","mtime":"2020-03-28T18:59:51.361Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-28T18:59:59.819Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Manual Validation","level":"1.4.5","depth":2,"next":{"title":"Limited Cluster Access for Deployment","level":"1.4.6","depth":2,"path":"operations/limited-kubeconfigs/limited-kubeconfigs.md","ref":"./operations/limited-kubeconfigs/limited-kubeconfigs.md","articles":[]},"previous":{"title":"Deploy to Your Own Cluster","level":"1.4.4","depth":2,"path":"operations/byok8s.md","ref":"./operations/byok8s.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"operations/manual-validation.md","mtime":"2020-03-28T18:59:51.361Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-28T18:59:59.819Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
