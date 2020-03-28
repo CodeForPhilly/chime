@@ -44,7 +44,7 @@ st.altair_chart(admits_chart, use_container_width=True)
 st.markdown(build_descriptions(chart=admits_chart, labels=p.labels))
 display_download_link(
     st,
-    filename=("%s_projected_admits.csv" % (p.current_date,)),
+    filename=f"{p.current_date}_projected_admits.csv",
     df=m.admits_df,
 )
 
@@ -66,7 +66,7 @@ st.altair_chart(census_chart, use_container_width=True)
 st.markdown(build_descriptions(chart=census_chart, labels=p.labels, suffix=" Census"))
 display_download_link(
     st,
-    filename=("%s_projected_census.csv" % (p.current_date,)),
+    filename=f"{p.current_date}_projected_census.csv",
     df=m.census_df,
 )
 
@@ -87,7 +87,7 @@ sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_df=m.s
 st.altair_chart(sim_sir_w_date_chart, use_container_width=True)
 display_download_link(
     st,
-    filename=("%s_sim_sir_w_date.csv" % (p.current_date,)),
+    filename=f"{p.current_date}_sim_sir_w_date.csv",
     df=m.sim_sir_w_date_df,
 )
 
