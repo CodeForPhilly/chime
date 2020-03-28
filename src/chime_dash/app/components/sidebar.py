@@ -3,6 +3,8 @@ Initializes the side bar containing the various inputs for the model
 
 #! _INPUTS should be considered for moving else where
 """
+import dash_html_components as dhc
+
 from typing import List, Dict, Any, Tuple
 from collections import OrderedDict
 
@@ -116,4 +118,24 @@ class Sidebar(Component):
                 )
             elements.append(element)
 
-        return elements
+        sidebar = dhc.Nav(
+            children=dhc.Div(
+                children=elements,
+                className="p-4",
+                style={
+                    "height": "calc(100vh - 48px)",
+                    "overflowY": "auto",
+                },
+            ),
+            className="col-md-3",
+            style={
+                "position": "fixed",
+                "top": "48px",
+                "bottom": 0,
+                "left": 0,
+                "zIndex": 100,
+                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)"
+            }
+        )
+
+        return [sidebar]

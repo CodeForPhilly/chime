@@ -1,37 +1,25 @@
-"""Combines all components
-
-The `sidebar` component combines all the inputs while other components potentially
-have callbacks.
-
-To add or remove components, adjust the `setup`.
-If callbacks are present, also adjust `CALLBACK_INPUTS`, `CALLBACK_OUTPUTS` and
-`callback_body`.
+"""Initializes the  dash html
 """
 from collections import OrderedDict
 
-import dash_html_components as dhc
+import dash_bootstrap_components as dbc
 from chime_dash.app.components.base import Component, HTMLComponentError
-from dash_bootstrap_components.themes import BOOTSTRAP
-from chime_dash.app.components.navbar import Navbar
-from chime_dash.app.components.container import Container
+from chime_dash.app.components.content import Content
+from chime_dash.app.components.sidebar import Sidebar
+from penn_chime.models import SimSirModel
 
 
-class Body(Component):
+class Container(Component):
     """
     """
-
-    external_stylesheets = [
-        "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css",
-        BOOTSTRAP,
-    ]
 
     def __init__(self, language, defaults):
         """
         """
         super().__init__(language, defaults)
         self.components = OrderedDict(
-            navbar=Navbar(language, defaults),
-            container=Container(language, defaults),
+            sidebar=Sidebar(language, defaults),
+            content=Content(language, defaults),
         )
         self.callback_outputs = []
         self.callback_inputs = OrderedDict()
@@ -40,14 +28,22 @@ class Body(Component):
             self.callback_inputs.update(component.callback_inputs)
 
     def get_html(self):
-        """Glues individual setup components together
+        """Initializes the content container dash html
         """
-        return dhc.Div(self.components["navbar"].html + self.components["container"].html)
+        container = dbc.Container(
+            children=dbc.Row(self.components["sidebar"].html + self.components["content"].html),
+            fluid=True,
+            className="mt-5",
+        )
+
+        return [container]
 
     def callback(self, *args, **kwargs):
         """
         """
-        kwargs = dict(zip(self.callback_inputs, args))
+        pars = self.components["sidebar"].parse_form_parameters(**kwargs)
+        kwargs["model"] = SimSirModel(pars)
+        kwargs["pars"] = pars
 
         callback_returns = []
         for component in self.components.values():

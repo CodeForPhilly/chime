@@ -23,12 +23,7 @@ class Header(Component):
             Div(
                 className="penn-medicine-header__content",
                 children=[
-                    A(
-                        href="https://www.pennmedicine.org",
-                        className="penn-medicine-header__logo",
-                        title=content["logo-title"],
-                        children=content["logo-text"],
-                    ),
+
                     A(
                         className="penn-medicine-header__title",
                         id="title",
