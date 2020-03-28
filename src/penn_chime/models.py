@@ -28,8 +28,7 @@ class SimSirModel:
         #p.doubling_time = None
         # END FIX
 
-
-
+        n_days_since = None
         if p.date_first_hospitalized:
             n_days_since = (p.today - p.date_first_hospitalized).days
             print("%s: %s - %s = %s days" % (
@@ -104,10 +103,6 @@ class SimSirModel:
         self.r_t = r_t
         self.r_naught = r_naught
         self.doubling_time_t = doubling_time_t
-        #self.raw_df = raw_df
-        #self.dispositions_df = dispositions_df
-        #self.admits_df = admits_df
-        #self.census_df = census_df
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             print('%s: use doubling_time.' % (datetime.now(),))
@@ -180,6 +175,7 @@ class SimSirModel:
         else:
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
 
+        self.n_days_since = n_days_since
         self.raw_df = raw_df
         self.dispositions_df = dispositions_df
         self.admits_df = admits_df

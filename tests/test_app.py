@@ -8,11 +8,10 @@ import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
 from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
-from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df, daily_growth_helper
-from src.penn_chime.parameters import Parameters
+from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df, get_growth_rate
+from src.penn_chime.parameters import Parameters, RateLos
 from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
-from src.penn_chime.defaults import RateLos
 
 PARAM = Parameters(
     current_hospitalized=100,
@@ -97,7 +96,7 @@ def test_mitigation_statement():
     header_test_helper(expected_halving, HALVING_MODEL, HALVING_PARAM)
 
 
-def test_daily_growth_presentation():
+def test_growth_rate():
     initial_growth = "and daily growth rate of **12.25%**."
     mitigated_growth = "and daily growth rate of **9.34%**."
     mitigated_halving = "and daily growth rate of **-1.33%**."
@@ -202,13 +201,13 @@ def test_new_admissions_chart():
     chart = new_admissions_chart(alt, projection_admits, PARAM)
     assert isinstance(chart, alt.Chart)
     # COMMENTING OUT because chart tests oughtn't bother with numeric info anyway
-    # assert chart.data.iloc[1].hospitalized < 1 
+    # assert chart.data.iloc[1].hospitalized < 1
     assert round(chart.data.iloc[40].icu, 0) == 25
 
     # test fx call with no params
     with pytest.raises(TypeError):
         new_admissions_chart()
-    
+
     # unnecessary
     # empty_chart = new_admissions_chart(alt, pd.DataFrame(), PARAM)
     # assert empty_chart.data.empty
@@ -244,7 +243,7 @@ def test_model(model=MODEL, param=PARAM):
     assert model.doubling_time_t == 7.764405988534983
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
-    assert len(model.raw_df) == param.n_days + 1 == 61
+    assert len(model.raw_df) == param.n_days + model.n_days_since + 1 == 61
 
     raw_df = model.raw_df
     first = raw_df.iloc[0, :]
@@ -271,10 +270,10 @@ def test_model(model=MODEL, param=PARAM):
     assert (diff.abs() < 0.1).all()
 
 
-def test_daily_growth_helper():
-    assert np.round(daily_growth_helper(5), decimals=4) == 14.8698
-    assert np.round(daily_growth_helper(0), decimals=4) == 0.0
-    assert np.round(daily_growth_helper(-4), decimals=4) == -15.9104
+def test_growth_rate():
+    assert np.round(get_growth_rate(5) * 100.0, decimals=4) == 14.8698
+    assert np.round(get_growth_rate(0) * 100.0, decimals=4) == 0.0
+    assert np.round(get_growth_rate(-4) * 100.0, decimals=4) == -15.9104
 
 
 def test_chart_descriptions(p=PARAM):

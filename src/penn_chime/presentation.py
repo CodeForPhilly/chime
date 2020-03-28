@@ -7,9 +7,8 @@ import altair as alt  # type: ignore
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
-from .defaults import Constants, RateLos
 from .utils import add_date_column, dataframe_to_base64
-from .parameters import Parameters
+from .parameters import Parameters, RateLos
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
 DOCS_URL = "https://code-for-philly.gitbook.io/chime"
@@ -152,7 +151,7 @@ class CheckboxInput(Input):
         super().__init__(st_obj.checkbox, label, value, kwargs)
 
 
-def display_sidebar(st, d: Constants) -> Parameters:
+def display_sidebar(st, d: Parameters) -> Parameters:
     # Initialize variables
     # these functions create input elements and bind the values they are set to
     # to the variables they are set equal to
@@ -244,7 +243,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         st_obj,
         "Regional Population",
         min_value=1,
-        value=d.region.population,
+        value=(d.region.population or d.population),
         step=1,
         format="%i",
     )
@@ -274,8 +273,9 @@ def display_sidebar(st, d: Constants) -> Parameters:
         date_first_hospitalized = date_first_hospitalized_input()
         doubling_time = None
     else:
-        date_first_hospitalized = None
         doubling_time = doubling_time_input()
+        date_first_hospitalized = None
+
     relative_contact_rate = relative_contact_pct_input()
 
     st.sidebar.markdown("### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
