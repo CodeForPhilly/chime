@@ -1,4 +1,6 @@
-"""Functions which set up plotly-dash plots
+"""services/plotting
+
+Logic for data manipulation needed when new call backs are executed
 """
 from typing import Dict, Any
 

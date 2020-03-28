@@ -52,9 +52,13 @@ st.markdown(chart_descriptions(new_admit_chart, p.labels))
 
 if st.checkbox("Show Projected Admissions in tabular form"):
     if st.checkbox("Show Daily Counts"):
-        draw_projected_admissions_table(st, m.admits_df, p.labels, as_date=p.as_date, daily_count=True)
+        draw_projected_admissions_table(st, m.admits_df, p.labels, 1, as_date=p.as_date)
     else:
-        draw_projected_admissions_table(st, m.admits_df, p.labels, as_date=p.as_date, daily_count=False)
+        admissions_day_range = st.slider(
+            'Interval of Days for Projected Admissions',
+            1, 10, 7
+        )
+        draw_projected_admissions_table(st, m.admits_df, p.labels, admissions_day_range, as_date=p.as_date)
     build_download_link(st,
         filename="projected_admissions.csv",
         df=m.admits_df,
@@ -72,9 +76,13 @@ st.altair_chart(
 st.markdown(chart_descriptions(census_chart, p.labels, suffix=" Census"))
 if st.checkbox("Show Projected Census in tabular form"):
     if st.checkbox("Show Daily Census Counts"):
-        draw_census_table(st, m.census_df, p.labels, as_date=p.as_date, daily_count=True)
+        draw_census_table(st, m.census_df, p.labels, 1, as_date=p.as_date)
     else:
-        draw_census_table(st, m.census_df, p.labels, as_date=p.as_date, daily_count=False)
+        census_day_range = st.slider(
+            'Interval of Days for Projected Census',
+            1, 10, 7
+        )
+        draw_census_table(st, m.census_df, p.labels, census_day_range, as_date=p.as_date)
     build_download_link(st,
         filename="projected_census.csv",
         df=m.census_df,
