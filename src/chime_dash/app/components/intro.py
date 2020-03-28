@@ -10,8 +10,6 @@ from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
 from dash_core_components import Markdown
 
-from penn_chime.parameters import Parameters
-
 from chime_dash.app.utils.templates import read_localization_markdown
 from chime_dash.app.components.base import Component
 
