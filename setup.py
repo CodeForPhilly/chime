@@ -9,12 +9,19 @@ from setuptools import setup, find_packages, find_namespace_packages
 
 CWD = path.abspath(path.dirname(__file__))
 
-with io.open(path.join(CWD, "README.md"), encoding="utf-8") as inp:
+#with io.open(path.join(CWD, "README.md"), encoding="utf-8") as inp:
+#    LONG_DESCRIPTION = inp.read()
+
+#with io.open(path.join(CWD, "requirements.txt"), encoding="utf-8") as inp:
+#    REQUIREMENTS = [el.strip() for el in inp.read().split(",")]
+
+with io.open("README.md", "r") as inp:
     LONG_DESCRIPTION = inp.read()
 
-with io.open(path.join(CWD, "requirements.txt"), encoding="utf-8") as inp:
+with io.open("requirements.txt", "r") as inp:
     REQUIREMENTS = [el.strip() for el in inp.read().split(",")]
 
+    
 setup(
     name="penn_chime",
     version=__version__,
