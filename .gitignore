@@ -18,6 +18,9 @@ venv.bak/
 .mypy_cache/
 __pycache__/
 
+# pytest
+.cache/
+
 # Module trash
 *.egg-info
 
