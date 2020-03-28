@@ -54,6 +54,5 @@ setup(
     keywords=[],
     packages=find_packages(".", exclude=["docs", "k82", "script"]),
     #install_requires=REQUIREMENTS,
-    classifiers=[],
     include_package_data=True,
 )
