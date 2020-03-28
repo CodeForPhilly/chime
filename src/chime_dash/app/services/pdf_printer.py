@@ -7,6 +7,7 @@ from dash import Dash
 from dash.testing.application_runners import ThreadedRunner
 from dash.testing.composite import DashComposite
 from dash_bootstrap_components.themes import BOOTSTRAP
+import dash_bootstrap_components as dbc
 from selenium import webdriver
 
 
@@ -27,7 +28,7 @@ def save_as_pdf(driver, path, options={}):
     file.write(base64.b64decode(result['data']))
 
 
-def print_to_pdf(html):
+def print_to_pdf(component, kwargs):
     app = Dash(
         __name__,
         external_stylesheets=[
@@ -35,8 +36,21 @@ def print_to_pdf(html):
         BOOTSTRAP,
     ]
     )
-    app.layout = html[0]
+
+    layout = dbc.Container(
+        children=component.html,
+        fluid=True,
+        className="mt-5",
+    )
+
+    app.layout = layout
     app.title = 'CHIME Printer'
+
+    outputs = component.callback(**kwargs)
+
+    @app.callback(component.callback_outputs, [])
+    def callback(*args):  # pylint: disable=W0612
+        return outputs
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
@@ -48,5 +62,3 @@ def print_to_pdf(html):
                 sleep(1)
             save_as_pdf(dc.driver, r'page.pdf', {'landscape': False})
             dc.driver.quit()
-
-

@@ -1,6 +1,7 @@
 """Initializes the  dash html
 """
 from collections import OrderedDict
+from copy import deepcopy
 
 import dash_bootstrap_components as dbc
 from chime_dash.app.components.base import Component, HTMLComponentError
@@ -46,15 +47,15 @@ class Container(Component):
         kwargs["model"] = SimSirModel(pars)
         kwargs["pars"] = pars
 
-        save_to_pdf = self.components["sidebar"].save_to_pdf(kwargs)
-        if save_to_pdf:
-            print_to_pdf(self.components['content'].html)
-
         callback_returns = []
         for component in self.components.values():
             try:
                 callback_returns += component.callback(**kwargs)
             except Exception as error:
                 raise HTMLComponentError(component, error)
+
+        save_to_pdf = self.components["sidebar"].save_to_pdf(kwargs)
+        if save_to_pdf:
+            print_to_pdf(deepcopy(self.components['content']), kwargs)
 
         return callback_returns
