@@ -11,3 +11,4 @@ COPY settings.cfg .
 COPY src src
 
 CMD ["streamlit", "run", "src/app.py"]
+
