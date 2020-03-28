@@ -91,12 +91,12 @@ class SimSirModel:
         self.recovered = p.recovered
 
         self.detection_probability = detection_probability
-        self.intrinsic_growth_rate = intrinsic_growth_rate
-        self.gamma = gamma
+        self.doubling_time_t = doubling_time_t
         self.beta = beta
+        self.gamma = gamma
+        self.intrinsic_growth_rate = intrinsic_growth_rate
         self.r_t = r_t
         self.r_naught = r_naught
-        self.doubling_time_t = doubling_time_t
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             print('%s: use doubling_time.' % (datetime.now(),))
@@ -132,14 +132,14 @@ class SimSirModel:
                     dt, census_df, current_infected = i_dt, i_census_df, i_current_infected
             p.doubling_time = dt
 
-            infected = 1 / p.hospitalized.rate / p.market_share
+            infected = 1.0 / p.hospitalized.rate / p.market_share
             # update all state that is dependent on doubling time.
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
-            gamma = 1 / p.infectious_days
+            gamma = 1.0 / p.infectious_days
             beta = get_beta(intrinsic_growth_rate, gamma, susceptible, p.relative_contact_rate)
             r_t = beta / gamma * susceptible
             r_naught = (intrinsic_growth_rate + gamma) / gamma
-            doubling_time_t = 1.0 / np.log2(beta * susceptible - gamma + 1)
+            doubling_time_t = 1.0 / np.log2(beta * susceptible - gamma + 1.0)
             raw_df = sim_sir_df(
                 susceptible,
                 current_infected,
@@ -153,14 +153,14 @@ class SimSirModel:
             admits_df = build_admits_df(dispositions_df)
             census_df = build_census_df(admits_df, lengths_of_stay)
 
-            self.population = p.population
+            self.gamma = gamma
             self.infected = current_infected
             self.intrinsic_growth_rate = intrinsic_growth_rate
-            self.gamma = gamma
             self.beta = beta
+            self.doubling_time_t = doubling_time_t
+            self.population = p.population
             self.r_t = r_t
             self.r_naught = r_naught
-            self.doubling_time_t = doubling_time_t
         else:
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
 
