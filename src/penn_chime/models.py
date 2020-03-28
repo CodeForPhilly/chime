@@ -259,9 +259,6 @@ def sir(
     s_n = (-beta * s * i) + s
     i_n = (beta * s * i - gamma * i) + i
     r_n = gamma * i + r
-    assert s_n >= 0.0
-    assert i_n >= 0.0
-    assert r_n >= 0.0
     if s_n < 0.0:
         s_n = 0.0
     if i_n < 0.0:
