@@ -502,11 +502,8 @@ def draw_raw_sir_simulation_table(st, model, parameters):
         parameters=parameters
     )
 
-def display_download_link(st, filename: str, df: pd.DataFrame, parameters: Parameters):
-    if parameters.as_date:
-        df = add_date_column(df, parameters.date_first_hospitalized, drop_day_column=True, date_format="%Y-%m-%d")
-
+def display_download_link(st, filename: str, df: pd.DataFrame):
     csv = dataframe_to_base64(df)
     st.markdown("""
-        <a download="{filename}" href="data:file/csv;base64,{csv}">Download full table as CSV</a>
+        <a download="{filename}" href="data:file/csv;base64,{csv}">Download {filename}</a>
 """.format(csv=csv,filename=filename), unsafe_allow_html=True)

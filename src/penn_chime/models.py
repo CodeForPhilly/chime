@@ -155,7 +155,7 @@ class SimSirModel:
                 p.n_days + n_days_since,
                 -n_days_since,
             )
-            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
+            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
             admits_df = build_admits_df(dispositions_df)
             census_df = build_census_df(admits_df, lengths_of_stay)
 
@@ -175,6 +175,7 @@ class SimSirModel:
         self.dispositions_df = dispositions_df
         self.admits_df = admits_df
         self.census_df = census_df
+        self.sim_sir_w_date_df = build_sim_sir_w_date_df(raw_df, p.current_date)
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(doubling_time_t)
@@ -208,7 +209,7 @@ def get_census_and_infected_projection(
     )
 
     current_infected = raw_df.infected.loc[n_days_since]
-    dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
+    dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
 
     admits_df = build_admits_df(dispositions_df)
     census_df = build_census_df(admits_df, lengths_of_stay)
@@ -292,15 +293,29 @@ def sim_sir_df(
     )
 
 
+def build_sim_sir_w_date_df(
+    raw_df: pd.DataFrame,
+    current_date: datetime,
+) -> pd.DataFrame:
+    day = raw_df.day
+    return pd.DataFrame({
+        "day": day,
+        "date": day.astype('timedelta64[D]') + np.datetime64(current_date),
+        "susceptible": raw_df.susceptible,
+        "infected": raw_df.infected,
+        "recovered": raw_df.recovered,
+    })
+
+
 def build_dispositions_df(
-    sim_sir_df: pd.DataFrame,
+    raw_df: pd.DataFrame,
     rates: Dict[str, float],
     market_share: float,
     current_date: datetime,
 ) -> pd.DataFrame:
-    """Get dispositions of patients adjusted by rate and market_share."""
-    patients = sim_sir_df.infected + sim_sir_df.recovered
-    day = sim_sir_df.day
+    """Build dispositions dataframe of patients adjusted by rate and market_share."""
+    patients = raw_df.infected + raw_df.recovered
+    day = raw_df.day
     return pd.DataFrame({
         "day": day,
         "date": day.astype('timedelta64[D]') + np.datetime64(current_date),

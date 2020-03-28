@@ -33,6 +33,7 @@ def build_admits_chart(
     ceil_df.icu = np.ceil(ceil_df.icu)
     ceil_df.ventilated = np.ceil(ceil_df.ventilated)
 
+    # TODO fix the fold to allow any number of dispositions
     return (
         alt.Chart(ceil_df)
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
@@ -51,23 +52,11 @@ def build_admits_chart(
     )
 
 
-def build_admits_table(
-    *,
-    admits_df: pd.DataFrame,
-    labels: Dict[str, str],
-    modulo: int,
-    as_date: bool = False
-):
-    table_df = admits_df[np.mod(admits_df.day, modulo) == 0].copy()
-    table_df.rename(labels)
-    return table_df
-
-
 def build_census_chart(
     *,
     alt,
     census_df: pd.DataFrame,
-    max_y_axis: int
+    max_y_axis: Optional[int] = None,
 ) -> Chart:
     """docstring"""
     idx = "date:T"
@@ -97,51 +86,27 @@ def build_census_chart(
     )
 
 
-def build_census_table(
+
+def build_sim_sir_w_date_chart(
     *,
-    census_df: pd.DataFrame,
-    labels: Dict[str, str],
-    modulo: int,
-    as_date: bool = False
-):
-    table_df = census_df[np.mod(census_df.day, modulo) == 0].copy()
-    table_df.rename(labels)
-    return table_df
-
-
-def additional_projections_chart(
-    alt, model, parameters
+    alt,
+    sim_sir_w_date_df: pd.DataFrame,
+    max_y_axis: Optional[int] = None,
 ) -> Chart:
-
-    # TODO use subselect of df_raw instead of creating a new df
-    raw_df = model.raw_df
-    dat = pd.DataFrame({
-        "day": raw_df.day,
-        "infected": raw_df.infected,
-        "recovered": raw_df.recovered
-    })
-
-    as_date = parameters.as_date
-    max_y_axis = parameters.max_y_axis
-
-    if as_date:
-        dat = add_date_column(dat, parameters.date_first_hospitalized)
-        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
-    else:
-        x_kwargs = {"shorthand": "day", "title": "Days from today"}
-
+    idx = "date:T"
+    x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     y_scale = alt.Scale()
 
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
 
     return (
-        alt.Chart(dat)
-        .transform_fold(fold=["infected", "recovered"])
+        alt.Chart(sim_sir_w_date_df)
+        .transform_fold(fold=["susceptible", "infected", "recovered"])
         .mark_line()
         .encode(
             x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Case Volume", scale=y_scale),
+            y=alt.Y("value:Q", title="Count", scale=y_scale),
             tooltip=["key:N", "value:Q"],
             color="key:N",
         )
@@ -149,14 +114,19 @@ def additional_projections_chart(
     )
 
 
-def build_descriptions(chart: Chart, labels, suffix: str = ""):
+def build_descriptions(
+    *,
+    chart: Chart,
+    labels: Dict[str, str],
+    suffix: str = ""
+) -> str:
     """
 
-    :param chart: Chart: The alt chart to be used in finding max points
-    :param suffix: str: The assumption is that the charts have similar column names.
+    :param chart: The alt chart to be used in finding max points
+    :param suffix: The assumption is that the charts have similar column names.
                    The census chart adds " Census" to the column names.
                    Make sure to include a space or underscore as appropriate
-    :return: str: Returns a multi-line string description of the results
+    :return: Returns a multi-line string description of the results
     """
     messages = []
 
@@ -184,3 +154,14 @@ def build_descriptions(chart: Chart, labels, suffix: str = ""):
     if asterisk:
         messages.append("_* The max is at the upper bound of the data, and therefore may not be the actual max_")
     return "\n\n".join(messages)
+
+
+def build_table(
+    *,
+    df: pd.DataFrame,
+    labels: Dict[str, str],
+    modulo: int = 1,
+) -> pd.DataFrame:
+    table_df = df[np.mod(df.day, modulo) == 0].copy()
+    table_df.rename(labels)
+    return table_df
