@@ -17,3 +17,7 @@ max_y_axis_value: Maximal y-axis value (leave blank for no max value)
 show_tables: Show tables with data
 show_tool_details: Show more info about this tool
 show_additional_projections: Show additional projections
+regional_parameters: Regional Parameters
+spread_and_contact: Spread and Contact Parameters
+severity_parameters: Severity Parameters
+display_parameters: Display Parameters
