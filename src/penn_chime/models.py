@@ -130,7 +130,8 @@ class SimSirModel:
                 loss = self.get_loss()
                 losses[i] = loss
 
-            p.doubling_time = dts[pd.Series(losses).argmin()]
+            p.doubling_time = doubling_time = dts[pd.Series(losses).argmin()]
+            logger.info('Set doubling_time = %s', doubling_time)
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.run_projection(p)
