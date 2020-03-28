@@ -40,6 +40,7 @@ class SimSirModel:
                 datetime.now(),
                 p.current_date, p.date_first_hospitalized,
                 n_days_since)
+        self.n_days_since = n_days_since
 
         self.rates = {
             key: d.rate
@@ -95,30 +96,29 @@ class SimSirModel:
         self.intrinsic_growth_rate = intrinsic_growth_rate
         self.r_t = r_t
         self.r_naught = r_naught
-        self.i_day = 0
         self.infected = 1.0 / p.hospitalized.rate / p.market_share
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             logger.info('Using doubling_time.')
+            self.i_day = 0
             self.beta = (
                 (intrinsic_growth_rate + gamma)
                 / susceptible
             )
-            
+
             self.run_projection(p)
-            n_days_since = int(get_argmin_ds(self.census_df, p.current_hospitalized))
-            self.i_day = n_days_since
+            self.i_day = i_day = int(get_argmin_ds(self.census_df, p.current_hospitalized))
             self.run_projection(p)
-            self.infected = self.raw_df['infected'].values[n_days_since]
-            self.susceptible = self.raw_df['susceptible'].values[n_days_since]
-            self.recovered = self.raw_df['recovered'].values[n_days_since]
-            logger.info(n_days_since)
+            self.infected = self.raw_df['infected'].values[i_day]
+            self.susceptible = self.raw_df['susceptible'].values[i_day]
+            self.recovered = self.raw_df['recovered'].values[i_day]
+            self.n_days_since = i_day
+            logger.info('Set i_day = %s', i_day)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
-            logger.debug('Using date_first_hospitalized.')
+            logger.info('Using date_first_hospitalized.')
+            self.i_day = self.n_days_since
             min_loss = 2.0**99
-            self.i_day = n_days_since
-            self.n_days_since = n_days_since
             dts = np.linspace(1, 15, 29)
             losses = np.zeros(dts.shape[0])
             self.current_hospitalized = p.current_hospitalized
@@ -242,9 +242,7 @@ def gen_sir(
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
     d = i_day
-    # TODO:
-    #    Bug, or bad input data.
-    #    See the plots for susceptible, that remains just unter 500,000
+    # TODO: Ask corey if n_days is really required for the sim
     # while i >= 0.5:
     for _ in range(n_days):
         yield d, s, i, r

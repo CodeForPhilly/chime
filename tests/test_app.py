@@ -258,13 +258,13 @@ def test_census_chart():
 def test_model(model=MODEL, param=PARAM):
     # test the Model
 
-    assert model.infected == 40000.0
+    assert round(model.infected, 0) == 49097.0
     assert isinstance(model.infected, float)  # based off note in models.py
 
     # test the class-calculated attributes
     assert model.detection_probability == 0.125
     assert model.intrinsic_growth_rate == 0.12246204830937302
-    assert model.beta == 3.582761451679408e-07
+    assert model.beta == 4.21501347256401e-07
     assert model.r_t == 2.307298374881539
     assert model.r_naught == 2.7144686763312222
     assert model.doubling_time_t == 7.764405988534983
@@ -274,7 +274,9 @@ def test_model_raw_start(model=MODEL, param=PARAM):
     raw_df = model.raw_df
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
-    assert len(raw_df) == (param.n_days + model.n_days_since + 1) == 99
+
+    # print('n_days: %s; i_day: %s; n_days_since: %s' % (param.n_days, model.i_day, model.n_days_since))
+    assert len(raw_df) == (param.n_days + model.n_days_since + 1) == 105
 
     first = raw_df.iloc[0, :]
     second = raw_df.iloc[1, :]
