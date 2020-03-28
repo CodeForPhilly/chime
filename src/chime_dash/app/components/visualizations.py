@@ -17,7 +17,7 @@ from penn_chime.parameters import Parameters
 
 from chime_dash.app.utils.templates import df_to_html_table
 from chime_dash.app.services.plotting import plot_dataframe
-from chime_dash.app.components.base import Component
+from chime_dash.app.utils.components import Component
 
 LOCALIZATION_FILE = "visualizations.yml"
 

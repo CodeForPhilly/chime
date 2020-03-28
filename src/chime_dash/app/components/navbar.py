@@ -5,7 +5,7 @@ from typing import List
 
 import dash_bootstrap_components as dbc
 import dash_html_components as html
-from chime_dash.app.components.base import Component
+from chime_dash.app.utils.components import Component
 from chime_dash.app.components.menu import Menu
 from dash.development.base_component import ComponentMeta
 from penn_chime.defaults import Constants
@@ -36,19 +36,16 @@ class Navbar(Component):
                                 className="penn-medicine-header__logo",
                                 title="Go to the Penn Medicine home page",
                             ),
-                            dbc.NavbarBrand(
-                                children="CHIME", href="/"
-                            ),
+                            dbc.NavbarBrand(children="CHIME", href="/"),
                         ],
                         align="center",
                         no_gutters=True,
                     ),
-
                 ]
                 + self.menu.html
             ),
             dark=True,
             fixed="top",
-            color="dark"
+            color="dark",
         )
         return [nav]

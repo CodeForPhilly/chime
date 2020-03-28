@@ -14,8 +14,12 @@ from dash.development.base_component import ComponentMeta
 from penn_chime.defaults import RateLos
 from penn_chime.parameters import Parameters
 
-from chime_dash.app.components.base import Component
-from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header
+from chime_dash.app.utils.components import Component
+from chime_dash.app.utils.templates import (
+    create_switch_input,
+    create_number_input,
+    create_header,
+)
 
 _INPUTS = OrderedDict(
     regional_parameters={"type": "header", "size": "h3"},
@@ -66,12 +70,14 @@ class Sidebar(Component):
     contains the various inputs used to interact
     with the model.
     """
+
     # localization temp. for widget descriptions
     localization_file = "sidebar.yml"
 
     callback_inputs = OrderedDict(
         (key, CallbackInput(component_id=key, component_property="value"))
-        for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )
+        for key in _INPUTS
+        if _INPUTS[key]["type"] not in ("header",)
     )
 
     @staticmethod
@@ -122,10 +128,7 @@ class Sidebar(Component):
             children=dhc.Div(
                 children=elements,
                 className="p-4",
-                style={
-                    "height": "calc(100vh - 48px)",
-                    "overflowY": "auto",
-                },
+                style={"height": "calc(100vh - 48px)", "overflowY": "auto",},
             ),
             className="col-md-3",
             style={
@@ -134,8 +137,8 @@ class Sidebar(Component):
                 "bottom": 0,
                 "left": 0,
                 "zIndex": 100,
-                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)"
-            }
+                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)",
+            },
         )
 
         return [sidebar]

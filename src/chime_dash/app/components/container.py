@@ -3,7 +3,7 @@
 from collections import OrderedDict
 
 import dash_bootstrap_components as dbc
-from chime_dash.app.components.base import Component, HTMLComponentError
+from chime_dash.app.utils.components import Component, HTMLComponentError
 from chime_dash.app.components.content import Content
 from chime_dash.app.components.sidebar import Sidebar
 from penn_chime.models import SimSirModel

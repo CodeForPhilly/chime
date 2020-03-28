@@ -10,7 +10,7 @@ If callbacks are present, also adjust `CALLBACK_INPUTS`, `CALLBACK_OUTPUTS` and
 from collections import OrderedDict
 
 import dash_html_components as dhc
-from chime_dash.app.components.base import Component, HTMLComponentError
+from chime_dash.app.utils.components import Component, HTMLComponentError
 from dash_bootstrap_components.themes import BOOTSTRAP
 from chime_dash.app.components.navbar import Navbar
 from chime_dash.app.components.container import Container

@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 import dash_bootstrap_components as dbc
 from chime_dash.app.components.additions import Additions
-from chime_dash.app.components.base import Component, HTMLComponentError
+from chime_dash.app.utils.components import Component, HTMLComponentError
 from chime_dash.app.components.definitions import Definitions
 from chime_dash.app.components.footer import Footer
 from chime_dash.app.components.header import Header

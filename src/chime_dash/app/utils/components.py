@@ -1,8 +1,6 @@
-"""app/components/base
+"""app/utils/components
 
-Abstract base class for components
-
-#! candidate for moving into utils/components
+component helper utilities
 """
 from typing import List, Dict, Any, Union
 

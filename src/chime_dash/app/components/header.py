@@ -6,7 +6,7 @@ from typing import List
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Div, A
 
-from chime_dash.app.components.base import Component
+from chime_dash.app.utils.components import Component
 
 
 class Header(Component):
