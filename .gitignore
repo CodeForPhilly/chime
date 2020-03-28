@@ -18,7 +18,6 @@ venv.bak/
 .mypy_cache/
 __pycache__/
 
-
 # Module trash
 *.egg-info
 
@@ -26,3 +25,5 @@ __pycache__/
 devel.ipynb
 .ipynb_checkpoints
 
+# build artifacts
+results/
