@@ -24,12 +24,12 @@ do_prepare() {
   fi
   python -m venv "${pkg_prefix}"
   source "${pkg_prefix}/bin/activate"
-  pip install --upgrade --force-reinstall "pip" "wheel"
+  pip install --upgrade --force-reinstall "pip" "wheel" "setuptools"
   return $?
 }
 
 do_build() {
-  pip install -r ${PLAN_CONTEXT}/../requirements.txt
+  pip install ${PLAN_CONTEXT}/../
   return $?
 }
 
