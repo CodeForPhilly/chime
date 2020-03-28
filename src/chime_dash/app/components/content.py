@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 import dash_bootstrap_components as dbc
 from chime_dash.app.components.additions import Additions
-from chime_dash.app.components.base import Component
+from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.definitions import Definitions
 from chime_dash.app.components.footer import Footer
 from chime_dash.app.components.header import Header
@@ -29,6 +29,11 @@ class Content(Component):
             definitions=Definitions(language, defaults),
             footer=Footer(language, defaults),
         )
+        self.callback_outputs = []
+        self.callback_inputs = OrderedDict()
+        for component in self.components.values():
+            self.callback_outputs += component.callback_outputs
+            self.callback_inputs.update(component.callback_inputs)
 
     def get_html(self):
         """Initializes the content container dash html
@@ -46,3 +51,15 @@ class Content(Component):
         )
 
         return [content]
+
+    def callback(self, *args, **kwargs):
+        """
+        """
+        callback_returns = []
+        for component in self.components.values():
+            try:
+                callback_returns += component.callback(**kwargs)
+            except Exception as error:
+                raise HTMLComponentError(component, error)
+
+        return callback_returns

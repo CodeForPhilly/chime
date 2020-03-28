@@ -12,7 +12,6 @@ from collections import OrderedDict
 import dash_html_components as dhc
 from chime_dash.app.components.base import Component, HTMLComponentError
 from dash_bootstrap_components.themes import BOOTSTRAP
-from penn_chime.models import SimSirModel
 from chime_dash.app.components.navbar import Navbar
 from chime_dash.app.components.container import Container
 
@@ -36,7 +35,6 @@ class Body(Component):
         )
         self.callback_outputs = []
         self.callback_inputs = OrderedDict()
-        self.callback_keys = []
         for component in self.components.values():
             self.callback_outputs += component.callback_outputs
             self.callback_inputs.update(component.callback_inputs)
@@ -50,9 +48,6 @@ class Body(Component):
         """
         """
         kwargs = dict(zip(self.callback_inputs, args))
-        pars = self.components["sidebar"].parse_form_parameters(**kwargs)
-        kwargs["model"] = SimSirModel(pars)
-        kwargs["pars"] = pars
 
         callback_returns = []
         for component in self.components.values():

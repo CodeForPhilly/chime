@@ -43,7 +43,7 @@ _INPUTS = OrderedDict(
     hospitalized_los={"type": "number", "min": 0, "step": 1, "max": 100},
     icu_los={"type": "number", "min": 0, "step": 1},
     ventilated_los={"type": "number", "min": 0, "step": 1},
-    market_share={"type": "number", "min": 1, "step": 1, "max": 100, "percent": True,},
+    market_share={"type": "number", "min": 1, "step": 1, "max": 100, "percent": True},
     susceptible={"type": "number", "min": 1, "step": 1},
     known_infected={"type": "number", "min": 0, "step": 1},
     n_days={"type": "number", "min": 20, "step": 1},
@@ -108,7 +108,7 @@ class Sidebar(Component):
                 )
             elements.append(element)
 
-        sidebar=dhc.Nav(
+        sidebar = dhc.Nav(
             children=dhc.Div(
                 children=elements,
                 className="p-4",
