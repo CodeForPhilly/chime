@@ -1,6 +1,7 @@
 
+from datetime import datetime
 from math import ceil
-import datetime
+from typing import Dict, Optional
 
 from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
@@ -11,7 +12,10 @@ from .presentation import DATE_FORMAT
 
 
 def build_admits_chart(
-    *, alt, admits_df: pd.DataFrame, max_y_axis
+    *,
+    alt,
+    admits_df: pd.DataFrame,
+    max_y_axis: Optional[int] = None,
 ) -> Chart:
     """docstring"""
     idx = "date:T"
@@ -50,8 +54,8 @@ def build_admits_chart(
 def build_admits_table(
     *,
     admits_df: pd.DataFrame,
-    labels,
-    modulo,
+    labels: Dict[str, str],
+    modulo: int,
     as_date: bool = False
 ):
     table_df = admits_df[np.mod(admits_df.day, modulo) == 0].copy()
@@ -60,7 +64,10 @@ def build_admits_table(
 
 
 def build_census_chart(
-    *, alt, census_df: pd.DataFrame, max_y_axis
+    *,
+    alt,
+    census_df: pd.DataFrame,
+    max_y_axis: int
 ) -> Chart:
     """docstring"""
     idx = "date:T"
@@ -93,8 +100,8 @@ def build_census_chart(
 def build_census_table(
     *,
     census_df: pd.DataFrame,
-    labels,
-    modulo,
+    labels: Dict[str, str],
+    modulo: int,
     as_date: bool = False
 ):
     table_df = census_df[np.mod(census_df.day, modulo) == 0].copy()
@@ -142,7 +149,7 @@ def additional_projections_chart(
     )
 
 
-def chart_descriptions(chart: Chart, labels, suffix: str = ""):
+def build_descriptions(chart: Chart, labels, suffix: str = ""):
     """
 
     :param chart: Chart: The alt chart to be used in finding max points
@@ -161,14 +168,11 @@ def chart_descriptions(chart: Chart, labels, suffix: str = ""):
         if chart.data[col].idxmax() + 1 == len(chart.data):
             asterisk = True
 
-        on = chart.data[day][chart.data[col].idxmax()]
-        if day == "date":
-            on = datetime.datetime.strftime(on, "%b %d")  # todo: bring this to an optional arg / i18n
-        else:
-            on += 1  # 0 index issue
+        # todo: bring this to an optional arg / i18n
+        on = datetime.strftime(chart.data[day][chart.data[col].idxmax()], "%b %d")
 
         messages.append(
-            "{}{} peaks at {:,} on day {}{}".format(
+            "{}{} peaks at {:,} on {}{}".format(
                 labels[col],
                 suffix,
                 ceil(chart.data[col].max()),

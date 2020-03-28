@@ -20,7 +20,7 @@ DEFAULTS = Parameters(
     infectious_days=14,
     known_infected=510,
     market_share=0.15,
-    n_days=60,
+    n_days=75,
     relative_contact_rate=0.3,
     ventilated=RateLos(0.005, 10),
 )

@@ -21,8 +21,8 @@ from penn_chime.charts import (
     build_admits_table,
     build_census_chart,
     build_census_table,
+    build_descriptions,
     additional_projections_chart,
-    chart_descriptions
 )
 
 # This is somewhat dangerous:
@@ -44,7 +44,7 @@ st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
 admits_chart = build_admits_chart(alt=alt, admits_df=m.admits_df, max_y_axis=p.max_y_axis)
 st.altair_chart(admits_chart, use_container_width=True)
-st.markdown(chart_descriptions(admits_chart, p.labels))
+st.markdown(build_descriptions(admits_chart, p.labels))
 
 if st.checkbox("Show Projected Admissions in tabular form"):
     admits_modulo = 1
@@ -73,7 +73,7 @@ st.subheader("Admitted Patients (Census)")
 st.markdown("Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals")
 census_chart = build_census_chart(alt=alt, census_df=m.census_df, max_y_axis=p.max_y_axis)
 st.altair_chart(census_chart, use_container_width=True)
-st.markdown(chart_descriptions(census_chart, p.labels, suffix=" Census"))
+st.markdown(build_descriptions(census_chart, p.labels, suffix=" Census"))
 
 if st.checkbox("Show Projected Census in tabular form"):
     census_modulo = 1
