@@ -43,4 +43,3 @@ def callback(*args):  # pylint: disable=W0612
 if __name__ == "__main__":
 #    main()
     app.run_server(host='0.0.0.0')
-
