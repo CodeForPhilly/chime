@@ -7,13 +7,23 @@ changed
 
 from __future__ import annotations
 
-from typing import Dict, Generator, Tuple, Optional
 from datetime import date, datetime
+from logging import INFO, basicConfig, getLogger
+from sys import stdout
+from typing import Dict, Generator, Tuple, Optional
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
 from .parameters import Parameters
+
+basicConfig(
+    level=INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=stdout,
+)
+logger = getLogger(__name__)
+
 
 EPSILON = 1.0e-7
 
@@ -25,11 +35,11 @@ class SimSirModel:
         n_days_since = None
         if p.date_first_hospitalized:
             n_days_since = (p.current_date - p.date_first_hospitalized).days
-            print("%s: %s - %s = %s days" % (
+            logger.debug(
+                "%s: %s - %s = %s days",
                 datetime.now(),
                 p.current_date, p.date_first_hospitalized,
-                n_days_since,
-            ))
+                n_days_since)
 
         rates = {
             key: d.rate
@@ -99,7 +109,7 @@ class SimSirModel:
         self.r_naught = r_naught
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
-            print('%s: use doubling_time.' % (datetime.now(),))
+            logger.debug('Using doubling_time.')
             n_days_since = int(get_argmin_ds(census_df, p.current_hospitalized))
 
             raw_df = sim_sir_df(
@@ -116,7 +126,7 @@ class SimSirModel:
             census_df = build_census_df(admits_df, lengths_of_stay)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
-            print('%s: using date_first_hospitalized.' % (datetime.now(),))
+            logger.debug('Using date_first_hospitalized.')
             min_loss = 2.0**99
             dt = census_df = current_infected = None
             for i_dt in np.linspace(1,15,29):
