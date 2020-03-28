@@ -315,36 +315,36 @@ def test_growth_rate():
 
 
 def test_build_descriptions(p=PARAM):
-    # new admissions chart
-    admits_df = pd.read_csv('tests/by_doubling_time/2020-03-28_projected_admits.csv')
+    admits_file = 'tests/by_doubling_time/2020-03-28_projected_admits.csv'
+    census_file = 'tests/by_doubling_time/2020-03-28_projected_census.csv'
+
+    admits_df = pd.read_csv(admits_file, parse_dates=['date'])
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
     description = build_descriptions(chart=chart, labels=p.labels)
 
-    hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
+    hosp, icu, vent = description.split("\n\n")  # break out the description into lines
 
     max_hosp = chart.data['hospitalized'].max()
     assert str(ceil(max_hosp)) in hosp
 
-    max_icu_ix = chart.data['icu'].idxmax()
-    assert max_icu_ix + 1 == len(chart.data)
-    assert "*" in icu
+    # TODO add test for asterisk
 
-    # test asterisk
+
+    # test no asterisk
     param = PARAM
     param.n_days = 600
 
-    admits_df = pd.read_csv('tests/by_doubling_time/2020-03-28_projected_admits.csv')
-    # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
+    admits_df = pd.read_csv(admits_file, parse_dates=['date'])
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
-    description = build_descriptions(chart, p.labels)
+    description = build_descriptions(chart=chart, labels=p.labels)
     assert "*" not in description
 
+
     # census chart
-    census_df = pd.read_csv('tests/by_doubling_time/2020-03-28_projected_census.csv')
-    # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
+    census_df = pd.read_csv(census_file, parse_dates=['date'])
     PARAM.as_date = True
-    chart = admitted_patients_chart(alt, census_df, p)
-    description = chart_descriptions(chart=chart, labels=p.labels)
+    chart = build_census_chart(alt=alt, census_df=census_df)
+    description = build_descriptions(chart=chart, labels=p.labels)
 
     assert str(ceil(chart.data['ventilated'].max())) in description
     assert str(chart.data['icu'].idxmax()) not in description
