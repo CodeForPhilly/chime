@@ -1,4 +1,5 @@
-"""Initializes the header dash html
+"""Initializes the Penn Medicine masthead
+#! consider moving this into navbar or static
 """
 from typing import List
 

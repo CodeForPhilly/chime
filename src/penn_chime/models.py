@@ -18,7 +18,8 @@ from .parameters import Parameters
 class SimSirModel:
 
     def __init__(self, p: Parameters) -> SimSirModel:
-        # TODO missing initial non-zero 'recovered' value
+        # TODO missing initial recovered value
+        susceptible = p.susceptible
         recovered = 0.0
         recovery_days = p.recovery_days
 
@@ -38,8 +39,6 @@ class SimSirModel:
         infected = (
             p.current_hospitalized / p.market_share / p.hospitalized.rate
         )
-
-        susceptible = p.population - infected
 
         detection_probability = (
             p.known_infected / infected if infected > 1.0e-7 else None
@@ -64,10 +63,10 @@ class SimSirModel:
         # self.r_naught = r_t / (1.0 - relative_contact_rate)
         r_naught = (intrinsic_growth_rate + gamma) / gamma
         doubling_time_t = 1.0 / np.log2(
-            beta * susceptible - gamma + 1)
+            beta * p.susceptible - gamma + 1)
 
         raw_df = sim_sir_df(
-            susceptible,
+            p.susceptible,
             infected,
             recovered,
             beta,
@@ -94,8 +93,6 @@ class SimSirModel:
         self.dispositions_df = dispositions_df
         self.admits_df = admits_df
         self.census_df = census_df
-        self.daily_growth = daily_growth_helper(p.doubling_time)
-        self.daily_growth_t = daily_growth_helper(doubling_time_t)
 
 
 def sir(
@@ -174,11 +171,3 @@ def build_census_df(
             for key, los in lengths_of_stay.items()
         }
     })
-
-
-def daily_growth_helper(doubling_time):
-    """Calculates average daily growth rate from doubling time"""
-    result = 0
-    if doubling_time != 0:
-        result = (np.power(2, 1.0 / doubling_time) - 1) * 100
-    return result
