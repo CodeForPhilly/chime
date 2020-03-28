@@ -459,49 +459,6 @@ def write_footer(st):
     st.markdown("© 2020, The Trustees of the University of Pennsylvania")
 
 
-def show_additional_projections(
-    st, alt, charting_func, model, parameters
-):
-    st.subheader(
-        "The number of infected and recovered individuals in the hospital catchment region at any given moment"
-    )
-
-    st.altair_chart(
-        charting_func(
-            alt,
-            model=model,
-            parameters=parameters
-        ),
-        use_container_width=True,
-    )
-
-
-##########
-# Tables #
-##########
-
-
-def draw_raw_sir_simulation_table(st, model, parameters):
-    as_date = parameters.as_date
-    projection_area = model.raw_df
-    if parameters.n_days_since_first_hospitalized is not None:
-        projection_area.loc[:, "day"] = projection_area.day - parameters.n_days_since_first_hospitalized
-    infect_table = (projection_area.iloc[::7, :]).apply(np.floor)
-    infect_table.index = range(infect_table.shape[0])
-    infect_table["day"] = infect_table.day.astype(int)
-
-    if as_date:
-        infect_table = add_date_column(
-            infect_table, parameters.date_first_hospitalized, drop_day_column=True, date_format=DATE_FORMAT
-        )
-
-    st.table(infect_table)
-    build_download_link(st,
-        filename="raw_sir_simulation_data.csv",
-        df=projection_area,
-        parameters=parameters
-    )
-
 def display_download_link(st, filename: str, df: pd.DataFrame):
     csv = dataframe_to_base64(df)
     st.markdown("""
