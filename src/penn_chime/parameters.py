@@ -92,11 +92,3 @@ class Parameters:
             "icu": icu,
             "ventilated": ventilated,
         }
-
-    def change_date(self):
-        """
-        This reflects a date from which previously-run reports will no
-        longer match current results, indicating when users should
-        re-run their reports
-        """
-        return "March 27 2020"

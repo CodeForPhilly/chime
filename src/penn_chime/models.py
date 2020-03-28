@@ -183,6 +183,16 @@ class SimSirModel:
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(doubling_time_t)
+        self.change_date = change_date
+
+
+def change_date():
+    """
+    This reflects a date from which previously-run reports will no
+    longer match current results, indicating when users should
+    re-run their reports
+    """
+    return date(year=2020, month=3, day=30)
 
 
 def get_census_and_infected_projection(
@@ -246,7 +256,7 @@ def get_growth_rate(doubling_time: Optional[float]) -> float:
     return (2.0 ** (1.0 / doubling_time) - 1.0)
 
 
-def get_loss(census_df: DataFrame, current_hospitalized: float, n_days_since: int) -> float:
+def get_loss(census_df: pd.DataFrame, current_hospitalized: float, n_days_since: int) -> float:
     """Squared error: predicted vs. actual current hospitalized."""
     predicted = census_df.hospitalized.loc[n_days_since]
     return (current_hospitalized - predicted) ** 2.0
