@@ -1,4 +1,1 @@
-[server]
-enableCORS = false
-headless = true
-port = 8000
+{{toToml cfg.streamlit}}

@@ -16,6 +16,10 @@ pkg_bin_dirs=(
 )
 pkg_svc_user="root"
 
+pkg_exports=(
+  [port]=streamlit.server.port
+)
+
 pkg_version() {
   if [ -n "${pkg_last_tag}" ]; then
     if [ ${pkg_last_tag_distance} -eq 0 ]; then
