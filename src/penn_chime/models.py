@@ -119,7 +119,7 @@ class SimSirModel:
             )
             dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
             admits_df = build_admits_df(dispositions_df)
-            census_df = build_census_df(census_df, lengths_of_stay)
+            census_df = build_census_df(admits_df, lengths_of_stay)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
             print('%s: using date_first_hospitalized.' % (datetime.now(),))
@@ -253,6 +253,9 @@ def sir(
     s_n = (-beta * s * i) + s
     i_n = (beta * s * i - gamma * i) + i
     r_n = gamma * i + r
+    assert s_n >= 0.0
+    assert i_n >= 0.0
+    assert r_n >= 0.0
     if s_n < 0.0:
         s_n = 0.0
     if i_n < 0.0:
