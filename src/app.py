@@ -19,9 +19,9 @@ from penn_chime.presentation import (
 from penn_chime.settings import DEFAULTS
 from penn_chime.models import SimSirModel
 from penn_chime.charts import (
+    build_admits_chart,
+    build_census_chart,
     additional_projections_chart,
-    admitted_patients_chart,
-    new_admissions_chart,
     chart_descriptions
 )
 
@@ -42,13 +42,9 @@ if st.checkbox("Show more info about this tool"):
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
-new_admit_chart = new_admissions_chart(alt, m.admits_df, parameters=p)
-st.altair_chart(
-    new_admissions_chart(alt, m.admits_df, parameters=p),
-    use_container_width=True,
-)
-
-st.markdown(chart_descriptions(new_admit_chart, p.labels))
+admits_chart = build_admits_chart(alt, m.admits_df, parameters=p)
+st.altair_chart(admits_chart, use_container_width=True)
+st.markdown(chart_descriptions(admits_chart, p.labels))
 
 if st.checkbox("Show Projected Admissions in tabular form"):
     if st.checkbox("Show Daily Counts"):
@@ -67,16 +63,14 @@ if st.checkbox("Show Projected Admissions in tabular form"):
         df=m.admits_df,
         parameters=p
     )
+
+
 st.subheader("Admitted Patients (Census)")
-st.markdown(
-    "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
-)
-census_chart = admitted_patients_chart(alt=alt, census_df=m.census_df, parameters=p)
-st.altair_chart(
-    admitted_patients_chart(alt=alt, census_df=m.census_df, parameters=p),
-    use_container_width=True,
-)
+st.markdown("Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals")
+census_chart = build_census_chart(alt=alt, census_df=m.census_df, parameters=p)
+st.altair_chart(census_chart, use_container_width=True)
 st.markdown(chart_descriptions(census_chart, p.labels, suffix=" Census"))
+
 if st.checkbox("Show Projected Census in tabular form"):
     if st.checkbox("Show Daily Census Counts"):
         draw_census_table(st, m.census_df, p.labels, 1, as_date=p.as_date)

@@ -4,10 +4,14 @@ Changes affecting results or their presentation should also update
 `change_date`, so users can see when results have last changed
 """
 
-from typing import Optional
+from collections import namedtuple
 from datetime import date
+from typing import Optional
 
-from .utils import RateLos
+
+# (0.02, 7) is 2%, 7 days
+# be sure to multiply by 100 when using as a default to the percent widgets!
+RateLos = namedtuple("RateLos", ("rate", "length_of_stay"))
 
 
 class Regions:

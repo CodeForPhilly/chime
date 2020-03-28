@@ -7,7 +7,7 @@ import altair as alt  # type: ignore
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
-from .utils import add_date_column, dataframe_to_base64
+from .utils import dataframe_to_base64
 from .parameters import Parameters, RateLos
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
@@ -184,6 +184,11 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=FLOAT_INPUT_STEP,
         format="%f",
     )
+    today_input = DateInput(
+        st_obj,
+        "As of date",
+        value=d.today,
+    )
     date_first_hospitalized_input = DateInput(
         st_obj,
         "Date of first hospitalized case",
@@ -269,6 +274,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     st.sidebar.markdown("### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)"
                         .format(docs_url=DOCS_URL))
 
+    today = today_input()
     if st.sidebar.checkbox("I know the date of the first hospitalized case in the region."):
         date_first_hospitalized = date_first_hospitalized_input()
         doubling_time = None
@@ -306,6 +312,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         max_y_axis=max_y_axis,
         n_days=n_days,
         relative_contact_rate=relative_contact_rate,
+        today=today,
         population=population,
 
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
