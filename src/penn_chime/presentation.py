@@ -186,7 +186,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     today_input = DateInput(
         st_obj,
-        "As of date",
+        "Current date (Default is today)",
         value=d.today,
     )
     date_first_hospitalized_input = DateInput(
@@ -265,6 +265,8 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     max_y_axis_input = NumberInput(st_obj, "Y-axis static value", value=500, format="%i", step=25)
 
     # Build in desired order
+    today = today_input()
+
     st.sidebar.markdown("### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
     population = population_input()
     market_share = market_share_pct_input()
@@ -274,7 +276,6 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     st.sidebar.markdown("### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)"
                         .format(docs_url=DOCS_URL))
 
-    today = today_input()
     if st.sidebar.checkbox("I know the date of the first hospitalized case in the region."):
         date_first_hospitalized = date_first_hospitalized_input()
         doubling_time = None
