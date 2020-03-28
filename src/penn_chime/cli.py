@@ -9,7 +9,7 @@ from datetime import datetime
 from pandas import DataFrame
 
 from penn_chime.parameters import Parameters, RateLos
-from penn_chime.models import SimSirModel
+from penn_chime.models import SimSirModel as Model, change_date
 
 
 class FromFile(Action):
@@ -45,7 +45,7 @@ def validator(arg, cast, min_value, max_value, required=True):
 
 def parse_args():
     """Parse args."""
-    parser = ArgumentParser(description="CHIME")
+    parser = ArgumentParser(description=f"penn_chime: {change_date()}")
     parser.add_argument("--file", type=open, action=FromFile)
 
     for arg, cast, min_value, max_value, help, required in (
@@ -138,7 +138,7 @@ def main():
         ventilated=RateLos(a.ventilated_rate, a.ventilated_los),
     )
 
-    m = SimSirModel(p)
+    m = Model(p)
 
     for df, name in (
         (m.sim_sir_w_date_df, "sim_sir_w_date"),
