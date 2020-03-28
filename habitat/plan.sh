@@ -18,10 +18,6 @@ pkg_bin_dirs=(
 pkg_svc_user="root"
 
 do_prepare() {
-  if ! ls "/etc/sudoers" &> "/dev/null"
-  then
-    echo "root ALL=(ALL)  ALL" >> "/etc/sudoers"
-  fi
   python -m venv "${pkg_prefix}"
   source "${pkg_prefix}/bin/activate"
   pip install --upgrade --force-reinstall "pip" "wheel" "setuptools"
