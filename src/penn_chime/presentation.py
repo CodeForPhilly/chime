@@ -271,7 +271,6 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=1,
         format="%i",
     )
-    as_date_input = CheckboxInput(st_obj, "Present result as dates instead of days", value=False)
     max_y_axis_set_input = CheckboxInput(st_obj, "Set the Y-axis on graphs to a static value")
     max_y_axis_input = NumberInput(st_obj, "Y-axis static value", value=500, format="%i", step=25)
 
@@ -308,7 +307,6 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     st.sidebar.markdown("### Display Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
     n_days = n_days_input()
     max_y_axis_set = max_y_axis_set_input()
-    as_date = as_date_input()
 
     max_y_axis = None
     if max_y_axis_set:
@@ -322,7 +320,6 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         relative_contact_rate=relative_contact_rate,
         ventilated=RateLos(ventilated_rate, ventilated_los),
 
-        as_date=as_date,
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,
         doubling_time=doubling_time,
@@ -410,7 +407,7 @@ We need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantit
 - To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
 """.format(
             doubling_time=parameters.doubling_time,
-            recovery_days=parameters.recovery_days,
+            recovery_days=parameters.infectious_days,
             r_naught=model.r_naught,
             relative_contact_rate=parameters.relative_contact_rate,
             doubling_time_t=model.doubling_time_t,

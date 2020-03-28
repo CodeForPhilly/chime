@@ -38,7 +38,6 @@ class Parameters:
         relative_contact_rate: float,
         ventilated: RateLos,
 
-        as_date: bool = False,
         current_date: date = date.today(),
         date_first_hospitalized: Optional[date] = None,
         doubling_time: Optional[float] = None,
@@ -68,7 +67,6 @@ class Parameters:
         else:
             raise AssertionError('Population or Regions required')
 
-        self.as_date = as_date
         self.current_date = current_date
         self.date_first_hospitalized = date_first_hospitalized
         self.doubling_time = doubling_time
