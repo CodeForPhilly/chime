@@ -13,9 +13,11 @@ from dash.development.base_component import ComponentMeta
 
 from penn_chime.defaults import RateLos
 from penn_chime.parameters import Parameters
+from penn_chime.models import SimSirModel
 
 from chime_dash.app.components.base import Component
 from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header
+from chime_dash.app.utils.callbacks import ChimeCallback
 
 FLOAT_INPUT_MIN = 0.001
 FLOAT_INPUT_STEP = "any"
@@ -78,11 +80,6 @@ class Sidebar(Component):
     # localization temp. for widget descriptions
     localization_file = "sidebar.yml"
 
-    callback_inputs = OrderedDict(
-        (key, CallbackInput(component_id=key, component_property="value"))
-        for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )
-    )
-
     @staticmethod
     def parse_form_parameters(**kwargs) -> Tuple[Parameters, Dict[str, Any]]:
         """Reads html form outputs and converts them to a parameter instance
@@ -107,6 +104,21 @@ class Sidebar(Component):
             n_days=kwargs["n_days"],
         )
         return pars
+
+    @staticmethod
+    def update_model(**kwargs):
+        """
+        """
+        pars = Sidebar.parse_form_parameters(**kwargs)
+        return pars, SimSirModel(pars)
+
+    def __init__(self, language, defaults):
+        input_change_callback = ChimeCallback(
+            changed_elements=OrderedDict((key, "value") for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )),
+            dom_updates=OrderedDict(pars="value", model="value"),
+            callback_fn=Sidebar.update_model,
+        )
+        super().__init__(language, defaults, [input_change_callback])
 
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the view

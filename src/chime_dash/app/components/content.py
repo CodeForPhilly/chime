@@ -8,7 +8,7 @@ from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.footer import Footer
 from chime_dash.app.components.header import Header
 from chime_dash.app.components.intro import Intro, ToolDetails
-from chime_dash.app.components.visualizations import Visualizations
+from chime_dash.app.containers.visualizations import Visualizations
 
 
 class Content(Component):
@@ -27,11 +27,6 @@ class Content(Component):
             additions=Additions(language, defaults),
             footer=Footer(language, defaults),
         )
-        self.callback_outputs = []
-        self.callback_inputs = OrderedDict()
-        for component in self.components.values():
-            self.callback_outputs += component.callback_outputs
-            self.callback_inputs.update(component.callback_inputs)
 
     def get_html(self):
         """Initializes the content container dash html
@@ -48,15 +43,3 @@ class Content(Component):
         )
 
         return [content]
-
-    def callback(self, *args, **kwargs):
-        """
-        """
-        callback_returns = []
-        for component in self.components.values():
-            try:
-                callback_returns += component.callback(**kwargs)
-            except Exception as error:
-                raise HTMLComponentError(component, error)
-
-        return callback_returns

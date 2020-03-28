@@ -1,45 +1,24 @@
 """Script which launches dash app
 """
-from dash import Dash
-from penn_chime.settings import DEFAULTS
-from chime_dash.app.components import Body
-LANGUAGE = "en"
+from chime_dash.app import DASH_APP
+from chime_dash.app.components import root
+from chime_dash.app.utils.callbacks import registered_callbacks, ChimeCallback
+from functools import lru_cache
 
+DASH_APP.config["external_stylesheets"] = root.external_stylesheets
+DASH_APP.config["external_scripts"] = root.external_scripts
+DASH_APP.layout = root.html
 
-#ef main():
-#   """Starts a dash app
-#   """
-#   body = Body(LANGUAGE, DEFAULTS)
-#   app = Dash(
-#       __name__,
-#       external_stylesheets=body.external_stylesheets,
-#       external_scripts=body.external_scripts,
-#   )
-#   app.layout = body.html
-#
-#   @app.callback(body.callback_outputs, list(body.callback_inputs.values()))
-#   def callback(*args):  # pylint: disable=W0612
-#       return body.callback(*args)
-#
-#   app.run_server(debug=True, host='0.0.0.0')
-
-body = Body(LANGUAGE, DEFAULTS)
-app = Dash(
-    __name__,
-    external_stylesheets=body.external_stylesheets,
-    external_scripts=body.external_scripts,
-)
-app.layout = body.html
-app.title = 'Penn Medicine CHIME'
-server = app.server
-
-@app.callback(body.callback_outputs, list(body.callback_inputs.values()))
-def callback(*args):  # pylint: disable=W0612
-    return body.callback(*args)
-
-# app.run_server(debug=True, host='0.0.0.0')
-
+for callback in registered_callbacks[ChimeCallback]:
+    if callback.memoize:
+        @lru_cache(maxsize=32)
+        @DASH_APP.callback(callback.outputs, callback.inputs)
+        def callback_wrapper(*args, **kwargs):
+            callback.callback_fn(args, kwargs)
+    else:
+        @DASH_APP.callback(callback.outputs, callback.inputs)
+        def callback_wrapper(*args, **kwargs):
+            callback.callback_fn(args, kwargs)
 
 if __name__ == "__main__":
-#    main()
-    app.run_server(host='0.0.0.0')
+    DASH_APP.server.run_server(host='0.0.0.0')
