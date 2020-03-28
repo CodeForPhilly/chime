@@ -22,18 +22,12 @@ class SimSirModel:
 
     def __init__(self, p: Parameters):
 
-        # BEGIN FIX PARAMETERS FOR TEST
-        #p.n_days = 100
-        #p.date_first_hospitalized = date(year=2020, month=3, day=7)
-        #p.doubling_time = None
-        # END FIX
-
         n_days_since = None
         if p.date_first_hospitalized:
-            n_days_since = (p.today - p.date_first_hospitalized).days
+            n_days_since = (p.current_date - p.date_first_hospitalized).days
             print("%s: %s - %s = %s days" % (
                 datetime.now(),
-                p.today, p.date_first_hospitalized,
+                p.current_date, p.date_first_hospitalized,
                 n_days_since,
             ))
 
