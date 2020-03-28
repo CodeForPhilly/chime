@@ -1,4 +1,8 @@
-"""Initializes the  dash html
+"""components/visualizations
+
+Initializes the visual components of the interactive model
+
+localization file can be found in app/templates/en
 """
 from typing import List, Any
 

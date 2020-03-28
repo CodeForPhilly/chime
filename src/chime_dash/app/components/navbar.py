@@ -1,4 +1,5 @@
-"""Navigation bar view
+"""components/navbar
+Navigation bar view
 """
 from typing import List
 
@@ -14,11 +15,12 @@ from chime_dash.app.components.menu import Menu
 
 
 class Navbar(Component):
-    """
+    """Navigation bar contains menu and brand
+    TODO refactor / design input on style and layout
     """
 
     def __init__(self, language: str = "en", defaults: Constants = DEFAULTS):
-        """Sets up self, menue and header
+        """Sets up self, menu and header
         """
         super().__init__(language, defaults=defaults)
         self.menu = Menu(language, defaults=defaults)

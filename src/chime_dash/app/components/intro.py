@@ -1,4 +1,8 @@
-"""Initializes the  dash html
+"""components/intro
+initializes the leading text as of right now
+
+currently both classes handle control and view this should be separated
+with the logic for dynamic text moving to services.
 """
 from typing import List, Any
 
