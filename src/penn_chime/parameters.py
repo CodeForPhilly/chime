@@ -17,27 +17,29 @@ class Parameters:
         self,
         *,
         current_hospitalized: int,
-        doubling_time: float,
         known_infected: int,
-        relative_contact_rate: float,
         population: int,
+        relative_contact_rate: float,
 
         hospitalized: RateLos,
         icu: RateLos,
         ventilated: RateLos,
 
         as_date: bool = False,
-        market_share: float = 1.0,
         date_first_hospitalized: Optional[date] = None,
+        doubling_time: Optional[float] = None,
+        market_share: float = 1.0,
         max_y_axis: Optional[int] = None,
         n_days: int = 60,
         recovery_days: int = 14,
+        recovered: int = 0,
+        today: date = date.today(),
     ):
         self.current_hospitalized = current_hospitalized
         self.doubling_time = doubling_time
         self.known_infected = known_infected
-        self.relative_contact_rate = relative_contact_rate
         self.population = population
+        self.relative_contact_rate = relative_contact_rate
 
         self.hospitalized = hospitalized
         self.icu = icu
@@ -47,13 +49,10 @@ class Parameters:
         self.market_share = market_share
         self.max_y_axis = max_y_axis
         self.n_days = n_days
+        self.recovered = recovered
         self.recovery_days = recovery_days
-        if date_first_hospitalized:
-            self.date_first_hospitalized = date_first_hospitalized # needed for utils.add_date_column
-            self.n_days_since_first_hospitalized = (date.today() - date_first_hospitalized).days
-        else:
-            self.date_first_hospitalized = None # needed for utils.add_date_column
-            self.n_days_since_first_hospitalized = None
+        self.today = today
+        self.date_first_hospitalized = date_first_hospitalized
 
         self.labels = {
             "hospitalized": "Hospitalized",
@@ -78,4 +77,4 @@ class Parameters:
         longer match current results, indicating when users should
         re-run their reports
         """
-        return "March 23 2020"
+        return "March 27 2020"

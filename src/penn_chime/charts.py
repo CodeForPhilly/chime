@@ -12,7 +12,7 @@ from .presentation import DATE_FORMAT
 
 
 def new_admissions_chart(
-    alt, projection_admits: pd.DataFrame, parameters: Parameters
+    alt, admits_df: pd.DataFrame, parameters: Parameters
 ) -> Chart:
     """docstring"""
     plot_projection_days = parameters.n_days - 10
@@ -26,14 +26,14 @@ def new_admissions_chart(
 
     tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
-        projection_admits = add_date_column(projection_admits, parameters.date_first_hospitalized)
+        projection_admits = add_date_column(admits_df, parameters.date_first_hospitalized)
         x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
     # TODO fix the fold to allow any number of dispositions
 
-    ceiled_admits = projection_admits.copy()
+    ceiled_admits = admits_df.copy()
 
     ceiled_admits.hospitalized = np.ceil(ceiled_admits.hospitalized)
     ceiled_admits.icu = np.ceil(ceiled_admits.icu)
@@ -58,7 +58,7 @@ def new_admissions_chart(
 
 
 def admitted_patients_chart(
-    alt, census: pd.DataFrame, parameters: Parameters
+    alt, census_df: pd.DataFrame, parameters: Parameters
 ) -> Chart:
     """docstring"""
 
@@ -66,7 +66,7 @@ def admitted_patients_chart(
     max_y_axis = parameters.max_y_axis
     as_date = parameters.as_date
     if as_date:
-        census = add_date_column(census, parameters.date_first_hospitalized)
+        census = add_date_column(census_df, parameters.date_first_hospitalized)
         x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
         idx = "date:T"
     else:
@@ -80,7 +80,8 @@ def admitted_patients_chart(
 
     # TODO fix the fold to allow any number of dispositions
     return (
-        alt.Chart(census.head(plot_projection_days))
+        #alt.Chart(census_df.head(plot_projection_days))
+        alt.Chart(census_df)
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
         .mark_line(point=True)
         .encode(
@@ -104,13 +105,10 @@ def additional_projections_chart(
     # TODO use subselect of df_raw instead of creating a new df
     raw_df = model.raw_df
     dat = pd.DataFrame({
+        "day": raw_df.day,
         "infected": raw_df.infected,
         "recovered": raw_df.recovered
     })
-    dat["day"] = dat.index
-
-    if parameters.n_days_since_first_hospitalized:
-        dat["day"] = dat.day - parameters.n_days_since_first_hospitalized
 
     as_date = parameters.as_date
     max_y_axis = parameters.max_y_axis

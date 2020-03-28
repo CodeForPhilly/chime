@@ -59,7 +59,7 @@ if st.checkbox("Show Projected Admissions in tabular form"):
             key="admissions_day_range_slider",
             min_value=1,
             max_value=10,
-            value=7 
+            value=7
         )
         draw_projected_admissions_table(st, m.admits_df, p.labels, admissions_day_range, as_date=p.as_date)
     build_download_link(st,
@@ -71,9 +71,9 @@ st.subheader("Admitted Patients (Census)")
 st.markdown(
     "Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals"
 )
-census_chart = admitted_patients_chart(alt=alt, census=m.census_df, parameters=p)
+census_chart = admitted_patients_chart(alt=alt, census_df=m.census_df, parameters=p)
 st.altair_chart(
-    admitted_patients_chart(alt=alt, census=m.census_df, parameters=p),
+    admitted_patients_chart(alt=alt, census_df=m.census_df, parameters=p),
     use_container_width=True,
 )
 st.markdown(chart_descriptions(census_chart, p.labels, suffix=" Census"))
@@ -86,7 +86,7 @@ if st.checkbox("Show Projected Census in tabular form"):
             key="census_day_range_slider",
             min_value=1,
             max_value=10,
-            value=7 
+            value=7
         )
         draw_census_table(st, m.census_df, p.labels, census_day_range, as_date=p.as_date)
     build_download_link(st,

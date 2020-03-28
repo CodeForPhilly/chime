@@ -105,8 +105,8 @@ and daily growth rate of **{daily_growth_t:.2f}%**.
             r_t=m.r_t,
             doubling_time_t=abs(m.doubling_time_t),
             impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to"),
-            daily_growth=m.daily_growth,
-            daily_growth_t=m.daily_growth_t,
+            daily_growth=m.daily_growth_rate + 100.0,
+            daily_growth_t=m.daily_growth_rate_t * 100.0,
             docs_url=DOCS_URL,
             infection_warning_str=infection_warning_str,
             infected_population_warning_str=infected_population_warning_str
