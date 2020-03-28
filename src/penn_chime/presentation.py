@@ -97,7 +97,7 @@ and daily growth rate of **{daily_growth_t:.2f}%**.
             hosp_rate=p.hospitalized.rate,
             S=p.population,
             market_share=p.market_share,
-            recovery_days=p.recovery_days,
+            recovery_days=p.infectious_days,
             r_naught=m.r_naught,
             doubling_time=p.doubling_time,
             relative_contact_rate=p.relative_contact_rate,
@@ -262,11 +262,11 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=1,
         format="%i",
     )
-    recovery_days_input = NumberInput(
+    infectious_days_input = NumberInput(
         st_obj,
-        "Recovery Days (Not hospital length of stay - infectious duration?)",
+        "Infectious Days",
         min_value=0,
-        value=d.recovery_days,
+        value=d.infectious_days,
         step=1,
         format="%i",
     )
@@ -296,7 +296,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     relative_contact_rate = relative_contact_pct_input()
 
     st.sidebar.markdown("### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
-    recovery_days = recovery_days_input()
+    infectious_days = infectious_days_input()
     hospitalized_rate = hospitalized_pct_input()
     icu_rate = icu_pct_input()
     ventilated_rate = ventilated_pct_input()
@@ -321,11 +321,11 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         relative_contact_rate=relative_contact_rate,
         ventilated=RateLos(ventilated_rate, ventilated_los),
 
-
         as_date=as_date,
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,
         doubling_time=doubling_time,
+        infectious_days=infectious_days,
         market_share=market_share,
         max_y_axis=max_y_axis,
         n_days=n_days,

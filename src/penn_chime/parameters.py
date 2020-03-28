@@ -42,11 +42,11 @@ class Parameters:
         current_date: date = date.today(),
         date_first_hospitalized: Optional[date] = None,
         doubling_time: Optional[float] = None,
+        infectious_days: int = 14,
         market_share: float = 1.0,
         max_y_axis: Optional[int] = None,
         n_days: int = 60,
         population: Optional[int] = None,
-        recovery_days: int = 14,
         recovered: int = 0,
         region: Optional[Regions] = None,
     ):
@@ -72,11 +72,11 @@ class Parameters:
         self.current_date = current_date
         self.date_first_hospitalized = date_first_hospitalized
         self.doubling_time = doubling_time
+        self.infectious_days = infectious_days
         self.market_share = market_share
         self.max_y_axis = max_y_axis
         self.n_days = n_days
         self.recovered = recovered
-        self.recovery_days = recovery_days
 
         self.labels = {
             "hospitalized": "Hospitalized",

@@ -62,7 +62,7 @@ class SimSirModel:
 
         intrinsic_growth_rate = get_growth_rate(p.doubling_time)
 
-        gamma = 1.0 / p.recovery_days
+        gamma = 1.0 / p.infectious_days
 
         # Contact rate, beta
         beta = (
@@ -141,7 +141,7 @@ class SimSirModel:
             infected = 1 / p.hospitalized.rate / p.market_share
             # update all state that is dependent on doubling time.
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
-            gamma = 1 / p.recovery_days
+            gamma = 1 / p.infectious_days
             beta = get_beta(intrinsic_growth_rate, gamma, susceptible, p.relative_contact_rate)
             r_t = beta / gamma * susceptible
             r_naught = (intrinsic_growth_rate + gamma) / gamma
@@ -193,8 +193,8 @@ def get_census_and_infected_projection(
 
     S, I, R = p.population - initial_i, initial_i, p.recovered
 
-    # mean recovery rate (inv_recovery_days)
-    gamma = 1.0 / p.recovery_days
+    # mean recovery rate (inv_infectious_days)
+    gamma = 1.0 / p.infectious_days
 
     # contact rate
     beta = (intrinsic_growth_rate + gamma) / S

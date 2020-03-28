@@ -17,6 +17,7 @@ DEFAULTS = Parameters(
     doubling_time=4.0,
     hospitalized=RateLos(0.025, 7),
     icu=RateLos(0.0075, 9),
+    infectious_days=14,
     known_infected=510,
     market_share=0.15,
     n_days=60,
