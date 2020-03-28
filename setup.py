@@ -30,7 +30,7 @@ setup(
         "Documentation": "https://codeforphilly.github.io/chime/",
     },
     package_dir={'': 'src'},
-    packages=find_namespace_packages(where='src', exclude=('tests')),
+    #packages=find_namespace_packages(where='src', exclude=('tests')),
     install_requires=[
         "streamlit",
         "pandas",
