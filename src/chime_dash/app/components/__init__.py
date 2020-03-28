@@ -33,7 +33,6 @@ class Body(Component):
     """
 
     external_stylesheets = [
-        "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css",
         BOOTSTRAP,
     ]
 
