@@ -293,6 +293,10 @@ def gen_sir(
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
     d = i_day
+    # TODO:
+    #    Bug, or bad input data.
+    #    See the plots for susceptible, that remains just unter 500,000
+    # while i >= 0.5:
     for _ in range(n_days):
         yield d, s, i, r
         s, i, r = sir(s, i, r, beta, gamma, n)
