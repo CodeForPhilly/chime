@@ -52,7 +52,7 @@ setup(
         'console_scripts': ['penn_chime=penn_chime.cli:main'],
     },
     keywords=[],
-    packages=find_packages(".", exclude=["docs", "k82", "script"]),
+    packages=find_packages(".", exclude=["docs", "k82", "script", "tests"]),
     #install_requires=REQUIREMENTS,
     include_package_data=True,
 )
