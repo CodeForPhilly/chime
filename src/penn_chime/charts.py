@@ -97,7 +97,7 @@ def build_census_table(
     modulo,
     as_date: bool = False
 ):
-    table_df = census_df[np.mod(census_df.day, day_range) == 0].copy()
+    table_df = census_df[np.mod(census_df.day, modulo) == 0].copy()
     table_df.rename(labels)
     return table_df
 

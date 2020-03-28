@@ -32,14 +32,14 @@ class Parameters:
         self,
         *,
         current_hospitalized: int,
-        known_infected: int,
-        relative_contact_rate: float,
-
         hospitalized: RateLos,
         icu: RateLos,
+        known_infected: int,
+        relative_contact_rate: float,
         ventilated: RateLos,
 
         as_date: bool = False,
+        current_date: date = date.today(),
         date_first_hospitalized: Optional[date] = None,
         doubling_time: Optional[float] = None,
         market_share: float = 1.0,
@@ -49,7 +49,6 @@ class Parameters:
         recovery_days: int = 14,
         recovered: int = 0,
         region: Optional[Regions] = None,
-        today: date = date.today(),
     ):
 
         self.current_hospitalized = current_hospitalized
@@ -70,6 +69,7 @@ class Parameters:
             raise AssertionError('Population or Regions required')
 
         self.as_date = as_date
+        self.current_date = current_date
         self.date_first_hospitalized = date_first_hospitalized
         self.doubling_time = doubling_time
         self.market_share = market_share
@@ -77,7 +77,6 @@ class Parameters:
         self.n_days = n_days
         self.recovered = recovered
         self.recovery_days = recovery_days
-        self.today = today
 
         self.labels = {
             "hospitalized": "Hospitalized",

@@ -186,10 +186,10 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=FLOAT_INPUT_STEP,
         format="%f",
     )
-    today_input = DateInput(
+    current_date_input = DateInput(
         st_obj,
         "Current date (Default is today)",
-        value=d.today,
+        value=d.current_date,
     )
     date_first_hospitalized_input = DateInput(
         st_obj,
@@ -262,12 +262,20 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=1,
         format="%i",
     )
+    recovery_days_input = NumberInput(
+        st_obj,
+        "Recovery Days (Not hospital length of stay - infectious duration?)",
+        min_value=0,
+        value=d.recovery_days,
+        step=1,
+        format="%i",
+    )
     as_date_input = CheckboxInput(st_obj, "Present result as dates instead of days", value=False)
     max_y_axis_set_input = CheckboxInput(st_obj, "Set the Y-axis on graphs to a static value")
     max_y_axis_input = NumberInput(st_obj, "Y-axis static value", value=500, format="%i", step=25)
 
     # Build in desired order
-    today = today_input()
+    current_date = current_date_input()
 
     st.sidebar.markdown("### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
     population = population_input()
@@ -288,6 +296,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     relative_contact_rate = relative_contact_pct_input()
 
     st.sidebar.markdown("### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
+    recovery_days = recovery_days_input()
     hospitalized_rate = hospitalized_pct_input()
     icu_rate = icu_pct_input()
     ventilated_rate = ventilated_pct_input()
@@ -305,22 +314,22 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         max_y_axis = max_y_axis_input()
 
     return Parameters(
-        as_date=as_date,
         current_hospitalized=current_hospitalized,
-        market_share=market_share,
-        known_infected=known_infected,
-        doubling_time=doubling_time,
-        date_first_hospitalized=date_first_hospitalized,
-
-        max_y_axis=max_y_axis,
-        n_days=n_days,
-        relative_contact_rate=relative_contact_rate,
-        today=today,
-        population=population,
-
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
+        known_infected=known_infected,
+        relative_contact_rate=relative_contact_rate,
         ventilated=RateLos(ventilated_rate, ventilated_los),
+
+
+        as_date=as_date,
+        current_date=current_date,
+        date_first_hospitalized=date_first_hospitalized,
+        doubling_time=doubling_time,
+        market_share=market_share,
+        max_y_axis=max_y_axis,
+        n_days=n_days,
+        population=population,
     )
 
 

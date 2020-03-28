@@ -88,7 +88,7 @@ class SimSirModel:
             gamma,
             p.n_days,
         )
-        dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.today)
+        dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
         admits_df = build_admits_df(dispositions_df)
         census_df = build_census_df(admits_df, lengths_of_stay)
 
@@ -117,11 +117,9 @@ class SimSirModel:
                 p.n_days + n_days_since,
                 -n_days_since,
             )
-            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.today)
+            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
             admits_df = build_admits_df(dispositions_df)
             census_df = build_census_df(census_df, lengths_of_stay)
-
-            print(raw_df)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
             print('%s: using date_first_hospitalized.' % (datetime.now(),))
@@ -169,9 +167,6 @@ class SimSirModel:
             self.r_t = r_t
             self.r_naught = r_naught
             self.doubling_time_t = doubling_time_t
-
-            print(raw_df)
-
         else:
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
 
@@ -298,14 +293,14 @@ def build_dispositions_df(
     sim_sir_df: pd.DataFrame,
     rates: Dict[str, float],
     market_share: float,
-    today: datetime,
+    current_date: datetime,
 ) -> pd.DataFrame:
     """Get dispositions of patients adjusted by rate and market_share."""
     patients = sim_sir_df.infected + sim_sir_df.recovered
     day = sim_sir_df.day
     return pd.DataFrame({
         "day": day,
-        "date": day.astype('timedelta64[D]') + np.datetime64(today),
+        "date": day.astype('timedelta64[D]') + np.datetime64(current_date),
         **{
             key: patients * rate * market_share
             for key, rate in rates.items()
