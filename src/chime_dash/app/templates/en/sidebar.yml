@@ -1,0 +1,19 @@
+current_hospitalized: Currently Hospitalized COVID-19 Patients
+doubling_time: Doubling time before social distancing (days)
+relative_contact_rate: Social distancing (% reduction in social contact)
+hospitalized_rate: Hospitalization %(total infections)
+icu_rate: ICU %(total infections)
+ventilated_rate: Ventilated %(total infections)
+hospitalized_los: Hospital Length of Stay
+icu_los: ICU Length of Stay
+ventilated_los: Vent Length of Stay
+market_share: Hospital Market Share (%)
+susceptible: Regional Population
+known_infected: Currently Known Regional Infections (only used to compute detection rate - does not change projections)
+n_days: Number of days to project
+as_date: Present results as dates
+max_y_axis: Set the Y-axis on graphs to a static
+max_y_axis_value: Maximal y-axis value (leave blank for no max value)
+show_tables: Show tables with data
+show_tool_details: Show more info about this tool
+show_additional_projections: Show additional projections
