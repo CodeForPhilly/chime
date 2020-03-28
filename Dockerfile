@@ -8,6 +8,7 @@ WORKDIR /app
 
 RUN pip install -q -r requirements.txt
 
-COPY . ./
+COPY . . 
 
 CMD ["streamlit", "run", "src/app.py"]
+

@@ -3,3 +3,7 @@ pandas
 numpy
 pytest
 altair
+dash
+dash_bootstrap_components
+pyyaml
+gunicorn
