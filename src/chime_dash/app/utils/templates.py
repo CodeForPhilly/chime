@@ -6,12 +6,13 @@ from typing import Dict, Any, Optional
 
 from os import path
 
+from dash_core_components import Location
 from yaml import safe_load
 
 from numpy import mod
 from pandas import DataFrame
 
-from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4
+from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4, Button
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
 from penn_chime.defaults import Constants
@@ -133,6 +134,16 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
         options=[{"label": content[idx], "value": data.get("value", False)}],
     )
 
+
+def create_button(idx: str, content: Dict[str, str]):
+    """
+    Create button using localization text as button label
+    """
+    return Button(id=idx, children=content[idx])
+
+
+def create_location(idx: str):
+    return Location(id=idx)
 
 def _get_default_values(
     key: str,

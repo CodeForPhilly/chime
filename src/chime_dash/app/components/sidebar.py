@@ -15,7 +15,7 @@ from penn_chime.defaults import RateLos
 from penn_chime.parameters import Parameters
 
 from chime_dash.app.components.base import Component
-from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header
+from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header, create_button
 
 FLOAT_INPUT_MIN = 0.001
 FLOAT_INPUT_STEP = "any"
@@ -67,6 +67,7 @@ _INPUTS = OrderedDict(
     show_tables={"type": "switch", "value": False},
     show_tool_details={"type": "switch", "value": False},
     show_additional_projections={"type": "switch", "value": False},
+    save_as_pdf={"type": "button", "property": "n_clicks"}
 )
 
 
@@ -79,9 +80,14 @@ class Sidebar(Component):
     localization_file = "sidebar.yml"
 
     callback_inputs = OrderedDict(
-        (key, CallbackInput(component_id=key, component_property="value"))
+        (key, CallbackInput(component_id=key, component_property=_INPUTS[key].get("property", "value")))
         for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )
     )
+
+    def __init__(self, *args, **kwargs):
+        self._save_to_pdf = False
+        self.pdf_button_clicks = 0
+        super().__init__(*args, **kwargs)
 
     @staticmethod
     def parse_form_parameters(**kwargs) -> Tuple[Parameters, Dict[str, Any]]:
@@ -119,6 +125,8 @@ class Sidebar(Component):
                 element = create_switch_input(idx, data, self.content)
             elif data["type"] == "header":
                 element = create_header(idx, self.content)
+            elif data["type"] == "button":
+                element = create_button(idx, self.content)
             else:
                 raise ValueError(
                     "Failed to parse input '{idx}' with data '{data}'".format(
@@ -148,3 +156,12 @@ class Sidebar(Component):
         )
 
         return [sidebar]
+
+    def save_to_pdf(self, kwargs):
+        """
+        Return status of save to pdf flag and set it off.
+        """
+        if kwargs.get('save_as_pdf', 0) and kwargs.get('save_as_pdf', 0) > self.pdf_button_clicks:
+            self.pdf_button_clicks = kwargs.get('save_as_pdf', '0')
+            return True
+        return False

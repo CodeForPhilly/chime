@@ -6,6 +6,7 @@ import dash_bootstrap_components as dbc
 from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.content import Content
 from chime_dash.app.components.sidebar import Sidebar
+from chime_dash.app.services.pdf_printer import print_to_pdf
 from penn_chime.models import SimSirModel
 
 
@@ -44,6 +45,10 @@ class Container(Component):
         pars = self.components["sidebar"].parse_form_parameters(**kwargs)
         kwargs["model"] = SimSirModel(pars)
         kwargs["pars"] = pars
+
+        save_to_pdf = self.components["sidebar"].save_to_pdf(kwargs)
+        if save_to_pdf:
+            print_to_pdf(self.components['content'].html)
 
         callback_returns = []
         for component in self.components.values():
