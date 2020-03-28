@@ -1,7 +1,7 @@
-pkg_origin="bixu"
+pkg_origin="codeforphilly"
 pkg_name="chime"
 pkg_version="0.1.0"
-pkg_maintainer="Blake Irvin <blakeirvin@me.com>"
+pkg_maintainer="Code for Philly <hello@codeforphilly.org>"
 pkg_license=('MIT')
 pkg_deps=(
   "core/python"
