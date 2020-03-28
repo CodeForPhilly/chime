@@ -1,4 +1,6 @@
-"""Initializes the  dash html
+"""components/additions
+currently handles both view and logic should be separated
+graph activated via "Show additional projections"
 """
 from typing import List, Any
 

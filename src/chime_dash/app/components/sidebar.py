@@ -1,4 +1,7 @@
-"""Initializes the  dash html
+"""components/sidebar
+Initializes the side bar containing the various inputs for the model
+
+#! _INPUTS should be considered for moving else where
 """
 import dash_html_components as dhc
 
@@ -62,9 +65,11 @@ _INPUTS = OrderedDict(
 
 
 class Sidebar(Component):
+    """Sidebar to the left of the screen
+    contains the various inputs used to interact
+    with the model.
     """
-    """
-
+    # localization temp. for widget descriptions
     localization_file = "sidebar.yml"
 
     callback_inputs = OrderedDict(
@@ -98,7 +103,7 @@ class Sidebar(Component):
         return pars
 
     def get_html(self) -> List[ComponentMeta]:
-        """Initializes the header dash html
+        """Initializes the view
         """
         elements = []
         for idx, data in _INPUTS.items():

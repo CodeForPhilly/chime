@@ -1,4 +1,7 @@
-"""Initializes dropdown menu
+"""component/menu
+Dropdown menu which appears on the navigation bar at the top of the screen
+
+refactor incoming
 """
 from typing import List
 

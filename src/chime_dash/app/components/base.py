@@ -1,4 +1,8 @@
-"""Module provides abstract base component needed for rendering
+"""app/components/base
+
+Abstract base class for components
+
+#! candidate for moving into utils/components
 """
 from typing import List, Dict, Any, Union
 

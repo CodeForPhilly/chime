@@ -1,4 +1,6 @@
-"""Utility functions for dash frontend
+"""utils/templates
+Utility functions for localization templates
+templates themselves can be found in app/templates/en
 """
 from typing import Dict, Any, Optional
 
@@ -14,7 +16,7 @@ from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
 from penn_chime.defaults import Constants
 
-
+# Consider moving this to a config file eventually
 TEMPLATE_DIR = path.join(
     path.abspath(path.dirname(path.dirname(__file__))), "templates"
 )
