@@ -11,24 +11,15 @@ from .presentation import DATE_FORMAT
 
 
 def build_admits_chart(
-    alt, admits_df: pd.DataFrame, parameters: Parameters
+    *, alt, admits_df: pd.DataFrame, max_y_axis
 ) -> Chart:
     """docstring"""
-    max_y_axis = parameters.max_y_axis
-    as_date = parameters.as_date
-
+    idx = "date:T"
+    x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     y_scale = alt.Scale()
 
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
-
-    tooltip_dict = {False: "day", True: "date:T"}
-    if as_date:
-        today = np.datetime64(parameters.today)
-        admits_df['date'] = admits_df.day.astype('timedelta64[D]') + today
-        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
-    else:
-        x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
     # TODO fix the fold to allow any number of dispositions
 
@@ -47,7 +38,7 @@ def build_admits_chart(
             y=alt.Y("value:Q", title="Daily admissions", scale=y_scale),
             color="key:N",
             tooltip=[
-                tooltip_dict[as_date],
+                idx,
                 alt.Tooltip("value:Q", format=".0f", title="Admissions"),
                 "key:N",
             ],
@@ -56,23 +47,24 @@ def build_admits_chart(
     )
 
 
+def build_admits_table(
+    *,
+    admits_df: pd.DataFrame,
+    labels,
+    modulo,
+    as_date: bool = False
+):
+    table_df = admits_df[np.mod(admits_df.day, modulo) == 0].copy()
+    table_df.rename(labels)
+    return table_df
+
+
 def build_census_chart(
-    alt, census_df: pd.DataFrame, parameters: Parameters
+    *, alt, census_df: pd.DataFrame, max_y_axis
 ) -> Chart:
     """docstring"""
-
-    plot_projection_days = parameters.n_days - 10
-    max_y_axis = parameters.max_y_axis
-    as_date = parameters.as_date
-    if as_date:
-        today = np.datetime64(parameters.today)
-        census_df['date'] = census_df.day.astype('timedelta64[D]') + today
-        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
-        idx = "date:T"
-    else:
-        x_kwargs = {"shorthand": "day", "title": "Days from today"}
-        idx = "day"
-
+    idx = "date:T"
+    x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     y_scale = alt.Scale()
 
     if max_y_axis:
@@ -96,6 +88,18 @@ def build_census_chart(
         )
         .interactive()
     )
+
+
+def build_census_table(
+    *,
+    census_df: pd.DataFrame,
+    labels,
+    modulo,
+    as_date: bool = False
+):
+    table_df = census_df[np.mod(census_df.day, day_range) == 0].copy()
+    table_df.rename(labels)
+    return table_df
 
 
 def additional_projections_chart(

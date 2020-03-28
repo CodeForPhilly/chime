@@ -4,11 +4,9 @@ import altair as alt  # type: ignore
 import streamlit as st  # type: ignore
 
 from penn_chime.presentation import (
-    build_download_link,
+    display_download_link,
     display_header,
     display_sidebar,
-    draw_census_table,
-    draw_projected_admissions_table,
     draw_raw_sir_simulation_table,
     hide_menu_style,
     show_additional_projections,
@@ -20,7 +18,9 @@ from penn_chime.settings import DEFAULTS
 from penn_chime.models import SimSirModel
 from penn_chime.charts import (
     build_admits_chart,
+    build_admits_table,
     build_census_chart,
+    build_census_table,
     additional_projections_chart,
     chart_descriptions
 )
@@ -42,23 +42,27 @@ if st.checkbox("Show more info about this tool"):
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
-admits_chart = build_admits_chart(alt, m.admits_df, parameters=p)
+admits_chart = build_admits_chart(alt=alt, admits_df=m.admits_df, max_y_axis=p.max_y_axis)
 st.altair_chart(admits_chart, use_container_width=True)
 st.markdown(chart_descriptions(admits_chart, p.labels))
 
 if st.checkbox("Show Projected Admissions in tabular form"):
-    if st.checkbox("Show Daily Counts"):
-        draw_projected_admissions_table(st, m.admits_df, p.labels, 1, as_date=p.as_date)
-    else:
-        admissions_day_range = st.slider(
+    admits_modulo = 1
+    if not st.checkbox("Show Daily Counts"):
+        admits_modulo = st.slider(
             label="Interval of Days",
             key="admissions_day_range_slider",
             min_value=1,
             max_value=10,
             value=7
         )
-        draw_projected_admissions_table(st, m.admits_df, p.labels, admissions_day_range, as_date=p.as_date)
-    build_download_link(st,
+    table_df = build_admits_table(
+        admits_df=m.admits_df,
+        labels=p.labels,
+        modulo=admits_modulo,
+        as_date=p.as_date)
+    st.table(table_df)
+    display_download_link(st,
         filename="projected_admissions.csv",
         df=m.admits_df,
         parameters=p
@@ -67,23 +71,27 @@ if st.checkbox("Show Projected Admissions in tabular form"):
 
 st.subheader("Admitted Patients (Census)")
 st.markdown("Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals")
-census_chart = build_census_chart(alt=alt, census_df=m.census_df, parameters=p)
+census_chart = build_census_chart(alt=alt, census_df=m.census_df, max_y_axis=p.max_y_axis)
 st.altair_chart(census_chart, use_container_width=True)
 st.markdown(chart_descriptions(census_chart, p.labels, suffix=" Census"))
 
 if st.checkbox("Show Projected Census in tabular form"):
-    if st.checkbox("Show Daily Census Counts"):
-        draw_census_table(st, m.census_df, p.labels, 1, as_date=p.as_date)
-    else:
-        census_day_range = st.slider(
+    census_modulo = 1
+    if not st.checkbox("Show Daily Census Counts"):
+        census_modulo = st.slider(
             label='Interval of Days',
             key="census_day_range_slider",
             min_value=1,
             max_value=10,
             value=7
         )
-        draw_census_table(st, m.census_df, p.labels, census_day_range, as_date=p.as_date)
-    build_download_link(st,
+    table_df = build_census_table(
+        census_df=m.census_df,
+        labels=p.labels,
+        modulo=census_modulo,
+        as_date=p.as_date)
+    st.table(table_df)
+    display_download_link(st,
         filename="projected_census.csv",
         df=m.census_df,
         parameters=p

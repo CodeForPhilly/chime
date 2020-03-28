@@ -88,7 +88,7 @@ class SimSirModel:
             gamma,
             p.n_days,
         )
-        dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
+        dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.today)
         admits_df = build_admits_df(dispositions_df)
         census_df = build_census_df(admits_df, lengths_of_stay)
 
@@ -117,7 +117,7 @@ class SimSirModel:
                 p.n_days + n_days_since,
                 -n_days_since,
             )
-            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
+            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.today)
             admits_df = build_admits_df(dispositions_df)
             census_df = build_census_df(census_df, lengths_of_stay)
 
@@ -288,34 +288,24 @@ def sim_sir_df(
     s: float, i: float, r: float, beta: float, gamma: float, n_days: int, i_day: int = 0
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
-    dat = pd.DataFrame(
+    return pd.DataFrame(
         data=gen_sir(s, i, r, beta, gamma, n_days, i_day),
         columns=("day", "susceptible", "infected", "recovered"),
     )
-    return dat
-
-
-def get_dispositions(
-    patients: np.ndarray,
-    rates: Dict[str, float],
-    market_share: float,
-) -> Dict[str, np.ndarray]:
-    """Get dispositions of patients adjusted by rate and market_share."""
-    return {
-        key: patients * rate * market_share
-        for key, rate in rates.items()
-    }
 
 
 def build_dispositions_df(
     sim_sir_df: pd.DataFrame,
     rates: Dict[str, float],
     market_share: float,
+    today: datetime,
 ) -> pd.DataFrame:
     """Get dispositions of patients adjusted by rate and market_share."""
     patients = sim_sir_df.infected + sim_sir_df.recovered
+    day = sim_sir_df.day
     return pd.DataFrame({
-        "day": sim_sir_df.day,
+        "day": day,
+        "date": day.astype('timedelta64[D]') + np.datetime64(today),
         **{
             key: patients * rate * market_share
             for key, rate in rates.items()
@@ -327,6 +317,7 @@ def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
     """Build admits dataframe from dispositions."""
     admits_df = dispositions_df.iloc[:-1, :] - dispositions_df.shift(1)
     admits_df.day = dispositions_df.day
+    admits_df.date = dispositions_df.date
     return admits_df
 
 
@@ -337,6 +328,7 @@ def build_census_df(
     """Average Length of Stay for each disposition of COVID-19 case (total guesses)"""
     return pd.DataFrame({
         'day': admits_df.day,
+        'date': admits_df.date,
         **{
             key: (
                 admits_df[key].cumsum().iloc[:-los]
