@@ -41,12 +41,12 @@ class SimSirModel:
                 p.current_date, p.date_first_hospitalized,
                 n_days_since)
 
-        rates = {
+        self.rates = {
             key: d.rate
             for key, d in p.dispositions.items()
         }
 
-        lengths_of_stay = {
+        self.lengths_of_stay = {
             key: d.length_of_stay
             for key, d in p.dispositions.items()
         }
@@ -84,18 +84,6 @@ class SimSirModel:
         doubling_time_t = 1.0 / np.log2(
             beta * susceptible - gamma + 1)
 
-        raw_df = sim_sir_df(
-            susceptible,
-            infected,
-            p.recovered,
-            beta,
-            gamma,
-            p.n_days,
-        )
-        dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
-        admits_df = build_admits_df(dispositions_df)
-        census_df = build_census_df(admits_df, lengths_of_stay)
-
         self.susceptible = susceptible
         self.infected = infected
         self.recovered = p.recovered
@@ -107,64 +95,46 @@ class SimSirModel:
         self.intrinsic_growth_rate = intrinsic_growth_rate
         self.r_t = r_t
         self.r_naught = r_naught
+        self.i_day = 0
+        self.infected = 1.0 / p.hospitalized.rate / p.market_share
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
-            logger.debug('Using doubling_time.')
-            n_days_since = int(get_argmin_ds(census_df, p.current_hospitalized))
-
-            raw_df = sim_sir_df(
-                susceptible,
-                infected,
-                p.recovered,
-                beta,
-                gamma,
-                p.n_days + n_days_since,
-                -n_days_since,
+            logger.info('Using doubling_time.')
+            self.beta = (
+                (intrinsic_growth_rate + gamma)
+                / susceptible
             )
-            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
-            admits_df = build_admits_df(dispositions_df)
-            census_df = build_census_df(admits_df, lengths_of_stay)
+            
+            self.run_projection(p)
+            n_days_since = int(get_argmin_ds(self.census_df, p.current_hospitalized))
+            self.i_day = n_days_since
+            self.run_projection(p)
+            self.infected = self.raw_df['infected'].values[n_days_since]
+            self.susceptible = self.raw_df['susceptible'].values[n_days_since]
+            self.recovered = self.raw_df['recovered'].values[n_days_since]
+            logger.info(n_days_since)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
             logger.debug('Using date_first_hospitalized.')
             min_loss = 2.0**99
-            dt = census_df = current_infected = None
-            for i_dt in np.linspace(1,15,29):
-                i_census_df, i_current_infected = get_census_and_infected_projection(
-                    rates=rates,
-                    lengths_of_stay=lengths_of_stay,
-                    n_days_since=n_days_since,
-                    doubling_time=i_dt,
-                    p=p)
-                loss = get_loss(i_census_df, p.current_hospitalized, n_days_since)
-                if loss < min_loss:
-                    min_loss = loss
-                    dt, census_df, current_infected = i_dt, i_census_df, i_current_infected
-            p.doubling_time = dt
+            self.i_day = n_days_since
+            self.n_days_since = n_days_since
+            dts = np.linspace(1, 15, 29)
+            losses = np.zeros(dts.shape[0])
+            self.current_hospitalized = p.current_hospitalized
+            for i, i_dt in enumerate(dts):
+                intrinsic_growth_rate = get_growth_rate(i_dt)
+                self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
 
-            infected = 1.0 / p.hospitalized.rate / p.market_share
-            # update all state that is dependent on doubling time.
+                self.run_projection(p)
+                loss = self.get_loss()
+                losses[i] = loss
+
+            p.doubling_time = dts[pd.Series(losses).argmin()]
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
-            gamma = 1.0 / p.infectious_days
-            beta = get_beta(intrinsic_growth_rate, gamma, susceptible, p.relative_contact_rate)
-            r_t = beta / gamma * susceptible
-            r_naught = (intrinsic_growth_rate + gamma) / gamma
-            doubling_time_t = 1.0 / np.log2(beta * susceptible - gamma + 1.0)
-            raw_df = sim_sir_df(
-                susceptible,
-                current_infected,
-                p.recovered,
-                beta,
-                gamma,
-                p.n_days + n_days_since,
-                -n_days_since,
-            )
-            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
-            admits_df = build_admits_df(dispositions_df)
-            census_df = build_census_df(admits_df, lengths_of_stay)
+            self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
+            self.run_projection(p)
 
-            self.gamma = gamma
-            self.infected = current_infected
             self.intrinsic_growth_rate = intrinsic_growth_rate
             self.beta = beta
             self.doubling_time_t = doubling_time_t
@@ -174,17 +144,32 @@ class SimSirModel:
         else:
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
 
-        self.n_days_since = n_days_since
-        self.raw_df = raw_df
-        self.dispositions_df = dispositions_df
-        self.admits_df = admits_df
-        self.census_df = census_df
-        self.sim_sir_w_date_df = build_sim_sir_w_date_df(raw_df, p.current_date)
+
+        self.sim_sir_w_date_df = build_sim_sir_w_date_df(self.raw_df, p.current_date)
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
-        self.daily_growth_rate_t = get_growth_rate(doubling_time_t)
+        self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
         self.change_date = change_date
 
+    def run_projection(self, p):
+        self.raw_df = sim_sir_df(
+            self.susceptible,
+            self.infected,
+            p.recovered,
+            self.beta,
+            self.gamma,
+            p.n_days + self.i_day,
+            -self.i_day
+        )
+        self.dispositions_df = build_dispositions_df(self.raw_df, self.rates, p.market_share, p.current_date)
+        self.admits_df = build_admits_df(self.dispositions_df)
+        self.census_df = build_census_df(self.admits_df, self.lengths_of_stay)
+        self.current_infected = self.raw_df.infected.loc[self.i_day]
+
+    def get_loss(self) -> float:
+        """Squared error: predicted vs. actual current hospitalized."""
+        predicted = self.census_df.hospitalized.loc[self.n_days_since]
+        return (self.current_hospitalized - predicted) ** 2.0
 
 def change_date():
     """
@@ -193,42 +178,6 @@ def change_date():
     re-run their reports
     """
     return date(year=2020, month=3, day=30)
-
-
-def get_census_and_infected_projection(
-    *,
-    rates: Dict[str: float],
-    lengths_of_stay: Dict[str: int],
-    n_days_since: int,
-    doubling_time: float,
-    p: Parameters
-) -> Tuple[pd.DataFrame, float]:
-    intrinsic_growth_rate = get_growth_rate(doubling_time)
-
-    initial_i = 1.0 / p.hospitalized.rate / p.market_share
-
-    S, I, R = p.population - initial_i, initial_i, p.recovered
-
-    # mean recovery rate (inv_infectious_days)
-    gamma = 1.0 / p.infectious_days
-
-    # contact rate
-    beta = (intrinsic_growth_rate + gamma) / S
-
-    n_days = p.n_days
-
-    raw_df = sim_sir_df(
-        S, I, R, beta, gamma,
-        p.n_days + n_days_since,
-        -n_days_since
-    )
-
-    current_infected = raw_df.infected.loc[n_days_since]
-    dispositions_df = build_dispositions_df(raw_df, rates, p.market_share, p.current_date)
-
-    admits_df = build_admits_df(dispositions_df)
-    census_df = build_census_df(admits_df, lengths_of_stay)
-    return census_df, current_infected
 
 
 def get_argmin_ds(census_df: pd.DataFrame, current_hospitalized: float) -> float:
