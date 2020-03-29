@@ -304,6 +304,23 @@ def test_model_raw_start():
     assert [round(v, 0) for v in (d, s, i, r)] == [17, 549.0, 220.0, 110.0]
 
 
+def test_model_conservation():
+    p = copy(PARAM)
+    m = Model(p)
+    raw_df = m.raw_df
+
+    assert (0.0 <= raw_df.susceptible).all()
+    assert (0.0 <= raw_df.infected).all()
+    assert (0.0 <= raw_df.recovered).all()
+
+    diff = raw_df.susceptible + raw_df.infected + raw_df.recovered - p.population
+    assert (diff < 0.1).all()
+
+    assert (raw_df.susceptible <= p.population).all()
+    assert (raw_df.infected <= p.population).all()
+    assert (raw_df.recovered <= p.population).all()
+
+
 def test_model_raw_end():
     param = copy(PARAM)
     model = Model(param)
