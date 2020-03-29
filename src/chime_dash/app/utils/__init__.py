@@ -6,5 +6,4 @@ module but do not change the parameters of the class
 Modules
 -------
 templates       utilities for localization templates
-# ? components
 """
