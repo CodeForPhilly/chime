@@ -291,20 +291,20 @@ def test_model_raw_start():
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
 
     # print('n_days: %s; i_day: %s' % (param.n_days, model.i_day))
-    assert len(raw_df) == (len(np.arange(-model.i_day, param.n_days)) + 1) == 105
+    assert len(raw_df) == (len(np.arange(-model.i_day, param.n_days + 1))) == 104
 
     first = raw_df.iloc[0, :]
     second = raw_df.iloc[1, :]
 
     assert first.susceptible + first.infected + first.recovered == param.population
-    assert first.susceptible == 460000.0
-    assert round(second.infected, 0) == 43735
-    assert list(model.dispositions_df.iloc[0, :]) == [-38, date(year=2020, month=2, day=19), 100.0, 40.0, 20.0]
-    assert round(raw_df.recovered[30], 0) == 216711
+    assert first.susceptible == 499600.0
+    assert round(second.infected, 0) == 449.0
+    assert list(model.dispositions_df.iloc[0, :]) == [-43, date(year=2020, month=2, day=15), 1.0, 0.4, 0.2]
+    assert round(raw_df.recovered[30], 0) == 7083.0
 
     d, dt, s, i, r = list(model.dispositions_df.iloc[60, :])
-    assert dt == date(year=2020, month=4, day=19)
-    assert [round(v, 0) for v in (d, s, i, r)] == [22, 1101.0, 441.0, 220.0]
+    assert dt == date(year=2020, month=4, day=15)
+    assert [round(v, 0) for v in (d, s, i, r)] == [17, 549.0, 220.0, 110.0]
 
 
 def test_model_raw_end():
