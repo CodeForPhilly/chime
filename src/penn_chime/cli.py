@@ -8,8 +8,9 @@ from datetime import datetime
 
 from pandas import DataFrame
 
-from penn_chime.parameters import Parameters, RateLos
-from penn_chime.models import SimSirModel as Model, change_date
+from .constants import CHANGE_DATE
+from .parameters import Parameters, RateLos
+from .models import SimSirModel as Model
 
 
 class FromFile(Action):
@@ -45,7 +46,7 @@ def validator(arg, cast, min_value, max_value, required=True):
 
 def parse_args():
     """Parse args."""
-    parser = ArgumentParser(description=f"penn_chime: {change_date()}")
+    parser = ArgumentParser(description=f"penn_chime: {CHANGE_DATE}")
     parser.add_argument("--file", type=open, action=FromFile)
 
     for arg, cast, min_value, max_value, help, required in (
@@ -85,14 +86,6 @@ def parse_args():
         ("--icu-los", int, 0, None, "ICU Length of Stay (days)", True),
         ("--icu-rate", float, 0.0, 1.0, "ICU Rate: 0.0 - 1.0", True),
         (
-            "--known-infected",
-            int,
-            0,
-            None,
-            "Currently Known Regional Infections (>=0) (only used to compute detection rate - does not change projections)",
-            True,
-        ),
-        (
             "--market_share",
             float,
             0.00001,
@@ -127,7 +120,6 @@ def main():
         date_first_hospitalized=a.date_first_hospitalized,
         doubling_time=a.doubling_time,
         infectious_days=a.infectious_days,
-        known_infected=a.known_infected,
         market_share=a.market_share,
         n_days=a.n_days,
         relative_contact_rate=a.relative_contact_rate,
