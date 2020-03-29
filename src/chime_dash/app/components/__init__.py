@@ -13,7 +13,7 @@ from dash_bootstrap_components import Row, Col
 from dash_bootstrap_components.themes import BOOTSTRAP
 from dash_html_components import Script, Div
 
-from penn_chime.settings import DEFAULTS
+from penn_chime.parameters import Parameters as Constant
 from penn_chime.models import SimSirModel
 
 
