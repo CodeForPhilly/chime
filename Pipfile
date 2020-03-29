@@ -4,13 +4,17 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "*"
 
 [packages]
 streamlit = "*"
 pandas = "*"
 numpy = "*"
+pytest = "*"
 altair = "*"
+dash = "*"
+dash-bootstrap-components = "*"
+gunicorn = "*"
+PyYAML = "*"
 
 [requires]
 python_version = "3.7"

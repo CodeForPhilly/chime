@@ -1,0 +1,12 @@
+#!/bin/sh
+export HOME="/hab/svc/chime/config"
+cd "/hab/svc/chime"
+
+if [ "$(whoami)" = "root" ]; then
+  exec chpst \
+    -U root:hab \
+    -u root:hab \
+    streamlit run "{{pkg.path}}/app.py" 2>&1
+else
+  exec streamlit run "{{pkg.path}}/app.py" 2>&1
+fi

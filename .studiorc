@@ -1,0 +1,1 @@
+export HAB_HART_COMPRESSION_LEVEL=0  # disables compression to speed up local dev

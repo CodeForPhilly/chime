@@ -3,8 +3,8 @@ from datetime import datetime
 from math import ceil
 from typing import Dict, Optional
 
-from altair import Chart  # type: ignore
-import pandas as pd  # type: ignore
+from altair import Chart
+import pandas as pd
 import numpy as np
 
 from .constants import DATE_FORMAT

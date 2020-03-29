@@ -11,8 +11,8 @@ from logging import INFO, basicConfig, getLogger
 from sys import stdout
 from typing import Dict, Generator, Tuple, Optional
 
-import numpy as np  # type: ignore
-import pandas as pd  # type: ignore
+import numpy as np
+import pandas as pd
 
 from .constants import EPSILON, CHANGE_DATE
 from .parameters import Parameters

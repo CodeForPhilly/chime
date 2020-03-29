@@ -3,9 +3,9 @@
 from typing import Optional
 from datetime import date
 
-import altair as alt  # type: ignore
-import numpy as np  # type: ignore
-import pandas as pd  # type: ignore
+import altair as alt
+import numpy as np
+import pandas as pd
 
 from .constants import (
     CHANGE_DATE,

@@ -12,10 +12,10 @@
   - [Release Process](./operations/release-process.md)
   - [The `chime-live` Cluster](./operations/chime-live-cluster.md)
   - [Deploy to Heroku](./operations/heroku.md)
+  - [Deploy with Chef Habitat](./operations/habitat.md)
   - [Deploy to Your Own Cluster](./operations/byok8s.md)
-  - [Limited Cluster Access for Deployment][1]
+  - [Manual Validation](./operations/manual-validation.md)
+  - [Limited Cluster Access for Deployment](./operations/limited-kubeconfigs/limited-kubeconfigs.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Maintainers](MAINTAINERS.md)
 - [Glossary](GLOSSARY.md)
-
-[1]: ./operations/limited-kubeconfigs/limited-kubeconfigs.md
