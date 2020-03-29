@@ -19,7 +19,6 @@ def build_admits_chart(
 ) -> Chart:
     """Build admits chart."""
     y_scale = alt.Scale()
-
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
 
@@ -28,21 +27,26 @@ def build_admits_chart(
     ceil_df.icu = np.ceil(ceil_df.icu)
     ceil_df.ventilated = np.ceil(ceil_df.ventilated)
 
+    x = dict(shorthand="date:T", title="Date", axis=alt.Axis(format=(DATE_FORMAT)))
+    y = dict(shorthand="value:Q", title="Daily admissions", scale=y_scale)
+    color = "key:N"
+    tooltip=["date:T", alt.Tooltip("value:Q", format=".0f", title="Admit"), "key:N"]
+
     # TODO fix the fold to allow any number of dispositions
-    return (
-        alt.Chart(ceil_df)
+    points = (
+        alt.Chart()
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
+        .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
-        .encode(
-            x=alt.X("date:T", title="Date", axis=alt.Axis(format=(DATE_FORMAT))),
-            y=alt.Y("value:Q", title="Daily admissions", scale=y_scale),
-            color="key:N",
-            tooltip=[
-                "date:T",
-                alt.Tooltip("value:Q", format=".0f", title="Admit"),
-                "key:N",
-            ])
     )
+    bar = (
+        alt.Chart()
+        .encode(x=alt.X(**x))
+        .transform_filter(alt.datum.day == 0)
+        .mark_rule(color="black", opacity=0.35, size=2)
+    )
+    return alt.layer(points, bar, data=admits_df)
+
 
 
 def build_census_chart(
@@ -52,7 +56,6 @@ def build_census_chart(
     max_y_axis: Optional[int] = None,
 ) -> Chart:
     """Build census chart."""
-
     y_scale = alt.Scale()
     if max_y_axis:
         y_scale.domain = (0, max_y_axis)
@@ -63,7 +66,7 @@ def build_census_chart(
     tooltip = ["date:T", alt.Tooltip("value:Q", format=".0f", title="Census"), "key:N"]
 
     # TODO fix the fold to allow any number of dispositions
-    base = (
+    points = (
         alt.Chart()
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
@@ -73,9 +76,9 @@ def build_census_chart(
         alt.Chart()
         .encode(x=alt.X(**x))
         .transform_filter(alt.datum.day == 0)
-        .mark_rule(color="black", opacity=0.35, size=3)
+        .mark_rule(color="black", opacity=0.35, size=2)
     )
-    return alt.layer(base, bar, data=census_df)
+    return alt.layer(points, bar, data=census_df)
 
 
 def build_sim_sir_w_date_chart(
@@ -105,7 +108,7 @@ def build_sim_sir_w_date_chart(
         alt.Chart()
         .encode(x=alt.X(**x))
         .transform_filter(alt.datum.day == 0)
-        .mark_rule(color="black", opacity=0.35, size=3)
+        .mark_rule(color="black", opacity=0.35, size=2)
     )
     return alt.layer(points, bar, data=sim_sir_w_date_df)
 

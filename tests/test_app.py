@@ -235,8 +235,8 @@ def test_sim_sir():
 def test_admits_chart():
     admits_df = pd.read_csv("tests/by_doubling_time/2020-03-28_projected_admits.csv")
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
-    assert isinstance(chart, alt.Chart)
-    assert round(chart.data.iloc[40].icu, 0) == 39
+    assert isinstance(chart, (alt.Chart, alt.LayerChart))
+    assert round(chart.data.iloc[40].icu, 0) == 38
 
     # test fx call with no params
     with pytest.raises(TypeError):
