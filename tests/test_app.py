@@ -61,66 +61,58 @@ def mock_st():
     return MockStreamlit()
 
 
+class TestPresentation:
+    @pytest.mark.xfail()
+    def test_header_fail(self, mock_st, PARAM):
+        """
+        Just proving to myself that these tests work
+        """
+        some_garbage = "ajskhlaeHFPIQONOI8QH34TRNAOP8ESYAW4"
+        display_header(mock_st, PARAM)
+        assert len(
+            list(filter(lambda s: some_garbage in s, mock_st.render_store))
+        ), "This should fail"
+    
+    def test_penn_logo_in_header(self, MODEL, PARAM, mock_st):
+        penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
+        display_header(mock_st, MODEL, PARAM)
+        assert len(
+            list(filter(lambda s: penn_css in s, mock_st.render_store))
+        ), "The Penn Medicine header should be printed"
 
 
-# test presentation
+    def test_the_rest_of_header_shows_up(self, MODEL, PARAM, mock_st):
+        random_part_of_header = "implying an effective $R_t$ of"
+        display_header(mock_st, MODEL, PARAM)
+        assert len(
+            list(filter(lambda s: random_part_of_header in s, mock_st.render_store))
+        ), "The whole header should render"
 
 
-def test_penn_logo_in_header(MODEL, PARAM, mock_st):
-    penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
-    display_header(mock_st, MODEL, PARAM)
-    assert len(
-        list(filter(lambda s: penn_css in s, mock_st.render_store))
-    ), "The Penn Medicine header should be printed"
+    def test_mitigation_statement(self, MODEL, PARAM, mock_st):
+        expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
+        display_header(mock_st, MODEL, PARAM)
+        assert [s for s in mock_st.render_store if expected_doubling in s]
+        # assert len((list(filter(lambda s: expected_doubling in s, mock_st.render_store))))
 
-
-def test_the_rest_of_header_shows_up(MODEL, PARAM, mock_st):
-    random_part_of_header = "implying an effective $R_t$ of"
-    display_header(mock_st, MODEL, PARAM)
-    assert len(
-        list(filter(lambda s: random_part_of_header in s, mock_st.render_store))
-    ), "The whole header should render"
-
-
-def test_mitigation_statement(MODEL, PARAM, mock_st):
-    expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
-    display_header(mock_st, MODEL, PARAM)
-    assert [s for s in mock_st.render_store if expected_doubling in s]
-    # assert len((list(filter(lambda s: expected_doubling in s, mock_st.render_store))))
-
-    expected_halving = "outbreak **halves the infections every 51.9** days"
-    halving_params = Parameters(
-        current_hospitalized=100,
-        doubling_time=6.0,
-        known_infected=5000,
-        market_share=0.05,
-        relative_contact_rate=0.7,
-        susceptible=500000,
-        hospitalized=RateLos(0.05, 7),
-        icu=RateLos(0.02, 9),
-        ventilated=RateLos(0.01, 10),
-        n_days=60,
-    )
-    halving_model = SimSirModel(halving_params)
-    display_header(mock_st, halving_model, halving_params)
-    assert [s for s in mock_st.render_store if expected_halving in s]
-    #assert len((list(filter(lambda s: expected_halving in s, mock_st.render_store))))
-
-
-
-
-
-@pytest.mark.xfail()
-def test_header_fail():
-    """
-    Just proving to myself that these tests work
-    """
-    some_garbage = "ajskhlaeHFPIQONOI8QH34TRNAOP8ESYAW4"
-    display_header(mock_st, PARAM)
-    assert len(
-        list(filter(lambda s: some_garbage in s, mock_st.render_store))
-    ), "This should fail"
-
+    def test_mitigation_statement_with_halved_parameters(self, mock_st):
+        expected_halving = "outbreak **halves the infections every 51.9** days"
+        halving_params = Parameters(
+            current_hospitalized=100,
+            doubling_time=6.0,
+            known_infected=5000,
+            market_share=0.05,
+            relative_contact_rate=0.7,
+            susceptible=500000,
+            hospitalized=RateLos(0.05, 7),
+            icu=RateLos(0.02, 9),
+            ventilated=RateLos(0.01, 10),
+            n_days=60,
+        )
+        halving_model = SimSirModel(halving_params)
+        display_header(mock_st, halving_model, halving_params)
+        assert [s for s in mock_st.render_store if expected_halving in s]
+        #assert len((list(filter(lambda s: expected_halving in s, mock_st.render_store))))
 
 
 def test_defaults_repr():
@@ -128,6 +120,7 @@ def test_defaults_repr():
     Test DEFAULTS.repr
     """
     repr(DEFAULTS)
+    # TODO: Add assertions
 
 
 
