@@ -1,26 +1,25 @@
 from collections import OrderedDict
 from typing import Callable, List
 
-from dash.dependencies import Input, Output, DashDependency
+from dash.dependencies import Input, Output
 
 
 class ChimeCallback:
-    @staticmethod
-    def _convert_to_dash_dependency(dep: OrderedDict[str, str], dep_type: type[DashDependency]):
-        result = []
-        for component_id, component_property in dep.values():
-            result.append(dep_type(component_id=component_id, component_property=component_property))
-        return result
-
     def __init__(self,
-                 changed_elements: OrderedDict[str, str],
-                 dom_updates: OrderedDict[str, str],
+                 changed_elements: OrderedDict,
+                 dom_updates: OrderedDict,
                  callback_fn: Callable,
                  memoize: bool = True
                  ):
-
-        self.inputs = ChimeCallback._convert_to_dash_dependency(changed_elements, Input)
-        self.outputs = ChimeCallback._convert_to_dash_dependency(dom_updates, Output)
+        pass
+        self.inputs = [
+            Input(component_id=component_id, component_property=component_property)
+            for component_id, component_property in changed_elements.items()
+        ]
+        self.outputs = [
+            Output(component_id=component_id, component_property=component_property)
+            for component_id, component_property in dom_updates.items()
+        ]
         self.callback_fn = callback_fn
         self.memoize = memoize
 
@@ -29,5 +28,6 @@ registered_callbacks: List[ChimeCallback] = []
 
 
 def register_callbacks(callbacks: List[ChimeCallback]):
-    registered_callbacks.extend(callbacks)
+    if callbacks:
+        registered_callbacks.extend(callbacks)
 

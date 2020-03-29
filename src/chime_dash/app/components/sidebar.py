@@ -8,7 +8,6 @@ import dash_html_components as dhc
 from typing import List, Dict, Any, Tuple
 from collections import OrderedDict
 
-from dash.dependencies import Input as CallbackInput
 from dash.development.base_component import ComponentMeta
 
 from penn_chime.defaults import RateLos
@@ -81,11 +80,16 @@ class Sidebar(Component):
     localization_file = "sidebar.yml"
 
     @staticmethod
-    def parse_form_parameters(**kwargs) -> Tuple[Parameters, Dict[str, Any]]:
+    def get_ordered_input_keys():
+        return [key for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )]
+
+    @staticmethod
+    def parse_form_parameters(input_values) -> Tuple[Parameters, Dict[str, Any]]:
         """Reads html form outputs and converts them to a parameter instance
 
         Returns Parameters and as_date argument
         """
+        kwargs = dict(zip(Sidebar.get_ordered_input_keys(), input_values))
         pars = Parameters(
             current_hospitalized=kwargs["current_hospitalized"],
             doubling_time=kwargs["doubling_time"],
@@ -106,16 +110,16 @@ class Sidebar(Component):
         return pars
 
     @staticmethod
-    def update_model(**kwargs):
+    def update_model(input_values, kwargs):
         """
         """
-        pars = Sidebar.parse_form_parameters(**kwargs)
-        return pars, SimSirModel(pars)
+        pars = Sidebar.parse_form_parameters(input_values)
+        return [pars, SimSirModel(pars)]
 
     def __init__(self, language, defaults):
         input_change_callback = ChimeCallback(
-            changed_elements=OrderedDict((key, "value") for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )),
-            dom_updates=OrderedDict(pars="value", model="value"),
+            changed_elements=OrderedDict((key, "value") for key in Sidebar.get_ordered_input_keys()),
+            dom_updates=OrderedDict(pars="children", model="children"),
             callback_fn=Sidebar.update_model,
         )
         super().__init__(language, defaults, [input_change_callback])
@@ -123,7 +127,10 @@ class Sidebar(Component):
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the view
         """
-        elements = []
+        elements = [
+            dhc.Div(id='model', style={'display': 'none'}),
+            dhc.Div(id='pars', style={'display': 'none'})
+        ]
         for idx, data in _INPUTS.items():
             if data["type"] == "number":
                 element = create_number_input(idx, data, self.content, self.defaults)
