@@ -230,7 +230,7 @@ def sir(
 
 
 def gen_sir(
-    s: float, i: float, r: float, gamma: float, i_day: int = 0, *args
+    s: float, i: float, r: float, gamma: float, i_day: int, *args
 ) -> Generator[Tuple[int, float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples.
     Parameter order has changed to allow multiple (beta, n_days)
@@ -249,7 +249,7 @@ def gen_sir(
 
 
 def sim_sir_df(
-    s: float, i: float, r: float, gamma: float, i_day: int = 0, *args
+    s: float, i: float, r: float, gamma: float, i_day: int, *args
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(

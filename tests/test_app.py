@@ -218,7 +218,15 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    raw_df = sim_sir_df(5, 6, 7, 0.1, 0.1, 40)
+    raw_df = sim_sir_df(
+        5, # s
+        6, # i
+        7, # r
+        0.1, # gamma
+        0, # i_day
+        0.1, # beta1
+        40, # n_days1
+    )
 
     first = raw_df.iloc[0, :]
     last = raw_df.iloc[-1, :]
@@ -299,7 +307,7 @@ def test_model_raw_end(model=MODEL, param=PARAM):
 
     last = raw_df.iloc[-1, :]
     assert last.susceptible + last.infected + last.recovered == param.population
-    assert round(last.susceptible, 0) == 49556.0
+    assert round(last.susceptible, 0) == 83391.0
 
 
 def test_model_cumulative_census(model=MODEL):
