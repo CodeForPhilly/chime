@@ -22,7 +22,7 @@ from penn_chime.charts import (
     additional_projections_chart,
     admitted_patients_chart,
     new_admissions_chart,
-    chart_descriptions
+    chart_descriptions,
 )
 
 # This is somewhat dangerous:
@@ -38,14 +38,15 @@ display_header(st, m, p)
 
 if st.checkbox("Show more info about this tool"):
     notes = "The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)"
-    show_more_info_about_this_tool(st=st, model=m, parameters=p, defaults=DEFAULTS, notes=notes)
+    show_more_info_about_this_tool(
+        st=st, model=m, parameters=p, defaults=DEFAULTS, notes=notes
+    )
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions at Penn hospitals")
 new_admit_chart = new_admissions_chart(alt, m.admits_df, parameters=p)
 st.altair_chart(
-    new_admissions_chart(alt, m.admits_df, parameters=p),
-    use_container_width=True,
+    new_admissions_chart(alt, m.admits_df, parameters=p), use_container_width=True,
 )
 
 st.markdown(chart_descriptions(new_admit_chart, p.labels))
@@ -55,14 +56,13 @@ if st.checkbox("Show Projected Admissions in tabular form"):
         draw_projected_admissions_table(st, m.admits_df, p.labels, 1, as_date=p.as_date)
     else:
         admissions_day_range = st.slider(
-            'Interval of Days for Projected Admissions',
-            1, 10, 7
+            "Interval of Days for Projected Admissions", 1, 10, 7
         )
-        draw_projected_admissions_table(st, m.admits_df, p.labels, admissions_day_range, as_date=p.as_date)
-    build_download_link(st,
-        filename="projected_admissions.csv",
-        df=m.admits_df,
-        parameters=p
+        draw_projected_admissions_table(
+            st, m.admits_df, p.labels, admissions_day_range, as_date=p.as_date
+        )
+    build_download_link(
+        st, filename="projected_admissions.csv", df=m.admits_df, parameters=p
     )
 st.subheader("Admitted Patients (Census)")
 st.markdown(
@@ -78,15 +78,12 @@ if st.checkbox("Show Projected Census in tabular form"):
     if st.checkbox("Show Daily Census Counts"):
         draw_census_table(st, m.census_df, p.labels, 1, as_date=p.as_date)
     else:
-        census_day_range = st.slider(
-            'Interval of Days for Projected Census',
-            1, 10, 7
+        census_day_range = st.slider("Interval of Days for Projected Census", 1, 10, 7)
+        draw_census_table(
+            st, m.census_df, p.labels, census_day_range, as_date=p.as_date
         )
-        draw_census_table(st, m.census_df, p.labels, census_day_range, as_date=p.as_date)
-    build_download_link(st,
-        filename="projected_census.csv",
-        df=m.census_df,
-        parameters=p
+    build_download_link(
+        st, filename="projected_census.csv", df=m.census_df, parameters=p
     )
 
 st.markdown(

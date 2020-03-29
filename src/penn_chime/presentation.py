@@ -45,7 +45,9 @@ def display_header(st, m, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + p.change_date() + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
+        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """
+        + p.change_date()
+        + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
@@ -78,7 +80,11 @@ outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effect
             relative_contact_rate=p.relative_contact_rate,
             r_t=m.r_t,
             doubling_time_t=abs(m.doubling_time_t),
-            impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to")
+            impact_statement=(
+                "halves the infections every"
+                if m.r_t < 1
+                else "reduces the doubling time to"
+            ),
         )
     )
 
@@ -95,11 +101,7 @@ def display_sidebar(st, d: Constants) -> Parameters:
         raise ValueError("Known cases must be larger than one to enable predictions.")
 
     n_days = st.sidebar.number_input(
-        "Number of days to project",
-        min_value=30,
-        value=d.n_days,
-        step=10,
-        format="%i",
+        "Number of days to project", min_value=30, value=d.n_days, step=10, format="%i",
     )
 
     current_hospitalized = st.sidebar.number_input(
@@ -213,7 +215,9 @@ def display_sidebar(st, d: Constants) -> Parameters:
         format="%i",
     )
 
-    as_date = st.sidebar.checkbox(label="Present result as dates instead of days", value=False)
+    as_date = st.sidebar.checkbox(
+        label="Present result as dates instead of days", value=False
+    )
 
     max_y_axis_set = st.sidebar.checkbox("Set the Y-axis on graphs to a static value")
     max_y_axis = None
@@ -232,7 +236,6 @@ def display_sidebar(st, d: Constants) -> Parameters:
         n_days=n_days,
         relative_contact_rate=relative_contact_rate,
         susceptible=susceptible,
-
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
         ventilated=RateLos(ventilated_rate, ventilated_los),
@@ -358,19 +361,13 @@ def write_footer(st):
     st.markdown("© 2020, The Trustees of the University of Pennsylvania")
 
 
-def show_additional_projections(
-    st, alt, charting_func, model, parameters
-):
+def show_additional_projections(st, alt, charting_func, model, parameters):
     st.subheader(
         "The number of infected and recovered individuals in the hospital catchment region at any given moment"
     )
 
     st.altair_chart(
-        charting_func(
-            alt,
-            model=model,
-            parameters=parameters
-        ),
+        charting_func(alt, model=model, parameters=parameters),
         use_container_width=True,
     )
 
@@ -383,7 +380,9 @@ def show_additional_projections(
 def draw_projected_admissions_table(
     st, projection_admits: pd.DataFrame, labels, day_range, as_date: bool = False
 ):
-    admits_table = projection_admits[np.mod(projection_admits.index, day_range) == 0].copy()
+    admits_table = projection_admits[
+        np.mod(projection_admits.index, day_range) == 0
+    ].copy()
     admits_table["day"] = admits_table.index
     admits_table.index = range(admits_table.shape[0])
     admits_table = admits_table.fillna(0).astype(int)
@@ -397,7 +396,9 @@ def draw_projected_admissions_table(
     return None
 
 
-def draw_census_table(st, census_df: pd.DataFrame, labels, day_range, as_date: bool = False):
+def draw_census_table(
+    st, census_df: pd.DataFrame, labels, day_range, as_date: bool = False
+):
     census_table = census_df[np.mod(census_df.index, day_range) == 0].copy()
     census_table.index = range(census_table.shape[0])
     census_table.loc[0, :] = 0
@@ -426,17 +427,24 @@ def draw_raw_sir_simulation_table(st, model, parameters):
         )
 
     st.table(infect_table)
-    build_download_link(st,
+    build_download_link(
+        st,
         filename="raw_sir_simulation_data.csv",
         df=projection_area,
-        parameters=parameters
+        parameters=parameters,
     )
+
 
 def build_download_link(st, filename: str, df: pd.DataFrame, parameters: Parameters):
     if parameters.as_date:
         df = add_date_column(df, drop_day_column=True, date_format="%Y-%m-%d")
 
     csv = dataframe_to_base64(df)
-    st.markdown("""
+    st.markdown(
+        """
         <a download="{filename}" href="data:file/csv;base64,{csv}">Download full table as CSV</a>
-""".format(csv=csv,filename=filename), unsafe_allow_html=True)
+""".format(
+            csv=csv, filename=filename
+        ),
+        unsafe_allow_html=True,
+    )

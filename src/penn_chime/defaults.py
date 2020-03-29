@@ -27,11 +27,9 @@ class Constants:
         known_infected: int,
         relative_contact_rate: int,
         region: Regions,
-
         hospitalized: RateLos,
         icu: RateLos,
         ventilated: RateLos,
-
         as_date: bool = False,
         market_share: float = 1.0,
         max_y_axis: int = None,

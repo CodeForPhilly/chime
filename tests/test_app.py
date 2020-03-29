@@ -7,7 +7,11 @@ import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
-from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
+from src.penn_chime.charts import (
+    new_admissions_chart,
+    admitted_patients_chart,
+    chart_descriptions,
+)
 from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
@@ -96,7 +100,7 @@ def test_mitigation_statement():
     halving_model = SimSirModel(halving_params)
     display_header(st, halving_model, halving_params)
     assert [s for s in st.render_store if expected_halving in s]
-    #assert len((list(filter(lambda s: expected_halving in s, st.render_store))))
+    # assert len((list(filter(lambda s: expected_halving in s, st.render_store))))
     st.cleanup()
 
 
@@ -250,7 +254,12 @@ def test_model(model=MODEL, param=PARAM):
     assert round(raw_df.recovered[30], 0) == 224048
 
     assert list(model.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
-    assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [60, 1182.0, 473.0, 236.0]
+    assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [
+        60,
+        1182.0,
+        473.0,
+        236.0,
+    ]
 
     # test that admissions are being properly calculated (thanks @PhilMiller)
     cumulative_admits = model.admits_df.cumsum()
@@ -262,16 +271,18 @@ def test_model(model=MODEL, param=PARAM):
 
 def test_chart_descriptions(p=PARAM):
     # new admissions chart
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
+    projection_admits = pd.read_csv("tests/projection_admits.csv")
     chart = new_admissions_chart(alt, projection_admits, p)
     description = chart_descriptions(chart, p.labels)
 
-    hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
+    hosp, icu, vent, asterisk = description.split(
+        "\n\n"
+    )  # break out the description into lines
 
-    max_hosp = chart.data['hospitalized'].max()
+    max_hosp = chart.data["hospitalized"].max()
     assert str(ceil(max_hosp)) in hosp
 
-    max_icu_ix = chart.data['icu'].idxmax()
+    max_icu_ix = chart.data["icu"].idxmax()
     assert max_icu_ix + 1 == len(chart.data)
     assert "*" in icu
 
@@ -279,19 +290,24 @@ def test_chart_descriptions(p=PARAM):
     param = PARAM
     param.n_days = 600
 
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
+    projection_admits = pd.read_csv("tests/projection_admits.csv")
     # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
     chart = new_admissions_chart(alt, projection_admits, p)
     description = chart_descriptions(chart, p.labels)
     assert "*" not in description
 
     # census chart
-    census_df = pd.read_csv('tests/census_df.csv')
+    census_df = pd.read_csv("tests/census_df.csv")
     # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
     PARAM.as_date = True
     chart = admitted_patients_chart(alt, census_df, p)
     description = chart_descriptions(chart, p.labels)
 
-    assert str(ceil(chart.data['ventilated'].max())) in description
-    assert str(chart.data['icu'].idxmax()) not in description
-    assert datetime.datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
+    assert str(ceil(chart.data["ventilated"].max())) in description
+    assert str(chart.data["icu"].idxmax()) not in description
+    assert (
+        datetime.datetime.strftime(
+            chart.data.iloc[chart.data["icu"].idxmax()].date, "%b %d"
+        )
+        in description
+    )

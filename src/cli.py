@@ -12,6 +12,7 @@ from penn_chime.parameters import Parameters
 from penn_chime.models import SimSirModel
 from penn_chime.utils import RateLos
 
+
 class FromFile(Action):
     """From File."""
 
@@ -111,7 +112,6 @@ def main():
         n_days=a.n_days,
         relative_contact_rate=a.relative_contact_rate,
         susceptible=a.susceptible,
-
         hospitalized=RateLos(a.hospitalized_rate, a.hospitalized_los),
         icu=RateLos(a.icu_rate, a.icu_los),
         ventilated=RateLos(a.ventilated_rate, a.ventilated_los),

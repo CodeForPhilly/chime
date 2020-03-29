@@ -29,8 +29,7 @@ class Body(Component):
         """
         super().__init__(language, defaults)
         self.components = OrderedDict(
-            navbar=Navbar(language, defaults),
-            container=Container(language, defaults),
+            navbar=Navbar(language, defaults), container=Container(language, defaults),
         )
         self.callback_outputs = []
         self.callback_inputs = OrderedDict()
@@ -41,7 +40,9 @@ class Body(Component):
     def get_html(self):
         """Glues individual setup components together
         """
-        return dhc.Div(self.components["navbar"].html + self.components["container"].html)
+        return dhc.Div(
+            self.components["navbar"].html + self.components["container"].html
+        )
 
     def callback(self, *args, **kwargs):
         """

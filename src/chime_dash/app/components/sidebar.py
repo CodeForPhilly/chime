@@ -15,14 +15,24 @@ from penn_chime.defaults import RateLos
 from penn_chime.parameters import Parameters
 
 from chime_dash.app.components.base import Component
-from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header
+from chime_dash.app.utils.templates import (
+    create_switch_input,
+    create_number_input,
+    create_header,
+)
 
 FLOAT_INPUT_MIN = 0.001
 FLOAT_INPUT_STEP = "any"
 
 _INPUTS = OrderedDict(
     regional_parameters={"type": "header", "size": "h3"},
-    market_share={"type": "number", "min": FLOAT_INPUT_MIN, "step": FLOAT_INPUT_STEP, "max": 100.0, "percent": True},
+    market_share={
+        "type": "number",
+        "min": FLOAT_INPUT_MIN,
+        "step": FLOAT_INPUT_STEP,
+        "max": 100.0,
+        "percent": True,
+    },
     susceptible={"type": "number", "min": 1, "step": 1},
     known_infected={"type": "number", "min": 0, "step": 1},
     current_hospitalized={"type": "number", "min": 0, "step": 1},
@@ -48,7 +58,7 @@ _INPUTS = OrderedDict(
         "min": 0.0,
         "step": FLOAT_INPUT_STEP,
         "max": 100.0,
-        "percent": True
+        "percent": True,
     },
     ventilated_rate={
         "type": "number",
@@ -75,12 +85,14 @@ class Sidebar(Component):
     contains the various inputs used to interact
     with the model.
     """
+
     # localization temp. for widget descriptions
     localization_file = "sidebar.yml"
 
     callback_inputs = OrderedDict(
         (key, CallbackInput(component_id=key, component_property="value"))
-        for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )
+        for key in _INPUTS
+        if _INPUTS[key]["type"] not in ("header",)
     )
 
     @staticmethod
@@ -131,10 +143,7 @@ class Sidebar(Component):
             children=dhc.Div(
                 children=elements,
                 className="p-4",
-                style={
-                    "height": "calc(100vh - 48px)",
-                    "overflowY": "auto",
-                },
+                style={"height": "calc(100vh - 48px)", "overflowY": "auto",},
             ),
             className="col-md-3",
             style={
@@ -143,8 +152,8 @@ class Sidebar(Component):
                 "bottom": 0,
                 "left": 0,
                 "zIndex": 100,
-                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)"
-            }
+                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)",
+            },
         )
 
         return [sidebar]

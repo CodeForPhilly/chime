@@ -47,6 +47,6 @@ class Menu(Component):
             in_navbar=True,
             label="Learn More",
             color="light",
-            right=True
+            right=True,
         )
         return [menu]

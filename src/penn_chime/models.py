@@ -16,36 +16,28 @@ from .parameters import Parameters
 
 
 class SimSirModel:
-
     def __init__(self, p: Parameters) -> SimSirModel:
         # TODO missing initial recovered value
         susceptible = p.susceptible
         recovered = 0.0
         recovery_days = p.recovery_days
 
-        rates = {
-            key: d.rate
-            for key, d in p.dispositions.items()
-        }
+        rates = {key: d.rate for key, d in p.dispositions.items()}
 
-        lengths_of_stay = {
-            key: d.length_of_stay
-            for key, d in p.dispositions.items()
-        }
+        lengths_of_stay = {key: d.length_of_stay for key, d in p.dispositions.items()}
 
         # Note: this should not be an integer.
         # We're appoximating infected from what we do know.
         # TODO market_share > 0, hosp_rate > 0
-        infected = (
-            p.current_hospitalized / p.market_share / p.hospitalized.rate
-        )
+        infected = p.current_hospitalized / p.market_share / p.hospitalized.rate
 
         detection_probability = (
             p.known_infected / infected if infected > 1.0e-7 else None
         )
 
-        intrinsic_growth_rate = \
+        intrinsic_growth_rate = (
             (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
+        )
 
         gamma = 1.0 / recovery_days
 
@@ -62,17 +54,9 @@ class SimSirModel:
         # Simplify equation to avoid division by zero:
         # self.r_naught = r_t / (1.0 - relative_contact_rate)
         r_naught = (intrinsic_growth_rate + gamma) / gamma
-        doubling_time_t = 1.0 / np.log2(
-            beta * p.susceptible - gamma + 1)
+        doubling_time_t = 1.0 / np.log2(beta * p.susceptible - gamma + 1)
 
-        raw_df = sim_sir_df(
-            p.susceptible,
-            infected,
-            recovered,
-            beta,
-            gamma,
-            p.n_days,
-        )
+        raw_df = sim_sir_df(p.susceptible, infected, recovered, beta, gamma, p.n_days,)
         dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
         admits_df = build_admits_df(dispositions_df)
         census_df = build_census_df(admits_df, lengths_of_stay)
@@ -133,20 +117,18 @@ def sim_sir_df(
         columns=("day", "susceptible", "infected", "recovered"),
     )
 
+
 def build_dispositions_df(
-    sim_sir_df: pd.DataFrame,
-    rates: Dict[str, float],
-    market_share: float,
+    sim_sir_df: pd.DataFrame, rates: Dict[str, float], market_share: float,
 ) -> pd.DataFrame:
     """Get dispositions of patients adjusted by rate and market_share."""
     patients = sim_sir_df.infected + sim_sir_df.recovered
-    return pd.DataFrame({
-        "day": sim_sir_df.day,
-        **{
-            key: patients * rate * market_share
-            for key, rate in rates.items()
+    return pd.DataFrame(
+        {
+            "day": sim_sir_df.day,
+            **{key: patients * rate * market_share for key, rate in rates.items()},
         }
-    })
+    )
 
 
 def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
@@ -157,17 +139,18 @@ def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_census_df(
-    admits_df: pd.DataFrame,
-    lengths_of_stay: Dict[str, int],
+    admits_df: pd.DataFrame, lengths_of_stay: Dict[str, int],
 ) -> pd.DataFrame:
     """ALOS for each disposition of COVID-19 case (total guesses)"""
-    return pd.DataFrame({
-        'day': admits_df.day,
-        **{
-            key: (
-                admits_df[key].cumsum().iloc[:-los]
-                - admits_df[key].cumsum().shift(los).fillna(0)
-            ).apply(np.ceil)
-            for key, los in lengths_of_stay.items()
+    return pd.DataFrame(
+        {
+            "day": admits_df.day,
+            **{
+                key: (
+                    admits_df[key].cumsum().iloc[:-los]
+                    - admits_df[key].cumsum().shift(los).fillna(0)
+                ).apply(np.ceil)
+                for key, los in lengths_of_stay.items()
+            },
         }
-    })
+    )

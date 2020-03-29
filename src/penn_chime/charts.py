@@ -1,4 +1,3 @@
-
 from math import ceil
 import datetime
 
@@ -26,7 +25,11 @@ def new_admissions_chart(
     tooltip_dict = {False: "day", True: "date:T"}
     if as_date:
         projection_admits = add_date_column(projection_admits)
-        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
+        x_kwargs = {
+            "shorthand": "date:T",
+            "title": "Date",
+            "axis": alt.Axis(format=(DATE_FORMAT)),
+        }
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
@@ -49,9 +52,7 @@ def new_admissions_chart(
     )
 
 
-def admitted_patients_chart(
-    alt, census: pd.DataFrame, parameters: Parameters
-) -> Chart:
+def admitted_patients_chart(alt, census: pd.DataFrame, parameters: Parameters) -> Chart:
     """docstring"""
 
     plot_projection_days = parameters.n_days - 10
@@ -59,7 +60,11 @@ def admitted_patients_chart(
     as_date = parameters.as_date
     if as_date:
         census = add_date_column(census)
-        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
+        x_kwargs = {
+            "shorthand": "date:T",
+            "title": "Date",
+            "axis": alt.Axis(format=(DATE_FORMAT)),
+        }
         idx = "date:T"
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
@@ -89,16 +94,11 @@ def admitted_patients_chart(
     )
 
 
-def additional_projections_chart(
-    alt, model, parameters
-) -> Chart:
+def additional_projections_chart(alt, model, parameters) -> Chart:
 
     # TODO use subselect of df_raw instead of creating a new df
     raw_df = model.raw_df
-    dat = pd.DataFrame({
-        "infected": raw_df.infected,
-        "recovered": raw_df.recovered
-    })
+    dat = pd.DataFrame({"infected": raw_df.infected, "recovered": raw_df.recovered})
     dat["day"] = dat.index
 
     as_date = parameters.as_date
@@ -106,7 +106,11 @@ def additional_projections_chart(
 
     if as_date:
         dat = add_date_column(dat)
-        x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
+        x_kwargs = {
+            "shorthand": "date:T",
+            "title": "Date",
+            "axis": alt.Axis(format=(DATE_FORMAT)),
+        }
     else:
         x_kwargs = {"shorthand": "day", "title": "Days from today"}
 
@@ -150,7 +154,9 @@ def chart_descriptions(chart: Chart, labels, suffix: str = ""):
 
         on = chart.data[day][chart.data[col].idxmax()]
         if day == "date":
-            on = datetime.datetime.strftime(on, "%b %d")  # todo: bring this to an optional arg / i18n
+            on = datetime.datetime.strftime(
+                on, "%b %d"
+            )  # todo: bring this to an optional arg / i18n
         else:
             on += 1  # 0 index issue
 
@@ -165,5 +171,7 @@ def chart_descriptions(chart: Chart, labels, suffix: str = ""):
         )
 
     if asterisk:
-        messages.append("_* The max is at the upper bound of the data, and therefore may not be the actual max_")
+        messages.append(
+            "_* The max is at the upper bound of the data, and therefore may not be the actual max_"
+        )
     return "\n\n".join(messages)

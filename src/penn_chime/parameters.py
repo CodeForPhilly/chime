@@ -18,11 +18,9 @@ class Parameters:
         known_infected: int,
         relative_contact_rate: float,
         susceptible: int,
-
         hospitalized: RateLos,
         icu: RateLos,
         ventilated: RateLos,
-
         as_date: bool = False,
         market_share: float = 1.0,
         max_y_axis: int = None,

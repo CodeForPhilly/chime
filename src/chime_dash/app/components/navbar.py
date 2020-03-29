@@ -36,20 +36,17 @@ class Navbar(Component):
                                 className="penn-medicine-header__logo",
                                 title="Go to the Penn Medicine home page",
                             ),
-                            dbc.NavbarBrand(
-                                children="CHIME", href="/"
-                            ),
+                            dbc.NavbarBrand(children="CHIME", href="/"),
                         ],
                         align="center",
                         no_gutters=True,
                     ),
-
                 ]
                 + self.menu.html,
-                fluid=True
+                fluid=True,
             ),
             dark=True,
             fixed="top",
-            color="dark"
+            color="dark",
         )
         return [nav]
