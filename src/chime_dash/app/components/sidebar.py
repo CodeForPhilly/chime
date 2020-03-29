@@ -110,7 +110,7 @@ class Sidebar(Component):
         return pars
 
     @staticmethod
-    def update_model(input_values, kwargs):
+    def update_model(*input_values, **kwargs):
         """
         """
         pars = Sidebar.parse_form_parameters(input_values)
