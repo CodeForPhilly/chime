@@ -34,7 +34,8 @@ class Visualizations(Component):
         Output(component_id="new-admissions-table", component_property="children"),
         Output(component_id="admitted-patients-graph", component_property="figure"),
         Output(component_id="admitted-patients-table", component_property="children"),
-        Output(component_id="download-link", component_property="href"),
+        Output(component_id="download-admissions", component_property="href"),
+        Output(component_id="download-census", component_property="href"),
     ]
 
     def get_html(self) -> List[ComponentMeta]:
@@ -43,11 +44,12 @@ class Visualizations(Component):
         return [
             H2(self.content["new-admissions-title"]),
             Markdown(self.content["new-admissions-text"]),
-            A('Download Data', id='download-link', download="rawdata.csv", href="", target="_blank"),
+            A(self.content["download-text"], id='download-admissions', download="admissions.csv", href="", target="_blank", className="btn btn-primary"),
             Graph(id="new-admissions-graph"),
             Table(id="new-admissions-table"),
             H2(self.content["admitted-patients-title"]),
             Markdown(self.content["admitted-patients-text"]),
+            A(self.content["download-text"], id='download-census', download="census.csv", href="", target="_blank", className="btn btn-primary"),
             Graph(id="admitted-patients-graph"),
             Table(id="admitted-patients-table"),
         ]
@@ -62,10 +64,6 @@ class Visualizations(Component):
         admissions_data = plot_dataframe(
             projection_admits.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
         )
-
-        # Create admissions CSV
-        admissions_csv = projection_admits.to_csv(index=False, encoding='utf-8')
-        admissions_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(admissions_csv)
 
         # Create admissions table data
         if kwargs["as_date"]:
@@ -89,7 +87,16 @@ class Visualizations(Component):
             else None
         )
 
-        return [admissions_data, admissions_table_data, census_data, census_table_data, admissions_csv]
+        # Create admissions CSV
+        admissions_csv = projection_admits.to_csv(index=False, encoding='utf-8')
+        admissions_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(admissions_csv)
+
+        # Create census CSV
+        census_csv = census_df.to_csv(index=False, encoding='utf-8')
+        census_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(census_csv)
+
+
+        return [admissions_data, admissions_table_data, census_data, census_table_data, admissions_csv, census_csv]
 
     @staticmethod
     def _build_frames(**kwargs):
