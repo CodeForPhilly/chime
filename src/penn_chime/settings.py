@@ -1,29 +1,25 @@
 #!/usr/bin/env python
 
-from .defaults import Constants, Regions, RateLos
+from datetime import date
 
-delaware = 564696
-chester = 519293
-montgomery = 826075
-bucks = 628341
-philly = 1581000
+from .parameters import Parameters, Regions, RateLos
 
-DEFAULTS = Constants(
-    # EDIT YOUR DEFAULTS HERE
+DEFAULTS = Parameters(
     region=Regions(
-        delaware=delaware,
-        chester=chester,
-        montgomery=montgomery,
-        bucks=bucks,
-        philly=philly,
+        delaware=564696,
+        chester=519293,
+        montgomery=826075,
+        bucks=628341,
+        philly=1581000,
     ),
-    current_hospitalized=14,
+    current_hospitalized=32,
+    date_first_hospitalized=date(2020,3,7),
     doubling_time=4.0,
-    known_infected=510,
-    n_days=60,
-    market_share=0.15,
-    relative_contact_rate=0.3,
     hospitalized=RateLos(0.025, 7),
     icu=RateLos(0.0075, 9),
+    infectious_days=14,
+    market_share=0.15,
+    n_days=60,
+    relative_contact_rate=0.3,
     ventilated=RateLos(0.005, 10),
 )

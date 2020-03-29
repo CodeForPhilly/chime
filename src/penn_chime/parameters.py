@@ -1,10 +1,28 @@
 """Parameters.
 
 Changes affecting results or their presentation should also update
-`change_date`, so users can see when results have last changed
+constants.py `change_date``.
 """
 
-from .utils import RateLos
+from collections import namedtuple
+from datetime import date
+from typing import Optional
+
+
+# (0.02, 7) is 2%, 7 days
+# be sure to multiply by 100 when using as a default to the percent widgets!
+RateLos = namedtuple("RateLos", ("rate", "length_of_stay"))
+
+
+class Regions:
+    """Arbitrary regions to sum population."""
+
+    def __init__(self, **kwargs):
+        population = 0
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+            population += value
+        self.population = population
 
 
 class Parameters:
@@ -14,36 +32,45 @@ class Parameters:
         self,
         *,
         current_hospitalized: int,
-        doubling_time: float,
-        known_infected: int,
-        relative_contact_rate: float,
-        population: int,
-
         hospitalized: RateLos,
         icu: RateLos,
+        relative_contact_rate: float,
         ventilated: RateLos,
-
-        as_date: bool = False,
+        current_date: date = date.today(),
+        date_first_hospitalized: Optional[date] = None,
+        doubling_time: Optional[float] = None,
+        infectious_days: int = 14,
         market_share: float = 1.0,
-        max_y_axis: int = None,
+        max_y_axis: Optional[int] = None,
         n_days: int = 60,
-        recovery_days: int = 14,
+        population: Optional[int] = None,
+        recovered: int = 0,
+        region: Optional[Regions] = None,
     ):
         self.current_hospitalized = current_hospitalized
-        self.doubling_time = doubling_time
-        self.known_infected = known_infected
         self.relative_contact_rate = relative_contact_rate
-        self.population = population
 
         self.hospitalized = hospitalized
         self.icu = icu
         self.ventilated = ventilated
 
-        self.as_date = as_date
+        if region is not None and population is None:
+            self.region = region
+            self.population = region.population
+        elif population is not None:
+            self.region = None
+            self.population = population
+        else:
+            raise AssertionError('population or regions must be provided.')
+
+        self.current_date = current_date
+        self.date_first_hospitalized = date_first_hospitalized
+        self.doubling_time = doubling_time
+        self.infectious_days = infectious_days
         self.market_share = market_share
         self.max_y_axis = max_y_axis
         self.n_days = n_days
-        self.recovery_days = recovery_days
+        self.recovered = recovered
 
         self.labels = {
             "hospitalized": "Hospitalized",
@@ -61,11 +88,3 @@ class Parameters:
             "icu": icu,
             "ventilated": ventilated,
         }
-
-    def change_date(self):
-        """
-        This reflects a date from which previously-run reports will no
-        longer match current results, indicating when users should
-        re-run their reports
-        """
-        return "March 23 2020"
