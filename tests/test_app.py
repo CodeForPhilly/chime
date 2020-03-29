@@ -301,11 +301,19 @@ def test_model_raw_end(model=MODEL, param=PARAM):
 
 
 def test_model_cumulative_census(model=MODEL):
-    # test that admissions are being properly calculated
+    # test that census is being properly calculated
     raw_df = model.raw_df
-    cumulative_admits = model.admits_df.cumsum()
-    diff = cumulative_admits.hospitalized[1:-1] - (
-        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
+    admits_df = model.admits_df
+    df = pd.DataFrame({
+        "hospitalized": admits_df.hospitalized,
+        "icu": admits_df.icu,
+        "ventilated": admits_df.ventilated
+    })
+    admits = df.cumsum()
+
+    # TODO: is 1.0 for ceil function?
+    diff = admits.hospitalized[1:-1] - (
+        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
     )
     assert (diff.abs() < 0.1).all()
 
