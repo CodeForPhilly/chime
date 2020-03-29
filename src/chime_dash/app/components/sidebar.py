@@ -114,7 +114,7 @@ class Sidebar(Component):
         """
         """
         pars = Sidebar.parse_form_parameters(input_values)
-        return [pars, SimSirModel(pars)]
+        return [pars.json, SimSirModel(pars).json]
 
     def __init__(self, language, defaults):
         input_change_callback = ChimeCallback(

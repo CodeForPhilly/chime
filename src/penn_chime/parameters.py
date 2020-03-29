@@ -5,6 +5,7 @@ Changes affecting results or their presentation should also update
 """
 
 from .utils import RateLos
+from json import dumps
 
 
 class Parameters:
@@ -62,10 +63,15 @@ class Parameters:
             "ventilated": ventilated,
         }
 
-    def change_date(self):
+    @staticmethod
+    def change_date():
         """
         This reflects a date from which previously-run reports will no
         longer match current results, indicating when users should
         re-run their reports
         """
         return "March 23 2020"
+
+    @property
+    def json(self):
+        return dumps(self, default=lambda o: o.__dict__, sort_keys=True)

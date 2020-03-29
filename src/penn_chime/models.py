@@ -6,6 +6,7 @@ changed
 """
 
 from __future__ import annotations
+from json import dumps
 
 from typing import Dict, Generator, Tuple
 
@@ -93,6 +94,16 @@ class SimSirModel:
         self.dispositions_df = dispositions_df
         self.admits_df = admits_df
         self.census_df = census_df
+
+    @property
+    def json(self):
+        def to_json_helper(obj):
+            result = obj.__dict__.copy()
+            for key, value in result.items():
+                if isinstance(value, pd.DataFrame):
+                    result[key] = value.to_dict()
+            return result
+        return dumps(self, default=to_json_helper, sort_keys=True)
 
 
 def sir(
