@@ -18,17 +18,12 @@ def build_admits_chart(
     max_y_axis: Optional[int] = None,
 ) -> Chart:
     """docstring"""
-    idx = "date:T"
-    x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     y_scale = alt.Scale()
 
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
 
-    # TODO fix the fold to allow any number of dispositions
-
     ceil_df = admits_df.copy()
-
     ceil_df.hospitalized = np.ceil(ceil_df.hospitalized)
     ceil_df.icu = np.ceil(ceil_df.icu)
     ceil_df.ventilated = np.ceil(ceil_df.ventilated)
@@ -39,15 +34,14 @@ def build_admits_chart(
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
         .mark_line(point=True)
         .encode(
-            x=alt.X(**x_kwargs),
+            x=alt.X("date:T", title="Date", axis=alt.Axis(format=(DATE_FORMAT))),
             y=alt.Y("value:Q", title="Daily admissions", scale=y_scale),
             color="key:N",
             tooltip=[
-                idx,
+                "date:T",
                 alt.Tooltip("value:Q", format=".0f", title="Admit"),
                 "key:N",
-            ],
-        ).interactive()
+            ])
     )
 
 
@@ -65,7 +59,7 @@ def build_census_chart(
 
     # TODO fix the fold to allow any number of dispositions
     base = (
-        alt.Chart()
+        alt.Chart(census_df)
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
         .mark_line(point=True, interpolate='basis')
         .encode(
@@ -76,9 +70,9 @@ def build_census_chart(
                 "date:T",
                 alt.Tooltip("value:Q", format=".0f", title="Census"),
                 "key:N",
-            ],
-        ).interactive()
+            ])
     )
+    return base
     bar = (
         alt.Chart()
         .mark_rule(
@@ -102,8 +96,9 @@ def build_sim_sir_w_date_chart(
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
 
+    # TODO fix the fold to allow any number of dispositions
     base = (
-        alt.Chart()
+        alt.Chart(sim_sir_w_date_df)
         .transform_fold(fold=["susceptible", "infected", "recovered"])
         .mark_line()
         .encode(
@@ -112,8 +107,8 @@ def build_sim_sir_w_date_chart(
             tooltip=["key:N", "value:Q"],
             color="key:N",
         )
-        .interactive()
     )
+    return base
     bar = (
         alt.Chart()
         .mark_rule(
