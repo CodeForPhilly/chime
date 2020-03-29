@@ -5,7 +5,7 @@ Changes affecting results or their presentation should also update
 """
 
 from .utils import RateLos
-from json import dumps
+from json import dumps, loads
 
 
 class Parameters:
@@ -75,3 +75,23 @@ class Parameters:
     @property
     def json(self):
         return dumps(self, default=lambda o: o.__dict__, sort_keys=True)
+
+    @classmethod
+    def from_json(cls, json):
+        values = loads(json)
+        result = cls(
+            current_hospitalized=values["current_hospitalized"],
+            doubling_time=values["doubling_time"],
+            known_infected=values["known_infected"],
+            relative_contact_rate=values["relative_contact_rate"],
+            susceptible=values["susceptible"],
+            hospitalized=RateLos(*values["hospitalized"]),
+            icu=RateLos(*values["icu"]),
+            ventilated=RateLos(*values["ventilated"])
+        )
+
+        for key, value in values.items():
+            if result.__dict__[key] != value and key not in ["hospitalized", "icu", "ventilated", "dispositions"]:
+                result.__dict__[key] = value
+
+        return result

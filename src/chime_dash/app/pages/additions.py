@@ -2,10 +2,9 @@
 currently handles both view and logic should be separated
 graph activated via "Show additional projections"
 """
-from typing import List, Any
+from typing import List
 from collections import OrderedDict
 
-from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
 from dash_html_components import H4, Div
 from dash_core_components import Graph
@@ -59,8 +58,8 @@ class Additions(Component):
     localization_file = "additions.yml"
 
     def __init__(self, language, defaults):
-        def build_graph_and_table_helper(model, max_y_axis_value, as_date):
-            return Additions.build_graph_and_table(model, max_y_axis_value, as_date, self.content)
+        def build_graph_and_table_helper(model_json, max_y_axis_value, as_date):
+            return Additions.build_graph_and_table(model_json, max_y_axis_value, as_date, self.content)
         super().__init__(language, defaults, [
             ChimeCallback(  # If user toggles show_additional_projections, show/hide the additions content
                 changed_elements=OrderedDict(show_additional_projections="value"),
