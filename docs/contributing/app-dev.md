@@ -23,7 +23,7 @@ See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_starte
 
 ```bash
 pipenv shell
-pipenv install
+pipenv sync --dev
 streamlit run src/app.py
 ```
 
