@@ -77,8 +77,8 @@ HALVING_PARAM = Parameters(
     n_days=60,
 )
 
-MODEL = Model(PARAM)
-HALVING_MODEL = Model(HALVING_PARAM)
+MODEL = Model(copy(PARAM))
+HALVING_MODEL = Model(copy(HALVING_PARAM))
 
 
 # set up
