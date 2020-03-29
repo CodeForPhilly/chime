@@ -8,14 +8,16 @@ import dash_html_components as dhc
 from typing import List, Dict, Any, Tuple
 from collections import OrderedDict
 
-from dash.dependencies import Input as CallbackInput
+from dash.dependencies import Input as CallbackInput, Output
 from dash.development.base_component import ComponentMeta
+from dash_html_components import Br
 
 from penn_chime.defaults import RateLos
 from penn_chime.parameters import Parameters
 
 from chime_dash.app.components.base import Component
-from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header, create_button
+from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header, create_button, \
+    create_link
 
 FLOAT_INPUT_MIN = 0.001
 FLOAT_INPUT_STEP = "any"
@@ -67,7 +69,8 @@ _INPUTS = OrderedDict(
     show_tables={"type": "switch", "value": False},
     show_tool_details={"type": "switch", "value": False},
     show_additional_projections={"type": "switch", "value": False},
-    save_as_pdf={"type": "button", "property": "n_clicks"}
+    save_as_pdf={"type": "button", "property": "n_clicks"},
+    pdf_file_link={"type": "link", "property": "href"}
 )
 
 
@@ -81,8 +84,11 @@ class Sidebar(Component):
 
     callback_inputs = OrderedDict(
         (key, CallbackInput(component_id=key, component_property=_INPUTS[key].get("property", "value")))
-        for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )
+        for key in _INPUTS if _INPUTS[key]["type"] not in ("header", "link")
     )
+
+    callback_outputs = [Output(component_id='pdf_file_link', component_property='href'),
+                        Output(component_id='pdf_file_link', component_property='children')]
 
     def __init__(self, *args, **kwargs):
         self._save_to_pdf = False
@@ -127,6 +133,9 @@ class Sidebar(Component):
                 element = create_header(idx, self.content)
             elif data["type"] == "button":
                 element = create_button(idx, self.content)
+            elif data["type"] == "link":
+                elements.append(Br())
+                element = create_link(idx)
             else:
                 raise ValueError(
                     "Failed to parse input '{idx}' with data '{data}'".format(
@@ -165,3 +174,9 @@ class Sidebar(Component):
             self.pdf_button_clicks = kwargs.get('save_as_pdf', '0')
             return True
         return False
+
+    def callback(  # pylint: disable=W0613, R0201
+        self, *args, **kwargs
+    ) -> List[Dict[str, Any]]:
+        return [kwargs.get('pdf_url', ''),
+                self.content['download_report'] if kwargs.get('pdf_url', None) else None]

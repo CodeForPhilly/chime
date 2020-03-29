@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional
 
 from os import path
 
-from dash_core_components import Location
+from dash_core_components import Location, Link
 from yaml import safe_load
 
 from numpy import mod
@@ -22,6 +22,8 @@ TEMPLATE_DIR = path.join(
     path.abspath(path.dirname(path.dirname(__file__))), "templates"
 )
 
+
+UPLOAD_DIRECTORY = "/app/app_temp_files"
 
 def read_localization_yml(file: str, language: str) -> Dict[str, Any]:
     """Reads localization template.
@@ -144,6 +146,10 @@ def create_button(idx: str, content: Dict[str, str]):
 
 def create_location(idx: str):
     return Location(id=idx)
+
+
+def create_link(idx):
+    return Link(id=idx)
 
 def _get_default_values(
     key: str,

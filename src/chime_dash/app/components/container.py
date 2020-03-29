@@ -4,6 +4,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import dash_bootstrap_components as dbc
+import dash_core_components as dcc
 from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.content import Content
 from chime_dash.app.components.sidebar import Sidebar
@@ -19,6 +20,7 @@ class Container(Component):
         """
         """
         super().__init__(language, defaults)
+        self.pdf_filename = None
         self.components = OrderedDict(
             sidebar=Sidebar(language, defaults),
             content=Content(language, defaults),
@@ -47,15 +49,17 @@ class Container(Component):
         kwargs["model"] = SimSirModel(pars)
         kwargs["pars"] = pars
 
+        save_to_pdf = self.components["sidebar"].save_to_pdf(kwargs)
+        if save_to_pdf:
+            self.pdf_filename = print_to_pdf(deepcopy(self.components['content']), kwargs)
+
+        kwargs['pdf_url'] = self.pdf_filename
+
         callback_returns = []
         for component in self.components.values():
             try:
                 callback_returns += component.callback(**kwargs)
             except Exception as error:
                 raise HTMLComponentError(component, error)
-
-        save_to_pdf = self.components["sidebar"].save_to_pdf(kwargs)
-        if save_to_pdf:
-            print_to_pdf(deepcopy(self.components['content']), kwargs)
 
         return callback_returns

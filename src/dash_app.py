@@ -1,5 +1,11 @@
 """Script which launches dash app
 """
+import os
+
+from dash import Dash
+from flask import send_from_directory
+
+from chime_dash.app.utils.templates import UPLOAD_DIRECTORY
 from chime_dash.app.run import DASH
 from penn_chime.settings import DEFAULTS
 from chime_dash.app.components import Body
@@ -24,11 +30,21 @@ LANGUAGE = "en"
 #
 #   app.run_server(debug=True, host='0.0.0.0')
 
+
+if not os.path.exists(UPLOAD_DIRECTORY):
+    os.makedirs(UPLOAD_DIRECTORY)
+
 body = Body(LANGUAGE, DEFAULTS)
 
 DASH.layout = body.html
 DASH.title = "Penn Medicine CHIME"  #! Should be moved into config / out of view
 
+@server.route("/download/<path:path>")
+def download(path):
+    """Serve a file from the upload directory."""
+    return send_from_directory(UPLOAD_DIRECTORY, path, as_attachment=True)
+
+@app.callback(body.callback_outputs, list(body.callback_inputs.values()))
 
 @DASH.callback(body.callback_outputs, list(body.callback_inputs.values()))
 def callback(*args):  # pylint: disable=W0612
