@@ -5,7 +5,6 @@ from collections import OrderedDict
 import dash_bootstrap_components as dbc
 from chime_dash.app.components.additions import Additions
 from chime_dash.app.components.base import Component, HTMLComponentError
-from chime_dash.app.components.definitions import Definitions
 from chime_dash.app.components.footer import Footer
 from chime_dash.app.components.header import Header
 from chime_dash.app.components.intro import Intro, ToolDetails
@@ -26,7 +25,6 @@ class Content(Component):
             tool_details=ToolDetails(language, defaults),
             visualizations=Visualizations(language, defaults),
             additions=Additions(language, defaults),
-            definitions=Definitions(language, defaults),
             footer=Footer(language, defaults),
         )
         self.callback_outputs = []
@@ -44,7 +42,6 @@ class Content(Component):
             + self.components["tool_details"].html
             + self.components["visualizations"].html
             + self.components["additions"].html
-            + self.components["definitions"].html
             + self.components["footer"].html,
             width=9,
             className="ml-sm-auto p-5",
