@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from typing import Dict, Generator, Tuple
 
-import numpy as np  # type: ignore
-import pandas as pd  # type: ignore
+import numpy as np
+import pandas as pd
 
 from .parameters import Parameters
 

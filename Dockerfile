@@ -2,6 +2,7 @@ FROM python:3.7.7-slim-buster
 RUN mkdir /app
 WORKDIR /app
 COPY README.md .
+COPY setup.cfg .
 COPY setup.py .
 COPY requirements.txt .
 # Creating an empty src dir is a (hopefully) temporary hack to improve layer caching and speed up image builds

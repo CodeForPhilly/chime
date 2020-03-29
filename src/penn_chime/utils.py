@@ -5,10 +5,8 @@ from datetime import datetime, timedelta
 from typing import Optional
 from base64 import b64encode
 
-import numpy as np  # type: ignore
-import pandas as pd  # type: ignore
-
-# from .parameters import Parameters
+import numpy as np
+import pandas as pd
 
 
 # (0.02, 7) is 2%, 7 days
