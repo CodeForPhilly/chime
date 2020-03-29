@@ -44,13 +44,13 @@ class Visualizations(Component):
         return [
             H2(self.content["new-admissions-title"]),
             Markdown(self.content["new-admissions-text"]),
-            A(self.content["download-text"], id='download-admissions', download="admissions.csv", href="", target="_blank", className="btn btn-primary"),
             Graph(id="new-admissions-graph"),
+            A(self.content["download-text"], id='download-admissions', download="admissions.csv", href="", target="_blank", className="btn btn-sm btn-info"),
             Table(id="new-admissions-table"),
             H2(self.content["admitted-patients-title"]),
             Markdown(self.content["admitted-patients-text"]),
-            A(self.content["download-text"], id='download-census', download="census.csv", href="", target="_blank", className="btn btn-primary"),
             Graph(id="admitted-patients-graph"),
+            A(self.content["download-text"], id='download-census', download="census.csv", href="", target="_blank", className="btn btn-sm btn-info"),
             Table(id="admitted-patients-table"),
         ]
 
