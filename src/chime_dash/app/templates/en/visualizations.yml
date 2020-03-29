@@ -10,3 +10,6 @@ date: Date
 hosp: Hospitalized
 icu: ICU
 vent: Ventalized
+
+# Date Localization
+date-format: "%m%d%Y" 
