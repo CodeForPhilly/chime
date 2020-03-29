@@ -8,13 +8,8 @@ h1 {
 	
 }
 
-.svg-container {
-	z-index: -1;
-}
-
 a.btn {
-	margin-top: -32px;
 	margin-right: 40px;
-	z-index: 1;
 	float: right;
 }
+
