@@ -107,7 +107,11 @@ def parse_args():
         ("--ventilated-days", int, 0, None, "Average Days on Ventilator", True),
         ("--ventilated-rate", float, 0.0, 1.0, "Ventilated Rate: 0.0 - 1.0", True),
     ):
-        parser.add_argument(arg, type=validator(arg, cast, min_value, max_value, required))
+        parser.add_argument(
+            arg,
+            type=validator(arg, cast, min_value, max_value, required),
+            help=help,
+        )
     return parser.parse_args()
 
 
