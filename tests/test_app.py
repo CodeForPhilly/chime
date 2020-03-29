@@ -293,7 +293,6 @@ def test_model_raw_start():
     first = raw_df.iloc[0, :]
     second = raw_df.iloc[1, :]
 
-    assert first.susceptible + first.infected + first.recovered == param.population
     assert first.susceptible == 499600.0
     assert round(second.infected, 0) == 449.0
     assert list(model.dispositions_df.iloc[0, :]) == [-43, date(year=2020, month=2, day=15), 1.0, 0.4, 0.2]
@@ -327,7 +326,6 @@ def test_model_raw_end():
     raw_df = model.raw_df
 
     last = raw_df.iloc[-1, :]
-    assert last.susceptible + last.infected + last.recovered == param.population
     assert round(last.susceptible, 0) == 83391.0
 
 
