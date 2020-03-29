@@ -1,5 +1,6 @@
 """Tests."""
 
+from copy import copy
 from math import ceil  # type: ignore
 from datetime import date, datetime  # type: ignore
 import pytest  # type: ignore
@@ -264,8 +265,10 @@ def test_census_chart():
         build_census_chart()
 
 
-def test_model(model=MODEL, param=PARAM):
+def test_model():
     # test the Model
+    param = copy(PARAM)
+    model = Model(param)
 
     assert round(model.infected, 0) == 45810.0
     assert isinstance(model.infected, float)  # based off note in models.py
@@ -280,7 +283,9 @@ def test_model(model=MODEL, param=PARAM):
     assert model.doubling_time_t == 7.764405988534983
 
 
-def test_model_raw_start(model=MODEL, param=PARAM):
+def test_model_raw_start():
+    param = copy(PARAM)
+    model = Model(param)
     raw_df = model.raw_df
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
@@ -302,7 +307,9 @@ def test_model_raw_start(model=MODEL, param=PARAM):
     assert [round(v, 0) for v in (d, s, i, r)] == [22, 1101.0, 441.0, 220.0]
 
 
-def test_model_raw_end(model=MODEL, param=PARAM):
+def test_model_raw_end():
+    param = copy(PARAM)
+    model = Model(param)
     raw_df = model.raw_df
 
     last = raw_df.iloc[-1, :]
@@ -310,8 +317,11 @@ def test_model_raw_end(model=MODEL, param=PARAM):
     assert round(last.susceptible, 0) == 83391.0
 
 
-def test_model_cumulative_census(model=MODEL):
+def test_model_cumulative_census():
     # test that census is being properly calculated
+    param = copy(PARAM)
+    model = Model(param)
+
     raw_df = model.raw_df
     admits_df = model.admits_df
     df = pd.DataFrame({
@@ -334,13 +344,15 @@ def test_growth_rate():
     assert np.round(get_growth_rate(-4) * 100.0, decimals=4) == -15.9104
 
 
-def test_build_descriptions(p=PARAM):
+def test_build_descriptions():
+    param = copy(PARAM)
+
     admits_file = 'tests/by_doubling_time/2020-03-28_projected_admits.csv'
     census_file = 'tests/by_doubling_time/2020-03-28_projected_census.csv'
 
     admits_df = pd.read_csv(admits_file, parse_dates=['date'])
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
-    description = build_descriptions(chart=chart, labels=p.labels)
+    description = build_descriptions(chart=chart, labels=param.labels)
 
     hosp, icu, vent = description.split("\n\n")  # break out the description into lines
 
@@ -349,22 +361,19 @@ def test_build_descriptions(p=PARAM):
 
     # TODO add test for asterisk
 
-
     # test no asterisk
-    param = PARAM
     param.n_days = 600
 
     admits_df = pd.read_csv(admits_file, parse_dates=['date'])
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
-    description = build_descriptions(chart=chart, labels=p.labels)
+    description = build_descriptions(chart=chart, labels=param.labels)
     assert "*" not in description
 
 
     # census chart
     census_df = pd.read_csv(census_file, parse_dates=['date'])
-    PARAM.as_date = True
     chart = build_census_chart(alt=alt, census_df=census_df)
-    description = build_descriptions(chart=chart, labels=p.labels)
+    description = build_descriptions(chart=chart, labels=param.labels)
 
     assert str(ceil(chart.data['ventilated'].max())) in description
     assert str(chart.data['icu'].idxmax()) not in description
