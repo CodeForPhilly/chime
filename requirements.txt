@@ -2,6 +2,7 @@ streamlit
 pandas
 numpy
 pytest
+black
 altair
 dash
 dash_bootstrap_components
