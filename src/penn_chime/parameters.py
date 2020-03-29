@@ -11,7 +11,7 @@ from typing import Optional
 
 # (0.02, 7) is 2%, 7 days
 # be sure to multiply by 100 when using as a default to the percent widgets!
-RateLos = namedtuple("RateLos", ("rate", "length_of_stay"))
+RateDays = namedtuple("RateDays", ("rate", "days"))
 
 
 class Regions:
@@ -32,10 +32,10 @@ class Parameters:
         self,
         *,
         current_hospitalized: int,
-        hospitalized: RateLos,
-        icu: RateLos,
+        hospitalized: RateDays,
+        icu: RateDays,
         relative_contact_rate: float,
-        ventilated: RateLos,
+        ventilated: RateDays,
         current_date: date = date.today(),
         date_first_hospitalized: Optional[date] = None,
         doubling_time: Optional[float] = None,

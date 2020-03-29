@@ -9,7 +9,7 @@ from datetime import datetime
 from pandas import DataFrame
 
 from .constants import CHANGE_DATE
-from .parameters import Parameters, RateLos
+from .parameters import Parameters, RateDays
 from .models import SimSirModel as Model
 
 
@@ -74,7 +74,7 @@ def parse_args():
             "Doubling time before social distancing (days)",
             True,
         ),
-        ("--hospitalized-los", int, 0, None, "Hospitalized Length of Stay (days)", True),
+        ("--hospitalized-days", int, 0, None, "Hospital Length of Stay (days)", True),
         (
             "--hospitalized-rate",
             float,
@@ -83,7 +83,7 @@ def parse_args():
             "Hospitalized Rate: 0.00001 - 1.0",
             True,
         ),
-        ("--icu-los", int, 0, None, "ICU Length of Stay (days)", True),
+        ("--icu-days", int, 0, None, "Days in ICU", True),
         ("--icu-rate", float, 0.0, 1.0, "ICU Rate: 0.0 - 1.0", True),
         (
             "--market_share",
@@ -104,7 +104,7 @@ def parse_args():
             True,
         ),
         ("--population", int, 1, None, "Regional Population >= 1", True),
-        ("--ventilated-los", int, 0, None, "Ventilated Length of Stay (days)", True),
+        ("--ventilated-days", int, 0, None, "Days on Ventilator", True),
         ("--ventilated-rate", float, 0.0, 1.0, "Ventilated Rate: 0.0 - 1.0", True),
     ):
         parser.add_argument(arg, type=validator(arg, cast, min_value, max_value, required))
@@ -125,9 +125,9 @@ def main():
         relative_contact_rate=a.relative_contact_rate,
         population=a.population,
 
-        hospitalized=RateLos(a.hospitalized_rate, a.hospitalized_los),
-        icu=RateLos(a.icu_rate, a.icu_los),
-        ventilated=RateLos(a.ventilated_rate, a.ventilated_los),
+        hospitalized=RateDays(a.hospitalized_rate, a.hospitalized_days),
+        icu=RateDays(a.icu_rate, a.icu_days),
+        ventilated=RateDays(a.ventilated_rate, a.ventilated_days),
     )
 
     m = Model(p)
