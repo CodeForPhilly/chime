@@ -33,18 +33,6 @@ hide_menu_style = """
 
 def display_header(st, m, p):
 
-    detection_prob_str = (
-        "{detection_prob:.0%}".format(detection_prob=m.detection_probability)
-        if m.detection_probability
-        else "unknown"
-    )
-
-    infection_warning_str = (
-        """(Warning: The number of known infections is greater than the estimate of infected patients based on inputs for current hospitalization, market share, and hospitalization rate. Please verify the market share value in the sidebar, and see if the hospitalization rate needs to be lowered.)"""
-        if p.known_infected > m.infected
-        else ""
-    )
-
     infected_population_warning_str = (
         """(Warning: The number of estimated infections is greater than the total regional population. Please verify the values entered in the sidebar.)"""
         if m.infected > p.population
@@ -66,24 +54,18 @@ def display_header(st, m, p):
         """[Documentation](https://code-for-philly.gitbook.io/chime/) | [Github](https://github.com/CodeForPhilly/chime/) | [Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)"""
     )
     st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + str(CHANGE_DATE) + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
-    )
-    st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine to assist hospitals and public health officials with hospital capacity planning,
     but can be used anywhere in the world.
-    Customize it for your region by modifying data inputs in the left panel.
-    For questions on how to use this tool see the [User docs]({docs_url}). Code can be found on [Github](https://github.com/CodeForPhilly/chime)*.
+    Customize it for your region by modifying data inputs in the left panel.*
     """.format(docs_url=DOCS_URL)
     )
 
     st.markdown(
-        """The estimated number of currently infected individuals is **{total_infections:.0f}**. The **{initial_infections}**
-    confirmed cases in the region imply a **{detection_prob_str}** rate of detection. This is based on current inputs for
+        """The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
     Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
 
-{infection_warning_str}
 {infected_population_warning_str}
 
 An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
@@ -94,8 +76,6 @@ outbreak **{impact_statement:s} {doubling_time_t:.1f}** days, implying an effect
 and daily growth rate of **{daily_growth_t:.2f}%**.
 """.format(
             total_infections=m.infected,
-            initial_infections=p.known_infected,
-            detection_prob_str=detection_prob_str,
             current_hosp=p.current_hospitalized,
             hosp_rate=p.hospitalized.rate,
             S=p.population,
@@ -107,10 +87,9 @@ and daily growth rate of **{daily_growth_t:.2f}%**.
             r_t=m.r_t,
             doubling_time_t=abs(m.doubling_time_t),
             impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to"),
-            daily_growth=m.daily_growth_rate + 100.0,
+            daily_growth=m.daily_growth_rate * 100.0,
             daily_growth_t=m.daily_growth_rate_t * 100.0,
             docs_url=DOCS_URL,
-            infection_warning_str=infection_warning_str,
             infected_population_warning_str=infected_population_warning_str
         )
     )
@@ -162,8 +141,6 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     # to the variables they are set equal to
     # it's kindof like ember or angular if you are familiar with those
 
-    if d.known_infected < 1:
-        raise ValueError("Known cases must be larger than one to enable predictions.")
     st_obj = st.sidebar
     current_hospitalized_input = NumberInput(
         st_obj,
@@ -257,14 +234,6 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=1,
         format="%i",
     )
-    known_infected_input = NumberInput(
-        st_obj,
-        "Currently Known Regional Infections (only used to compute detection rate - does not change projections)",
-        min_value=0,
-        value=d.known_infected,
-        step=1,
-        format="%i",
-    )
     infectious_days_input = NumberInput(
         st_obj,
         "Infectious Days",
@@ -282,7 +251,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     st.sidebar.markdown("### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
     population = population_input()
     market_share = market_share_pct_input()
-    known_infected = known_infected_input()
+    #known_infected = known_infected_input()
     current_hospitalized = current_hospitalized_input()
 
     st.sidebar.markdown("### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)"
@@ -318,7 +287,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         current_hospitalized=current_hospitalized,
         hospitalized=RateLos(hospitalized_rate, hospitalized_los),
         icu=RateLos(icu_rate, icu_los),
-        known_infected=known_infected,
+        #known_infected=known_infected,
         relative_contact_rate=relative_contact_rate,
         ventilated=RateLos(ventilated_rate, ventilated_los),
 

@@ -49,10 +49,6 @@ class SimSirModel:
 
         susceptible = p.population - infected
 
-        detection_probability = (
-            p.known_infected / infected if infected > EPSILON else None
-        )
-
         intrinsic_growth_rate = get_growth_rate(p.doubling_time)
 
         gamma = 1.0 / p.infectious_days
@@ -74,8 +70,6 @@ class SimSirModel:
         self.susceptible = susceptible
         self.infected = infected
         self.recovered = p.recovered
-
-        self.detection_probability = detection_probability
 
         self.beta = beta
         self.gamma = gamma
