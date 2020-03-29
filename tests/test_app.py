@@ -7,27 +7,33 @@ import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
-from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
+from src.penn_chime.charts import (
+    new_admissions_chart,
+    admitted_patients_chart,
+    chart_descriptions,
+)
 from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df
 from src.penn_chime.parameters import Parameters
 from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
 from src.penn_chime.defaults import RateLos
 
+
 @pytest.fixture()
 def PARAM():
     return Parameters(
-    current_hospitalized=100,
-    doubling_time=6.0,
-    known_infected=5000,
-    market_share=0.05,
-    relative_contact_rate=0.15,
-    susceptible=500000,
-    hospitalized=RateLos(0.05, 7),
-    icu=RateLos(0.02, 9),
-    ventilated=RateLos(0.01, 10),
-    n_days=60,
-)
+        current_hospitalized=100,
+        doubling_time=6.0,
+        known_infected=5000,
+        market_share=0.05,
+        relative_contact_rate=0.15,
+        susceptible=500000,
+        hospitalized=RateLos(0.05, 7),
+        icu=RateLos(0.02, 9),
+        ventilated=RateLos(0.01, 10),
+        n_days=60,
+    )
+
 
 @pytest.fixture()
 def MODEL(PARAM):
@@ -38,9 +44,11 @@ def MODEL(PARAM):
 def census_df():
     return pd.read_csv("tests/census_df.csv")
 
+
 @pytest.fixture()
 def projection_admits():
-    return pd.read_csv('tests/projection_admits.csv')
+    return pd.read_csv("tests/projection_admits.csv")
+
 
 # set up
 
@@ -55,6 +63,7 @@ class MockStreamlit:
 
     def just_store_instead_of_rendering(self, inp, *args, **kwargs):
         self.render_store.append(inp)
+
 
 @pytest.fixture()
 def mock_st():
@@ -72,7 +81,7 @@ class TestPresentation:
         assert len(
             list(filter(lambda s: some_garbage in s, mock_st.render_store))
         ), "This should fail"
-    
+
     def test_penn_logo_in_header(self, MODEL, PARAM, mock_st):
         penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
         display_header(mock_st, MODEL, PARAM)
@@ -80,14 +89,12 @@ class TestPresentation:
             list(filter(lambda s: penn_css in s, mock_st.render_store))
         ), "The Penn Medicine header should be printed"
 
-
     def test_the_rest_of_header_shows_up(self, MODEL, PARAM, mock_st):
         random_part_of_header = "implying an effective $R_t$ of"
         display_header(mock_st, MODEL, PARAM)
         assert len(
             list(filter(lambda s: random_part_of_header in s, mock_st.render_store))
         ), "The whole header should render"
-
 
     def test_mitigation_statement(self, MODEL, PARAM, mock_st):
         expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
@@ -112,7 +119,7 @@ class TestPresentation:
         halving_model = SimSirModel(halving_params)
         display_header(mock_st, halving_model, halving_params)
         assert [s for s in mock_st.render_store if expected_halving in s]
-        #assert len((list(filter(lambda s: expected_halving in s, mock_st.render_store))))
+        # assert len((list(filter(lambda s: expected_halving in s, mock_st.render_store))))
 
 
 def test_defaults_repr():
@@ -123,8 +130,7 @@ def test_defaults_repr():
     # TODO: Add assertions
 
 
-
-class TestMath():
+class TestMath:
     def test_sir(self):
         """
         Someone who is good at testing, help
@@ -152,7 +158,9 @@ class TestMath():
 
         with pytest.raises(TypeError) as error:
             sir(100, 1, "R", 0.2, 0.5, 1)
-        assert str(error.value) == "unsupported operand type(s) for +: 'float' and 'str'"
+        assert (
+            str(error.value) == "unsupported operand type(s) for +: 'float' and 'str'"
+        )
 
         with pytest.raises(TypeError) as error:
             sir(100, 1, 0, "beta", 0.5, 1)
@@ -160,16 +168,19 @@ class TestMath():
 
         with pytest.raises(TypeError) as error:
             sir(100, 1, 0, 0.2, "gamma", 1)
-        assert str(error.value) == "unsupported operand type(s) for -: 'float' and 'str'"
+        assert (
+            str(error.value) == "unsupported operand type(s) for -: 'float' and 'str'"
+        )
 
         with pytest.raises(TypeError) as error:
             sir(100, 1, 0, 0.2, 0.5, "N")
-        assert str(error.value) == "unsupported operand type(s) for /: 'str' and 'float'"
+        assert (
+            str(error.value) == "unsupported operand type(s) for /: 'str' and 'float'"
+        )
 
         # Zeros across the board should fail
         with pytest.raises(ZeroDivisionError):
             sir(0, 0, 0, 0, 0, 0)
-
 
     def test_sim_sir(self):
         """
@@ -189,7 +200,6 @@ class TestMath():
 
         assert isinstance(raw_df, pd.DataFrame)
 
-
     def test_new_admissions_chart(self, PARAM):
         projection_admits = pd.read_csv("tests/projection_admits.csv")
         chart = new_admissions_chart(alt, projection_admits, PARAM)
@@ -204,7 +214,6 @@ class TestMath():
         empty_chart = new_admissions_chart(alt, pd.DataFrame(), PARAM)
         assert empty_chart.data.empty
 
-
     def test_admitted_patients_chart(self, census_df, PARAM):
         chart = admitted_patients_chart(alt, census_df, PARAM)
         assert isinstance(chart, alt.Chart)
@@ -217,7 +226,6 @@ class TestMath():
 
         empty_chart = admitted_patients_chart(alt, pd.DataFrame(), PARAM)
         assert empty_chart.data.empty
-
 
     def test_model(self, MODEL, PARAM):
         # test the Model
@@ -248,7 +256,12 @@ class TestMath():
         assert round(raw_df.recovered[30], 0) == 224048
 
         assert list(MODEL.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
-        assert [round(i, 0) for i in MODEL.dispositions_df.iloc[60, :]] == [60, 1182.0, 473.0, 236.0]
+        assert [round(i, 0) for i in MODEL.dispositions_df.iloc[60, :]] == [
+            60,
+            1182.0,
+            473.0,
+            236.0,
+        ]
 
         # test that admissions are being properly calculated (thanks @PhilMiller)
         cumulative_admits = MODEL.admits_df.cumsum()
@@ -263,12 +276,14 @@ class TestChartDescriptions:
         chart = new_admissions_chart(alt, projection_admits, PARAM)
         description = chart_descriptions(chart, PARAM.labels)
 
-        hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
+        hosp, icu, vent, asterisk = description.split(
+            "\n\n"
+        )  # break out the description into lines
 
-        max_hosp = chart.data['hospitalized'].max()
+        max_hosp = chart.data["hospitalized"].max()
         assert str(ceil(max_hosp)) in hosp
 
-        max_icu_ix = chart.data['icu'].idxmax()
+        max_icu_ix = chart.data["icu"].idxmax()
         assert max_icu_ix + 1 == len(chart.data)
         assert "*" in icu
 
@@ -286,6 +301,11 @@ class TestChartDescriptions:
         chart = admitted_patients_chart(alt, census_df, PARAM)
         description = chart_descriptions(chart, PARAM.labels)
 
-        assert str(ceil(chart.data['ventilated'].max())) in description
-        assert str(chart.data['icu'].idxmax()) not in description
-        assert datetime.datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
+        assert str(ceil(chart.data["ventilated"].max())) in description
+        assert str(chart.data["icu"].idxmax()) not in description
+        assert (
+            datetime.datetime.strftime(
+                chart.data.iloc[chart.data["icu"].idxmax()].date, "%b %d"
+            )
+            in description
+        )
