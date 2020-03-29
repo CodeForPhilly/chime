@@ -74,6 +74,7 @@ def df_to_html_table(
     """Converts pandas data frame to html table
     """
     index_name = dataframe.index.name
+    index_name = "index" if index_name is None else index_name
     tmp = dataframe.reset_index()
     tmp = tmp[mod(tmp.index, n_mod) == 0].copy()
     tmp = tmp.set_index(index_name)
