@@ -71,20 +71,17 @@ class SimSirModel:
         # Simplify equation to avoid division by zero:
         # self.r_naught = r_t / (1.0 - relative_contact_rate)
         r_naught = (intrinsic_growth_rate + gamma) / gamma
-        doubling_time_t = 1.0 / np.log2(
-            beta * susceptible - gamma + 1)
 
         self.susceptible = susceptible
         self.infected = infected
         self.recovered = p.recovered
 
         self.detection_probability = detection_probability
-        self.doubling_time_t = doubling_time_t
+
         self.beta = beta
         self.gamma = gamma
+        self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
         self.intrinsic_growth_rate = intrinsic_growth_rate
-        self.r_t = r_t
-        self.r_naught = r_naught
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             logger.info('Using doubling_time: %s', p.doubling_time)
@@ -94,12 +91,19 @@ class SimSirModel:
                 / susceptible
             )
 
+            self.i_day = 0 # seed to the full length
+            self.beta_t = self.beta
             self.run_projection(p)
             self.i_day = i_day = int(get_argmin_ds(self.census_df, p.current_hospitalized))
+
+            self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
             self.run_projection(p)
             self.infected = self.raw_df['infected'].values[i_day]
             self.susceptible = self.raw_df['susceptible'].values[i_day]
             self.recovered = self.raw_df['recovered'].values[i_day]
+            self.r_t = self.beta_t / gamma * susceptible
+            self.r_naught = self.beta / gamma * susceptible
+            logger.info('Set i_day = %s', i_day)
             p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
             logger.info(
                 'Estimated date_first_hospitalized: %s; current_date: %s; i_day: %s',
@@ -121,6 +125,7 @@ class SimSirModel:
             for i, i_dt in enumerate(dts):
                 intrinsic_growth_rate = get_growth_rate(i_dt)
                 self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
+                self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
                 self.run_projection(p)
                 loss = self.get_loss()
@@ -130,19 +135,24 @@ class SimSirModel:
             logger.info('Estimated doubling_time: %s', p.doubling_time)
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
+            self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
             self.run_projection(p)
 
             self.intrinsic_growth_rate = intrinsic_growth_rate
-            self.beta = beta
-            self.doubling_time_t = doubling_time_t
             self.population = p.population
-            self.r_t = r_t
-            self.r_naught = r_naught
         else:
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
 
         logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))
         logger.info('len(raw_df): %s', len(self.raw_df))
+
+        self.r_t = self.beta_t / gamma * susceptible
+        self.r_naught = self.beta / gamma * susceptible
+
+        doubling_time_t = 1.0 / np.log2(
+            self.beta_t * susceptible - gamma + 1)
+        self.doubling_time_t = doubling_time_t
+
         self.sim_sir_w_date_df = build_sim_sir_w_date_df(self.raw_df, p.current_date)
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
@@ -153,10 +163,12 @@ class SimSirModel:
             self.susceptible,
             self.infected,
             p.recovered,
-            self.beta,
             self.gamma,
-            p.n_days + self.i_day,
-            -self.i_day
+            -self.i_day,
+            self.beta,
+            self.i_day,
+            self.beta_t,
+            p.n_days
         )
         self.dispositions_df = build_dispositions_df(self.raw_df, self.rates, p.market_share, p.current_date)
         self.admits_df = build_admits_df(self.dispositions_df)
@@ -218,28 +230,30 @@ def sir(
 
 
 def gen_sir(
-    s: float, i: float, r: float,
-    beta: float, gamma: float, n_days: int, i_day: int = 0
+    s: float, i: float, r: float, gamma: float, i_day: int, *args
 ) -> Generator[Tuple[int, float, float, float], None, None]:
-    """Simulate SIR model forward in time yielding tuples."""
+    """Simulate SIR model forward in time yielding tuples.
+    Parameter order has changed to allow multiple (beta, n_days)
+    to reflect multiple changing social distancing policies.
+    """
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
     d = i_day
-    # TODO: Ask corey if n_days is really required for the sim
-    # while i >= 0.5:
-    for _ in range(n_days):
-        yield d, s, i, r
-        s, i, r = sir(s, i, r, beta, gamma, n)
-        d += 1
+    while args:
+        beta, n_days, *args = args
+        for _ in range(n_days):
+            yield d, s, i, r
+            s, i, r = sir(s, i, r, beta, gamma, n)
+            d += 1
     yield d, s, i, r
 
 
 def sim_sir_df(
-    s: float, i: float, r: float, beta: float, gamma: float, n_days: int, i_day: int = 0
+    s: float, i: float, r: float, gamma: float, i_day: int, *args
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
-        data=gen_sir(s, i, r, beta, gamma, n_days, i_day),
+        data=gen_sir(s, i, r, gamma, i_day, *args),
         columns=("day", "susceptible", "infected", "recovered"),
     )
 
