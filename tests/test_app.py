@@ -44,7 +44,7 @@ def projection_admits():
 
 # set up
 
-# we just want to verify that st _attempted_ to render the right stuff
+# we just want to verify that mock_st _attempted_ to render the right stuff
 # so we store the input, and make sure that it matches what we expect
 class MockStreamlit:
     def __init__(self):
@@ -55,43 +55,39 @@ class MockStreamlit:
 
     def just_store_instead_of_rendering(self, inp, *args, **kwargs):
         self.render_store.append(inp)
-        return None
 
-    def cleanup(self):
-        """
-        Call this after every test, unless you intentionally want to accumulate stuff-to-render
-        """
-        self.render_store = []
+@pytest.fixture()
+def mock_st():
+    return MockStreamlit()
 
 
-st = MockStreamlit()
 
 
 # test presentation
 
 
-def test_penn_logo_in_header(MODEL, PARAM):
+def test_penn_logo_in_header(MODEL, PARAM, mock_st):
     penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
-    display_header(st, MODEL, PARAM)
+    display_header(mock_st, MODEL, PARAM)
     assert len(
-        list(filter(lambda s: penn_css in s, st.render_store))
+        list(filter(lambda s: penn_css in s, mock_st.render_store))
     ), "The Penn Medicine header should be printed"
 
 
-def test_the_rest_of_header_shows_up():
+def test_the_rest_of_header_shows_up(MODEL, PARAM, mock_st):
     random_part_of_header = "implying an effective $R_t$ of"
+    display_header(mock_st, MODEL, PARAM)
     assert len(
-        list(filter(lambda s: random_part_of_header in s, st.render_store))
+        list(filter(lambda s: random_part_of_header in s, mock_st.render_store))
     ), "The whole header should render"
 
 
-def test_mitigation_statement(MODEL, PARAM):
-    st.cleanup()
+def test_mitigation_statement(MODEL, PARAM, mock_st):
     expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
-    display_header(st, MODEL, PARAM)
-    assert [s for s in st.render_store if expected_doubling in s]
-    # assert len((list(filter(lambda s: expected_doubling in s, st.render_store))))
-    st.cleanup()
+    display_header(mock_st, MODEL, PARAM)
+    assert [s for s in mock_st.render_store if expected_doubling in s]
+    # assert len((list(filter(lambda s: expected_doubling in s, mock_st.render_store))))
+
     expected_halving = "outbreak **halves the infections every 51.9** days"
     halving_params = Parameters(
         current_hospitalized=100,
@@ -106,13 +102,12 @@ def test_mitigation_statement(MODEL, PARAM):
         n_days=60,
     )
     halving_model = SimSirModel(halving_params)
-    display_header(st, halving_model, halving_params)
-    assert [s for s in st.render_store if expected_halving in s]
-    #assert len((list(filter(lambda s: expected_halving in s, st.render_store))))
-    st.cleanup()
+    display_header(mock_st, halving_model, halving_params)
+    assert [s for s in mock_st.render_store if expected_halving in s]
+    #assert len((list(filter(lambda s: expected_halving in s, mock_st.render_store))))
 
 
-st.cleanup()
+
 
 
 @pytest.mark.xfail()
@@ -121,11 +116,11 @@ def test_header_fail():
     Just proving to myself that these tests work
     """
     some_garbage = "ajskhlaeHFPIQONOI8QH34TRNAOP8ESYAW4"
-    display_header(st, PARAM)
+    display_header(mock_st, PARAM)
     assert len(
-        list(filter(lambda s: some_garbage in s, st.render_store))
+        list(filter(lambda s: some_garbage in s, mock_st.render_store))
     ), "This should fail"
-    st.cleanup()
+
 
 
 def test_defaults_repr():
