@@ -36,7 +36,6 @@ class SimSirModel:
             n_days_since = (p.current_date - p.date_first_hospitalized).days
             logger.debug(
                 "%s: %s - %s = %s days",
-                datetime.now(),
                 p.current_date, p.date_first_hospitalized,
                 n_days_since)
         self.n_days_since = n_days_since
@@ -55,7 +54,7 @@ class SimSirModel:
         # We're appoximating infected from what we do know.
         # TODO market_share > 0, hosp_rate > 0
         infected = (
-            p.current_hospitalized / p.market_share / p.hospitalized.rate
+            1 / p.market_share / p.hospitalized.rate
         )
 
         susceptible = p.population - infected
