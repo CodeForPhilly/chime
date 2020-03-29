@@ -7,7 +7,7 @@ changed
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from logging import INFO, basicConfig, getLogger
 from sys import stdout
 from typing import Dict, Generator, Tuple, Optional
@@ -87,7 +87,7 @@ class SimSirModel:
         self.r_naught = r_naught
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
-            logger.info('Using doubling_time.')
+            logger.info('Using doubling_time: %s', p.doubling_time)
             self.i_day = 0
             self.beta = (
                 (intrinsic_growth_rate + gamma)
@@ -100,11 +100,20 @@ class SimSirModel:
             self.infected = self.raw_df['infected'].values[i_day]
             self.susceptible = self.raw_df['susceptible'].values[i_day]
             self.recovered = self.raw_df['recovered'].values[i_day]
-            logger.info('Set i_day = %s', i_day)
+            p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
+            logger.info(
+                'Estimated date_first_hospitalized: %s; current_date: %s; i_day: %s',
+                p.date_first_hospitalized,
+                p.current_date,
+                self.i_day)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
             self.i_day = (p.current_date - p.date_first_hospitalized).days
-            logger.info('Using date_first_hospitalized: %s', self.i_day)
+            logger.info(
+                'Using date_first_hospitalized: %s; current_date: %s; i_day: %s',
+                p.date_first_hospitalized,
+                p.current_date,
+                self.i_day)
             min_loss = 2.0**99
             dts = np.linspace(1, 15, 29)
             losses = np.zeros(dts.shape[0])
@@ -117,8 +126,8 @@ class SimSirModel:
                 loss = self.get_loss()
                 losses[i] = loss
 
-            p.doubling_time = doubling_time = dts[pd.Series(losses).argmin()]
-            logger.info('Set doubling_time = %s', doubling_time)
+            p.doubling_time = dts[pd.Series(losses).argmin()]
+            logger.info('Estimated doubling_time: %s', p.doubling_time)
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.run_projection(p)
