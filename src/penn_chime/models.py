@@ -15,7 +15,9 @@ from typing import Dict, Generator, Tuple, Optional
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
+from .constants import EPSILON, CHANGE_DATE
 from .parameters import Parameters
+
 
 basicConfig(
     level=INFO,
@@ -23,9 +25,6 @@ basicConfig(
     stream=stdout,
 )
 logger = getLogger(__name__)
-
-
-EPSILON = 1.0e-7
 
 
 class SimSirModel:
@@ -150,7 +149,6 @@ class SimSirModel:
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
-        self.change_date = change_date
 
     def run_projection(self, p):
         self.raw_df = sim_sir_df(
@@ -171,14 +169,6 @@ class SimSirModel:
         """Squared error: predicted vs. actual current hospitalized."""
         predicted = self.census_df.hospitalized.loc[self.n_days_since]
         return (self.current_hospitalized - predicted) ** 2.0
-
-def change_date():
-    """
-    This reflects a date from which previously-run reports will no
-    longer match current results, indicating when users should
-    re-run their reports
-    """
-    return date(year=2020, month=3, day=30)
 
 
 def get_argmin_ds(census_df: pd.DataFrame, current_hospitalized: float) -> float:

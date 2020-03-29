@@ -7,15 +7,17 @@ import altair as alt  # type: ignore
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
+from .constants import (
+    CHANGE_DATE,
+    DATE_FORMAT,
+    DOCS_URL,
+    FLOAT_INPUT_MIN,
+    FLOAT_INPUT_STEP,
+)
+
 from .utils import dataframe_to_base64
 from .parameters import Parameters, RateLos
 from .models import SimSirModel as Model
-
-DATE_FORMAT = "%b, %d"  # see https://strftime.org
-DOCS_URL = "https://code-for-philly.gitbook.io/chime"
-
-FLOAT_INPUT_MIN = 0.001
-FLOAT_INPUT_STEP = FLOAT_INPUT_MIN
 
 hide_menu_style = """
         <style>
@@ -64,7 +66,7 @@ def display_header(st, m, p):
         """[Documentation](https://code-for-philly.gitbook.io/chime/) | [Github](https://github.com/CodeForPhilly/chime/) | [Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)"""
     )
     st.markdown(
-        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + str(m.change_date()) + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
+        """**IMPORTANT NOTICE**: Admissions and Census calculations were previously **undercounting**. Please update your reports generated before """ + str(CHANGE_DATE) + """. See more about changes [here](https://github.com/CodeForPhilly/chime/labels/models)."""
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at

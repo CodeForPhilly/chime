@@ -7,8 +7,8 @@ from altair import Chart  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np
 
+from .constants import DATE_FORMAT
 from .parameters import Parameters
-from .presentation import DATE_FORMAT
 
 
 def build_admits_chart(
