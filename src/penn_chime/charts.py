@@ -44,11 +44,10 @@ def build_admits_chart(
             color="key:N",
             tooltip=[
                 idx,
-                alt.Tooltip("value:Q", format=".0f", title="Admissions"),
+                alt.Tooltip("value:Q", format=".0f", title="Admit"),
                 "key:N",
             ],
-        )
-        .interactive()
+        ).interactive()
     )
 
 
@@ -59,32 +58,37 @@ def build_census_chart(
     max_y_axis: Optional[int] = None,
 ) -> Chart:
     """docstring"""
-    idx = "date:T"
-    x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     y_scale = alt.Scale()
 
     if max_y_axis:
         y_scale.domain = (0, max_y_axis)
 
     # TODO fix the fold to allow any number of dispositions
-    return (
-        #alt.Chart(census_df.head(plot_projection_days))
-        alt.Chart(census_df)
+    base = (
+        alt.Chart()
         .transform_fold(fold=["hospitalized", "icu", "ventilated"])
-        .mark_line(point=True)
+        .mark_line(point=True, interpolate='basis')
         .encode(
-            x=alt.X(**x_kwargs),
+            x=alt.X("date:T", title="Date", axis=alt.Axis(format=(DATE_FORMAT))),
             y=alt.Y("value:Q", title="Census", scale=y_scale),
             color="key:N",
             tooltip=[
-                idx,
+                "date:T",
                 alt.Tooltip("value:Q", format=".0f", title="Census"),
                 "key:N",
             ],
-        )
-        .interactive()
+        ).interactive()
     )
-
+    bar = (
+        alt.Chart()
+        .mark_rule(
+            color="black",
+            opacity=0.35,
+            size=3)
+        .encode(x=alt.X("day:Q", title="Current Date"))
+        .transform_filter(alt.datum.day == 0)
+    )
+    return alt.layer(base, bar, data=census_df)
 
 
 def build_sim_sir_w_date_chart(
@@ -93,25 +97,34 @@ def build_sim_sir_w_date_chart(
     sim_sir_w_date_df: pd.DataFrame,
     max_y_axis: Optional[int] = None,
 ) -> Chart:
-    idx = "date:T"
-    x_kwargs = {"shorthand": "date:T", "title": "Date", "axis": alt.Axis(format=(DATE_FORMAT))}
     y_scale = alt.Scale()
 
     if max_y_axis is not None:
         y_scale.domain = (0, max_y_axis)
 
-    return (
-        alt.Chart(sim_sir_w_date_df)
+    base = (
+        alt.Chart()
         .transform_fold(fold=["susceptible", "infected", "recovered"])
         .mark_line()
         .encode(
-            x=alt.X(**x_kwargs),
+            x=alt.X("date:T", title="Date", axis=alt.Axis(format=(DATE_FORMAT))),
             y=alt.Y("value:Q", title="Count", scale=y_scale),
             tooltip=["key:N", "value:Q"],
             color="key:N",
         )
         .interactive()
     )
+    bar = (
+        alt.Chart()
+        .mark_rule(
+            color="black",
+            opacity=0.35,
+            size=3)
+        .encode(x=alt.X("day:Q", title="Current Date"))
+        .transform_filter(alt.datum.day == 0)
+    )
+    return alt.layer(base, bar, data=sim_sir_w_date_df)
+
 
 
 def build_descriptions(
