@@ -22,7 +22,7 @@ from src.penn_chime.models import (
 )
 from src.penn_chime.parameters import (
     Parameters,
-    RateDays,
+    Disposition,
     Regions,
 )
 from src.penn_chime.presentation import display_header
@@ -45,9 +45,9 @@ DEFAULTS = Parameters(
     n_days=60,
     market_share=0.15,
     relative_contact_rate=0.3,
-    hospitalized=RateDays(0.025, 7),
-    icu=RateDays(0.0075, 9),
-    ventilated=RateDays(0.005, 10),
+    hospitalized=Disposition(0.025, 7),
+    icu=Disposition(0.0075, 9),
+    ventilated=Disposition(0.005, 10),
 )
 
 PARAM = Parameters(
@@ -56,9 +56,9 @@ PARAM = Parameters(
     market_share=0.05,
     relative_contact_rate=0.15,
     population=500000,
-    hospitalized=RateDays(0.05, 7),
-    icu=RateDays(0.02, 9),
-    ventilated=RateDays(0.01, 10),
+    hospitalized=Disposition(0.05, 7),
+    icu=Disposition(0.02, 9),
+    ventilated=Disposition(0.01, 10),
     n_days=60,
 )
 
@@ -68,9 +68,9 @@ HALVING_PARAM = Parameters(
     market_share=0.05,
     relative_contact_rate=0.7,
     population=500000,
-    hospitalized=RateDays(0.05, 7),
-    icu=RateDays(0.02, 9),
-    ventilated=RateDays(0.01, 10),
+    hospitalized=Disposition(0.05, 7),
+    icu=Disposition(0.02, 9),
+    ventilated=Disposition(0.01, 10),
     n_days=60,
 )
 

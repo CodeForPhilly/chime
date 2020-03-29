@@ -9,7 +9,7 @@ from datetime import datetime
 from pandas import DataFrame
 
 from .constants import CHANGE_DATE
-from .parameters import Parameters, RateDays
+from .parameters import Parameters, Disposition
 from .models import SimSirModel as Model
 
 
@@ -129,9 +129,9 @@ def main():
         relative_contact_rate=a.relative_contact_rate,
         population=a.population,
 
-        hospitalized=RateDays(a.hospitalized_rate, a.hospitalized_days),
-        icu=RateDays(a.icu_rate, a.icu_days),
-        ventilated=RateDays(a.ventilated_rate, a.ventilated_days),
+        hospitalized=Disposition(a.hospitalized_rate, a.hospitalized_days),
+        icu=Disposition(a.icu_rate, a.icu_days),
+        ventilated=Disposition(a.ventilated_rate, a.ventilated_days),
     )
 
     m = Model(p)
