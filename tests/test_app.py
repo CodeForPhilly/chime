@@ -258,7 +258,7 @@ def test_census_chart():
 def test_model(model=MODEL, param=PARAM):
     # test the Model
 
-    assert round(model.infected, 0) == 49097.0
+    assert round(model.infected, 0) == 45810.0
     assert isinstance(model.infected, float)  # based off note in models.py
 
     # test the class-calculated attributes
