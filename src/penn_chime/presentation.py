@@ -206,7 +206,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     icu_days_input = NumberInput(
         st_obj,
-        "Days in ICU",
+        "Average Days in ICU",
         min_value=0,
         value=d.icu.days,
         step=1,
