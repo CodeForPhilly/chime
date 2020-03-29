@@ -94,7 +94,6 @@ class SimSirModel:
         self.intrinsic_growth_rate = intrinsic_growth_rate
         self.r_t = r_t
         self.r_naught = r_naught
-        self.infected = 1.0 / p.hospitalized.rate / p.market_share
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             logger.info('Using doubling_time.')
