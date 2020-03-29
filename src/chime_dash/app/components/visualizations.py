@@ -20,6 +20,8 @@ from chime_dash.app.services.plotting import plot_dataframe
 from chime_dash.app.components.base import Component
 
 import urllib.parse
+from datetime import date
+
 
 LOCALIZATION_FILE = "visualizations.yml"
 
@@ -41,16 +43,31 @@ class Visualizations(Component):
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the header dash html
         """
+        today = date.today().strftime(self.content["date-format"])
         return [
             H2(self.content["new-admissions-title"]),
             Markdown(self.content["new-admissions-text"]),
             Graph(id="new-admissions-graph"),
-            A(self.content["download-text"], id='download-admissions', download="admissions.csv", href="", target="_blank", className="btn btn-sm btn-info"),
+            A(
+                self.content["download-text"], 
+                id='download-admissions', 
+                download="admissions_{}.csv".format(today), 
+                href="", 
+                target="_blank", 
+                className="btn btn-sm btn-info"
+            ),
             Table(id="new-admissions-table"),
             H2(self.content["admitted-patients-title"]),
             Markdown(self.content["admitted-patients-text"]),
             Graph(id="admitted-patients-graph"),
-            A(self.content["download-text"], id='download-census', download="census.csv", href="", target="_blank", className="btn btn-sm btn-info"),
+            A(
+                self.content["download-text"], 
+                id='download-census', 
+                download="census_{}.csv".format(today), 
+                href="", 
+                target="_blank", 
+                className="btn btn-sm btn-info"
+            ),
             Table(id="admitted-patients-table"),
         ]
 
@@ -88,11 +105,11 @@ class Visualizations(Component):
         )
 
         # Create admissions CSV
-        admissions_csv = projection_admits.to_csv(index=False, encoding='utf-8')
+        admissions_csv = projection_admits.to_csv(index=True, encoding='utf-8')
         admissions_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(admissions_csv)
 
         # Create census CSV
-        census_csv = census_df.to_csv(index=False, encoding='utf-8')
+        census_csv = census_df.to_csv(index=True, encoding='utf-8')
         census_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(census_csv)
 
 
