@@ -1,7 +1,7 @@
 """effectful functions for streamlit io"""
 
-import numpy as np  # type: ignore
-import pandas as pd  # type: ignore
+import numpy as np
+import pandas as pd
 
 from .defaults import Constants, RateLos
 from .utils import add_date_column, dataframe_to_base64

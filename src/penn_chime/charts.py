@@ -2,8 +2,8 @@
 from math import ceil
 import datetime
 
-from altair import Chart  # type: ignore
-import pandas as pd  # type: ignore
+from altair import Chart
+import pandas as pd
 import numpy as np
 
 from .parameters import Parameters
