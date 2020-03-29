@@ -14,7 +14,9 @@ from src.penn_chime.presentation import display_header
 from src.penn_chime.settings import DEFAULTS
 from src.penn_chime.defaults import RateLos
 
-PARAM = Parameters(
+@pytest.fixture()
+def PARAM():
+    return Parameters(
     current_hospitalized=100,
     doubling_time=6.0,
     known_infected=5000,
@@ -27,8 +29,18 @@ PARAM = Parameters(
     n_days=60,
 )
 
-MODEL = SimSirModel(PARAM)
+@pytest.fixture()
+def MODEL(PARAM):
+    return SimSirModel(PARAM)
 
+
+@pytest.fixture()
+def census_df():
+    return pd.read_csv("tests/census_df.csv")
+
+@pytest.fixture()
+def projection_admits():
+    return pd.read_csv('tests/projection_admits.csv')
 
 # set up
 
@@ -58,7 +70,7 @@ st = MockStreamlit()
 # test presentation
 
 
-def test_penn_logo_in_header():
+def test_penn_logo_in_header(MODEL, PARAM):
     penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
     display_header(st, MODEL, PARAM)
     assert len(
@@ -73,7 +85,7 @@ def test_the_rest_of_header_shows_up():
     ), "The whole header should render"
 
 
-def test_mitigation_statement():
+def test_mitigation_statement(MODEL, PARAM):
     st.cleanup()
     expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
     display_header(st, MODEL, PARAM)
@@ -123,175 +135,169 @@ def test_defaults_repr():
     repr(DEFAULTS)
 
 
-# Test the math
+
+class TestMath():
+    def test_sir(self):
+        """
+        Someone who is good at testing, help
+        """
+        sir_test = sir(100, 1, 0, 0.2, 0.5, 1)
+        assert sir_test == (
+            0.7920792079207921,
+            0.20297029702970298,
+            0.0049504950495049506,
+        ), "This contrived example should work"
+
+        assert isinstance(sir_test, tuple)
+        for v in sir_test:
+            assert isinstance(v, float)
+            assert v >= 0
+
+        # Certain things should *not* work
+        with pytest.raises(TypeError) as error:
+            sir("S", 1, 0, 0.2, 0.5, 1)
+        assert str(error.value) == "can't multiply sequence by non-int of type 'float'"
+
+        with pytest.raises(TypeError) as error:
+            sir(100, "I", 0, 0.2, 0.5, 1)
+        assert str(error.value) == "can't multiply sequence by non-int of type 'float'"
+
+        with pytest.raises(TypeError) as error:
+            sir(100, 1, "R", 0.2, 0.5, 1)
+        assert str(error.value) == "unsupported operand type(s) for +: 'float' and 'str'"
+
+        with pytest.raises(TypeError) as error:
+            sir(100, 1, 0, "beta", 0.5, 1)
+        assert str(error.value) == "bad operand type for unary -: 'str'"
+
+        with pytest.raises(TypeError) as error:
+            sir(100, 1, 0, 0.2, "gamma", 1)
+        assert str(error.value) == "unsupported operand type(s) for -: 'float' and 'str'"
+
+        with pytest.raises(TypeError) as error:
+            sir(100, 1, 0, 0.2, 0.5, "N")
+        assert str(error.value) == "unsupported operand type(s) for /: 'str' and 'float'"
+
+        # Zeros across the board should fail
+        with pytest.raises(ZeroDivisionError):
+            sir(0, 0, 0, 0, 0, 0)
 
 
-def test_sir():
-    """
-    Someone who is good at testing, help
-    """
-    sir_test = sir(100, 1, 0, 0.2, 0.5, 1)
-    assert sir_test == (
-        0.7920792079207921,
-        0.20297029702970298,
-        0.0049504950495049506,
-    ), "This contrived example should work"
+    def test_sim_sir(self):
+        """
+        Rounding to move fast past decimal place issues
+        """
+        raw_df = sim_sir_df(5, 6, 7, 0.1, 0.1, 40)
 
-    assert isinstance(sir_test, tuple)
-    for v in sir_test:
-        assert isinstance(v, float)
-        assert v >= 0
+        first = raw_df.iloc[0, :]
+        last = raw_df.iloc[-1, :]
 
-    # Certain things should *not* work
-    with pytest.raises(TypeError) as error:
-        sir("S", 1, 0, 0.2, 0.5, 1)
-    assert str(error.value) == "can't multiply sequence by non-int of type 'float'"
+        assert round(first.susceptible, 0) == 5
+        assert round(first.infected, 2) == 6
+        assert round(first.recovered, 0) == 7
+        assert round(last.susceptible, 2) == 0
+        assert round(last.infected, 2) == 0.18
+        assert round(last.recovered, 2) == 17.82
 
-    with pytest.raises(TypeError) as error:
-        sir(100, "I", 0, 0.2, 0.5, 1)
-    assert str(error.value) == "can't multiply sequence by non-int of type 'float'"
-
-    with pytest.raises(TypeError) as error:
-        sir(100, 1, "R", 0.2, 0.5, 1)
-    assert str(error.value) == "unsupported operand type(s) for +: 'float' and 'str'"
-
-    with pytest.raises(TypeError) as error:
-        sir(100, 1, 0, "beta", 0.5, 1)
-    assert str(error.value) == "bad operand type for unary -: 'str'"
-
-    with pytest.raises(TypeError) as error:
-        sir(100, 1, 0, 0.2, "gamma", 1)
-    assert str(error.value) == "unsupported operand type(s) for -: 'float' and 'str'"
-
-    with pytest.raises(TypeError) as error:
-        sir(100, 1, 0, 0.2, 0.5, "N")
-    assert str(error.value) == "unsupported operand type(s) for /: 'str' and 'float'"
-
-    # Zeros across the board should fail
-    with pytest.raises(ZeroDivisionError):
-        sir(0, 0, 0, 0, 0, 0)
+        assert isinstance(raw_df, pd.DataFrame)
 
 
-def test_sim_sir():
-    """
-    Rounding to move fast past decimal place issues
-    """
-    raw_df = sim_sir_df(5, 6, 7, 0.1, 0.1, 40)
+    def test_new_admissions_chart(self, PARAM):
+        projection_admits = pd.read_csv("tests/projection_admits.csv")
+        chart = new_admissions_chart(alt, projection_admits, PARAM)
+        assert isinstance(chart, alt.Chart)
+        assert chart.data.iloc[1].hospitalized < 1
+        assert round(chart.data.iloc[40].icu, 0) == 25
 
-    first = raw_df.iloc[0, :]
-    last = raw_df.iloc[-1, :]
+        # test fx call with no params
+        with pytest.raises(TypeError):
+            new_admissions_chart()
 
-    assert round(first.susceptible, 0) == 5
-    assert round(first.infected, 2) == 6
-    assert round(first.recovered, 0) == 7
-    assert round(last.susceptible, 2) == 0
-    assert round(last.infected, 2) == 0.18
-    assert round(last.recovered, 2) == 17.82
-
-    assert isinstance(raw_df, pd.DataFrame)
+        empty_chart = new_admissions_chart(alt, pd.DataFrame(), PARAM)
+        assert empty_chart.data.empty
 
 
-def test_new_admissions_chart():
-    projection_admits = pd.read_csv("tests/projection_admits.csv")
-    chart = new_admissions_chart(alt, projection_admits, PARAM)
-    assert isinstance(chart, alt.Chart)
-    assert chart.data.iloc[1].hospitalized < 1
-    assert round(chart.data.iloc[40].icu, 0) == 25
+    def test_admitted_patients_chart(self, census_df, PARAM):
+        chart = admitted_patients_chart(alt, census_df, PARAM)
+        assert isinstance(chart, alt.Chart)
+        assert chart.data.iloc[1].hospitalized == 1
+        assert chart.data.iloc[49].ventilated == 203
 
-    # test fx call with no params
-    with pytest.raises(TypeError):
-        new_admissions_chart()
+        # test fx call with no params
+        with pytest.raises(TypeError):
+            admitted_patients_chart()
 
-    empty_chart = new_admissions_chart(alt, pd.DataFrame(), PARAM)
-    assert empty_chart.data.empty
-
-
-def test_admitted_patients_chart():
-    census_df = pd.read_csv("tests/census_df.csv")
-    chart = admitted_patients_chart(alt, census_df, PARAM)
-    assert isinstance(chart, alt.Chart)
-    assert chart.data.iloc[1].hospitalized == 1
-    assert chart.data.iloc[49].ventilated == 203
-
-    # test fx call with no params
-    with pytest.raises(TypeError):
-        admitted_patients_chart()
-
-    empty_chart = admitted_patients_chart(alt, pd.DataFrame(), PARAM)
-    assert empty_chart.data.empty
+        empty_chart = admitted_patients_chart(alt, pd.DataFrame(), PARAM)
+        assert empty_chart.data.empty
 
 
-def test_model(model=MODEL, param=PARAM):
-    # test the Model
+    def test_model(self, MODEL, PARAM):
+        # test the Model
 
-    assert model.infected == 40000.0
-    assert isinstance(model.infected, float)  # based off note in models.py
+        assert MODEL.infected == 40000.0
+        assert isinstance(MODEL.infected, float)  # based off note in models.py
 
-    # test the class-calculated attributes
-    assert model.detection_probability == 0.125
-    assert model.intrinsic_growth_rate == 0.12246204830937302
-    assert model.beta == 3.2961405355450555e-07
-    assert model.r_t == 2.307298374881539
-    assert model.r_naught == 2.7144686763312222
-    assert model.doubling_time_t == 7.764405988534983
+        # test the class-calculated attributes
+        assert MODEL.detection_probability == 0.125
+        assert MODEL.intrinsic_growth_rate == 0.12246204830937302
+        assert MODEL.beta == 3.2961405355450555e-07
+        assert MODEL.r_t == 2.307298374881539
+        assert MODEL.r_naught == 2.7144686763312222
+        assert MODEL.doubling_time_t == 7.764405988534983
 
-    # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
-    assert len(model.raw_df) == param.n_days + 1 == 61
+        # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
+        assert len(MODEL.raw_df) == PARAM.n_days + 1 == 61
 
-    raw_df = model.raw_df
-    first = raw_df.iloc[0, :]
-    second = raw_df.iloc[1, :]
-    last = raw_df.iloc[-1, :]
+        raw_df = MODEL.raw_df
+        first = raw_df.iloc[0, :]
+        second = raw_df.iloc[1, :]
+        last = raw_df.iloc[-1, :]
 
-    assert first.susceptible == 500000.0
-    assert round(second.infected, 0) == 43735
+        assert first.susceptible == 500000.0
+        assert round(second.infected, 0) == 43735
 
-    assert round(last.susceptible, 0) == 67202
-    assert round(raw_df.recovered[30], 0) == 224048
+        assert round(last.susceptible, 0) == 67202
+        assert round(raw_df.recovered[30], 0) == 224048
 
-    assert list(model.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
-    assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [60, 1182.0, 473.0, 236.0]
+        assert list(MODEL.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
+        assert [round(i, 0) for i in MODEL.dispositions_df.iloc[60, :]] == [60, 1182.0, 473.0, 236.0]
 
-    # test that admissions are being properly calculated (thanks @PhilMiller)
-    cumulative_admits = model.admits_df.cumsum()
-    diff = cumulative_admits.hospitalized[1:-1] - (
-        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
-    )
-    assert (diff.abs() < 0.1).all()
+        # test that admissions are being properly calculated (thanks @PhilMiller)
+        cumulative_admits = MODEL.admits_df.cumsum()
+        diff = cumulative_admits.hospitalized[1:-1] - (
+            0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
+        )
+        assert (diff.abs() < 0.1).all()
 
 
-def test_chart_descriptions(p=PARAM):
-    # new admissions chart
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
-    chart = new_admissions_chart(alt, projection_admits, p)
-    description = chart_descriptions(chart, p.labels)
+class TestChartDescriptions:
+    def test_new_admissions_chart(self, PARAM, projection_admits):
+        chart = new_admissions_chart(alt, projection_admits, PARAM)
+        description = chart_descriptions(chart, PARAM.labels)
 
-    hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
+        hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
 
-    max_hosp = chart.data['hospitalized'].max()
-    assert str(ceil(max_hosp)) in hosp
+        max_hosp = chart.data['hospitalized'].max()
+        assert str(ceil(max_hosp)) in hosp
 
-    max_icu_ix = chart.data['icu'].idxmax()
-    assert max_icu_ix + 1 == len(chart.data)
-    assert "*" in icu
+        max_icu_ix = chart.data['icu'].idxmax()
+        assert max_icu_ix + 1 == len(chart.data)
+        assert "*" in icu
 
-    # test asterisk
-    param = PARAM
-    param.n_days = 600
+    def test_asterisk(self, PARAM, projection_admits):
+        PARAM.n_days = 600
 
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
-    # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
-    chart = new_admissions_chart(alt, projection_admits, p)
-    description = chart_descriptions(chart, p.labels)
-    assert "*" not in description
+        # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
+        chart = new_admissions_chart(alt, projection_admits, PARAM)
+        description = chart_descriptions(chart, PARAM.labels)
+        assert "*" not in description
 
-    # census chart
-    census_df = pd.read_csv('tests/census_df.csv')
-    # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
-    PARAM.as_date = True
-    chart = admitted_patients_chart(alt, census_df, p)
-    description = chart_descriptions(chart, p.labels)
+    def test_census_chart(self, PARAM, census_df):
+        # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
+        PARAM.as_date = True
+        chart = admitted_patients_chart(alt, census_df, PARAM)
+        description = chart_descriptions(chart, PARAM.labels)
 
-    assert str(ceil(chart.data['ventilated'].max())) in description
-    assert str(chart.data['icu'].idxmax()) not in description
-    assert datetime.datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
+        assert str(ceil(chart.data['ventilated'].max())) in description
+        assert str(chart.data['icu'].idxmax()) not in description
+        assert datetime.datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
