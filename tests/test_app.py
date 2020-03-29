@@ -297,7 +297,7 @@ def test_model_raw_end(model=MODEL, param=PARAM):
 
     last = raw_df.iloc[-1, :]
     assert last.susceptible + last.infected + last.recovered == param.population
-    assert round(last.susceptible, 0) == 46683.0
+    assert round(last.susceptible, 0) == 49556.0
 
 
 def test_model_cumulative_census(model=MODEL):
