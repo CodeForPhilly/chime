@@ -1,8 +1,7 @@
 """Models.
 
 Changes affecting results or their presentation should also update
-parameters.py `change_date`, so users can see when results have last
-changed
+constants.py `change_date`,
 """
 
 from __future__ import annotations
@@ -141,6 +140,11 @@ class SimSirModel:
             self.intrinsic_growth_rate = intrinsic_growth_rate
             self.population = p.population
         else:
+            logger.info(
+                'doubling_time: %s; date_first_hospitalized: %s',
+                p.doubling_time,
+                p.date_first_hospitalized,
+            )
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
 
         logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))

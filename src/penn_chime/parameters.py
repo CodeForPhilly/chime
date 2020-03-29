@@ -1,7 +1,7 @@
 """Parameters.
 
 Changes affecting results or their presentation should also update
-`change_date`, so users can see when results have last changed
+constants.py `change_date``.
 """
 
 from collections import namedtuple
@@ -49,7 +49,6 @@ class Parameters:
         recovered: int = 0,
         region: Optional[Regions] = None,
     ):
-
         self.current_hospitalized = current_hospitalized
         self.known_infected = known_infected
         self.relative_contact_rate = relative_contact_rate
@@ -65,7 +64,7 @@ class Parameters:
             self.region = None
             self.population = population
         else:
-            raise AssertionError('Population or Regions required')
+            raise AssertionError('population or regions must be provided.')
 
         self.current_date = current_date
         self.date_first_hospitalized = date_first_hospitalized

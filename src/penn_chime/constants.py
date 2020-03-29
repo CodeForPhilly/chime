@@ -2,7 +2,6 @@
 
 from datetime import date
 
-
 """
 This reflects a date from which previously-run reports will no
 longer match current results, indicating when users should
