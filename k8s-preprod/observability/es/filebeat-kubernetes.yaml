@@ -8,27 +8,15 @@ metadata:
     k8s-app: filebeat
 data:
   filebeat.yml: |-
-    # filebeat.inputs:
-    #   - type: container
-    #     paths:
-    #       - /var/log/containers/*.log
-    #     processors:
-    #       - add_kubernetes_metadata:
-    #           host: ${NODE_NAME}
-    #           matchers:
-    #           - logs_path:
-    #               logs_path: "/var/log/containers/"
-    filebeat.autosdiscover: 
-      providers:
-        - type: kubernetes
-          node: ${NODE_NAME}
-            hints.enabled: true
-            hints.default_config:
-          type: container
-            paths:
-            - /var/log/containers/*${data.kubernetes.container.id}.log
-       
-        
+    filebeat.autodiscover:
+     providers:
+       - type: kubernetes
+         node: ${NODE_NAME}
+         hints.enabled: true
+         hints.default_config:
+           type: container
+           paths:
+             - /var/log/containers/*${data.kubernetes.container.id}.log
 
     processors:
       - add_cloud_metadata:
@@ -38,9 +26,10 @@ data:
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
 
     output.elasticsearch:
-      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      hosts: ['https://${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
+      ssl.verification_mode: none
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -71,13 +60,13 @@ spec:
         ]
         env:
         - name: ELASTICSEARCH_HOST
-          value: elasticsearch
+          value: "10.128.169.209"
         - name: ELASTICSEARCH_PORT
           value: "9200"
         - name: ELASTICSEARCH_USERNAME
           value: elastic
         - name: ELASTICSEARCH_PASSWORD
-          value: "w94cd5wps8jtxhqt8zvw8k9p"
+          value: w94cd5wps8jtxhqt8zvw8k9p
         - name: ELASTIC_CLOUD_ID
           value:
         - name: ELASTIC_CLOUD_AUTH
