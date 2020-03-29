@@ -8,7 +8,7 @@ from typing import List, Any
 
 from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
-from dash_html_components import H2
+from dash_html_components import H2, A
 from dash_core_components import Markdown, Graph
 from dash_bootstrap_components import Table
 
@@ -18,6 +18,8 @@ from penn_chime.parameters import Parameters
 from chime_dash.app.utils.templates import df_to_html_table
 from chime_dash.app.services.plotting import plot_dataframe
 from chime_dash.app.components.base import Component
+
+import urllib.parse
 
 LOCALIZATION_FILE = "visualizations.yml"
 
@@ -32,6 +34,7 @@ class Visualizations(Component):
         Output(component_id="new-admissions-table", component_property="children"),
         Output(component_id="admitted-patients-graph", component_property="figure"),
         Output(component_id="admitted-patients-table", component_property="children"),
+        Output(component_id="download-link", component_property="href"),
     ]
 
     def get_html(self) -> List[ComponentMeta]:
@@ -40,6 +43,7 @@ class Visualizations(Component):
         return [
             H2(self.content["new-admissions-title"]),
             Markdown(self.content["new-admissions-text"]),
+            A('Download Data', id='download-link', download="rawdata.csv", href="", target="_blank"),
             Graph(id="new-admissions-graph"),
             Table(id="new-admissions-table"),
             H2(self.content["admitted-patients-title"]),
@@ -58,6 +62,11 @@ class Visualizations(Component):
         admissions_data = plot_dataframe(
             projection_admits.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
         )
+
+        # Create admissions CSV
+        admissions_csv = projection_admits.to_csv(index=False, encoding='utf-8')
+        admissions_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(admissions_csv)
+
         # Create admissions table data
         if kwargs["as_date"]:
             projection_admits.index = projection_admits.index.strftime("%b, %d")
@@ -80,7 +89,7 @@ class Visualizations(Component):
             else None
         )
 
-        return [admissions_data, admissions_table_data, census_data, census_table_data]
+        return [admissions_data, admissions_table_data, census_data, census_table_data, admissions_csv]
 
     @staticmethod
     def _build_frames(**kwargs):
