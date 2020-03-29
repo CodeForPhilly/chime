@@ -277,8 +277,8 @@ def test_model_raw_start(model=MODEL, param=PARAM):
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
 
-    # print('n_days: %s; i_day: %s; n_days_since: %s' % (param.n_days, model.i_day, model.n_days_since))
-    assert len(raw_df) == (param.n_days + model.n_days_since + 1) == 105
+    # print('n_days: %s; i_day: %s' % (param.n_days, model.i_day))
+    assert len(raw_df) == (len(np.arange(-model.i_day, param.n_days)) + 1) == 105
 
     first = raw_df.iloc[0, :]
     second = raw_df.iloc[1, :]

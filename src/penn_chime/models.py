@@ -31,15 +31,6 @@ class SimSirModel:
 
     def __init__(self, p: Parameters):
 
-        n_days_since = None
-        if p.date_first_hospitalized:
-            n_days_since = (p.current_date - p.date_first_hospitalized).days
-            logger.debug(
-                "%s: %s - %s = %s days",
-                p.current_date, p.date_first_hospitalized,
-                n_days_since)
-        self.n_days_since = n_days_since
-
         self.rates = {
             key: d.rate
             for key, d in p.dispositions.items()
@@ -109,12 +100,11 @@ class SimSirModel:
             self.infected = self.raw_df['infected'].values[i_day]
             self.susceptible = self.raw_df['susceptible'].values[i_day]
             self.recovered = self.raw_df['recovered'].values[i_day]
-            self.n_days_since = i_day
             logger.info('Set i_day = %s', i_day)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
-            logger.info('Using date_first_hospitalized.')
-            self.i_day = self.n_days_since
+            self.i_day = (p.current_date - p.date_first_hospitalized).days
+            logger.info('Using date_first_hospitalized: %s', self.i_day)
             min_loss = 2.0**99
             dts = np.linspace(1, 15, 29)
             losses = np.zeros(dts.shape[0])
@@ -165,7 +155,7 @@ class SimSirModel:
 
     def get_loss(self) -> float:
         """Squared error: predicted vs. actual current hospitalized."""
-        predicted = self.census_df.hospitalized.loc[self.n_days_since]
+        predicted = self.census_df.hospitalized.loc[self.i_day]
         return (self.current_hospitalized - predicted) ** 2.0
 
 
@@ -192,12 +182,6 @@ def get_growth_rate(doubling_time: Optional[float]) -> float:
     if doubling_time is None or doubling_time == 0.0:
         return 0.0
     return (2.0 ** (1.0 / doubling_time) - 1.0)
-
-
-def get_loss(census_df: pd.DataFrame, current_hospitalized: float, n_days_since: int) -> float:
-    """Squared error: predicted vs. actual current hospitalized."""
-    predicted = census_df.hospitalized.loc[n_days_since]
-    return (current_hospitalized - predicted) ** 2.0
 
 
 def sir(
