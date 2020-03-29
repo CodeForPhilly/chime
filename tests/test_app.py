@@ -1,23 +1,58 @@
 """Tests."""
 
+from copy import copy
 from math import ceil  # type: ignore
-import datetime  # type: ignore
+from datetime import date, datetime  # type: ignore
 import pytest  # type: ignore
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
 import altair as alt  # type: ignore
 
-from src.penn_chime.charts import new_admissions_chart, admitted_patients_chart, chart_descriptions
-from src.penn_chime.models import SimSirModel, sir, sim_sir_df, build_admits_df, daily_growth_helper
-from src.penn_chime.parameters import Parameters
+from src.penn_chime.charts import (
+    build_admits_chart,
+    build_census_chart,
+    build_descriptions,
+)
+from src.penn_chime.models import (
+    SimSirModel as Model,
+    sir,
+    sim_sir_df,
+    build_admits_df,
+    get_growth_rate,
+)
+from src.penn_chime.parameters import (
+    Parameters,
+    RateLos,
+    Regions,
+)
 from src.penn_chime.presentation import display_header
-from src.penn_chime.settings import DEFAULTS
-from src.penn_chime.defaults import RateLos
+
+EPSILON = 1.e-7
+
+# The defaults in settings will change and break the tests
+DEFAULTS = Parameters(
+    region=Regions(
+        delaware=564696,
+        chester=519293,
+        montgomery=826075,
+        bucks=628341,
+        philly=1581000,
+    ),
+    current_date=datetime(year=2020, month=3, day=28),
+    current_hospitalized=14,
+    date_first_hospitalized=datetime(year=2020, month=3, day=7),
+    doubling_time=4.0,
+    n_days=60,
+    market_share=0.15,
+    relative_contact_rate=0.3,
+    hospitalized=RateLos(0.025, 7),
+    icu=RateLos(0.0075, 9),
+    ventilated=RateLos(0.005, 10),
+)
 
 PARAM = Parameters(
     current_hospitalized=100,
     doubling_time=6.0,
-    known_infected=5000,
     market_share=0.05,
     relative_contact_rate=0.15,
     population=500000,
@@ -30,7 +65,6 @@ PARAM = Parameters(
 HALVING_PARAM = Parameters(
     current_hospitalized=100,
     doubling_time=6.0,
-    known_infected=5000,
     market_share=0.05,
     relative_contact_rate=0.7,
     population=500000,
@@ -40,8 +74,8 @@ HALVING_PARAM = Parameters(
     n_days=60,
 )
 
-MODEL = SimSirModel(PARAM)
-HALVING_MODEL = SimSirModel(HALVING_PARAM)
+MODEL = Model(copy(PARAM))
+HALVING_MODEL = Model(copy(HALVING_PARAM))
 
 
 # set up
@@ -97,7 +131,7 @@ def test_mitigation_statement():
     header_test_helper(expected_halving, HALVING_MODEL, HALVING_PARAM)
 
 
-def test_daily_growth_presentation():
+def test_growth_rate():
     initial_growth = "and daily growth rate of **12.25%**."
     mitigated_growth = "and daily growth rate of **9.34%**."
     mitigated_halving = "and daily growth rate of **-1.33%**."
@@ -182,7 +216,15 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    raw_df = sim_sir_df(5, 6, 7, 0.1, 0.1, 40)
+    raw_df = sim_sir_df(
+        5, # s
+        6, # i
+        7, # r
+        0.1, # gamma
+        0, # i_day
+        0.1, # beta1
+        40, # n_days1
+    )
 
     first = raw_df.iloc[0, :]
     last = raw_df.iloc[-1, :]
@@ -197,118 +239,139 @@ def test_sim_sir():
     assert isinstance(raw_df, pd.DataFrame)
 
 
-def test_new_admissions_chart():
-    projection_admits = pd.read_csv("tests/projection_admits.csv")
-    chart = new_admissions_chart(alt, projection_admits, PARAM)
-    assert isinstance(chart, alt.Chart)
-    # COMMENTING OUT because chart tests oughtn't bother with numeric info anyway
-    # assert chart.data.iloc[1].hospitalized < 1 
-    assert round(chart.data.iloc[40].icu, 0) == 25
+def test_admits_chart():
+    admits_df = pd.read_csv("tests/by_doubling_time/2020-03-28_projected_admits.csv")
+    chart = build_admits_chart(alt=alt, admits_df=admits_df)
+    assert isinstance(chart, (alt.Chart, alt.LayerChart))
+    assert round(chart.data.iloc[40].icu, 0) == 38
 
     # test fx call with no params
     with pytest.raises(TypeError):
-        new_admissions_chart()
-    
-    # unnecessary
-    # empty_chart = new_admissions_chart(alt, pd.DataFrame(), PARAM)
-    # assert empty_chart.data.empty
+        build_admits_chart()
 
 
-def test_admitted_patients_chart():
-    census_df = pd.read_csv("tests/census_df.csv")
-    chart = admitted_patients_chart(alt, census_df, PARAM)
-    assert isinstance(chart, alt.Chart)
-    assert chart.data.iloc[1].hospitalized == 1
-    assert chart.data.iloc[49].ventilated == 203
+def test_census_chart():
+    census_df = pd.read_csv("tests/by_doubling_time/2020-03-28_projected_census.csv")
+    chart = build_census_chart(alt=alt, census_df=census_df)
+    assert isinstance(chart, (alt.Chart, alt.LayerChart))
+    assert chart.data.iloc[1].hospitalized == 3
+    assert chart.data.iloc[49].ventilated == 365
 
     # test fx call with no params
     with pytest.raises(TypeError):
-        admitted_patients_chart()
-
-    empty_chart = admitted_patients_chart(alt, pd.DataFrame(), PARAM)
-    assert empty_chart.data.empty
+        build_census_chart()
 
 
-def test_model(model=MODEL, param=PARAM):
+def test_model():
     # test the Model
+    param = copy(PARAM)
+    model = Model(param)
 
-    assert model.infected == 40000.0
+    assert round(model.infected, 0) == 45810.0
     assert isinstance(model.infected, float)  # based off note in models.py
 
     # test the class-calculated attributes
-    assert model.detection_probability == 0.125
+    # we're talking about getting rid of detection probability
+    # assert model.detection_probability == 0.125
     assert model.intrinsic_growth_rate == 0.12246204830937302
-    assert model.beta == 3.582761451679408e-07
+    assert abs(model.beta - 4.21501347256401e-07) < EPSILON
     assert model.r_t == 2.307298374881539
     assert model.r_naught == 2.7144686763312222
     assert model.doubling_time_t == 7.764405988534983
 
-    # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
-    assert len(model.raw_df) == param.n_days + 1 == 61
 
+def test_model_raw_start():
+    param = copy(PARAM)
+    model = Model(param)
     raw_df = model.raw_df
+
+    # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
+
+    # print('n_days: %s; i_day: %s' % (param.n_days, model.i_day))
+    assert len(raw_df) == (len(np.arange(-model.i_day, param.n_days + 1))) == 104
+
     first = raw_df.iloc[0, :]
     second = raw_df.iloc[1, :]
-    last = raw_df.iloc[-1, :]
 
     assert first.susceptible + first.infected + first.recovered == param.population
+    assert first.susceptible == 499600.0
+    assert round(second.infected, 0) == 449.0
+    assert list(model.dispositions_df.iloc[0, :]) == [-43, date(year=2020, month=2, day=15), 1.0, 0.4, 0.2]
+    assert round(raw_df.recovered[30], 0) == 7083.0
+
+    d, dt, s, i, r = list(model.dispositions_df.iloc[60, :])
+    assert dt == date(year=2020, month=4, day=15)
+    assert [round(v, 0) for v in (d, s, i, r)] == [17, 549.0, 220.0, 110.0]
+
+
+def test_model_raw_end():
+    param = copy(PARAM)
+    model = Model(param)
+    raw_df = model.raw_df
+
+    last = raw_df.iloc[-1, :]
     assert last.susceptible + last.infected + last.recovered == param.population
+    assert round(last.susceptible, 0) == 83391.0
 
-    assert first.susceptible == 460000.0
-    assert round(second.infected, 0) == 43735
 
-    assert round(last.susceptible, 0) == 59497
-    assert round(raw_df.recovered[30], 0) == 216711
+def test_model_cumulative_census():
+    # test that census is being properly calculated
+    param = copy(PARAM)
+    model = Model(param)
 
-    assert list(model.dispositions_df.iloc[0, :]) == [0, 100.0, 40.0, 20.0]
-    assert [round(i, 0) for i in model.dispositions_df.iloc[60, :]] == [60, 1101.0, 441.0, 220.0]
+    raw_df = model.raw_df
+    admits_df = model.admits_df
+    df = pd.DataFrame({
+        "hospitalized": admits_df.hospitalized,
+        "icu": admits_df.icu,
+        "ventilated": admits_df.ventilated
+    })
+    admits = df.cumsum()
 
-    # test that admissions are being properly calculated
-    cumulative_admits = model.admits_df.cumsum()
-    diff = cumulative_admits.hospitalized[1:-1] - (
-        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 100
+    # TODO: is 1.0 for ceil function?
+    diff = admits.hospitalized[1:-1] - (
+        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
     )
     assert (diff.abs() < 0.1).all()
 
 
-def test_daily_growth_helper():
-    assert np.round(daily_growth_helper(5), decimals=4) == 14.8698
-    assert np.round(daily_growth_helper(0), decimals=4) == 0.0
-    assert np.round(daily_growth_helper(-4), decimals=4) == -15.9104
+def test_growth_rate():
+    assert np.round(get_growth_rate(5) * 100.0, decimals=4) == 14.8698
+    assert np.round(get_growth_rate(0) * 100.0, decimals=4) == 0.0
+    assert np.round(get_growth_rate(-4) * 100.0, decimals=4) == -15.9104
 
 
-def test_chart_descriptions(p=PARAM):
-    # new admissions chart
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
-    chart = new_admissions_chart(alt, projection_admits, p)
-    description = chart_descriptions(chart, p.labels)
+def test_build_descriptions():
+    param = copy(PARAM)
 
-    hosp, icu, vent, asterisk = description.split("\n\n")  # break out the description into lines
+    admits_file = 'tests/by_doubling_time/2020-03-28_projected_admits.csv'
+    census_file = 'tests/by_doubling_time/2020-03-28_projected_census.csv'
+
+    admits_df = pd.read_csv(admits_file, parse_dates=['date'])
+    chart = build_admits_chart(alt=alt, admits_df=admits_df)
+    description = build_descriptions(chart=chart, labels=param.labels)
+
+    hosp, icu, vent = description.split("\n\n")  # break out the description into lines
 
     max_hosp = chart.data['hospitalized'].max()
     assert str(ceil(max_hosp)) in hosp
 
-    max_icu_ix = chart.data['icu'].idxmax()
-    assert max_icu_ix + 1 == len(chart.data)
-    assert "*" in icu
+    # TODO add test for asterisk
 
-    # test asterisk
-    param = PARAM
+    # test no asterisk
     param.n_days = 600
 
-    projection_admits = pd.read_csv('tests/projection_admits.csv')
-    # projection_admits = projection_admits.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
-    chart = new_admissions_chart(alt, projection_admits, p)
-    description = chart_descriptions(chart, p.labels)
+    admits_df = pd.read_csv(admits_file, parse_dates=['date'])
+    chart = build_admits_chart(alt=alt, admits_df=admits_df)
+    description = build_descriptions(chart=chart, labels=param.labels)
     assert "*" not in description
 
+
     # census chart
-    census_df = pd.read_csv('tests/census_df.csv')
-    # census_df = census_df.rename(columns={'hospitalized': 'Hospitalized', 'icu': 'ICU', 'ventilated': 'Ventilated'})
-    PARAM.as_date = True
-    chart = admitted_patients_chart(alt, census_df, p)
-    description = chart_descriptions(chart, p.labels)
+    census_df = pd.read_csv(census_file, parse_dates=['date'])
+    chart = build_census_chart(alt=alt, census_df=census_df)
+    description = build_descriptions(chart=chart, labels=param.labels)
 
     assert str(ceil(chart.data['ventilated'].max())) in description
     assert str(chart.data['icu'].idxmax()) not in description
-    assert datetime.datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
+    assert datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
