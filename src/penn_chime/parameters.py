@@ -34,10 +34,8 @@ class Parameters:
         current_hospitalized: int,
         hospitalized: RateLos,
         icu: RateLos,
-        known_infected: int,
         relative_contact_rate: float,
         ventilated: RateLos,
-
         current_date: date = date.today(),
         date_first_hospitalized: Optional[date] = None,
         doubling_time: Optional[float] = None,
@@ -51,7 +49,6 @@ class Parameters:
     ):
 
         self.current_hospitalized = current_hospitalized
-        self.known_infected = known_infected
         self.relative_contact_rate = relative_contact_rate
 
         self.hospitalized = hospitalized
