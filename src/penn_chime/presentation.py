@@ -214,7 +214,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     ventilated_days_input = NumberInput(
         st_obj,
-        "Days on Ventilator",
+        "Average Days on Ventilator",
         min_value=0,
         value=d.ventilated.days,
         step=1,
