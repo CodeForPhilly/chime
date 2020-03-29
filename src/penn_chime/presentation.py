@@ -16,7 +16,7 @@ from .constants import (
 )
 
 from .utils import dataframe_to_base64
-from .parameters import Parameters, RateLos
+from .parameters import Parameters, RateDays
 from .models import SimSirModel as Model
 
 hide_menu_style = """
@@ -196,27 +196,27 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         "Ventilated %(total infections)",
         value=d.ventilated.rate,
     )
-    hospitalized_los_input = NumberInput(
+    hospitalized_days_input = NumberInput(
         st_obj,
-        "Hospital Length of Stay",
+        "Average Hospital Length of Stay (days)",
         min_value=0,
-        value=d.hospitalized.length_of_stay,
+        value=d.hospitalized.days,
         step=1,
         format="%i",
     )
-    icu_los_input = NumberInput(
+    icu_days_input = NumberInput(
         st_obj,
-        "ICU Length of Stay",
+        "Average Days in ICU",
         min_value=0,
-        value=d.icu.length_of_stay,
+        value=d.icu.days,
         step=1,
         format="%i",
     )
-    ventilated_los_input = NumberInput(
+    ventilated_days_input = NumberInput(
         st_obj,
-        "Vent Length of Stay",
+        "Average Days on Ventilator",
         min_value=0,
-        value=d.ventilated.length_of_stay,
+        value=d.ventilated.days,
         step=1,
         format="%i",
     )
@@ -267,13 +267,13 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     relative_contact_rate = relative_contact_pct_input()
 
     st.sidebar.markdown("### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
-    infectious_days = infectious_days_input()
     hospitalized_rate = hospitalized_pct_input()
     icu_rate = icu_pct_input()
     ventilated_rate = ventilated_pct_input()
-    hospitalized_los = hospitalized_los_input()
-    icu_los = icu_los_input()
-    ventilated_los = ventilated_los_input()
+    infectious_days = infectious_days_input()
+    hospitalized_days = hospitalized_days_input()
+    icu_days = icu_days_input()
+    ventilated_days = ventilated_days_input()
 
     st.sidebar.markdown("### Display Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
     n_days = n_days_input()
@@ -285,11 +285,10 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     return Parameters(
         current_hospitalized=current_hospitalized,
-        hospitalized=RateLos(hospitalized_rate, hospitalized_los),
-        icu=RateLos(icu_rate, icu_los),
-        #known_infected=known_infected,
+        hospitalized=RateDays(hospitalized_rate, hospitalized_days),
+        icu=RateDays(icu_rate, icu_days),
         relative_contact_rate=relative_contact_rate,
-        ventilated=RateLos(ventilated_rate, ventilated_los),
+        ventilated=RateDays(ventilated_rate, ventilated_days),
 
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,

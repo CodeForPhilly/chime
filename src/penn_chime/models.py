@@ -35,8 +35,8 @@ class SimSirModel:
             for key, d in p.dispositions.items()
         }
 
-        self.lengths_of_stay = {
-            key: d.length_of_stay
+        self.days = {
+            key: d.days
             for key, d in p.dispositions.items()
         }
 
@@ -170,7 +170,7 @@ class SimSirModel:
         )
         self.dispositions_df = build_dispositions_df(self.raw_df, self.rates, p.market_share, p.current_date)
         self.admits_df = build_admits_df(self.dispositions_df)
-        self.census_df = build_census_df(self.admits_df, self.lengths_of_stay)
+        self.census_df = build_census_df(self.admits_df, self.days)
         self.current_infected = self.raw_df.infected.loc[self.i_day]
 
     def get_loss(self) -> float:
