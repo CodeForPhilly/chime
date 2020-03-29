@@ -198,7 +198,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     hospitalized_days_input = NumberInput(
         st_obj,
-        "Hospital Length of Stay",
+        "Average Hospital Length of Stay (days)",
         min_value=0,
         value=d.hospitalized.days,
         step=1,
