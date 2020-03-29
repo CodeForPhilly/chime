@@ -246,7 +246,7 @@ def test_admits_chart():
 def test_census_chart():
     census_df = pd.read_csv("tests/by_doubling_time/2020-03-28_projected_census.csv")
     chart = build_census_chart(alt=alt, census_df=census_df)
-    assert isinstance(chart, alt.Chart)
+    assert isinstance(chart, (alt.Chart, alt.LayerChart))
     assert chart.data.iloc[1].hospitalized == 3
     assert chart.data.iloc[49].ventilated == 365
 
