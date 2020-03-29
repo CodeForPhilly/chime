@@ -1,5 +1,7 @@
+from dash import Dash
 from collections import OrderedDict
 from typing import Callable, List
+from functools import lru_cache
 
 from dash.dependencies import Input, Output
 
@@ -23,11 +25,26 @@ class ChimeCallback:
         self.callback_fn = callback_fn
         self.memoize = memoize
 
+    def wrap(self, app: Dash):
+        if self.memoize:
+            @lru_cache(maxsize=32)
+            @app.callback(self.outputs, self.inputs)
+            def callback_wrapper(*args, **kwargs):
+                return self.callback_fn(*args, **kwargs)
+        else:
+            @app.callback(self.outputs, self.inputs)
+            def callback_wrapper(*args, **kwargs):
+                return self.callback_fn(*args, **kwargs)
 
-registered_callbacks: List[ChimeCallback] = []
+
+__registered_callbacks: List[ChimeCallback] = []
 
 
 def register_callbacks(callbacks: List[ChimeCallback]):
     if callbacks:
-        registered_callbacks.extend(callbacks)
+        __registered_callbacks.extend(callbacks)
 
+
+def wrap_callbacks(app):
+    for callback in __registered_callbacks:
+        callback.wrap(app)
