@@ -141,7 +141,8 @@ class SimSirModel:
         else:
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
 
-
+        logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))
+        logger.info('len(raw_df): %s', len(self.raw_df))
         self.sim_sir_w_date_df = build_sim_sir_w_date_df(self.raw_df, p.current_date)
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
