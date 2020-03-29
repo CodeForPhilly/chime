@@ -18,7 +18,8 @@ from chime_dash.app.components.base import Component
 from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header
 
 FLOAT_INPUT_MIN = 0.001
-FLOAT_INPUT_STEP = FLOAT_INPUT_MIN
+FLOAT_INPUT_STEP = "any"
+
 _INPUTS = OrderedDict(
     regional_parameters={"type": "header", "size": "h3"},
     market_share={"type": "number", "min": FLOAT_INPUT_MIN, "step": FLOAT_INPUT_STEP, "max": 100.0, "percent": True},
