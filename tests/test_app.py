@@ -293,7 +293,6 @@ def test_model_raw_start():
     first = raw_df.iloc[0, :]
     second = raw_df.iloc[1, :]
 
-    assert first.susceptible + first.infected + first.recovered == param.population
     assert first.susceptible == 499600.0
     assert round(second.infected, 0) == 449.0
     assert list(model.dispositions_df.iloc[0, :]) == [-43, date(year=2020, month=2, day=15), 1.0, 0.4, 0.2]
@@ -304,13 +303,29 @@ def test_model_raw_start():
     assert [round(v, 0) for v in (d, s, i, r)] == [17, 549.0, 220.0, 110.0]
 
 
+def test_model_conservation():
+    p = copy(PARAM)
+    m = Model(p)
+    raw_df = m.raw_df
+
+    assert (0.0 <= raw_df.susceptible).all()
+    assert (0.0 <= raw_df.infected).all()
+    assert (0.0 <= raw_df.recovered).all()
+
+    diff = raw_df.susceptible + raw_df.infected + raw_df.recovered - p.population
+    assert (diff < 0.1).all()
+
+    assert (raw_df.susceptible <= p.population).all()
+    assert (raw_df.infected <= p.population).all()
+    assert (raw_df.recovered <= p.population).all()
+
+
 def test_model_raw_end():
     param = copy(PARAM)
     model = Model(param)
     raw_df = model.raw_df
 
     last = raw_df.iloc[-1, :]
-    assert last.susceptible + last.infected + last.recovered == param.population
     assert round(last.susceptible, 0) == 83391.0
 
 
