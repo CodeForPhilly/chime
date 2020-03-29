@@ -6,7 +6,7 @@ changed
 """
 
 from __future__ import annotations
-from json import dumps
+from json import dumps, loads
 
 from typing import Dict, Generator, Tuple
 
@@ -18,82 +18,83 @@ from .parameters import Parameters
 
 class SimSirModel:
 
-    def __init__(self, p: Parameters) -> SimSirModel:
-        # TODO missing initial recovered value
-        susceptible = p.susceptible
-        recovered = 0.0
-        recovery_days = p.recovery_days
+    def __init__(self, p: Parameters = None) -> SimSirModel:
+        if p:
+            # TODO missing initial recovered value
+            susceptible = p.susceptible
+            recovered = 0.0
+            recovery_days = p.recovery_days
 
-        rates = {
-            key: d.rate
-            for key, d in p.dispositions.items()
-        }
+            rates = {
+                key: d.rate
+                for key, d in p.dispositions.items()
+            }
 
-        lengths_of_stay = {
-            key: d.length_of_stay
-            for key, d in p.dispositions.items()
-        }
+            lengths_of_stay = {
+                key: d.length_of_stay
+                for key, d in p.dispositions.items()
+            }
 
-        # Note: this should not be an integer.
-        # We're appoximating infected from what we do know.
-        # TODO market_share > 0, hosp_rate > 0
-        infected = (
-            p.current_hospitalized / p.market_share / p.hospitalized.rate
-        )
+            # Note: this should not be an integer.
+            # We're appoximating infected from what we do know.
+            # TODO market_share > 0, hosp_rate > 0
+            infected = (
+                p.current_hospitalized / p.market_share / p.hospitalized.rate
+            )
 
-        detection_probability = (
-            p.known_infected / infected if infected > 1.0e-7 else None
-        )
+            detection_probability = (
+                p.known_infected / infected if infected > 1.0e-7 else None
+            )
 
-        intrinsic_growth_rate = \
-            (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
+            intrinsic_growth_rate = \
+                (2.0 ** (1.0 / p.doubling_time) - 1.0) if p.doubling_time > 0.0 else 0.0
 
-        gamma = 1.0 / recovery_days
+            gamma = 1.0 / recovery_days
 
-        # Contact rate, beta
-        beta = (
-            (intrinsic_growth_rate + gamma)
-            / susceptible
-            * (1.0 - p.relative_contact_rate)
-        )  # {rate based on doubling time} / {initial susceptible}
+            # Contact rate, beta
+            beta = (
+                (intrinsic_growth_rate + gamma)
+                / susceptible
+                * (1.0 - p.relative_contact_rate)
+            )  # {rate based on doubling time} / {initial susceptible}
 
-        # r_t is r_0 after distancing
-        r_t = beta / gamma * susceptible
+            # r_t is r_0 after distancing
+            r_t = beta / gamma * susceptible
 
-        # Simplify equation to avoid division by zero:
-        # self.r_naught = r_t / (1.0 - relative_contact_rate)
-        r_naught = (intrinsic_growth_rate + gamma) / gamma
-        doubling_time_t = 1.0 / np.log2(
-            beta * p.susceptible - gamma + 1)
+            # Simplify equation to avoid division by zero:
+            # self.r_naught = r_t / (1.0 - relative_contact_rate)
+            r_naught = (intrinsic_growth_rate + gamma) / gamma
+            doubling_time_t = 1.0 / np.log2(
+                beta * p.susceptible - gamma + 1)
 
-        raw_df = sim_sir_df(
-            p.susceptible,
-            infected,
-            recovered,
-            beta,
-            gamma,
-            p.n_days,
-        )
-        dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
-        admits_df = build_admits_df(dispositions_df)
-        census_df = build_census_df(admits_df, lengths_of_stay)
+            raw_df = sim_sir_df(
+                p.susceptible,
+                infected,
+                recovered,
+                beta,
+                gamma,
+                p.n_days,
+            )
+            dispositions_df = build_dispositions_df(raw_df, rates, p.market_share)
+            admits_df = build_admits_df(dispositions_df)
+            census_df = build_census_df(admits_df, lengths_of_stay)
 
-        self.susceptible = susceptible
-        self.infected = infected
-        self.recovered = recovered
+            self.susceptible = susceptible
+            self.infected = infected
+            self.recovered = recovered
 
-        self.detection_probability = detection_probability
-        self.recovered = recovered
-        self.intrinsic_growth_rate = intrinsic_growth_rate
-        self.gamma = gamma
-        self.beta = beta
-        self.r_t = r_t
-        self.r_naught = r_naught
-        self.doubling_time_t = doubling_time_t
-        self.raw_df = raw_df
-        self.dispositions_df = dispositions_df
-        self.admits_df = admits_df
-        self.census_df = census_df
+            self.detection_probability = detection_probability
+            self.recovered = recovered
+            self.intrinsic_growth_rate = intrinsic_growth_rate
+            self.gamma = gamma
+            self.beta = beta
+            self.r_t = r_t
+            self.r_naught = r_naught
+            self.doubling_time_t = doubling_time_t
+            self.raw_df = raw_df
+            self.dispositions_df = dispositions_df
+            self.admits_df = admits_df
+            self.census_df = census_df
 
     @property
     def json(self):
@@ -104,6 +105,19 @@ class SimSirModel:
                     result[key] = value.to_dict()
             return result
         return dumps(self, default=to_json_helper, sort_keys=True)
+
+    @classmethod
+    def from_json(cls, json):
+        state = loads(json)
+        model = cls()
+        model_dict = model.__dict__
+
+        for key, value in state.items():
+            if isinstance(value, dict):
+                value = pd.DataFrame.from_dict(value)
+            model_dict[key] = value
+
+        return model
 
 
 def sir(
