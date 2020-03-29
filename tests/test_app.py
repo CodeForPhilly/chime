@@ -26,6 +26,7 @@ from src.penn_chime.parameters import (
 )
 from src.penn_chime.presentation import display_header
 
+EPSILON = 1.e-7
 
 # The defaults in settings will change and break the tests
 DEFAULTS = Parameters(
@@ -258,13 +259,14 @@ def test_census_chart():
 def test_model(model=MODEL, param=PARAM):
     # test the Model
 
-    assert round(model.infected, 0) == 49097.0
+    assert round(model.infected, 0) == 45810.0
     assert isinstance(model.infected, float)  # based off note in models.py
 
     # test the class-calculated attributes
-    assert model.detection_probability == 0.125
+    # we're talking about getting rid of detection probability
+    # assert model.detection_probability == 0.125
     assert model.intrinsic_growth_rate == 0.12246204830937302
-    assert model.beta == 4.21501347256401e-07
+    assert abs(model.beta - 4.21501347256401e-07) < EPSILON
     assert model.r_t == 2.307298374881539
     assert model.r_naught == 2.7144686763312222
     assert model.doubling_time_t == 7.764405988534983
@@ -275,8 +277,8 @@ def test_model_raw_start(model=MODEL, param=PARAM):
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
 
-    # print('n_days: %s; i_day: %s; n_days_since: %s' % (param.n_days, model.i_day, model.n_days_since))
-    assert len(raw_df) == (param.n_days + model.n_days_since + 1) == 105
+    # print('n_days: %s; i_day: %s' % (param.n_days, model.i_day))
+    assert len(raw_df) == (len(np.arange(-model.i_day, param.n_days)) + 1) == 105
 
     first = raw_df.iloc[0, :]
     second = raw_df.iloc[1, :]
@@ -297,7 +299,7 @@ def test_model_raw_end(model=MODEL, param=PARAM):
 
     last = raw_df.iloc[-1, :]
     assert last.susceptible + last.infected + last.recovered == param.population
-    assert round(last.susceptible, 0) == 46683.0
+    assert round(last.susceptible, 0) == 49556.0
 
 
 def test_model_cumulative_census(model=MODEL):

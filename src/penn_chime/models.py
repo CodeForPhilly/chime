@@ -7,7 +7,7 @@ changed
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from logging import INFO, basicConfig, getLogger
 from sys import stdout
 from typing import Dict, Generator, Tuple, Optional
@@ -31,15 +31,6 @@ class SimSirModel:
 
     def __init__(self, p: Parameters):
 
-        n_days_since = None
-        if p.date_first_hospitalized:
-            n_days_since = (p.current_date - p.date_first_hospitalized).days
-            logger.debug(
-                "%s: %s - %s = %s days",
-                p.current_date, p.date_first_hospitalized,
-                n_days_since)
-        self.n_days_since = n_days_since
-
         self.rates = {
             key: d.rate
             for key, d in p.dispositions.items()
@@ -54,7 +45,7 @@ class SimSirModel:
         # We're appoximating infected from what we do know.
         # TODO market_share > 0, hosp_rate > 0
         infected = (
-            1 / p.market_share / p.hospitalized.rate
+            1.0 / p.market_share / p.hospitalized.rate
         )
 
         susceptible = p.population - infected
@@ -81,7 +72,6 @@ class SimSirModel:
         # self.r_naught = r_t / (1.0 - relative_contact_rate)
         r_naught = (intrinsic_growth_rate + gamma) / gamma
 
-
         self.susceptible = susceptible
         self.infected = infected
         self.recovered = p.recovered
@@ -92,10 +82,9 @@ class SimSirModel:
         self.gamma = gamma
         self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
         self.intrinsic_growth_rate = intrinsic_growth_rate
-        self.infected = infected
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
-            logger.info('Using doubling_time.')
+            logger.info('Using doubling_time: %s', p.doubling_time)
             self.i_day = 0
             self.beta = (
                 (intrinsic_growth_rate + gamma)
@@ -112,14 +101,23 @@ class SimSirModel:
             self.infected = self.raw_df['infected'].values[i_day]
             self.susceptible = self.raw_df['susceptible'].values[i_day]
             self.recovered = self.raw_df['recovered'].values[i_day]
-            self.n_days_since = i_day
             self.r_t = self.beta_t / gamma * susceptible
             self.r_naught = self.beta / gamma * susceptible
             logger.info('Set i_day = %s', i_day)
+            p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
+            logger.info(
+                'Estimated date_first_hospitalized: %s; current_date: %s; i_day: %s',
+                p.date_first_hospitalized,
+                p.current_date,
+                self.i_day)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
-            logger.info('Using date_first_hospitalized.')
-            self.i_day = self.n_days_since
+            self.i_day = (p.current_date - p.date_first_hospitalized).days
+            logger.info(
+                'Using date_first_hospitalized: %s; current_date: %s; i_day: %s',
+                p.date_first_hospitalized,
+                p.current_date,
+                self.i_day)
             min_loss = 2.0**99
             dts = np.linspace(1, 15, 29)
             losses = np.zeros(dts.shape[0])
@@ -133,8 +131,8 @@ class SimSirModel:
                 loss = self.get_loss()
                 losses[i] = loss
 
-            p.doubling_time = doubling_time = dts[pd.Series(losses).argmin()]
-            logger.info('Set doubling_time = %s', doubling_time)
+            p.doubling_time = dts[pd.Series(losses).argmin()]
+            logger.info('Estimated doubling_time: %s', p.doubling_time)
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
@@ -144,6 +142,9 @@ class SimSirModel:
             self.population = p.population
         else:
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
+
+        logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))
+        logger.info('len(raw_df): %s', len(self.raw_df))
 
         self.r_t = self.beta_t / gamma * susceptible
         self.r_naught = self.beta / gamma * susceptible
@@ -176,7 +177,7 @@ class SimSirModel:
 
     def get_loss(self) -> float:
         """Squared error: predicted vs. actual current hospitalized."""
-        predicted = self.census_df.hospitalized.loc[self.n_days_since]
+        predicted = self.census_df.hospitalized.loc[self.i_day]
         return (self.current_hospitalized - predicted) ** 2.0
 
 
@@ -203,12 +204,6 @@ def get_growth_rate(doubling_time: Optional[float]) -> float:
     if doubling_time is None or doubling_time == 0.0:
         return 0.0
     return (2.0 ** (1.0 / doubling_time) - 1.0)
-
-
-def get_loss(census_df: pd.DataFrame, current_hospitalized: float, n_days_since: int) -> float:
-    """Squared error: predicted vs. actual current hospitalized."""
-    predicted = census_df.hospitalized.loc[n_days_since]
-    return (current_hospitalized - predicted) ** 2.0
 
 
 def sir(
