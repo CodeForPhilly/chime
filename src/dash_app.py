@@ -1,6 +1,6 @@
 """Script which launches dash app
 """
-from dash import Dash
+from chime_dash.app.run import DASH
 from penn_chime.settings import DEFAULTS
 from chime_dash.app.components import Body
 
@@ -46,3 +46,4 @@ def callback(*args):  # pylint: disable=W0612
 if __name__ == "__main__":
     #    main()
     app.run_server(host="0.0.0.0")
+
