@@ -22,7 +22,7 @@ def send_devtools(driver, cmd, params={}):
     url = driver.command_executor._url + resource
     body = json.dumps({"cmd": cmd, "params": params})
     response = driver.command_executor._request("POST", url, body)
-    if response["status"]:
+    if response.get("status", False):
         raise Exception(response.get("value"))
     return response.get("value")
 
