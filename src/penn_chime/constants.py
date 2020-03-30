@@ -15,4 +15,4 @@ DOCS_URL = "https://code-for-philly.gitbook.io/chime"
 EPSILON = 1.0e-7
 
 FLOAT_INPUT_MIN = 0.001
-FLOAT_INPUT_STEP = FLOAT_INPUT_MIN
+FLOAT_INPUT_STEP = 0.1
