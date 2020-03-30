@@ -10,6 +10,7 @@ from chime_dash.app.components.base import Component
 class ToolDetails(Component):
     """
     """
+    localization_file = "tool-details.md"
 
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the header dash html
@@ -19,10 +20,10 @@ class ToolDetails(Component):
             children=[Markdown(id="more_intro", dangerously_allow_html=True)]
         )]
 
-    def update_tool_details(self, model, pars):
+    def build(self, model, pars):
         result = None
         if model and pars:
-            tool_details = self._content
+            tool_details = self.content
             regions = "- " + "| \n".join(
                 f"{key} = {value} "
                 for key, value in self.defaults.region.__dict__.items()

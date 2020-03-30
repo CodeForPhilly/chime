@@ -25,7 +25,7 @@ class Intro(Component):
     def build(self, model, pars):
         result = None
         if model and pars:
-            intro = self._content
+            intro = self.content
             detection_prob_str = (
                 "{detection_probability:.0%}".format(detection_probability=model.detection_probability)
                 if model.detection_probability is not None else "?"
