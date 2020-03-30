@@ -32,4 +32,18 @@ context('Increment steppers', () => {
 
     cy.contains('Hospitalized Admissions peaks at 303');
   });
+
+  it('Increment doubling time', () => {
+    cy.contains('Hospitalized Admissions peaks at 301');
+
+    cy.get('input.st-al').eq(3)
+      .should('has.value', '4');
+
+    cy.get('.step-up').eq(3).click();
+
+    cy.get('input.st-al').eq(3)
+      .should('has.value', '4.25');
+
+    cy.contains('Hospitalized Admissions peaks at 273');
+  });
 });
