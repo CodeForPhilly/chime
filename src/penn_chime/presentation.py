@@ -51,14 +51,17 @@ def display_header(st, m, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """[Documentation](https://code-for-philly.gitbook.io/chime/) | [Github](https://github.com/CodeForPhilly/chime/) | [Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)"""
+        """[Documentation]({docs_url}) | [Github](https://github.com/CodeForPhilly/chime/) |
+[Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)""".format(
+            docs_url=DOCS_URL
+        )
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine to assist hospitals and public health officials with hospital capacity planning,
     but can be used anywhere in the world.
     Customize it for your region by modifying data inputs in the left panel.*
-    """.format(docs_url=DOCS_URL)
+    """
     )
 
     st.markdown(
@@ -86,11 +89,14 @@ and daily growth rate of **{daily_growth_t:.2f}%**.
             relative_contact_rate=p.relative_contact_rate,
             r_t=m.r_t,
             doubling_time_t=abs(m.doubling_time_t),
-            impact_statement=("halves the infections every" if m.r_t < 1 else "reduces the doubling time to"),
+            impact_statement=(
+                "halves the infections every"
+                if m.r_t < 1
+                else "reduces the doubling time to"
+            ),
             daily_growth=m.daily_growth_rate * 100.0,
             daily_growth_t=m.daily_growth_rate_t * 100.0,
-            docs_url=DOCS_URL,
-            infected_population_warning_str=infected_population_warning_str
+            infected_population_warning_str=infected_population_warning_str,
         )
     )
 
@@ -99,6 +105,7 @@ and daily growth rate of **{daily_growth_t:.2f}%**.
 
 class Input:
     """Helper to separate Streamlit input definition from creation/rendering"""
+
     def __init__(self, st_obj, label, value, kwargs):
         self.st_obj = st_obj
         self.label = label
@@ -110,8 +117,20 @@ class Input:
 
 
 class NumberInput(Input):
-    def __init__(self, st_obj, label, min_value=None, max_value=None, value=None, step=None, format=None, key=None):
-        kwargs = dict(min_value=min_value, max_value=max_value, step=step, format=format, key=key)
+    def __init__(
+        self,
+        st_obj,
+        label,
+        min_value=None,
+        max_value=None,
+        value=None,
+        step=None,
+        format=None,
+        key=None,
+    ):
+        kwargs = dict(
+            min_value=min_value, max_value=max_value, step=step, format=format, key=key
+        )
         super().__init__(st_obj.number_input, label, value, kwargs)
 
 
@@ -122,8 +141,20 @@ class DateInput(Input):
 
 
 class PercentInput(NumberInput):
-    def __init__(self, st_obj, label, min_value=0.0, max_value=100.0, value=None, step=FLOAT_INPUT_STEP, format="%f", key=None):
-        super().__init__(st_obj, label, min_value, max_value, value * 100.0, step, format, key)
+    def __init__(
+        self,
+        st_obj,
+        label,
+        min_value=0.0,
+        max_value=100.0,
+        value=None,
+        step=FLOAT_INPUT_STEP,
+        format="%f",
+        key=None,
+    ):
+        super().__init__(
+            st_obj, label, min_value, max_value, value * 100.0, step, format, key
+        )
 
     def __call__(self):
         return super().__call__() / 100.0
@@ -160,41 +191,38 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     doubling_time_input = NumberInput(
         st_obj,
-        "Doubling time before social distancing (days)",
-        min_value=FLOAT_INPUT_MIN,
+        "Doubling time in days (up to today)",
+        min_value=0.5,
         value=d.doubling_time,
-        step=FLOAT_INPUT_STEP,
+        step=0.25,
         format="%f",
     )
     current_date_input = DateInput(
-        st_obj,
-        "Current date (Default is today)",
-        value=d.current_date,
+        st_obj, "Current date (Default is today)", value=d.current_date,
     )
     date_first_hospitalized_input = DateInput(
-        st_obj,
-        "Date of first hospitalized case",
+        st_obj, "Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time",
         value=d.date_first_hospitalized,
     )
     relative_contact_pct_input = PercentInput(
         st_obj,
-        "Social distancing (% reduction in social contact)",
+        "Social distancing (% reduction in social contact going forward)",
+        min_value=0.0,
+        max_value=100.0,
         value=d.relative_contact_rate,
+        step=1.0,
     )
     hospitalized_pct_input = PercentInput(
-        st_obj,
-        "Hospitalization %(total infections)",
-        value=d.hospitalized.rate,
+        st_obj, "Hospitalization %(total infections)", value=d.hospitalized.rate,
     )
-    icu_pct_input = PercentInput(
-        st_obj,
+    icu_pct_input = PercentInput(st_obj,
         "ICU %(total infections)",
+        min_value=0.0,
         value=d.icu.rate,
+        step=0.05
     )
     ventilated_pct_input = PercentInput(
-        st_obj,
-        "Ventilated %(total infections)",
-        value=d.ventilated.rate,
+        st_obj, "Ventilated %(total infections)", value=d.ventilated.rate,
     )
     hospitalized_days_input = NumberInput(
         st_obj,
@@ -223,14 +251,14 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     market_share_pct_input = PercentInput(
         st_obj,
         "Hospital Market Share (%)",
-        min_value=FLOAT_INPUT_MIN,
+        min_value=0.5,
         value=d.market_share,
     )
     population_input = NumberInput(
         st_obj,
         "Regional Population",
         min_value=1,
-        value=(d.region.population or d.population),
+        value=(d.population),
         step=1,
         format="%i",
     )
@@ -242,22 +270,37 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=1,
         format="%i",
     )
-    max_y_axis_set_input = CheckboxInput(st_obj, "Set the Y-axis on graphs to a static value")
-    max_y_axis_input = NumberInput(st_obj, "Y-axis static value", value=500, format="%i", step=25)
+    max_y_axis_set_input = CheckboxInput(
+        st_obj, "Set the Y-axis on graphs to a static value"
+    )
+    max_y_axis_input = NumberInput(
+        st_obj, "Y-axis static value", value=500, format="%i", step=25
+    )
 
     # Build in desired order
-    current_date = current_date_input()
+    st.sidebar.markdown(
+        """**CHIME [v1.1.0](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.0) (2020/03/30)**"""
+    )
 
-    st.sidebar.markdown("### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
+    st.sidebar.markdown(
+        "### Hospital Parameters [ℹ]({docs_url}/what-is-chime/parameters#hospital-parameters)".format(
+            docs_url=DOCS_URL
+        )
+    )
     population = population_input()
     market_share = market_share_pct_input()
-    #known_infected = known_infected_input()
+    # known_infected = known_infected_input()
     current_hospitalized = current_hospitalized_input()
 
-    st.sidebar.markdown("### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)"
-                        .format(docs_url=DOCS_URL))
+    st.sidebar.markdown(
+        "### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters#spread-and-contact-parameters)".format(
+            docs_url=DOCS_URL
+        )
+    )
 
-    if st.sidebar.checkbox("I know the date of the first hospitalized case in the region."):
+    if st.sidebar.checkbox(
+        "I know the date of the first hospitalized case."
+    ):
         date_first_hospitalized = date_first_hospitalized_input()
         doubling_time = None
     else:
@@ -266,7 +309,11 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     relative_contact_rate = relative_contact_pct_input()
 
-    st.sidebar.markdown("### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
+    st.sidebar.markdown(
+        "### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters#severity-parameters)".format(
+            docs_url=DOCS_URL
+        )
+    )
     hospitalized_rate = hospitalized_pct_input()
     icu_rate = icu_pct_input()
     ventilated_rate = ventilated_pct_input()
@@ -275,7 +322,11 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     icu_days = icu_days_input()
     ventilated_days = ventilated_days_input()
 
-    st.sidebar.markdown("### Display Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(docs_url=DOCS_URL))
+    st.sidebar.markdown(
+        "### Display Parameters [ℹ]({docs_url}/what-is-chime/parameters#display-parameters)".format(
+            docs_url=DOCS_URL
+        )
+    )
     n_days = n_days_input()
     max_y_axis_set = max_y_axis_set_input()
 
@@ -283,13 +334,14 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     if max_y_axis_set:
         max_y_axis = max_y_axis_input()
 
+    current_date = current_date_input()
+
     return Parameters(
         current_hospitalized=current_hospitalized,
         hospitalized=Disposition(hospitalized_rate, hospitalized_days),
         icu=Disposition(icu_rate, icu_days),
         relative_contact_rate=relative_contact_rate,
         ventilated=Disposition(ventilated_rate, ventilated_days),
-
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,
         doubling_time=doubling_time,
@@ -302,11 +354,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
 
 def display_more_info(
-    st,
-    model: Model,
-    parameters: Parameters,
-    defaults: Parameters,
-    notes: str = "",
+    st, model: Model, parameters: Parameters, defaults: Parameters, notes: str = "",
 ):
     """a lot of streamlit writing to screen."""
     st.subheader(
@@ -398,12 +446,6 @@ $$\\beta = (g + \\gamma)$$.
 """.format(
             notes=notes
         )
-        + "- "
-        + "| \n".join(
-            f"{key} = {value} "
-            for key, value in defaults.region.__dict__.items()
-            if key != "_s"
-        )
     )
     return None
 
@@ -412,7 +454,9 @@ def write_definitions(st):
     st.subheader("Guidance on Selecting Inputs")
     st.markdown(
         """**This information has been moved to the
-[User Documentation]({docs_url}/what-is-chime/parameters#guidance-on-selecting-inputs)**""".format(docs_url=DOCS_URL)
+[User Documentation]({docs_url}/what-is-chime/parameters)**""".format(
+            docs_url=DOCS_URL
+        )
     )
 
 
@@ -421,6 +465,7 @@ def write_footer(st):
     st.markdown(
         """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
 * We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
+* Finally we'd like to thank [Code for Philly](https://codeforphilly.org/) and the many members of the open-source community that [contributed](https://github.com/CodeForPhilly/chime/graphs/contributors) to this project.
     """
     )
     st.markdown("© 2020, The Trustees of the University of Pennsylvania")
@@ -428,6 +473,11 @@ def write_footer(st):
 
 def display_download_link(st, filename: str, df: pd.DataFrame):
     csv = dataframe_to_base64(df)
-    st.markdown("""
+    st.markdown(
+        """
         <a download="{filename}" href="data:file/csv;base64,{csv}">Download {filename}</a>
-""".format(csv=csv,filename=filename), unsafe_allow_html=True)
+""".format(
+            csv=csv, filename=filename
+        ),
+        unsafe_allow_html=True,
+    )

@@ -59,7 +59,7 @@ class Parameters:
         infectious_days: int = 14,
         market_share: float = 1.0,
         max_y_axis: Optional[int] = None,
-        n_days: int = 60,
+        n_days: int = 100,
         population: Optional[int] = None,
         recovered: int = 0,
         region: Optional[Regions] = None,
