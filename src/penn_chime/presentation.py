@@ -194,7 +194,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         "Doubling time before social distancing (days)",
         min_value=FLOAT_INPUT_MIN,
         value=d.doubling_time,
-        step=FLOAT_INPUT_STEP,
+        step=0.25,
         format="%f",
     )
     current_date_input = DateInput(
