@@ -1,74 +1,74 @@
+"""Utilities for exporting dash app to pdf
+"""
 import json
 import base64
+
 from time import sleep
+
+from io import BytesIO
 
 from dash import Dash
 from dash.testing.application_runners import ThreadedRunner
 from dash.testing.composite import DashComposite
-from dash.dependencies import Input
 from dash_bootstrap_components.themes import BOOTSTRAP
-
-import dash_core_components as dcc
-import uuid
 import dash_bootstrap_components as dbc
 
-from chime_dash.app.utils.templates import UPLOAD_DIRECTORY
-from dash_html_components import Div
 from selenium import webdriver
 
 
-def send_devtools(driver, cmd, params={}):
-  resource = "/session/%s/chromium/send_command_and_get_result" % driver.session_id
-  url = driver.command_executor._url + resource
-  body = json.dumps({'cmd': cmd, 'params': params})
-  response = driver.command_executor._request('POST', url, body)
-  if response['status']:
-    raise Exception(response.get('value'))
-  return response.get('value')
+def send_devtools(driver, cmd, params=None):
+    params = params or None
+    resource = "/session/%s/chromium/send_command_and_get_result" % driver.session_id
+    url = driver.command_executor._url + resource
+    body = json.dumps({"cmd": cmd, "params": params})
+    response = driver.command_executor._request("POST", url, body)
+    if response.get("status", False):
+        raise Exception(response.get("value"))
+    return response.get("value")
 
 
-def save_as_pdf(driver, path, options={}):
-  # https://timvdlippe.github.io/devtools-protocol/tot/Page#method-printToPDF
-  result = send_devtools(driver, "Page.printToPDF", options)
-  with open(path, 'wb') as file:
-    file.write(base64.b64decode(result['data']))
+def save_as_pdf(driver, options=None):
+    """Saves pdf to buffer object
+    """
+    options = options or {}
+    # https://timvdlippe.github.io/devtools-protocol/tot/Page#method-printToPDF
+    result = send_devtools(driver, "Page.printToPDF", options)
+
+    cached_file = BytesIO()
+    cached_file.write(base64.b64decode(result["data"]))
+    cached_file.seek(0)
+    return cached_file
 
 
 def print_to_pdf(component, kwargs):
+    """Extracts content and prints pdf to buffer object.
+    """
     app = Dash(
         __name__,
         external_stylesheets=[
-        "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css",
-        BOOTSTRAP,
-    ]
+            "https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css",
+            BOOTSTRAP,
+        ],
     )
 
-    layout = Div([
-        dcc.Location(id="url", refresh=False),
-        dbc.Container(
-        children=component.html,
-        fluid=True,
-        className="mt-5",
-    )])
-
-    app.layout = layout
-    app.title = 'CHIME Printer'
+    app.layout = dbc.Container(children=component.html, fluid=True)
+    app.title = "CHIME Printer"
 
     outputs = component.callback(**kwargs)
 
-    @app.callback(component.callback_outputs, [Input('url', 'pathname')])
-    def callback(*args):  # pylint: disable=W0612
+    @app.callback(component.callback_outputs, list(component.callback_inputs.values()))
+    def callback(*args):  # pylint: disable=W0612, W0613
         return outputs
 
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--headless')
+    chrome_options.add_argument("--headless")
 
     with ThreadedRunner() as starter:
-        with DashComposite(starter, browser='Chrome', options=[chrome_options]) as dc:
+        with DashComposite(starter, browser="Chrome", options=[chrome_options]) as dc:
             dc.start_server(app, port=8051)
-            while 'Loading...' in dc.driver.page_source:
+            while "Loading..." in dc.driver.page_source:
                 sleep(1)
-            filename = f'chime-{str(uuid.uuid4())[:8]}.pdf'
-            save_as_pdf(dc.driver, f'{UPLOAD_DIRECTORY}/{filename}', {'landscape': False})
+            pdf = save_as_pdf(dc.driver, {"landscape": False})
             dc.driver.quit()
-    return f'/download/{filename}'
+
+    return pdf
