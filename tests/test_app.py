@@ -51,6 +51,7 @@ DEFAULTS = Parameters(
 )
 
 PARAM = Parameters(
+    current_date=datetime(year=2020, month=3, day=28),
     current_hospitalized=100,
     doubling_time=6.0,
     market_share=0.05,
@@ -63,6 +64,7 @@ PARAM = Parameters(
 )
 
 HALVING_PARAM = Parameters(
+    current_date=datetime(year=2020, month=3, day=28),
     current_hospitalized=100,
     doubling_time=6.0,
     market_share=0.05,
@@ -295,11 +297,11 @@ def test_model_raw_start():
 
     assert first.susceptible == 499600.0
     assert round(second.infected, 0) == 449.0
-    assert list(model.dispositions_df.iloc[0, :]) == [-43, date(year=2020, month=2, day=15), 1.0, 0.4, 0.2]
+    assert list(model.dispositions_df.iloc[0, :]) == [-43, date(year=2020, month=2, day=14), 1.0, 0.4, 0.2]
     assert round(raw_df.recovered[30], 0) == 7083.0
 
     d, dt, s, i, r = list(model.dispositions_df.iloc[60, :])
-    assert dt == date(year=2020, month=4, day=15)
+    assert dt == date(year=2020, month=4, day=14)
     assert [round(v, 0) for v in (d, s, i, r)] == [17, 549.0, 220.0, 110.0]
 
 
@@ -327,6 +329,16 @@ def test_model_raw_end():
 
     last = raw_df.iloc[-1, :]
     assert round(last.susceptible, 0) == 83391.0
+
+
+def test_model_monotonicity():
+    param = copy(PARAM)
+    model = Model(param)
+    raw_df = model.raw_df
+
+    # Susceptible population should be non-increasing, and Recovered non-decreasing
+    assert (raw_df.susceptible[1:] - raw_df.susceptible.shift(1)[1:] <= 0).all()
+    assert (raw_df.recovered  [1:] - raw_df.recovered.  shift(1)[1:] >= 0).all()
 
 
 def test_model_cumulative_census():
