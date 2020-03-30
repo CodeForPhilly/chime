@@ -285,7 +285,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     current_date = current_date_input()
 
     st.sidebar.markdown(
-        "### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters#regional-parameters)".format(
+        "### Hospital Parameters [ℹ]({docs_url}/what-is-chime/parameters#hospital-parameters)".format(
             docs_url=DOCS_URL
         )
     )
@@ -301,7 +301,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
 
     if st.sidebar.checkbox(
-        "I know the date of the first hospitalized case in the region."
+        "I know the date of the first hospitalized case."
     ):
         date_first_hospitalized = date_first_hospitalized_input()
         doubling_time = None
