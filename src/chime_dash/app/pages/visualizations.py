@@ -39,7 +39,7 @@ class Visualizations(Component):
 
     @staticmethod
     def build_graphs_and_tables(model_json, max_y_axis_value, n_days, as_date):
-        result = [None, None, None, None]
+        result = [{}, None, {}, None]
         if model_json:
             model = SimSirModel.from_json(model_json)
             projection_admits = model.admits_df
