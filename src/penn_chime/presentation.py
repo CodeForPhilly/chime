@@ -206,7 +206,10 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     relative_contact_pct_input = PercentInput(
         st_obj,
         "Social distancing (% reduction in social contact)",
+        min_value=0.0,
+        max_value=100.0,
         value=d.relative_contact_rate,
+        step=1.0,
     )
     hospitalized_pct_input = PercentInput(
         st_obj, "Hospitalization %(total infections)", value=d.hospitalized.rate,
