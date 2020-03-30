@@ -312,7 +312,7 @@ def build_census_df(
         'date': admits_df.date,
         **{
             key: (
-                admits_df[key].cumsum().iloc[:-los]
+                admits_df[key].cumsum()
                 - admits_df[key].cumsum().shift(los).fillna(0)
             ).apply(np.ceil)
             for key, los in lengths_of_stay.items()
