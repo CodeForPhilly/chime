@@ -192,7 +192,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     doubling_time_input = NumberInput(
         st_obj,
         "Doubling time before social distancing (days)",
-        min_value=FLOAT_INPUT_MIN,
+        min_value=0.5,
         value=d.doubling_time,
         step=0.25,
         format="%f",
@@ -215,7 +215,12 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     hospitalized_pct_input = PercentInput(
         st_obj, "Hospitalization %(total infections)", value=d.hospitalized.rate,
     )
-    icu_pct_input = PercentInput(st_obj, "ICU %(total infections)", value=d.icu.rate,)
+    icu_pct_input = PercentInput(st_obj,
+        "ICU %(total infections)",
+        min_value=0.0,
+        value=d.icu.rate,
+        step=0.05
+    )
     ventilated_pct_input = PercentInput(
         st_obj, "Ventilated %(total infections)", value=d.ventilated.rate,
     )
@@ -246,7 +251,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     market_share_pct_input = PercentInput(
         st_obj,
         "Hospital Market Share (%)",
-        min_value=FLOAT_INPUT_MIN,
+        min_value=0.5,
         value=d.market_share,
     )
     population_input = NumberInput(

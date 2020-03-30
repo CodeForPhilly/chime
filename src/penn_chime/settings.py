@@ -13,7 +13,7 @@ DEFAULTS = Parameters(
     icu=Disposition(0.0075, 9),
     infectious_days=14,
     market_share=0.15,
-    n_days=60,
+    n_days=100,
     relative_contact_rate=0.3,
     ventilated=Disposition(0.005, 10),
 )
