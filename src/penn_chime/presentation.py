@@ -51,16 +51,17 @@ def display_header(st, m, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """[Documentation](https://code-for-philly.gitbook.io/chime/) | [Github](https://github.com/CodeForPhilly/chime/) | [Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)"""
+        """[Documentation]({docs_url}) | [Github](https://github.com/CodeForPhilly/chime/) |
+[Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)""".format(
+            docs_url=DOCS_URL
+        )
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine to assist hospitals and public health officials with hospital capacity planning,
     but can be used anywhere in the world.
     Customize it for your region by modifying data inputs in the left panel.*
-    """.format(
-            docs_url=DOCS_URL
-        )
+    """
     )
 
     st.markdown(
@@ -95,7 +96,6 @@ and daily growth rate of **{daily_growth_t:.2f}%**.
             ),
             daily_growth=m.daily_growth_rate * 100.0,
             daily_growth_t=m.daily_growth_rate_t * 100.0,
-            docs_url=DOCS_URL,
             infected_population_warning_str=infected_population_warning_str,
         )
     )
@@ -269,10 +269,14 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
 
     # Build in desired order
+    st.sidebar.markdown(
+        """**CHIME [v2.0.0](https://github.com/CodeForPhilly/chime/releases/tag/v2.0.0) (2020/03/30)**"""
+    )
+
     current_date = current_date_input()
 
     st.sidebar.markdown(
-        "### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(
+        "### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters#regional-parameters)".format(
             docs_url=DOCS_URL
         )
     )
@@ -282,7 +286,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     current_hospitalized = current_hospitalized_input()
 
     st.sidebar.markdown(
-        "### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(
+        "### Spread and Contact Parameters [ℹ]({docs_url}/what-is-chime/parameters#spread-and-contact-parameters)".format(
             docs_url=DOCS_URL
         )
     )
@@ -299,7 +303,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     relative_contact_rate = relative_contact_pct_input()
 
     st.sidebar.markdown(
-        "### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(
+        "### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters#severity-parameters)".format(
             docs_url=DOCS_URL
         )
     )
@@ -312,7 +316,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     ventilated_days = ventilated_days_input()
 
     st.sidebar.markdown(
-        "### Display Parameters [ℹ]({docs_url}/what-is-chime/parameters)".format(
+        "### Display Parameters [ℹ]({docs_url}/what-is-chime/parameters#display-parameters)".format(
             docs_url=DOCS_URL
         )
     )
@@ -447,7 +451,7 @@ def write_definitions(st):
     st.subheader("Guidance on Selecting Inputs")
     st.markdown(
         """**This information has been moved to the
-[User Documentation]({docs_url}/what-is-chime/parameters#guidance-on-selecting-inputs)**""".format(
+[User Documentation]({docs_url}/what-is-chime/parameters)**""".format(
             docs_url=DOCS_URL
         )
     )
@@ -458,6 +462,7 @@ def write_footer(st):
     st.markdown(
         """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
 * We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
+* Finally we'd like to thank [Code for Philly](https://codeforphilly.org/) and the many members of the open-source community that [contributed](https://github.com/CodeForPhilly/chime/graphs/contributors) to this project.
     """
     )
     st.markdown("© 2020, The Trustees of the University of Pennsylvania")
