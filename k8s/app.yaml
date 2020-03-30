@@ -15,7 +15,7 @@ metadata:
 spec:
   replicas: 15
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app: chime
