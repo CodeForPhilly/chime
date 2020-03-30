@@ -92,7 +92,7 @@ jobs:
           echo "::set-env name=VERSION::$VERSION"
 
           # Update image version in application manifest
-          sed -Ei "s,(- image: docker.pkg.github.com)(.*),\1/${{ github.repository }}/$IMAGE_NAME:$VERSION," k8s/app.yaml
+          sed -Ei "s,(- image: docker.pkg.github.com)(.*),\1/${GITHUB_REPOSITORY,,}/$IMAGE_NAME:$VERSION," k8s/app.yaml
 
           # Show updated manifest file
           cat k8s/app.yaml
