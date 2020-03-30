@@ -99,13 +99,17 @@ def create_number_input(
     """
     input_kwargs = data.copy()
     input_kwargs.pop("percent", None)
+    LABEL_STYLE = {
+        "font-size": "0.8rem",
+        "margin-bottom": "0.1rem"
+    }
     if not "value" in input_kwargs:
         input_kwargs["value"] = _get_default_values(
             idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
         )
     return FormGroup(
         children=[
-            Label(html_for=idx, children=content[idx]),
+            Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
             Input(id=idx, **input_kwargs),
         ]
     )
@@ -115,7 +119,10 @@ def create_header(idx: str, content: Dict[str, str]):
     """
     Create heading element using localization map
     """
-    return H4(id=idx, children=content[idx])
+    HEADER_STYLE = {
+        "font-size": "1rem"
+    }
+    return H4(id=idx, children=content[idx], style=HEADER_STYLE)
 
 
 def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str]):
