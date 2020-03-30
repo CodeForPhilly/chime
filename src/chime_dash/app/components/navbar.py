@@ -45,7 +45,8 @@ class Navbar(Component):
                     ),
 
                 ]
-                + self.menu.html
+                + self.menu.html,
+                fluid=True
             ),
             dark=True,
             fixed="top",

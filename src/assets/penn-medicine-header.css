@@ -1,0 +1,73 @@
+
+/*
+------------------------------------------------------------------
+Place a link to this file in you source code before your site's 
+CSS files. 
+
+This will allow you to make style overrides if any of the 
+Penn Medicine Masthead CSS rules conflict with those of you site.
+
+If you have questions or need assistance, contact us at 
+PennMedicineWebMaster@uphs.upenn.edu
+------------------------------------------------------------------
+*/
+
+	.penn-medicine-header {
+		background-color: #2a3980;
+		display: block;
+		padding: 1.3rem 1.25rem 1.2rem;
+		margin: 0;
+	}
+	.penn-medicine-header__content {
+		max-width: 1215px;
+		margin: 0 auto;
+	}
+	.penn-medicine-header__content a,
+	.penn-medicine-header__content a:visited {
+		color: #fff;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 24px;
+		font-family: arial, sans-serif;
+		display: inline-block;
+	}
+	.penn-medicine-header__logo {
+		background-image: url(https://www.pennmedicine.org/Assets/PennMedicine/built/images/assets/logo-white.svg);
+		background-repeat: no-repeat;
+		background-size: 90%;
+		height: 33px;
+		width: 230px;
+		text-indent: -999999px;
+		border-right: 1px solid #fff;
+		margin-right: 1rem;
+	}
+	
+	@media (max-width: 1100px) {
+		.penn-medicine-header__content .penn-medicine-header__title {
+			clear: left;
+			margin-left: 35px;
+			display: block;
+			font-size: 20px;
+		}
+		.penn-medicine-header__logo {
+			border-right: none;
+			height: 30px;
+			width: 209px;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.penn-medicine-header__content .penn-medicine-header__title {
+			clear: left;
+			margin-left: 30px;
+			display: block;
+			font-size: 17px;
+		}
+		.penn-medicine-header__logo {
+			border-right: none;
+		}
+		.penn-medicine-header__logo {
+			height: 25px;
+			width: 174px;
+		}
+	}
