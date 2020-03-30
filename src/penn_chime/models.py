@@ -182,7 +182,10 @@ class SimSirModel:
 
 
 def get_argmin_ds(census_df: pd.DataFrame, current_hospitalized: float) -> float:
-    losses_df = (census_df.hospitalized - current_hospitalized) ** 2.0
+    # By design, this forbids choosing a day after the peak
+    # If that's a problem, see #381
+    peak_day = census_df.hospitalized.argmax()
+    losses_df = (census_df.hospitalized[:peak_day] - current_hospitalized) ** 2.0
     return losses_df.argmin()
 
 
