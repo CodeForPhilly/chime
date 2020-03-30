@@ -51,6 +51,8 @@ def print_to_pdf(component, kwargs):
         ],
     )
 
+    component.components['sidebar'].html[0].hidden = True
+
     app.layout = dbc.Container(children=component.html, fluid=True)
     app.title = "CHIME Printer"
 
