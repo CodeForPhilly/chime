@@ -45,7 +45,7 @@ def build_admits_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
-    return alt.layer(points, bar, data=admits_df)
+    return alt.layer(points, bar, data=ceil_df)
 
 
 
