@@ -1,3 +1,3 @@
-"""app/init
-# consider initializing Dash object here
+"""/app
+where the magic happens
 """
