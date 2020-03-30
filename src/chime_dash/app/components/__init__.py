@@ -2,11 +2,13 @@
 """
 from collections import OrderedDict
 
+import dash_bootstrap_components as dbc
 import dash_html_components as dhc
-from chime_dash.app.components.base import Component, HTMLComponentError
-from dash_bootstrap_components.themes import BOOTSTRAP
+from chime_dash.app.components.base import Component
 from chime_dash.app.components.navbar import Navbar
-from chime_dash.app.components.container import Container
+from chime_dash.app.pages.sidebar import Sidebar
+from chime_dash.app.pages.index import Index
+from dash_bootstrap_components.themes import BOOTSTRAP
 from penn_chime.settings import DEFAULTS
 
 LANGUAGE = "en"
@@ -26,13 +28,24 @@ class Body(Component):
         super().__init__(language, defaults)
         self.components = OrderedDict(
             navbar=Navbar(language, defaults),
-            container=Container(language, defaults),
+            sidebar=Sidebar(language, defaults),
+            # todo subscribe to changes to URL and select page appropriately
+            index=Index(language, defaults),
         )
 
     def get_html(self):
         """Glues individual setup components together
         """
-        return dhc.Div(self.components["navbar"].html + self.components["container"].html)
+        return dhc.Div(children=
+                       self.components["navbar"].html
+                       + [dbc.Container(
+                           children=dbc.Row(self.components["sidebar"].html + [dhc.Div(
+                               id="page-wrapper",
+                               children=self.components["index"].html
+                           )]),
+                           fluid=True,
+                           className="mt-5",
+                       )])
 
 
 root = Body(LANGUAGE, DEFAULTS)
