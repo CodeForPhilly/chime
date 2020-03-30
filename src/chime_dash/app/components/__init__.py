@@ -14,7 +14,6 @@ import dash_html_components as dhc
 from chime_dash.app.components.base import Component, HTMLComponentError
 from dash_bootstrap_components.themes import BOOTSTRAP
 
-from chime_dash.app.components.location import LocationComponent
 from chime_dash.app.components.navbar import Navbar
 from chime_dash.app.components.container import Container
 
@@ -32,9 +31,7 @@ class Body(Component):
         """
         super().__init__(language, defaults)
         self.components = OrderedDict(
-            navbar=Navbar(language, defaults),
-            container=Container(language, defaults),
-            location=LocationComponent()
+            navbar=Navbar(language, defaults), container=Container(language, defaults),
         )
         self.callback_outputs = []
         self.callback_inputs = OrderedDict()
