@@ -9,8 +9,25 @@ from datetime import date
 from typing import Optional
 
 
-# (0.02, 7) is 2%, 7 days
-# be sure to multiply by 100 when using as a default to the percent widgets!
+# Parameters for each disposition (hospitalized, icu, ventilated)
+#   The rate of disposition within the population of infected
+#   The average number days a patient has such disposition
+
+# Hospitalized:
+#   2.5 percent of the infected population are hospitalized: hospitalized.rate is 0.025
+#   Average hospital length of stay is 7 days: hospitalized.days = 7
+
+# ICU:
+#   0.75 percent of the infected population are in the ICU: icu.rate is 0.0075
+#   Average number of days in an ICU is 9 days: icu.days = 9
+
+# Ventilated:
+#   0.5 percent of the infected population are on a ventilator: ventilated.rate is 0.005
+#   Average number of days on a ventilator: ventilated.days = 10
+
+# Be sure to multiply by 100 when using the parameter as a default to a percent widget!
+
+
 Disposition = namedtuple("Disposition", ("rate", "days"))
 
 
