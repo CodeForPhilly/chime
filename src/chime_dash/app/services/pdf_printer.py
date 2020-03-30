@@ -1,5 +1,9 @@
+"""Utilities for exporting dash app to pdf
+"""
 import json
 import base64
+import uuid
+
 from time import sleep
 
 from dash import Dash
@@ -7,14 +11,13 @@ from dash.testing.application_runners import ThreadedRunner
 from dash.testing.composite import DashComposite
 from dash.dependencies import Input
 from dash_bootstrap_components.themes import BOOTSTRAP
-
+from dash_html_components import Div
 import dash_core_components as dcc
-import uuid
 import dash_bootstrap_components as dbc
 
-from chime_dash.app.utils.templates import UPLOAD_DIRECTORY
-from dash_html_components import Div
 from selenium import webdriver
+
+from chime_dash.app.utils.templates import UPLOAD_DIRECTORY
 
 
 def send_devtools(driver, cmd, params={}):
