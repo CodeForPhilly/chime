@@ -317,13 +317,13 @@ def build_census_df(
 
     # For the census to be inclusive, it needs to count each admission
     # for the length-of-stay applicable to the level of care needed
-    census_icu =  (admits_df.icu.cumsum()
-                   - admits_df.icu.cumsum().shift(lengths_of_stay['icu']).fillna(0)
+    census_icu =  (icu_admissions_exclusive.cumsum()
+                   - icu_admissions_exclusive.cumsum().shift(lengths_of_stay['icu']).fillna(0)
                    + census_vent
     ).apply(np.ceil)
 
-    census_hosp =  (admits_df.hospitalized.cumsum()
-                   - admits_df.hospitalized.cumsum().shift(lengths_of_stay['hospitalized']).fillna(0)
+    census_hosp =  (hospital_admissions_exclusive.cumsum()
+                   - hospital_admissions_exclusive.cumsum().shift(lengths_of_stay['hospitalized']).fillna(0)
                    + census_icu
     ).apply(np.ceil)
 
