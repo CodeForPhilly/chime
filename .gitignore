@@ -1,5 +1,6 @@
 # Editors
 .idea/
+.vscode/settings.json
 
 # Environments
 .env
