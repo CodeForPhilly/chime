@@ -33,6 +33,7 @@ spec:
           protocol: TCP
       imagePullSecrets:
       - name: regcred
+
 ---
 
 apiVersion: v1
