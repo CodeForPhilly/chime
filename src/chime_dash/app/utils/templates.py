@@ -1,4 +1,6 @@
-"""Utility functions for dash frontend
+"""utils/templates
+Utility functions for localization templates
+templates themselves can be found in app/templates/en
 """
 from typing import Dict, Any, Optional
 
@@ -9,12 +11,12 @@ from yaml import safe_load
 from numpy import mod
 from pandas import DataFrame
 
-from dash_html_components import Table, Thead, Tbody, Tr, Td, Th
+from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
 from penn_chime.defaults import Constants
 
-
+# Consider moving this to a config file eventually
 TEMPLATE_DIR = path.join(
     path.abspath(path.dirname(path.dirname(__file__))), "templates"
 )
@@ -97,16 +99,30 @@ def create_number_input(
     """
     input_kwargs = data.copy()
     input_kwargs.pop("percent", None)
+    LABEL_STYLE = {
+        "font-size": "0.8rem",
+        "margin-bottom": "0.1rem"
+    }
     if not "value" in input_kwargs:
         input_kwargs["value"] = _get_default_values(
             idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
         )
     return FormGroup(
         children=[
-            Label(html_for=idx, children=content[idx]),
+            Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
             Input(id=idx, **input_kwargs),
         ]
     )
+
+
+def create_header(idx: str, content: Dict[str, str]):
+    """
+    Create heading element using localization map
+    """
+    HEADER_STYLE = {
+        "font-size": "1rem"
+    }
+    return H4(id=idx, children=content[idx], style=HEADER_STYLE)
 
 
 def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str]):

@@ -1,12 +1,14 @@
-"""Initializes the  dash html
+"""components/intro
+initializes the leading text as of right now
+
+currently both classes handle control and view this should be separated
+with the logic for dynamic text moving to services.
 """
 from typing import List, Any
 
 from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
 from dash_core_components import Markdown
-
-from penn_chime.parameters import Parameters
 
 from chime_dash.app.utils.templates import read_localization_markdown
 from chime_dash.app.components.base import Component
