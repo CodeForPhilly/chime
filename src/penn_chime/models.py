@@ -307,14 +307,30 @@ def build_census_df(
     lengths_of_stay: Dict[str, int],
 ) -> pd.DataFrame:
     """Average Length of Stay for each disposition of COVID-19 case (total guesses)"""
+
+    hospital_admissions_exclusive = admits_df.hospitalized - admits_df.icu
+    icu_admissions_exclusive = admits_df.icu - admits_df.ventilated
+
+    census_vent = (admits_df.ventilated.cumsum() -
+                   admits_df.ventilated.cumsum().shift(lengths_of_stay['ventilated']).fillna(0)
+    ).apply(np.ceil)
+
+    # For the census to be inclusive, it needs to count each admission
+    # for the length-of-stay applicable to the level of care needed
+    census_icu =  (admits_df.icu.cumsum()
+                   - admits_df.icu.cumsum().shift(lengths_of_stay['icu']).fillna(0)
+                   + census_vent
+    ).apply(np.ceil)
+
+    census_hosp =  (admits_df.hospitalized.cumsum()
+                   - admits_df.hospitalized.cumsum().shift(lengths_of_stay['hospitalized']).fillna(0)
+                   + census_icu
+    ).apply(np.ceil)
+
     return pd.DataFrame({
         'day': admits_df.day,
         'date': admits_df.date,
-        **{
-            key: (
-                admits_df[key].cumsum()
-                - admits_df[key].cumsum().shift(los).fillna(0)
-            ).apply(np.ceil)
-            for key, los in lengths_of_stay.items()
-        }
+        'hospitalized': census_hosp,
+        'icu': census_icu,
+        'ventilated': census_vent,
     })
