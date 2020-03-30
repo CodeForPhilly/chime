@@ -2,22 +2,30 @@
 """
 from collections import OrderedDict
 
-import dash_bootstrap_components as dbc
-import dash_html_components as dhc
+from dash_bootstrap_components import Container, Row
+from dash_bootstrap_components.themes import BOOTSTRAP
+from dash_html_components import Div
+
 from chime_dash.app.components.base import Component
 from chime_dash.app.components.navbar import Navbar
-from chime_dash.app.pages.sidebar import Sidebar
 from chime_dash.app.pages.index import Index
-from dash_bootstrap_components.themes import BOOTSTRAP
-from penn_chime.settings import DEFAULTS
-
-LANGUAGE = "en"
+from chime_dash.app.pages.sidebar import Sidebar
 
 
+def singleton(class_):
+    instances = {}
+
+    def get_instance(*args, **kwargs):
+        if class_ not in instances:
+            instances[class_] = class_(*args, **kwargs)
+        return instances[class_]
+    return get_instance
+
+
+@singleton
 class Body(Component):
     """
     """
-
     external_stylesheets = [
         BOOTSTRAP,
     ]
@@ -36,16 +44,13 @@ class Body(Component):
     def get_html(self):
         """Glues individual setup components together
         """
-        return dhc.Div(children=
-                       self.components["navbar"].html
-                       + [dbc.Container(
-                           children=dbc.Row(self.components["sidebar"].html + [dhc.Div(
-                               id="page-wrapper",
-                               children=self.components["index"].html
-                           )]),
-                           fluid=True,
-                           className="mt-5",
-                       )])
-
-
-root = Body(LANGUAGE, DEFAULTS)
+        return Div(children=
+                   self.components["navbar"].html
+                   + [Container(
+                       children=Row(self.components["sidebar"].html + [Div(
+                           id="page-wrapper",
+                           children=self.components["index"].html
+                       )]),
+                       fluid=True,
+                       className="mt-5",
+                   )])

@@ -20,7 +20,6 @@ from chime_dash.app.utils.templates import df_to_html_table, read_localization_m
 from chime_dash.app.services.plotting import plot_dataframe
 
 from penn_chime.models import SimSirModel
-from penn_chime.parameters import Parameters
 from penn_chime.utils import add_date_column
 
 
