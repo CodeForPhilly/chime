@@ -51,6 +51,7 @@ DEFAULTS = Parameters(
 )
 
 PARAM = Parameters(
+    current_date=datetime(year=2020, month=3, day=28),
     current_hospitalized=100,
     doubling_time=6.0,
     market_share=0.05,
@@ -63,6 +64,7 @@ PARAM = Parameters(
 )
 
 HALVING_PARAM = Parameters(
+    current_date=datetime(year=2020, month=3, day=28),
     current_hospitalized=100,
     doubling_time=6.0,
     market_share=0.05,
@@ -287,7 +289,7 @@ def test_model_raw_start():
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
 
-    # print('n_days: %s; i_day: %s' % (param.n_days, model.i_day))
+    print('n_days: %s; i_day: %s' % (param.n_days, model.i_day))
     assert len(raw_df) == (len(np.arange(-model.i_day, param.n_days + 1))) == 104
 
     first = raw_df.iloc[0, :]
@@ -295,11 +297,11 @@ def test_model_raw_start():
 
     assert first.susceptible == 499600.0
     assert round(second.infected, 0) == 449.0
-    assert list(model.dispositions_df.iloc[0, :]) == [-43, date(year=2020, month=2, day=15), 1.0, 0.4, 0.2]
+    assert list(model.dispositions_df.iloc[0, :]) == [-43, date(year=2020, month=2, day=14), 1.0, 0.4, 0.2]
     assert round(raw_df.recovered[30], 0) == 7083.0
 
     d, dt, s, i, r = list(model.dispositions_df.iloc[60, :])
-    assert dt == date(year=2020, month=4, day=15)
+    assert dt == date(year=2020, month=4, day=14)
     assert [round(v, 0) for v in (d, s, i, r)] == [17, 549.0, 220.0, 110.0]
 
 
