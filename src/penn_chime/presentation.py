@@ -201,11 +201,12 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         st_obj, "Current date (Default is today)", value=d.current_date,
     )
     date_first_hospitalized_input = DateInput(
-        st_obj, "Date of first hospitalized case", value=d.date_first_hospitalized,
+        st_obj, "Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time",
+        value=d.date_first_hospitalized,
     )
     relative_contact_pct_input = PercentInput(
         st_obj,
-        "Social distancing (% reduction in social contact)",
+        "Social distancing (% reduction in social contact going forward)",
         min_value=0.0,
         max_value=100.0,
         value=d.relative_contact_rate,
