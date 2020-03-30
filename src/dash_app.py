@@ -1,17 +1,18 @@
 """Script which launches dash app
 """
-from dash import Dash
-from chime_dash.app.components import root
+from chime_dash.app.run import DASH
+from penn_chime.settings import DEFAULTS
+from chime_dash.app.components import Body
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
-DASH_APP = Dash(
-    __name__,
-    external_stylesheets=root.external_stylesheets,
-    external_scripts=root.external_scripts,
-)
-DASH_APP.title = 'Penn Medicine CHIME'
-DASH_APP.layout = root.html
-wrap_callbacks(DASH_APP)
+LANGUAGE = "en"
+
+body = Body(LANGUAGE, DEFAULTS)
+
+DASH.layout = body.html
+DASH.title = "Penn Medicine CHIME"  #! Should be moved into config / out of view
+wrap_callbacks(DASH)
 
 if __name__ == "__main__":
-    DASH_APP.run_server(host='0.0.0.0')
+    #    main()
+    DASH.run_server(host="0.0.0.0")
