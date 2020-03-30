@@ -2,25 +2,22 @@
 """
 import json
 import base64
-import uuid
 
 from time import sleep
+
+from io import BytesIO
 
 from dash import Dash
 from dash.testing.application_runners import ThreadedRunner
 from dash.testing.composite import DashComposite
-from dash.dependencies import Input
 from dash_bootstrap_components.themes import BOOTSTRAP
-from dash_html_components import Div
-import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 
 from selenium import webdriver
 
-from chime_dash.app.utils.templates import UPLOAD_DIRECTORY
 
-
-def send_devtools(driver, cmd, params={}):
+def send_devtools(driver, cmd, params=None):
+    params = params or None
     resource = "/session/%s/chromium/send_command_and_get_result" % driver.session_id
     url = driver.command_executor._url + resource
     body = json.dumps({"cmd": cmd, "params": params})
@@ -30,14 +27,22 @@ def send_devtools(driver, cmd, params={}):
     return response.get("value")
 
 
-def save_as_pdf(driver, path, options={}):
+def save_as_pdf(driver, options=None):
+    """Saves pdf to buffer object
+    """
+    options = options or {}
     # https://timvdlippe.github.io/devtools-protocol/tot/Page#method-printToPDF
     result = send_devtools(driver, "Page.printToPDF", options)
-    with open(path, "wb") as file:
-        file.write(base64.b64decode(result["data"]))
+
+    cached_file = BytesIO()
+    cached_file.write(base64.b64decode(result["data"]))
+    cached_file.seek(0)
+    return cached_file
 
 
 def print_to_pdf(component, kwargs):
+    """Extracts content and prints pdf to buffer object.
+    """
     app = Dash(
         __name__,
         external_stylesheets=[
@@ -46,20 +51,13 @@ def print_to_pdf(component, kwargs):
         ],
     )
 
-    layout = Div(
-        [
-            dcc.Location(id="url", refresh=False),
-            dbc.Container(children=component.html, fluid=True, className="mt-5",),
-        ]
-    )
-
-    app.layout = layout
+    app.layout = dbc.Container(children=component.html, fluid=True)
     app.title = "CHIME Printer"
 
     outputs = component.callback(**kwargs)
 
-    @app.callback(component.callback_outputs, [Input("url", "pathname")])
-    def callback(*args):  # pylint: disable=W0612
+    @app.callback(component.callback_outputs, list(component.callback_inputs.values()))
+    def callback(*args):  # pylint: disable=W0612, W0613
         return outputs
 
     chrome_options = webdriver.ChromeOptions()
@@ -70,9 +68,7 @@ def print_to_pdf(component, kwargs):
             dc.start_server(app, port=8051)
             while "Loading..." in dc.driver.page_source:
                 sleep(1)
-            filename = f"chime-{str(uuid.uuid4())[:8]}.pdf"
-            save_as_pdf(
-                dc.driver, f"{UPLOAD_DIRECTORY}/{filename}", {"landscape": False}
-            )
+            pdf = save_as_pdf(dc.driver, {"landscape": False})
             dc.driver.quit()
-    return f"/download/{filename}"
+
+    return pdf

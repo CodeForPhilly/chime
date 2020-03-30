@@ -21,5 +21,4 @@ regional_parameters: Regional Parameters
 spread_and_contact: Spread and Contact Parameters
 severity_parameters: Severity Parameters
 display_parameters: Display Parameters
-save_as_pdf: Generate PDF
-download_report: Download Report
+download_as_pdf_link: Download Report

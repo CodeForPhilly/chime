@@ -3,28 +3,37 @@ Initializes the side bar containing the various inputs for the model
 
 #! _INPUTS should be considered for moving else where
 """
-import dash_html_components as dhc
-
 from typing import List, Dict, Any, Tuple
 from collections import OrderedDict
 
 from dash.dependencies import Input as CallbackInput, Output
 from dash.development.base_component import ComponentMeta
-from dash_html_components import Br
+from dash_html_components import Br, Div, Nav
 
 from penn_chime.defaults import RateLos
 from penn_chime.parameters import Parameters
 
 from chime_dash.app.components.base import Component
-from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header, create_button, \
-    create_link
+from chime_dash.app.utils.templates import (
+    create_switch_input,
+    create_number_input,
+    create_header,
+    create_button,
+    create_link,
+)
 
 FLOAT_INPUT_MIN = 0.001
 FLOAT_INPUT_STEP = "any"
 
 _INPUTS = OrderedDict(
     regional_parameters={"type": "header", "size": "h3"},
-    market_share={"type": "number", "min": FLOAT_INPUT_MIN, "step": FLOAT_INPUT_STEP, "max": 100.0, "percent": True},
+    market_share={
+        "type": "number",
+        "min": FLOAT_INPUT_MIN,
+        "step": FLOAT_INPUT_STEP,
+        "max": 100.0,
+        "percent": True,
+    },
     susceptible={"type": "number", "min": 1, "step": 1},
     known_infected={"type": "number", "min": 0, "step": 1},
     current_hospitalized={"type": "number", "min": 0, "step": 1},
@@ -50,7 +59,7 @@ _INPUTS = OrderedDict(
         "min": 0.0,
         "step": FLOAT_INPUT_STEP,
         "max": 100.0,
-        "percent": True
+        "percent": True,
     },
     ventilated_rate={
         "type": "number",
@@ -69,8 +78,7 @@ _INPUTS = OrderedDict(
     show_tables={"type": "switch", "value": False},
     show_tool_details={"type": "switch", "value": False},
     show_additional_projections={"type": "switch", "value": False},
-    save_as_pdf={"type": "button", "property": "n_clicks"},
-    pdf_file_link={"type": "link", "property": "href"}
+    download_as_pdf_link={"type": "link"},
 )
 
 
@@ -79,20 +87,27 @@ class Sidebar(Component):
     contains the various inputs used to interact
     with the model.
     """
+
     # localization temp. for widget descriptions
     localization_file = "sidebar.yml"
 
     callback_inputs = OrderedDict(
-        (key, CallbackInput(component_id=key, component_property=_INPUTS[key].get("property", "value")))
-        for key in _INPUTS if _INPUTS[key]["type"] not in ("header", "link")
+        (
+            key,
+            CallbackInput(
+                component_id=key,
+                component_property=_INPUTS[key].get("property", "value"),
+            ),
+        )
+        for key in _INPUTS
+        if _INPUTS[key]["type"] not in ("header", "link")
     )
 
-    callback_outputs = [Output(component_id='pdf_file_link', component_property='href'),
-                        Output(component_id='pdf_file_link', component_property='children')]
+    callback_outputs = [
+        Output(component_id="download_as_pdf_link", component_property="href")
+    ]
 
     def __init__(self, *args, **kwargs):
-        self._save_to_pdf = False
-        self.pdf_button_clicks = 0
         super().__init__(*args, **kwargs)
 
     @staticmethod
@@ -135,7 +150,7 @@ class Sidebar(Component):
                 element = create_button(idx, self.content)
             elif data["type"] == "link":
                 elements.append(Br())
-                element = create_link(idx)
+                element = create_link(idx, self.content)
             else:
                 raise ValueError(
                     "Failed to parse input '{idx}' with data '{data}'".format(
@@ -144,14 +159,11 @@ class Sidebar(Component):
                 )
             elements.append(element)
 
-        sidebar = dhc.Nav(
-            children=dhc.Div(
+        sidebar = Nav(
+            children=Div(
                 children=elements,
                 className="p-4",
-                style={
-                    "height": "calc(100vh - 48px)",
-                    "overflowY": "auto",
-                },
+                style={"height": "calc(100vh - 48px)", "overflowY": "auto",},
             ),
             className="col-md-3",
             style={
@@ -160,23 +172,22 @@ class Sidebar(Component):
                 "bottom": 0,
                 "left": 0,
                 "zIndex": 100,
-                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)"
-            }
+                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)",
+            },
         )
 
         return [sidebar]
 
-    def save_to_pdf(self, kwargs):
-        """
-        Return status of save to pdf flag and set it off.
-        """
-        if kwargs.get('save_as_pdf', 0) and kwargs.get('save_as_pdf', 0) > self.pdf_button_clicks:
-            self.pdf_button_clicks = kwargs.get('save_as_pdf', '0')
-            return True
-        return False
-
     def callback(  # pylint: disable=W0613, R0201
         self, *args, **kwargs
     ) -> List[Dict[str, Any]]:
-        return [kwargs.get('pdf_url', ''),
-                self.content['download_report'] if kwargs.get('pdf_url', None) else None]
+
+        url = "/download-as-pdf?" + "&".join(
+            [
+                "{key}={val}".format(key=key, val=val)
+                for key, val in kwargs.items()
+                if not key in ["model", "pars"] and val is not None
+            ]
+        )
+
+        return [url]

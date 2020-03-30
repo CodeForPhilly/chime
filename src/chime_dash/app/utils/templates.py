@@ -4,7 +4,7 @@ templates themselves can be found in app/templates/en
 """
 from typing import Dict, Any, Optional
 
-from os import path
+from os import path, environ
 
 from dash_core_components import Location, Link
 from yaml import safe_load
@@ -12,7 +12,7 @@ from yaml import safe_load
 from numpy import mod
 from pandas import DataFrame
 
-from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4, Button
+from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4, Button, A
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
 from penn_chime.defaults import Constants
@@ -22,8 +22,6 @@ TEMPLATE_DIR = path.join(
     path.abspath(path.dirname(path.dirname(__file__))), "templates"
 )
 
-
-UPLOAD_DIRECTORY = "/app/app_temp_files"
 
 def read_localization_yml(file: str, language: str) -> Dict[str, Any]:
     """Reads localization template.
@@ -144,12 +142,9 @@ def create_button(idx: str, content: Dict[str, str]):
     return Button(id=idx, children=content[idx])
 
 
-def create_location(idx: str):
-    return Location(id=idx)
+def create_link(idx, content: Dict[str, str]):
+    return A(id=idx, children=content[idx])
 
-
-def create_link(idx):
-    return Link(id=idx)
 
 def _get_default_values(
     key: str,

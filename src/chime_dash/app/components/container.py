@@ -1,14 +1,13 @@
 """Initializes the  dash html
 """
 from collections import OrderedDict
-from copy import deepcopy
 
 import dash_bootstrap_components as dbc
-import dash_core_components as dcc
+
 from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.content import Content
 from chime_dash.app.components.sidebar import Sidebar
-from chime_dash.app.services.pdf_printer import print_to_pdf
+
 from penn_chime.models import SimSirModel
 
 
@@ -22,8 +21,7 @@ class Container(Component):
         super().__init__(language, defaults)
         self.pdf_filename = None
         self.components = OrderedDict(
-            sidebar=Sidebar(language, defaults),
-            content=Content(language, defaults),
+            sidebar=Sidebar(language, defaults), content=Content(language, defaults),
         )
         self.callback_outputs = []
         self.callback_inputs = OrderedDict()
@@ -35,7 +33,9 @@ class Container(Component):
         """Initializes the content container dash html
         """
         container = dbc.Container(
-            children=dbc.Row(self.components["sidebar"].html + self.components["content"].html),
+            children=dbc.Row(
+                self.components["sidebar"].html + self.components["content"].html
+            ),
             fluid=True,
             className="mt-5",
         )
@@ -48,12 +48,6 @@ class Container(Component):
         pars = self.components["sidebar"].parse_form_parameters(**kwargs)
         kwargs["model"] = SimSirModel(pars)
         kwargs["pars"] = pars
-
-        save_to_pdf = self.components["sidebar"].save_to_pdf(kwargs)
-        if save_to_pdf:
-            self.pdf_filename = print_to_pdf(deepcopy(self.components['content']), kwargs)
-
-        kwargs['pdf_url'] = self.pdf_filename
 
         callback_returns = []
         for component in self.components.values():
