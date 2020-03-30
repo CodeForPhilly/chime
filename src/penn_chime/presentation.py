@@ -16,7 +16,7 @@ from .constants import (
 )
 
 from .utils import dataframe_to_base64
-from .parameters import Parameters, RateDays
+from .parameters import Parameters, Disposition
 from .models import SimSirModel as Model
 
 hide_menu_style = """
@@ -285,10 +285,10 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     return Parameters(
         current_hospitalized=current_hospitalized,
-        hospitalized=RateDays(hospitalized_rate, hospitalized_days),
-        icu=RateDays(icu_rate, icu_days),
+        hospitalized=Disposition(hospitalized_rate, hospitalized_days),
+        icu=Disposition(icu_rate, icu_days),
         relative_contact_rate=relative_contact_rate,
-        ventilated=RateDays(ventilated_rate, ventilated_days),
+        ventilated=Disposition(ventilated_rate, ventilated_days),
 
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,
