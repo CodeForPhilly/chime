@@ -34,7 +34,7 @@ m = SimSirModel(p)
 display_header(st, m, p)
 
 if st.checkbox("Show more info about this tool"):
-    notes = "The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)"
+    notes = "The total size of the susceptible population will be the entire catchment area for our hospitals."
     display_more_info(st=st, model=m, parameters=p, defaults=DEFAULTS, notes=notes)
 
 st.subheader("New Admissions")

@@ -253,7 +253,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         st_obj,
         "Regional Population",
         min_value=1,
-        value=(d.region.population or d.population),
+        value=(d.population),
         step=1,
         format="%i",
     )
@@ -440,12 +440,6 @@ $$\\beta = (g + \\gamma)$$.
 - {notes} \n
 """.format(
             notes=notes
-        )
-        + "- "
-        + "| \n".join(
-            f"{key} = {value} "
-            for key, value in defaults.region.__dict__.items()
-            if key != "_s"
         )
     )
     return None

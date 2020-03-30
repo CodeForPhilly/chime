@@ -5,14 +5,8 @@ from datetime import date
 from .parameters import Parameters, Regions, Disposition
 
 DEFAULTS = Parameters(
-    region=Regions(
-        delaware=564696,
-        chester=519293,
-        montgomery=826075,
-        bucks=628341,
-        philly=1581000,
-    ),
-    current_hospitalized=32,
+    population=3600000,
+    current_hospitalized=69,
     date_first_hospitalized=date(2020,3,7),
     doubling_time=4.0,
     hospitalized=Disposition(0.025, 7),
