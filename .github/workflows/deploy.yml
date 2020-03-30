@@ -52,7 +52,7 @@ jobs:
           if [ -n "$prod_diff" ]; then
             prod_diff_msg=$(cat <<EOF
           To be applied to prod from $prod_manifest_dir:
-          ```
+          ```diff
           $prod_diff
           ```
 
