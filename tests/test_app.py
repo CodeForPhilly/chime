@@ -329,6 +329,16 @@ def test_model_raw_end():
     assert round(last.susceptible, 0) == 83391.0
 
 
+def test_model_monotonicity():
+    param = copy(PARAM)
+    model = Model(param)
+    raw_df = model.raw_df
+
+    # Susceptible population should be non-increasing, and Recovered non-decreasing
+    assert (raw_df.susceptible[1:] - raw_df.susceptible.shift(1)[1:] <= 0).all()
+    assert (raw_df.recovered  [1:] - raw_df.recovered.  shift(1)[1:] >= 0).all()
+
+
 def test_model_cumulative_census():
     # test that census is being properly calculated
     param = copy(PARAM)
