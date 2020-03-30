@@ -31,8 +31,8 @@ class Additions(Component):
         return [not show_tables]
 
     @staticmethod
-    def build_graph_and_table(model_json, max_y_axis_value, as_date, content):
-        figure = None
+    def build_graph_and_table(model_json, max_y_axis_value, n_days, as_date, content):
+        figure = {"layout": {"height ": 0}}  # Hack to ensure the graph is sized correctly when made visible
         table = None
 
         if model_json:
@@ -50,7 +50,11 @@ class Additions(Component):
                 columns={key: content[key] for key in time_evolution.columns}
             ).astype(int)
 
-            figure = plot_dataframe(time_evolution.drop(columns=content["susceptible"]), max_y_axis=max_y_axis_value)
+            figure = plot_dataframe(
+                time_evolution.drop(columns=content["susceptible"]).head(n_days - 10),
+                max_y_axis=max_y_axis_value
+            )
+            figure["layout"]["height"] = False
             table = Table(df_to_html_table(time_evolution, data_only=True, n_mod=7))
 
         return [figure, table]
@@ -58,8 +62,8 @@ class Additions(Component):
     localization_file = "additions.yml"
 
     def __init__(self, language, defaults):
-        def build_graph_and_table_helper(model_json, max_y_axis_value, as_date):
-            return Additions.build_graph_and_table(model_json, max_y_axis_value, as_date, self.content)
+        def build_graph_and_table_helper(model_json, max_y_axis_value, n_days, as_date):
+            return Additions.build_graph_and_table(model_json, max_y_axis_value, n_days, as_date, self.content)
         super().__init__(language, defaults, [
             ChimeCallback(  # If user toggles show_additional_projections, show/hide the additions content
                 changed_elements=OrderedDict(show_additional_projections="value"),
@@ -72,7 +76,12 @@ class Additions(Component):
                 callback_fn=Additions.show_hide_additions_table
             ),
             ChimeCallback(  # If the max_y_axis or as_date inputs or model change, update the graph and table
-                changed_elements=OrderedDict(model="children", max_y_axis_value="value", as_date="value"),
+                changed_elements=OrderedDict(
+                    model="children",
+                    max_y_axis_value="value",
+                    n_days="value",
+                    as_date="value"
+                ),
                 dom_updates=OrderedDict(infected_v_revovered_graph="figure", infected_v_revovered_table="children"),
                 callback_fn=build_graph_and_table_helper
             )
@@ -83,10 +92,9 @@ class Additions(Component):
         """
         return [Div(
             id="additions",
-            hidden=True,
             children=[
                 H4(self.content["infected-v-revovered-title"]),
                 Graph(id="infected_v_revovered_graph"),
-                Div(id="infected_v_revovered_table", hidden=True)
+                Div(id="infected_v_revovered_table")
             ]
         )]
