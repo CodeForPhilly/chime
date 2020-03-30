@@ -12,9 +12,9 @@ from dash.development.base_component import ComponentMeta
 
 from penn_chime.defaults import RateLos
 from penn_chime.parameters import Parameters
-from penn_chime.models import SimSirModel
 
 from chime_dash.app.components.base import Component
+from chime_dash.app.utils import parameters_serializer
 from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header
 from chime_dash.app.utils.callbacks import ChimeCallback
 
@@ -84,43 +84,34 @@ class Sidebar(Component):
         return [key for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )]
 
     @staticmethod
-    def parse_form_parameters(input_values) -> Tuple[Parameters, Dict[str, Any]]:
-        """Reads html form outputs and converts them to a parameter instance
-
-        Returns Parameters and as_date argument
+    def update_parameters(*input_values, **kwargs) -> List[str]:
         """
-        kwargs = dict(zip(Sidebar.get_ordered_input_keys(), input_values))
+        """
+        inputs_dict = dict(zip(Sidebar.get_ordered_input_keys(), input_values))
         pars = Parameters(
-            current_hospitalized=kwargs["current_hospitalized"],
-            doubling_time=kwargs["doubling_time"],
-            known_infected=kwargs["known_infected"],
-            market_share=kwargs["market_share"] / 100,
-            relative_contact_rate=kwargs["relative_contact_rate"] / 100,
-            susceptible=kwargs["susceptible"],
+            current_hospitalized=inputs_dict["current_hospitalized"],
+            doubling_time=inputs_dict["doubling_time"],
+            known_infected=inputs_dict["known_infected"],
+            market_share=inputs_dict["market_share"] / 100,
+            relative_contact_rate=inputs_dict["relative_contact_rate"] / 100,
+            susceptible=inputs_dict["susceptible"],
             hospitalized=RateLos(
-                kwargs["hospitalized_rate"] / 100, kwargs["hospitalized_los"]
+                inputs_dict["hospitalized_rate"] / 100, inputs_dict["hospitalized_los"]
             ),
-            icu=RateLos(kwargs["icu_rate"] / 100, kwargs["icu_los"]),
+            icu=RateLos(inputs_dict["icu_rate"] / 100, inputs_dict["icu_los"]),
             ventilated=RateLos(
-                kwargs["ventilated_rate"] / 100, kwargs["ventilated_los"]
+                inputs_dict["ventilated_rate"] / 100, inputs_dict["ventilated_los"]
             ),
-            max_y_axis=kwargs["max_y_axis_value"],
-            n_days=kwargs["n_days"],
+            max_y_axis=inputs_dict["max_y_axis_value"],
+            n_days=inputs_dict["n_days"],
         )
-        return pars
-
-    @staticmethod
-    def update_model(*input_values, **kwargs):
-        """
-        """
-        pars = Sidebar.parse_form_parameters(input_values)
-        return [pars.json, SimSirModel(pars).json]
+        return [parameters_serializer(pars)]
 
     def __init__(self, language, defaults):
         input_change_callback = ChimeCallback(
             changed_elements=OrderedDict((key, "value") for key in Sidebar.get_ordered_input_keys()),
-            dom_updates=OrderedDict(pars="children", model="children"),
-            callback_fn=Sidebar.update_model,
+            dom_updates=OrderedDict(pars="children"),
+            callback_fn=Sidebar.update_parameters,
         )
         super().__init__(language, defaults, [input_change_callback])
 
@@ -128,7 +119,6 @@ class Sidebar(Component):
         """Initializes the view
         """
         elements = [
-            dhc.Div(id='model', style={'display': 'none'}),
             dhc.Div(id='pars', style={'display': 'none'})
         ]
         for idx, data in _INPUTS.items():

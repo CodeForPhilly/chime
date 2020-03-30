@@ -14,7 +14,7 @@ from chime_dash.app.components.additions import Additions
 from chime_dash.app.components.intro import Intro
 from chime_dash.app.components.visualizations import Visualizations
 
-from chime_dash.app.utils import toggle_hidden, build_csv_download
+from chime_dash.app.utils import toggle_hidden, build_csv_download, parameters_deserializer
 from chime_dash.app.utils.callbacks import ChimeCallback
 from chime_dash.app.utils.templates import df_to_html_table, read_localization_markdown
 from chime_dash.app.services.plotting import plot_dataframe
@@ -111,13 +111,12 @@ class Index(Component):
         """
         """
 
-        def handle_model_change_helper(model_json, pars_json):
+        def handle_model_change_helper(pars_json):
             model = None
             pars = None
-            if model_json:
-                model = SimSirModel.from_json(model_json)
             if pars_json:
-                pars = Parameters.from_json(pars_json)
+                pars = parameters_deserializer(pars_json)
+                model = SimSirModel(pars)
 
             intro = self.components["intro"].build(model, pars)
             more_intro = self.components["intro"].build(model, pars)
@@ -145,7 +144,7 @@ class Index(Component):
                 callback_fn=self.toggle_tables
             ),
             ChimeCallback(  # If the parameters or model change, update the text
-                changed_elements=OrderedDict(model="children", pars="children"),
+                changed_elements=OrderedDict(pars="children"),
                 dom_updates=OrderedDict(
                     intro="children",
                     more_intro="children",
