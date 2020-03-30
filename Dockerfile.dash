@@ -1,0 +1,12 @@
+FROM python:3.7.7-slim-buster
+
+WORKDIR /code 
+
+COPY requirements.txt requirements.txt
+RUN pip install -q -r requirements.txt
+
+COPY src src 
+
+# EXPOSE $PORT 
+
+CMD gunicorn dash_app:server --bind 0.0.0.0:$PORT --chdir src/

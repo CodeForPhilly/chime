@@ -1,0 +1,15 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "cypress": "^4.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "cypress run"
+  },
+  "author": "Gary Sieling <gary@garysieling.com>",
+  "license": "ISC"
+}

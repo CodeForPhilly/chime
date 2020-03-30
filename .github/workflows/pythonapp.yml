@@ -37,3 +37,13 @@ jobs:
       run: |
         pip install pytest
         python -m pytest
+    - name: Run App
+      run: |
+        streamlit run src/app.py &
+    - name: Cypress
+      uses: cypress-io/github-action@v1.23.2
+      with:
+        working-directory: e2e
+        wait-on: 'http://localhost:8000'
+        wait-on-timeout: 300
+

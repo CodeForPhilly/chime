@@ -9,7 +9,12 @@ verify_ssl = true
 streamlit = "*"
 pandas = "*"
 numpy = "*"
+pytest = "*"
 altair = "*"
+dash = "*"
+dash-bootstrap-components = "*"
+gunicorn = "*"
+PyYAML = "*"
 
 [requires]
 python_version = "3.7"

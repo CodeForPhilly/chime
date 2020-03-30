@@ -11,6 +11,9 @@ on:
 
 env:
   IMAGE_NAME: penn-chime
+  DEPLOY_PUSH_BRANCH: develop
+  # Required for action steebchen/kubectl
+  KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_preprod }}
 
 jobs:
   # Run tests.
@@ -66,3 +69,60 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+
+  deploy-preprod:
+
+    needs: push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Needed for proper rebase
+      - name: Update application manifest
+        run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Pass version to subsequent steps
+          echo "::set-env name=VERSION::$VERSION"
+
+          # Update image version in application manifest
+          sed -Ei "s,(- image: docker.pkg.github.com)(.*),\1/${GITHUB_REPOSITORY,,}/$IMAGE_NAME:$VERSION," k8s/app.yaml
+
+          # Show updated manifest file
+          cat k8s/app.yaml
+
+      - name: Deploy to preprod
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: apply -f k8s/app.yaml
+
+      - name: Sync preprod resources
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: apply -Rf k8s.preprod
+
+      - name: Wait for deploy to complete
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: -n chime rollout status deployment.v1.apps/chime
+
+      - name: Show completed deployment
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: -n chime get deployment chime -o yaml
+
+      - name: Push manifest update
+        uses: github-actions-x/commit@v2.5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          push-branch: ${{ env.DEPLOY_PUSH_BRANCH }}
+          commit-message: "chore: bump k8s manifest up CHIME ${{ env.VERSION }}"
+          rebase: 'true'
+          name: Chime CI
+          email: services@codeforphilly.com

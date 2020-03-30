@@ -32,22 +32,66 @@
 
 ## Deploying a New CHIME Version
 
-1. Merge new version into `master` branch
-2. Create a new release tag in the format `v1.2.3`, incrementing semantically
-3. Wait for the `Docker` GitHub Actions workflow to complete
-4. Verify the new version shows up at the top as "Latest version" here: https://github.com/CodeForPhilly/chime/packages/155340
-5. Run:
+1. [Create a new release](release-process.md)
+2. Wait for the `Docker` GitHub Actions workflow to complete
+3. Verify the new version shows up at the top as "Latest version" here: https://github.com/CodeForPhilly/chime/packages/155340
+4. Open a new issue on GitHub titled "Deploy chime $VERSION" (ex: https://github.com/CodeForPhilly/chime/issues/98)
+  * Note the PR in which the release was approved
+  * Confirm that the tag for the version was created
+5. Create a local branch (based on "develop") to perform deploy time changed on, named "deploy/$VERSION"
 
     ```bash
     VERSION=1.2.3
-    kubectl set image --record deployment/chime chime="docker.pkg.github.com/codeforphilly/chime/penn-chime:${VERSION}"
+    git rev-parse --abbrev-ref HEAD
+    # develop
+    git pull
+    git checkout -b deploy/$VERSION
     ```
 
-6. Watch rollout status:
+6. Update the app.yaml manifest file
 
     ```bash
-    kubectl rollout status deployment.v1.apps/chime
+    VERSION=1.2.3
+    sed -Ei "s/(- image: .*):(.*)/\1:$VERSION/" k8s/app.yaml
+    git add -A
+    # verify changes are as expected
+    git diff --staged
+    git commit -m "Deploy chime $VERSION"
     ```
+
+7. Push changes
+
+    ```bash
+    VERSION=1.2.3
+    git push -u origin deploy/$VERSION
+    ```
+
+8. Open PR on GitHub to merge changes back into develop, ideally with
+ the review of another DevOps admin whenever possible. Ensure to link
+ to the PR in the deployment issue previously opened on GitHub.
+
+9. Run:
+
+    ```bash
+    kubectl apply -f k8s/app.yaml
+    ```
+
+10. Watch rollout status:
+
+    ```bash
+    kubectl -n chime rollout status deployment.v1.apps/chime
+    ```
+
+11. Confirm the expected version is running
+
+    ```bash
+    kubectl -n chime get deployment chime -o yaml | grep image:
+    #  - image: docker.pkg.github.com/codeforphilly/chime/penn-chime:$VERSION
+    ```
+
+12. Paste the output from steps 11 & 12 into the previously opened deployment issue
+ to document the successful deployment and close the issue
+13. $$$ PROFIT $$$
 
 ## Applying Changes to `k8s/` Manifests
 
@@ -68,5 +112,5 @@ kubectl apply -f k8s/infra/ingress-nginx.yaml
 Or the entire directory:
 
 ```bash
-kubectl diff -Rf k8s/
+kubectl apply -Rf k8s/
 ```
