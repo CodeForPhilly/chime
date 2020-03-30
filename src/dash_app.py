@@ -39,12 +39,12 @@ body = Body(LANGUAGE, DEFAULTS)
 DASH.layout = body.html
 DASH.title = "Penn Medicine CHIME"  #! Should be moved into config / out of view
 
-@server.route("/download/<path:path>")
+
+@DASH.server.route("/download/<path:path>")
 def download(path):
     """Serve a file from the upload directory."""
     return send_from_directory(UPLOAD_DIRECTORY, path, as_attachment=True)
 
-@app.callback(body.callback_outputs, list(body.callback_inputs.values()))
 
 @DASH.callback(body.callback_outputs, list(body.callback_inputs.values()))
 def callback(*args):  # pylint: disable=W0612
