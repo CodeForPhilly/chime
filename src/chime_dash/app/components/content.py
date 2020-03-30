@@ -6,8 +6,9 @@ import dash_bootstrap_components as dbc
 from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.footer import Footer
 from chime_dash.app.components.header import Header
+from chime_dash.app.components.tool_details import ToolDetails
 from chime_dash.app.pages.additions import Additions
-from chime_dash.app.pages.intro import Intro, ToolDetails
+from chime_dash.app.pages.intro import Intro
 from chime_dash.app.pages.visualizations import Visualizations
 
 
