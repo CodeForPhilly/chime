@@ -91,9 +91,7 @@ class SimSirModel:
 
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
             self.run_projection(p)
-            self.infected = self.raw_df['infected'].values[i_day]
-            self.susceptible = self.raw_df['susceptible'].values[i_day]
-            self.recovered = self.raw_df['recovered'].values[i_day]
+
             self.r_t = self.beta_t / gamma * susceptible
             self.r_naught = self.beta / gamma * susceptible
             logger.info('Set i_day = %s', i_day)
@@ -143,6 +141,10 @@ class SimSirModel:
 
         logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))
         logger.info('len(raw_df): %s', len(self.raw_df))
+
+        self.infected = self.raw_df['infected'].values[self.i_day]
+        self.susceptible = self.raw_df['susceptible'].values[self.i_day]
+        self.recovered = self.raw_df['recovered'].values[self.i_day]
 
         self.r_t = self.beta_t / gamma * susceptible
         self.r_naught = self.beta / gamma * susceptible
