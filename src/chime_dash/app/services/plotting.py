@@ -4,8 +4,6 @@ Logic for data manipulation needed when new call backs are executed
 """
 from typing import Dict, Any
 
-from penn_chime.utils import add_date_column
-
 import pandas as pd
 
 

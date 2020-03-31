@@ -12,6 +12,7 @@
   - [Release Process](./operations/release-process.md)
   - [The `chime-live` Cluster](./operations/chime-live-cluster.md)
   - [Deploy to Heroku](./operations/heroku.md)
+  - [Deploy with Chef Habitat](./operations/habitat.md)
   - [Deploy to Your Own Cluster](./operations/byok8s.md)
   - [Manual Validation](./operations/manual-validation.md)
   - [Limited Cluster Access for Deployment](./operations/limited-kubeconfigs/limited-kubeconfigs.md)

@@ -1,15 +1,19 @@
-## Habitat Service Package for CHIME
+# Habitat Service Package for CHIME
+
 This package can be used to run CHIME as a fully self-contained application.
 See https://habitat.sh for more details.
 
-### Examples
+## Examples
+
 Quickstart With Docker "Shim" Container:
-```
-docker run -it -p 8000:8000 bixu/hab hab sup run "bixu/chime" --channel="unstable"
+
+```bash
+docker run -it -p 8000:8000 bixu/hab hab sup run "codeforphilly/chime" --channel="unstable"
 ```
 
 Local Prototyping Example:
-```
+
+```bash
 set -e
 curl --silent "https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh" | sudo bash -s
 hab cli setup
@@ -20,7 +24,8 @@ hab sup run $HAB_ORIGIN/chime --channel="unstable"
 ```
 
 Complete `systemd` Bootstrap Example:
-```
+
+```bash
 echo 'HAB_AUTH_TOKEN="<enter your token from https://bldr.habitat.sh/#/profile>"
 HAB_LICENSE="accept"
 HAB_NONINTERACTIVE="true"
@@ -50,5 +55,5 @@ sudo systemctl restart supervisor
 sudo groupadd hab || true
 sudo useradd --system --gid hab hab || true
 
-sudo hab svc load "bixu/chime" --channel="unstable"
+sudo hab svc load "codeforphilly/chime" --channel="unstable"
 ```

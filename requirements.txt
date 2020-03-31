@@ -1,4 +1,3 @@
--e .
 streamlit
 pandas
 numpy
@@ -8,3 +7,4 @@ dash
 dash_bootstrap_components
 pyyaml
 gunicorn
+selenium

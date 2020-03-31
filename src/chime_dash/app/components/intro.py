@@ -35,30 +35,37 @@ class Intro(Component):
     def callback(self, *args, **kwargs):
         """
         """
-        pars = kwargs["pars"]
         intro = read_localization_markdown(LOCALIZATION_FILE_1, self.language)
-        detection_prob_str = (
-            "{detection_probability:.0%}".format(
-                detection_probability=kwargs["model"].detection_probability
-            )
-            if kwargs["model"].detection_probability is not None
-            else "?"
+        infected_population_warning_str = (
+            "(Warning:"
+            " The number of estimated infections is greater than"
+            " the total regional population."
+            " Please verify the values entered in the sidebar.)"
+            ""
+            if kwargs["model"].infected > kwargs["pars"].population
+            else ""
         )
         return [
             intro.format(
                 total_infections=kwargs["model"].infected,
-                initial_infections=pars.known_infected,
-                detection_prob_str=detection_prob_str,
-                current_hosp=pars.current_hospitalized,
-                hosp_rate=pars.hospitalized.rate,
-                S=pars.susceptible,
-                market_share=pars.market_share,
-                recovery_days=pars.recovery_days,
+                current_hosp=kwargs["pars"].current_hospitalized,
+                hosp_rate=kwargs["pars"].hospitalized.rate,
+                S=kwargs["pars"].population,
+                market_share=kwargs["pars"].market_share,
+                recovery_days=kwargs["pars"].infectious_days,
                 r_naught=kwargs["model"].r_naught,
                 doubling_time=kwargs["pars"].doubling_time,
-                relative_contact_rate=pars.relative_contact_rate,
+                relative_contact_rate=kwargs["pars"].relative_contact_rate,
                 r_t=kwargs["model"].r_t,
-                doubling_time_t=kwargs["model"].doubling_time_t,
+                doubling_time_t=abs(kwargs["model"].doubling_time_t),
+                impact_statement=(
+                    "halves the infections every"
+                    if kwargs["model"].r_t < 1
+                    else "reduces the doubling time to"
+                ),
+                daily_growth=kwargs["model"].daily_growth_rate * 100.0,
+                daily_growth_t=kwargs["model"].daily_growth_rate_t * 100.0,
+                infected_population_warning_str=infected_population_warning_str,
             )
         ]
 
@@ -81,20 +88,13 @@ class ToolDetails(Component):
     def callback(self, *args, **kwargs) -> List[Any]:
         """Renders the parameter dependent values in the introduction markdown
         """
-        pars = kwargs["pars"]
         tool_details = read_localization_markdown(LOCALIZATION_FILE_2, self.language)
-        regions = "- " + "| \n".join(
-            f"{key} = {value} "
-            for key, value in self.defaults.region.__dict__.items()
-            if key != "_s"
-        )
         return [
             tool_details.format(
-                regions=regions,
-                recovery_days=int(pars.doubling_time),
-                doubling_time=pars.doubling_time,
+                recovery_days=int(kwargs["pars"].doubling_time),
+                doubling_time=kwargs["pars"].doubling_time,
                 r_naught=kwargs["model"].r_naught,
-                relative_contact_rate=pars.relative_contact_rate,
+                relative_contact_rate=kwargs["pars"].relative_contact_rate,
                 doubling_time_t=kwargs["model"].doubling_time_t,
                 r_t=kwargs["model"].r_t,
             )

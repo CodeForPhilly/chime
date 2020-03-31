@@ -6,103 +6,159 @@ localization file can be found in app/templates/en
 """
 from typing import List, Any
 
+import urllib.parse
+from datetime import date, datetime
+
 from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
-from dash_html_components import H2
+from dash_html_components import H2, A, Div
 from dash_core_components import Markdown, Graph
 from dash_bootstrap_components import Table
 
-from penn_chime.utils import add_date_column
-from penn_chime.parameters import Parameters
+from penn_chime.charts import build_table
+from penn_chime.constants import DATE_FORMAT
 
 from chime_dash.app.utils.templates import df_to_html_table
 from chime_dash.app.services.plotting import plot_dataframe
 from chime_dash.app.components.base import Component
 
-LOCALIZATION_FILE = "visualizations.yml"
-
 
 class Visualizations(Component):
-    """
+    """Creates graphs, tables and download links for data
+
+    Categories
+    * new addmissions
+    * admitted patients
+    * Simulated SIR data
     """
 
     localization_file = "visualizations.yml"
     callback_outputs = [
         Output(component_id="new-admissions-graph", component_property="figure"),
         Output(component_id="new-admissions-table", component_property="children"),
+        Output(component_id="new-admissions-download", component_property="href"),
         Output(component_id="admitted-patients-graph", component_property="figure"),
         Output(component_id="admitted-patients-table", component_property="children"),
+        Output(component_id="admitted-patients-download", component_property="href"),
+        Output(component_id="SIR-graph", component_property="figure"),
+        Output(component_id="SIR-table", component_property="children"),
+        Output(component_id="SIR-download", component_property="href"),
     ]
 
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the header dash html
         """
+        today = date.today().strftime(self.content["date-format"])
         return [
             H2(self.content["new-admissions-title"]),
             Markdown(self.content["new-admissions-text"]),
             Graph(id="new-admissions-graph"),
-            Table(id="new-admissions-table"),
+            A(
+                self.content["download-text"],
+                id="new-admissions-download",
+                download="admissions_{}.csv".format(today),
+                href="",
+                target="_blank",
+                className="btn btn-sm btn-info my-2",
+            ),
+            Div(
+                className="row justify-content-center",
+                children=Div(
+                    className="col-auto",
+                    children=[
+                        Table(id="new-admissions-table", className="table-responsive"),
+                    ],
+                ),
+            ),
             H2(self.content["admitted-patients-title"]),
             Markdown(self.content["admitted-patients-text"]),
             Graph(id="admitted-patients-graph"),
-            Table(id="admitted-patients-table"),
+            A(
+                self.content["download-text"],
+                id="admitted-patients-download",
+                download="census_{}.csv".format(today),
+                href="",
+                target="_blank",
+                className="btn btn-sm btn-info my-4",
+            ),
+            Div(
+                className="row justify-content-center",
+                children=Div(
+                    className="col-auto",
+                    children=[
+                        Table(
+                            id="admitted-patients-table", className="table-responsive"
+                        ),
+                    ],
+                ),
+            ),
+            H2(self.content["SIR-title"]),
+            Markdown(self.content["SIR-text"]),
+            Graph(id="SIR-graph"),
+            A(
+                self.content["download-text"],
+                id="SIR-download",
+                download="SIR_{}.csv".format(today),
+                href="",
+                target="_blank",
+                className="btn btn-sm btn-info my-4",
+            ),
+            Div(
+                className="row justify-content-center",
+                children=Div(
+                    className="col-auto",
+                    children=[Table(id="SIR-table", className="table-responsive"),],
+                ),
+            ),
         ]
+
+    @staticmethod
+    def _prepare_visualizations(dataframe, **kwargs) -> List[Any]:
+        """Creates plot, table and download link for data frame.
+        """
+        plot_data = plot_dataframe(
+            dataframe.dropna().set_index("date").drop(columns=["day"]),
+            max_y_axis=kwargs.get("max_y_axis", None),
+        )
+
+        table = (
+            df_to_html_table(
+                build_table(
+                    df=dataframe,
+                    labels=kwargs.get("labels", dataframe.columns),
+                    modulo=kwargs.get("table_mod", 7),
+                ),
+                format={
+                    float: int,
+                    (date, datetime): lambda d: d.strftime(DATE_FORMAT),
+                },
+            )
+            if kwargs.get("show_tables", None)
+            else None
+        )
+
+        csv = dataframe.to_csv(index=True, encoding="utf-8")
+        csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(csv)
+
+        return [plot_data, table, csv]
 
     def callback(self, *args, **kwargs) -> List[Any]:
         """Renders the parameter dependent plots and tables
         """
         pars = kwargs.get("pars")
-        projection_admits, census_df = self._build_frames(**kwargs)
+        admits_df = kwargs["model"].admits_df
+        census_df = kwargs["model"].census_df
+        simsir_df = kwargs["model"].sim_sir_w_date_df
 
-        # Create admissions figure
-        admissions_data = plot_dataframe(
-            projection_admits.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
-        )
-        # Create admissions table data
-        if kwargs["as_date"]:
-            projection_admits.index = projection_admits.index.strftime("%b, %d")
-        admissions_table_data = (
-            df_to_html_table(projection_admits, data_only=True, n_mod=7)
-            if kwargs["show_tables"]
-            else None
+        viz_kwargs = dict(
+            labels=pars.labels,
+            table_mod=7,
+            max_y_axis=pars.max_y_axis,
+            show_tables=kwargs["show_tables"],
         )
 
-        # Create census figure
-        census_data = plot_dataframe(
-            census_df.head(pars.n_days - 10), max_y_axis=pars.max_y_axis
+        return (
+            self._prepare_visualizations(admits_df, **viz_kwargs)
+            + self._prepare_visualizations(census_df, **viz_kwargs)
+            + self._prepare_visualizations(simsir_df, **viz_kwargs)
         )
-        # Create admissions table data
-        if kwargs["as_date"]:
-            census_df.index = census_df.index.strftime("%b, %d")
-        census_table_data = (
-            df_to_html_table(census_df, data_only=True, n_mod=7)
-            if kwargs["show_tables"]
-            else None
-        )
-
-        return [admissions_data, admissions_table_data, census_data, census_table_data]
-
-    @staticmethod
-    def _build_frames(**kwargs):
-
-        # Prepare admissions data & census data
-        projection_admits = kwargs["model"].admits_df.copy()
-        census_df = kwargs["model"].census_df.copy()
-
-        # Convert columns
-        if kwargs["as_date"]:
-            projection_admits = add_date_column(
-                projection_admits, drop_day_column=True
-            ).set_index("date")
-            census_df = add_date_column(census_df, drop_day_column=True).set_index(
-                "date"
-            )
-        else:
-            projection_admits = projection_admits.set_index("day")
-            census_df = census_df.set_index("day")
-
-        projection_admits = projection_admits.fillna(0).astype(int)
-        census_df.iloc[0, :] = 0
-        census_df = census_df.dropna().astype(int)
-
-        return projection_admits, census_df
