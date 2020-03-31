@@ -14,7 +14,7 @@ from pandas import DataFrame
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
-from penn_chime.defaults import Constants
+from penn_chime.parameters import Parameters
 
 # Consider moving this to a config file eventually
 TEMPLATE_DIR = path.join(
@@ -87,7 +87,7 @@ def df_to_html_table(
 
 
 def create_number_input(
-    idx: str, data: Dict[str, Any], content: Dict[str, str], defaults: Constants
+    idx: str, data: Dict[str, Any], content: Dict[str, str], defaults: Parameters
 ):
     """Returns number formgroup for given form data.
 
@@ -95,14 +95,11 @@ def create_number_input(
         idx: The name of the varibale (html id)
         data: Input form kwargs.
         content: Localization text
-        defaults: Constants to infer defaults
+        defaults: Parameters to infer defaults
     """
     input_kwargs = data.copy()
     input_kwargs.pop("percent", None)
-    LABEL_STYLE = {
-        "font-size": "0.8rem",
-        "margin-bottom": "0.1rem"
-    }
+    LABEL_STYLE = {"font-size": "0.8rem", "margin-bottom": "0.1rem"}
     if not "value" in input_kwargs:
         input_kwargs["value"] = _get_default_values(
             idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
@@ -119,10 +116,33 @@ def create_header(idx: str, content: Dict[str, str]):
     """
     Create heading element using localization map
     """
-    HEADER_STYLE = {
-        "font-size": "1rem"
-    }
+    HEADER_STYLE = {"font-size": "1rem"}
     return H4(id=idx, children=content[idx], style=HEADER_STYLE)
+
+
+def create_date_input(
+    idx: str, data: Dict[str, Any], content: Dict[str, str], defaults: Parameters
+):
+    """Returns number formgroup for given form data.
+
+    Arguments:
+        idx: The name of the varibale (html id)
+        data: Input form kwargs.
+        content: Localization text
+        defaults: Parameters to infer defaults
+    """
+    input_kwargs = data.copy()
+    LABEL_STYLE = {"font-size": "0.8rem", "margin-bottom": "0.1rem"}
+    if not "value" in input_kwargs:
+        input_kwargs["value"] = _get_default_values(
+            idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
+        )
+    return FormGroup(
+        children=[
+            Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
+            Input(id=idx, **input_kwargs),
+        ]
+    )
 
 
 def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str]):
@@ -132,7 +152,7 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
         idx: The name of the varibale (html id)
         data: Input form kwargs.
         content: Localization text
-        defaults: Constants to infer defaults
+        defaults: Parameters to infer defaults
     """
     return Checklist(
         id=idx,
@@ -143,7 +163,7 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
 
 def _get_default_values(
     key: str,
-    defaults: Constants,
+    defaults: Parameters,
     min_val: Optional[float] = None,
     max_val: Optional[float] = None,
 ) -> float:
@@ -154,7 +174,7 @@ def _get_default_values(
 
     Arguments:
         key: The name of the varibale (html id)
-        defaults: Constants to infer defaults
+        defaults: Parameters to infer defaults
         min_val: Min boundary of form
         max_val: Max boundary of form
     """
