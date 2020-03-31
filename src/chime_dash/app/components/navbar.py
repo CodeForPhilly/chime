@@ -5,10 +5,12 @@ from typing import List
 
 import dash_bootstrap_components as dbc
 import dash_html_components as html
+from dash.development.base_component import ComponentMeta
+
 from chime_dash.app.components.base import Component
 from chime_dash.app.components.menu import Menu
-from dash.development.base_component import ComponentMeta
-from penn_chime.defaults import Constants
+
+from penn_chime.parameters import Parameters
 from penn_chime.settings import DEFAULTS
 
 
@@ -17,7 +19,7 @@ class Navbar(Component):
     TODO refactor / design input on style and layout
     """
 
-    def __init__(self, language: str = "en", defaults: Constants = DEFAULTS):
+    def __init__(self, language: str = "en", defaults: Parameters = DEFAULTS):
         """Sets up self, menu and header
         """
         super().__init__(language, defaults=defaults)
@@ -36,20 +38,17 @@ class Navbar(Component):
                                 className="penn-medicine-header__logo",
                                 title="Go to the Penn Medicine home page",
                             ),
-                            dbc.NavbarBrand(
-                                children="CHIME", href="/"
-                            ),
+                            dbc.NavbarBrand(children="CHIME", href="/"),
                         ],
                         align="center",
                         no_gutters=True,
                     ),
-
                 ]
                 + self.menu.html,
-                fluid=True
+                fluid=True,
             ),
             dark=True,
             fixed="top",
-            color="dark"
+            color="dark",
         )
         return [nav]
