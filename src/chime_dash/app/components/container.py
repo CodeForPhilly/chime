@@ -1,4 +1,4 @@
-"""Initializes the  dash html
+"""Initializes the dash html for content container
 """
 from collections import OrderedDict
 
@@ -10,7 +10,7 @@ from penn_chime.models import SimSirModel
 
 
 class Container(Component):
-    """
+    """Container contains sidebar and content components
     """
 
     def __init__(self, language, defaults):
@@ -40,10 +40,10 @@ class Container(Component):
         return [container]
 
     def callback(self, *args, **kwargs):
-        """
+        """Parse sidebar parameters to model and call sub component callbacks
         """
         pars = self.components["sidebar"].parse_form_parameters(**kwargs)
-        kwargs["model"] = SimSirModel(pars)
+        kwargs["model"] = SimSirModel(pars)  # note that this call modifies pars!
         kwargs["pars"] = pars
 
         callback_returns = []
