@@ -92,7 +92,6 @@ _INPUTS = OrderedDict(
     max_y_axis_value={"type": "number", "min": 10, "step": 10, "value": None},
     show_tables={"type": "switch", "value": False},
     show_tool_details={"type": "switch", "value": False},
-    show_additional_projections={"type": "switch", "value": False},
 )
 
 # Different kind of inputs store different kind of "values"
@@ -155,6 +154,7 @@ class Sidebar(Component):
             ventilated=Disposition(
                 kwargs["ventilated_rate"] / 100, kwargs["ventilated_los"]
             ),
+            max_y_axis=kwargs.get("max_y_axis_value", None),
         )
         return pars
 
