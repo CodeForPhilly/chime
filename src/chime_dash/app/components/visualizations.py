@@ -24,17 +24,25 @@ from chime_dash.app.components.base import Component
 
 
 class Visualizations(Component):
-    """
+    """Creates graphs, tables and download links for data
+
+    Categories
+    * new addmissions
+    * admitted patients
+    * Simulated SIR data
     """
 
     localization_file = "visualizations.yml"
     callback_outputs = [
         Output(component_id="new-admissions-graph", component_property="figure"),
         Output(component_id="new-admissions-table", component_property="children"),
+        Output(component_id="new-admissions-download", component_property="href"),
         Output(component_id="admitted-patients-graph", component_property="figure"),
         Output(component_id="admitted-patients-table", component_property="children"),
-        Output(component_id="download-admissions", component_property="href"),
-        Output(component_id="download-census", component_property="href"),
+        Output(component_id="admitted-patients-download", component_property="href"),
+        Output(component_id="SIR-graph", component_property="figure"),
+        Output(component_id="SIR-table", component_property="children"),
+        Output(component_id="SIR-download", component_property="href"),
     ]
 
     def get_html(self) -> List[ComponentMeta]:
@@ -47,7 +55,7 @@ class Visualizations(Component):
             Graph(id="new-admissions-graph"),
             A(
                 self.content["download-text"],
-                id="download-admissions",
+                id="new-admissions-download",
                 download="admissions_{}.csv".format(today),
                 href="",
                 target="_blank",
@@ -67,7 +75,7 @@ class Visualizations(Component):
             Graph(id="admitted-patients-graph"),
             A(
                 self.content["download-text"],
-                id="download-census",
+                id="admitted-patients-download",
                 download="census_{}.csv".format(today),
                 href="",
                 target="_blank",
@@ -84,7 +92,55 @@ class Visualizations(Component):
                     ],
                 ),
             ),
+            H2(self.content["SIR-title"]),
+            Markdown(self.content["SIR-text"]),
+            Graph(id="SIR-graph"),
+            A(
+                self.content["download-text"],
+                id="SIR-download",
+                download="SIR_{}.csv".format(today),
+                href="",
+                target="_blank",
+                className="btn btn-sm btn-info my-4",
+            ),
+            Div(
+                className="row justify-content-center",
+                children=Div(
+                    className="col-auto",
+                    children=[Table(id="SIR-table", className="table-responsive"),],
+                ),
+            ),
         ]
+
+    @staticmethod
+    def _prepare_visualizations(dataframe, **kwargs) -> List[Any]:
+        """Creates plot, table and download link for data frame.
+        """
+        plot_data = plot_dataframe(
+            dataframe.dropna().set_index("date").drop(columns=["day"]),
+            max_y_axis=kwargs.get("max_y_axis", None),
+        )
+
+        table = (
+            df_to_html_table(
+                build_table(
+                    df=dataframe,
+                    labels=kwargs.get("labels", dataframe.columns),
+                    modulo=kwargs.get("table_mod", 7),
+                ),
+                format={
+                    float: int,
+                    (date, datetime): lambda d: d.strftime(DATE_FORMAT),
+                },
+            )
+            if kwargs.get("show_tables", None)
+            else None
+        )
+
+        csv = dataframe.to_csv(index=True, encoding="utf-8")
+        csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(csv)
+
+        return [plot_data, table, csv]
 
     def callback(self, *args, **kwargs) -> List[Any]:
         """Renders the parameter dependent plots and tables
@@ -92,75 +148,17 @@ class Visualizations(Component):
         pars = kwargs.get("pars")
         admits_df = kwargs["model"].admits_df
         census_df = kwargs["model"].census_df
+        simsir_df = kwargs["model"].sim_sir_w_date_df
 
-        census_modulo = 7
-        admits_modulo = 7
-
-        # Create admissions figure
-        admits_plot_data = plot_dataframe(
-            admits_df.dropna().set_index("date").drop(columns=["day"]),
+        viz_kwargs = dict(
+            labels=pars.labels,
+            table_mod=7,
             max_y_axis=pars.max_y_axis,
+            show_tables=kwargs["show_tables"],
         )
 
-        # Create admissions table data
-        admits_table = (
-            df_to_html_table(
-                build_table(df=admits_df, labels=pars.labels, modulo=admits_modulo),
-                format={
-                    float: int,
-                    (date, datetime): lambda d: d.strftime(DATE_FORMAT),
-                },
-            )
-            if kwargs["show_tables"]
-            else None
+        return (
+            self._prepare_visualizations(admits_df, **viz_kwargs)
+            + self._prepare_visualizations(census_df, **viz_kwargs)
+            + self._prepare_visualizations(simsir_df, **viz_kwargs)
         )
-
-        # Create census figure
-        census_plot_data = plot_dataframe(
-            census_df.dropna().set_index("date").drop(columns=["day"]),
-            max_y_axis=pars.max_y_axis,
-        )
-        # Create admissions table data
-        census_table = (
-            df_to_html_table(
-                build_table(df=census_df, labels=pars.labels, modulo=census_modulo),
-                format={
-                    float: int,
-                    (date, datetime): lambda d: d.strftime(DATE_FORMAT),
-                },
-            )
-            if kwargs["show_tables"]
-            else None
-        )
-
-        # Create admissions CSV
-        admissions_csv = admits_df.to_csv(index=True, encoding="utf-8")
-        admissions_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(
-            admissions_csv
-        )
-
-        # Create census CSV
-        census_csv = census_df.to_csv(index=True, encoding="utf-8")
-        census_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(census_csv)
-
-        return [
-            admits_plot_data,
-            admits_table,
-            census_plot_data,
-            census_table,
-            admissions_csv,
-            census_csv,
-        ]
-
-    @staticmethod
-    def _build_frames(**kwargs):
-
-        # Prepare admissions data & census data
-        projection_admits = kwargs["model"].admits_df.copy()
-        census_df = kwargs["model"].census_df.copy()
-
-        projection_admits = projection_admits.fillna(0).astype(int)
-        census_df.iloc[0, :] = 0
-        census_df = census_df.dropna().astype(int)
-
-        return projection_admits, census_df
