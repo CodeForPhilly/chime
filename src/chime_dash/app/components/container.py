@@ -18,8 +18,7 @@ class Container(Component):
         """
         super().__init__(language, defaults)
         self.components = OrderedDict(
-            sidebar=Sidebar(language, defaults),
-            content=Content(language, defaults),
+            sidebar=Sidebar(language, defaults), content=Content(language, defaults),
         )
         self.callback_outputs = []
         self.callback_inputs = OrderedDict()
@@ -31,7 +30,9 @@ class Container(Component):
         """Initializes the content container dash html
         """
         container = dbc.Container(
-            children=dbc.Row(self.components["sidebar"].html + self.components["content"].html),
+            children=dbc.Row(
+                self.components["sidebar"].html + self.components["content"].html
+            ),
             fluid=True,
             className="mt-5",
         )
