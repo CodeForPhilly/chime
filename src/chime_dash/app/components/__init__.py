@@ -22,6 +22,7 @@ class Body(Component):
 
     external_stylesheets = [
         BOOTSTRAP,
+        'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap',
     ]
 
     def __init__(self, language, defaults):
