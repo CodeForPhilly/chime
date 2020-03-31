@@ -47,7 +47,7 @@ class Visualizations(Component):
                 download="census_{}.csv".format(today),
                 href="",
                 target="_blank",
-                className="btn btn-sm btn-info"
+                className="btn btn-sm btn-info",
             ),
             Div(id="admitted_patients_table"),
         ]

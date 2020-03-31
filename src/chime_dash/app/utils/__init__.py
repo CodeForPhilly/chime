@@ -46,8 +46,11 @@ def build_csv_download(df):
     return "data:text/csv;charset=utf-8,{csv}".format(csv=quote(df.to_csv(index=True, encoding='utf-8')))
 
 
-def toggle_hidden(boolean_input_value, elements_to_update):
+def get_n_switch_values(input_value, elements_to_update):
     result = []
+    boolean_input_value = False
+    if input_value == [True]:
+        boolean_input_value = True
     for _ in repeat(None, elements_to_update):
         # todo Fix once switch values make sense. Currently reported as 'None' for off and '[False]' for on
         result.append(not boolean_input_value)

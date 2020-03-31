@@ -88,13 +88,20 @@ class Sidebar(Component):
         """
         """
         inputs_dict = dict(zip(Sidebar.get_ordered_input_keys(), input_values))
+        # todo remove this hack needed because of how Checklist type used for switch input returns values
+        for key in _INPUTS:
+            if _INPUTS[key]["type"] == "switch":
+                value = False
+                if inputs_dict[key] == [True]:
+                    value = True
+                inputs_dict[key] = value
         pars = Parameters(
             current_hospitalized=inputs_dict["current_hospitalized"],
             doubling_time=inputs_dict["doubling_time"],
             known_infected=inputs_dict["known_infected"],
-            market_share=inputs_dict["market_share"] / 100,
             relative_contact_rate=inputs_dict["relative_contact_rate"] / 100,
             susceptible=inputs_dict["susceptible"],
+
             hospitalized=RateLos(
                 inputs_dict["hospitalized_rate"] / 100, inputs_dict["hospitalized_los"]
             ),
@@ -102,6 +109,8 @@ class Sidebar(Component):
             ventilated=RateLos(
                 inputs_dict["ventilated_rate"] / 100, inputs_dict["ventilated_los"]
             ),
+            as_date=inputs_dict["as_date"],
+            market_share=inputs_dict["market_share"] / 100,
             max_y_axis=inputs_dict["max_y_axis_value"],
             n_days=inputs_dict["n_days"],
         )
