@@ -327,7 +327,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
             docs_url=DOCS_URL
         )
     )
-    n_days = n_days_input()
+    n_days = n_days_input() + 1 # Overcome zero index error with panda df
     max_y_axis_set = max_y_axis_set_input()
 
     max_y_axis = None
