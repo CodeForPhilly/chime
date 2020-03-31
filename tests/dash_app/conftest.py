@@ -1,7 +1,7 @@
 from pytest import fixture
 from selenium.webdriver.chrome.options import Options
 
-from dash_app import app
+from dash_app import DASH
 
 
 def pytest_setup_options():
@@ -17,6 +17,6 @@ def pytest_setup_options():
 @fixture
 def test_app(dash_duo):
 
-    dash_duo.start_server(app)
+    dash_duo.start_server(DASH)
 
     yield dash_duo
