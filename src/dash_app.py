@@ -1,6 +1,6 @@
 """Script which launches dash app
 """
-from chime_dash.app.run import DASH
+from chime_dash.app.run import DASH, server
 from penn_chime.settings import DEFAULTS
 from chime_dash.app.components import Body
 
