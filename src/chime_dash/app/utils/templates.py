@@ -70,18 +70,35 @@ def read_localization_markdown(file: str, language: str) -> str:
 
 
 def df_to_html_table(
-    dataframe: DataFrame, data_only: bool = False, n_mod: Optional[int] = None,
+    dataframe: DataFrame,
+    data_only: bool = False,
+    n_mod: Optional[int] = None,
+    format: Optional[Dict[Any, str]] = None,
 ) -> Table:
     """Converts pandas data frame to html table
     """
+    format = format or {}
+
+    def cast_type(val):
+        for dtype, cast in format.items():
+            if isinstance(val, dtype):
+                return cast(val)
+        return val
+
     index_name = dataframe.index.name
-    tmp = dataframe.reset_index()
-    tmp = tmp[mod(tmp.index, n_mod) == 0].copy()
-    tmp = tmp.set_index(index_name)
+    index_name = index_name or "#"
+
+    tmp = dataframe.copy()
+    if n_mod is not None:
+        tmp = tmp[mod(tmp.index, n_mod) == 0].copy()
+
     data = [
-        Thead([Tr([Th(tmp.index.name)] + [Th(col) for col in tmp.columns])]),
+        Thead([Tr([Th(index_name)] + [Th(col) for col in tmp.columns])]),
         Tbody(
-            [Tr([Th(idx)] + [Td(col) for col in row]) for idx, row in tmp.iterrows()]
+            [
+                Tr([Th(cast_type(idx))] + [Td(cast_type(col)) for col in row])
+                for idx, row in tmp.iterrows()
+            ]
         ),
     ]
     return data if data_only else Table(data)

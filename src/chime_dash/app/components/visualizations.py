@@ -6,24 +6,21 @@ localization file can be found in app/templates/en
 """
 from typing import List, Any
 
+import urllib.parse
+from datetime import date, datetime
+
 from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
-from dash_html_components import H2, A
+from dash_html_components import H2, A, Div
 from dash_core_components import Markdown, Graph
 from dash_bootstrap_components import Table
 
-from penn_chime.utils import add_date_column
-from penn_chime.parameters import Parameters
+from penn_chime.charts import build_table
+from penn_chime.constants import DATE_FORMAT
 
 from chime_dash.app.utils.templates import df_to_html_table
 from chime_dash.app.services.plotting import plot_dataframe
 from chime_dash.app.components.base import Component
-
-import urllib.parse
-from datetime import date
-
-
-LOCALIZATION_FILE = "visualizations.yml"
 
 
 class Visualizations(Component):
@@ -49,71 +46,111 @@ class Visualizations(Component):
             Markdown(self.content["new-admissions-text"]),
             Graph(id="new-admissions-graph"),
             A(
-                self.content["download-text"], 
-                id='download-admissions', 
-                download="admissions_{}.csv".format(today), 
-                href="", 
-                target="_blank", 
-                className="btn btn-sm btn-info"
+                self.content["download-text"],
+                id="download-admissions",
+                download="admissions_{}.csv".format(today),
+                href="",
+                target="_blank",
+                className="btn btn-sm btn-info my-2",
             ),
-            Table(id="new-admissions-table"),
+            Div(
+                className="row justify-content-center",
+                children=Div(
+                    className="col-auto",
+                    children=[
+                        Table(id="new-admissions-table", className="table-responsive"),
+                    ],
+                ),
+            ),
             H2(self.content["admitted-patients-title"]),
             Markdown(self.content["admitted-patients-text"]),
             Graph(id="admitted-patients-graph"),
             A(
-                self.content["download-text"], 
-                id='download-census', 
-                download="census_{}.csv".format(today), 
-                href="", 
-                target="_blank", 
-                className="btn btn-sm btn-info"
+                self.content["download-text"],
+                id="download-census",
+                download="census_{}.csv".format(today),
+                href="",
+                target="_blank",
+                className="btn btn-sm btn-info my-4",
             ),
-            Table(id="admitted-patients-table"),
+            Div(
+                className="row justify-content-center",
+                children=Div(
+                    className="col-auto",
+                    children=[
+                        Table(
+                            id="admitted-patients-table", className="table-responsive"
+                        ),
+                    ],
+                ),
+            ),
         ]
 
     def callback(self, *args, **kwargs) -> List[Any]:
         """Renders the parameter dependent plots and tables
         """
         pars = kwargs.get("pars")
-        projection_admits, census_df = self._build_frames(**kwargs)
+        admits_df = kwargs["model"].admits_df
+        census_df = kwargs["model"].census_df
+
+        census_modulo = 7
+        admits_modulo = 7
 
         # Create admissions figure
-        admissions_data = plot_dataframe(
-            projection_admits.head(pars.n_days - 10), max_y_axis=pars.max_y_axis,
+        admits_plot_data = plot_dataframe(
+            admits_df.dropna().set_index("date").drop(columns=["day"]),
+            max_y_axis=pars.max_y_axis,
         )
 
         # Create admissions table data
-        if kwargs["as_date"]:
-            projection_admits.index = projection_admits.index.strftime("%b, %d")
-        admissions_table_data = (
-            df_to_html_table(projection_admits, data_only=True, n_mod=7)
+        admits_table = (
+            df_to_html_table(
+                build_table(df=admits_df, labels=pars.labels, modulo=admits_modulo),
+                format={
+                    float: int,
+                    (date, datetime): lambda d: d.strftime(DATE_FORMAT),
+                },
+            )
             if kwargs["show_tables"]
             else None
         )
 
         # Create census figure
-        census_data = plot_dataframe(
-            census_df.head(pars.n_days - 10), max_y_axis=pars.max_y_axis
+        census_plot_data = plot_dataframe(
+            census_df.dropna().set_index("date").drop(columns=["day"]),
+            max_y_axis=pars.max_y_axis,
         )
         # Create admissions table data
-        if kwargs["as_date"]:
-            census_df.index = census_df.index.strftime("%b, %d")
-        census_table_data = (
-            df_to_html_table(census_df, data_only=True, n_mod=7)
+        census_table = (
+            df_to_html_table(
+                build_table(df=census_df, labels=pars.labels, modulo=census_modulo),
+                format={
+                    float: int,
+                    (date, datetime): lambda d: d.strftime(DATE_FORMAT),
+                },
+            )
             if kwargs["show_tables"]
             else None
         )
 
         # Create admissions CSV
-        admissions_csv = projection_admits.to_csv(index=True, encoding='utf-8')
-        admissions_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(admissions_csv)
+        admissions_csv = admits_df.to_csv(index=True, encoding="utf-8")
+        admissions_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(
+            admissions_csv
+        )
 
         # Create census CSV
-        census_csv = census_df.to_csv(index=True, encoding='utf-8')
+        census_csv = census_df.to_csv(index=True, encoding="utf-8")
         census_csv = "data:text/csv;charset=utf-8," + urllib.parse.quote(census_csv)
 
-
-        return [admissions_data, admissions_table_data, census_data, census_table_data, admissions_csv, census_csv]
+        return [
+            admits_plot_data,
+            admits_table,
+            census_plot_data,
+            census_table,
+            admissions_csv,
+            census_csv,
+        ]
 
     @staticmethod
     def _build_frames(**kwargs):
@@ -121,18 +158,6 @@ class Visualizations(Component):
         # Prepare admissions data & census data
         projection_admits = kwargs["model"].admits_df.copy()
         census_df = kwargs["model"].census_df.copy()
-
-        # Convert columns
-        if kwargs["as_date"]:
-            projection_admits = add_date_column(
-                projection_admits, drop_day_column=True
-            ).set_index("date")
-            census_df = add_date_column(census_df, drop_day_column=True).set_index(
-                "date"
-            )
-        else:
-            projection_admits = projection_admits.set_index("day")
-            census_df = census_df.set_index("day")
 
         projection_admits = projection_admits.fillna(0).astype(int)
         census_df.iloc[0, :] = 0
