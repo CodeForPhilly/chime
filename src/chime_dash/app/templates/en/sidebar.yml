@@ -1,23 +1,27 @@
+hospital_parameters: Hospital Parameters
+population: Regional Population
+market_share: Hospital Market Share (%)
 current_hospitalized: Currently Hospitalized COVID-19 Patients
-doubling_time: Doubling time before social distancing (days)
-relative_contact_rate: Social distancing (% reduction in social contact)
+
+spread_parameters: Spread and Contact Parameters
+date_first_hospitalized: Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time
+doubling_time: Doubling time in days (up to today)
+relative_contact_rate: Social distancing (% reduction in social contact going forward)
+
+severity_parameters: Severity Parameters
 hospitalized_rate: Hospitalization %(total infections)
 icu_rate: ICU %(total infections)
 ventilated_rate: Ventilated %(total infections)
-hospitalized_los: Hospital Length of Stay
-icu_los: ICU Length of Stay
-ventilated_los: Vent Length of Stay
-market_share: Hospital Market Share (%)
-susceptible: Regional Population
-known_infected: Currently Known Regional Infections (only used to compute detection rate - does not change projections)
+infectious_days: Infectious Days
+hospitalized_los: Average Hospital Length of Stay (days)
+icu_los: Average Days in ICU
+ventilated_los: Average Days on Ventilator
+
+display_parameters: Display parameters
 n_days: Number of days to project
-as_date: Present results as dates
+current_date: Current date (Default is today)
 max_y_axis: Set the Y-axis on graphs to a static
 max_y_axis_value: Maximal y-axis value (leave blank for no max value)
 show_tables: Show tables with data
 show_tool_details: Show more info about this tool
 show_additional_projections: Show additional projections
-regional_parameters: Regional Parameters
-spread_and_contact: Spread and Contact Parameters
-severity_parameters: Severity Parameters
-display_parameters: Display Parameters
