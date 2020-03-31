@@ -81,7 +81,7 @@ class Index(Component):
                     time_evolution.drop(columns=content["susceptible"]).head(pars.n_days - 10),
                     max_y_axis=pars.max_y_axis
                 )
-                evo_figure["layout"].pop("height", None)
+                evo_figure["layout"]["height"] = 450
                 evo_table = dbc.Table(df_to_html_table(time_evolution, data_only=True, n_mod=7))
 
             admissions_csv = build_csv_download(projection_admits)
