@@ -12,13 +12,13 @@ class Bounded(Validator):
             self,
             lower_bound: Optional[float] = None,
             upper_bound: Optional[float] = None) -> None:
+        assert lower_bound is not None or upper_bound is not None, "Do not use this object to create an unbounded validator."
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         self.message = {
             (lower_bound, upper_bound): f"in ({self.lower_bound}, {self.upper_bound})",
             (None, upper_bound): f"less than {self.upper_bound}",
             (lower_bound, None): f"greater than {self.lower_bound}",
-            (None, None): "ACTUALLY the value is unbounded"
         }
 
     def validate(self, value):
