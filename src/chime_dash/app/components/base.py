@@ -12,7 +12,7 @@ from dash import Dash
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Div
 
-from penn_chime.defaults import Constants
+from penn_chime.parameters import Parameters
 from penn_chime.settings import DEFAULTS
 
 from chime_dash.app.utils.templates import read_localization_yml, read_localization_markdown
@@ -35,7 +35,7 @@ class Component(ABC):
     def __init__(
             self,
             language: str = "en",
-            defaults: Constants = DEFAULTS,
+            defaults: Parameters = DEFAULTS,
             callbacks: List[ChimeCallback] = None
     ):
         """Initializes the component

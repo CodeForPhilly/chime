@@ -3,31 +3,48 @@ Initializes the side bar containing the various inputs for the model
 
 #! _INPUTS should be considered for moving else where
 """
-import dash_html_components as dhc
+from dash_html_components import Nav, Div
 
 from typing import List, Dict, Any, Tuple
 from collections import OrderedDict
+from datetime import date, datetime
 
 from dash.development.base_component import ComponentMeta
 
-from penn_chime.defaults import RateLos
-from penn_chime.parameters import Parameters
+from penn_chime.parameters import Parameters, Disposition
 
 from chime_dash.app.components.base import Component
 from chime_dash.app.utils import parameters_serializer
-from chime_dash.app.utils.templates import create_switch_input, create_number_input, create_header
 from chime_dash.app.utils.callbacks import ChimeCallback
+from chime_dash.app.utils.templates import (
+    create_switch_input,
+    create_number_input,
+    create_date_input,
+    create_header,
+)
 
 FLOAT_INPUT_MIN = 0.001
 FLOAT_INPUT_STEP = "any"
 
 _INPUTS = OrderedDict(
-    regional_parameters={"type": "header", "size": "h3"},
-    market_share={"type": "number", "min": FLOAT_INPUT_MIN, "step": FLOAT_INPUT_STEP, "max": 100.0, "percent": True},
-    susceptible={"type": "number", "min": 1, "step": 1},
-    known_infected={"type": "number", "min": 0, "step": 1},
+    ###
+    hospital_parameters={"type": "header", "size": "h3"},
+    population={"type": "number", "min": 1, "step": 1},
+    market_share={
+        "type": "number",
+        "min": FLOAT_INPUT_MIN,
+        "step": FLOAT_INPUT_STEP,
+        "max": 100.0,
+        "percent": True,
+    },
     current_hospitalized={"type": "number", "min": 0, "step": 1},
-    spread_and_contact={"type": "header", "size": "h3"},
+    ###
+    spread_parameters={"type": "header", "size": "h4"},
+    date_first_hospitalized={
+        "type": "date",
+        "min_date_allowed": datetime(2019, 10, 1),
+        "max_date_allowed": datetime(2021, 12, 31),
+    },
     doubling_time={"type": "number", "min": FLOAT_INPUT_MIN, "step": FLOAT_INPUT_STEP},
     relative_contact_rate={
         "type": "number",
@@ -36,7 +53,8 @@ _INPUTS = OrderedDict(
         "max": 100.0,
         "percent": True,
     },
-    severity_parameters={"type": "header", "size": "h3"},
+    ###
+    severity_parameters={"type": "header", "size": "h4"},
     hospitalized_rate={
         "type": "number",
         "min": 0.0,
@@ -49,7 +67,7 @@ _INPUTS = OrderedDict(
         "min": 0.0,
         "step": FLOAT_INPUT_STEP,
         "max": 100.0,
-        "percent": True
+        "percent": True,
     },
     ventilated_rate={
         "type": "number",
@@ -58,17 +76,31 @@ _INPUTS = OrderedDict(
         "max": 100.0,
         "percent": True,
     },
+    infectious_days={"type": "number", "min": 0, "step": 1},
     hospitalized_los={"type": "number", "min": 0, "step": 1},
     icu_los={"type": "number", "min": 0, "step": 1},
     ventilated_los={"type": "number", "min": 0, "step": 1},
-    display_parameters={"type": "header", "size": "h3"},
+    ###
+    display_parameters={"type": "header", "size": "h4"},
     n_days={"type": "number", "min": 30, "step": 1},
+    current_date={
+        "type": "date",
+        "min_date_allowed": datetime(2019, 10, 1),
+        "max_date_allowed": datetime(2021, 12, 31),
+        "initial_visible_month": date.today(),
+        "date": date.today(),
+    },
     max_y_axis_value={"type": "number", "min": 10, "step": 10, "value": None},
-    as_date={"type": "switch", "value": False},
     show_tables={"type": "switch", "value": False},
     show_tool_details={"type": "switch", "value": False},
-    show_additional_projections={"type": "switch", "value": False},
 )
+
+# Different kind of inputs store different kind of "values"
+# This tells the callback output for which field to look
+_PROPERTY_OUTPUT_MAP = {
+    "number": "value",
+    "date": "date",
+}
 
 
 class Sidebar(Component):
@@ -76,6 +108,7 @@ class Sidebar(Component):
     contains the various inputs used to interact
     with the model.
     """
+
     # localization temp. for widget descriptions
     localization_file = "sidebar.yml"
 
@@ -84,41 +117,58 @@ class Sidebar(Component):
         return [key for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )]
 
     @staticmethod
-    def update_parameters(*input_values, **kwargs) -> List[str]:
-        """
-        """
-        inputs_dict = dict(zip(Sidebar.get_ordered_input_keys(), input_values))
+    def get_formated_values(input_values):
+        result = dict(zip(Sidebar.get_ordered_input_keys(), input_values))
         # todo remove this hack needed because of how Checklist type used for switch input returns values
         for key in _INPUTS:
             if _INPUTS[key]["type"] == "switch":
                 value = False
-                if inputs_dict[key] == [True]:
+                if result[key] == [True]:
                     value = True
-                inputs_dict[key] = value
-        pars = Parameters(
-            current_hospitalized=inputs_dict["current_hospitalized"],
-            doubling_time=inputs_dict["doubling_time"],
-            known_infected=inputs_dict["known_infected"],
-            relative_contact_rate=inputs_dict["relative_contact_rate"] / 100,
-            susceptible=inputs_dict["susceptible"],
+                result[key] = value
+            elif _INPUTS[key]["type"] == "date":
+                value = result[key]
+                result[key] = datetime.strptime(value, "%Y-%m-%d").date() if value else value
+        return result
 
-            hospitalized=RateLos(
+    @staticmethod
+    def update_parameters(*input_values, **kwargs) -> List[str]:
+        """Reads html form outputs and converts them to a parameter instance
+
+        Returns Parameters
+        """
+        inputs_dict = Sidebar.get_formated_values(input_values)
+        dt = inputs_dict["doubling_time"] if inputs_dict["doubling_time"] else None
+        dfh = inputs_dict["date_first_hospitalized"] if not dt else None
+        pars = Parameters(
+            population=inputs_dict["population"],
+            current_hospitalized=inputs_dict["current_hospitalized"],
+            date_first_hospitalized=dfh,
+            doubling_time=dt,
+            hospitalized=Disposition(
                 inputs_dict["hospitalized_rate"] / 100, inputs_dict["hospitalized_los"]
             ),
-            icu=RateLos(inputs_dict["icu_rate"] / 100, inputs_dict["icu_los"]),
-            ventilated=RateLos(
+            icu=Disposition(inputs_dict["icu_rate"] / 100, inputs_dict["icu_los"]),
+            infectious_days=inputs_dict["infectious_days"],
+            market_share=inputs_dict["market_share"] / 100,
+            n_days=inputs_dict["n_days"],
+            relative_contact_rate=inputs_dict["relative_contact_rate"] / 100,
+            ventilated=Disposition(
                 inputs_dict["ventilated_rate"] / 100, inputs_dict["ventilated_los"]
             ),
-            as_date=inputs_dict["as_date"],
-            market_share=inputs_dict["market_share"] / 100,
-            max_y_axis=inputs_dict["max_y_axis_value"],
-            n_days=inputs_dict["n_days"],
+            max_y_axis=inputs_dict.get("max_y_axis_value", None),
         )
         return [parameters_serializer(pars)]
 
     def __init__(self, language, defaults):
+        changed_elements = OrderedDict(
+            (key, _PROPERTY_OUTPUT_MAP.get(_INPUTS[key]["type"], "value"))
+            for key in _INPUTS
+            if _INPUTS[key]["type"] not in ("header",)
+        )
+
         input_change_callback = ChimeCallback(
-            changed_elements=OrderedDict((key, "value") for key in Sidebar.get_ordered_input_keys()),
+            changed_elements=changed_elements,
             dom_updates=OrderedDict(pars="children"),
             callback_fn=Sidebar.update_parameters,
         )
@@ -128,13 +178,15 @@ class Sidebar(Component):
         """Initializes the view
         """
         elements = [
-            dhc.Div(id='pars', style={'display': 'none'})
+            Div(id='pars', style={'display': 'none'})
         ]
         for idx, data in _INPUTS.items():
             if data["type"] == "number":
                 element = create_number_input(idx, data, self.content, self.defaults)
             elif data["type"] == "switch":
                 element = create_switch_input(idx, data, self.content)
+            elif data["type"] == "date":
+                element = create_date_input(idx, data, self.content, self.defaults)
             elif data["type"] == "header":
                 element = create_header(idx, self.content)
             else:
@@ -145,14 +197,11 @@ class Sidebar(Component):
                 )
             elements.append(element)
 
-        sidebar = dhc.Nav(
-            children=dhc.Div(
+        sidebar = Nav(
+            children=Div(
                 children=elements,
                 className="p-4",
-                style={
-                    "height": "calc(100vh - 48px)",
-                    "overflowY": "auto",
-                },
+                style={"height": "calc(100vh - 48px)", "overflowY": "auto",},
             ),
             className="col-md-3",
             style={
@@ -161,8 +210,9 @@ class Sidebar(Component):
                 "bottom": 0,
                 "left": 0,
                 "zIndex": 100,
-                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)"
-            }
+                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)",
+            },
         )
 
         return [sidebar]
+

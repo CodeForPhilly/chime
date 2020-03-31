@@ -24,25 +24,37 @@ class Intro(Component):
 
     def build(self, model, pars):
         result = None
+
         if model and pars:
             intro = self.content
-            detection_prob_str = (
-                "{detection_probability:.0%}".format(detection_probability=model.detection_probability)
-                if model.detection_probability is not None else "?"
+            infected_population_warning_str = (
+                "(Warning:"
+                " The number of estimated infections is greater than"
+                " the total regional population."
+                " Please verify the values entered in the sidebar.)"
+                ""
+                if model.infected > pars.population
+                else ""
             )
             result = intro.format(
                 total_infections=model.infected,
-                initial_infections=pars.known_infected,
-                detection_prob_str=detection_prob_str,
                 current_hosp=pars.current_hospitalized,
                 hosp_rate=pars.hospitalized.rate,
-                S=pars.susceptible,
+                S=pars.population,
                 market_share=pars.market_share,
-                recovery_days=pars.recovery_days,
+                recovery_days=pars.infectious_days,
                 r_naught=model.r_naught,
                 doubling_time=pars.doubling_time,
                 relative_contact_rate=pars.relative_contact_rate,
                 r_t=model.r_t,
                 doubling_time_t=model.doubling_time_t,
+                impact_statement=(
+                    "halves the infections every"
+                    if model.r_t < 1
+                    else "reduces the doubling time to"
+                ),
+                daily_growth=model.daily_growth_rate * 100.0,
+                daily_growth_t=model.daily_growth_rate_t * 100.0,
+                infected_population_warning_str=infected_population_warning_str,
             )
         return [result]

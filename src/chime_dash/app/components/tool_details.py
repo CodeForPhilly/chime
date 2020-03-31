@@ -24,13 +24,7 @@ class ToolDetails(Component):
         result = None
         if model and pars:
             tool_details = self.content
-            regions = "- " + "| \n".join(
-                f"{key} = {value} "
-                for key, value in self.defaults.region.__dict__.items()
-                if key != "_s"
-            )
             result = tool_details.format(
-                regions=regions,
                 recovery_days=int(pars.doubling_time),
                 doubling_time=pars.doubling_time,
                 r_naught=model.r_naught,
