@@ -191,7 +191,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     doubling_time_input = NumberInput(
         st_obj,
-        "Doubling time before social distancing (days)",
+        "Doubling time in days (up to today)",
         min_value=0.5,
         value=d.doubling_time,
         step=0.25,
@@ -282,10 +282,8 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         """**CHIME [v1.1.0](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.0) (2020/03/30)**"""
     )
 
-    current_date = current_date_input()
-
     st.sidebar.markdown(
-        "### Regional Parameters [ℹ]({docs_url}/what-is-chime/parameters#regional-parameters)".format(
+        "### Hospital Parameters [ℹ]({docs_url}/what-is-chime/parameters#hospital-parameters)".format(
             docs_url=DOCS_URL
         )
     )
@@ -301,7 +299,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
 
     if st.sidebar.checkbox(
-        "I know the date of the first hospitalized case in the region."
+        "I know the date of the first hospitalized case."
     ):
         date_first_hospitalized = date_first_hospitalized_input()
         doubling_time = None
@@ -335,6 +333,8 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     max_y_axis = None
     if max_y_axis_set:
         max_y_axis = max_y_axis_input()
+
+    current_date = current_date_input()
 
     return Parameters(
         current_hospitalized=current_hospitalized,
