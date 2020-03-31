@@ -10,3 +10,5 @@ Positive = Bounded(lower_bound=-EPSILON)
 Rate = Rate()  # type: ignore
 Date = Date()  # type: ignore
 OptionalDate = OptionalDate()  # type: ignore
+# # rolling a custom validator for doubling time in case DS wants to add upper bound
+# DoublingTime = OptionalBounded(lower_bound=0-EPSILON, upper_bound=None)

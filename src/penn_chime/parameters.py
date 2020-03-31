@@ -90,7 +90,7 @@ class Parameters:
         self.current_date = Date(value=current_date)
        
         self.date_first_hospitalized = OptionalDate(value=date_first_hospitalized)
-        self.doubling_time = doubling_time
+        self.doubling_time = OptionalStrictlyPositive(value=doubling_time)
 
         self.infectious_days = StrictlyPositive(value=infectious_days)
         self.market_share = Rate(value=market_share)
