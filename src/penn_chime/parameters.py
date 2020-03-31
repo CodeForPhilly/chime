@@ -8,7 +8,9 @@ from collections import namedtuple
 from datetime import date
 from typing import Optional
 
-from .validators import Positive, StrictlyPositive, Rate
+from .validators import (
+    Positive, OptionalStrictlyPositive, StrictlyPositive, Rate, Date, OptionalDate
+    )
 
 # Parameters for each disposition (hospitalized, icu, ventilated)
 #   The rate of disposition within the population of infected
@@ -85,14 +87,14 @@ class Parameters:
         else:
             raise AssertionError('population or regions must be provided.')
 
-        self.current_date = current_date
+        self.current_date = Date(value=current_date)
        
-        self.date_first_hospitalized = date_first_hospitalized
+        self.date_first_hospitalized = OptionalDate(value=date_first_hospitalized)
         self.doubling_time = doubling_time
 
         self.infectious_days = StrictlyPositive(value=infectious_days)
         self.market_share = Rate(value=market_share)
-        self.max_y_axis = max_y_axis
+        self.max_y_axis = OptionalStrictlyPositive(value=max_y_axis)
         self.n_days = StrictlyPositive(value=n_days)
         self.recovered = Positive(value=recovered)
 
