@@ -472,7 +472,7 @@ def write_footer(st):
 
 
 def display_download_link(st, filename: str, df: pd.DataFrame):
-    csv = dataframe_to_base64(df)
+    csv = dataframe_to_base64(df[:-1]) # Overcome zero index error with panda df
     st.markdown(
         """
         <a download="{filename}" href="data:file/csv;base64,{csv}">Download {filename}</a>
