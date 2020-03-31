@@ -2,6 +2,7 @@
 """
 from chime_dash.app.run import DASH
 
+server = DASH.server
 
 if __name__ == "__main__":
     #    main()

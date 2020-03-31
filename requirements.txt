@@ -7,3 +7,4 @@ dash
 dash_bootstrap_components
 pyyaml
 gunicorn
+selenium
