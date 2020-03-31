@@ -12,6 +12,7 @@ from numpy import mod
 from pandas import DataFrame
 
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4
+from dash_core_components import DatePickerSingle
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
 from penn_chime.parameters import Parameters
@@ -132,15 +133,17 @@ def create_date_input(
         defaults: Parameters to infer defaults
     """
     input_kwargs = data.copy()
+    input_kwargs.pop("type")
     LABEL_STYLE = {"font-size": "0.8rem", "margin-bottom": "0.1rem"}
-    if not "value" in input_kwargs:
-        input_kwargs["value"] = _get_default_values(
-            idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
-        )
+    if not "date" in input_kwargs:
+        input_kwargs["date"] = input_kwargs[
+            "initial_visible_month"
+        ] = _get_default_values(idx, defaults)
+
     return FormGroup(
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
-            Input(id=idx, **input_kwargs),
+            DatePickerSingle(id=idx, **input_kwargs),
         ]
     )
 
@@ -181,11 +184,17 @@ def _get_default_values(
     min_val = 0 if min_val is None else min_val
 
     if "rate" in key:
-        split = key.split("_")
-        val = getattr(getattr(defaults, split[0], {}), "rate", min_val) * 100
+        val = (
+            defaults.dispositions[key.split("_")[0]].rate
+            if key.split("_")[0] in defaults.dispositions
+            else getattr(defaults, key, min_val)
+        ) * 100
     elif "los" in key:
-        split = key.split("_")
-        val = getattr(getattr(defaults, split[0], {}), "length_of_stay", min_val)
+        val = (
+            defaults.dispositions[key.split("_")[0]].days
+            if key.split("_")[0] in defaults.dispositions
+            else getattr(defaults, key, min_val)
+        )
     elif "share" in key:
         val = getattr(defaults, key, min_val) * 100
     elif "susceptible" in key:

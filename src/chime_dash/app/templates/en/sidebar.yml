@@ -5,7 +5,7 @@ current_hospitalized: Currently Hospitalized COVID-19 Patients
 
 spread_parameters: Spread and Contact Parameters
 date_first_hospitalized: Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time
-doubling_time: Doubling time in days (up to today)
+doubling_time: Doubling time in days (up to today. This overwrites date of first hospitalized estimation)
 relative_contact_rate: Social distancing (% reduction in social contact going forward)
 
 severity_parameters: Severity Parameters

@@ -88,14 +88,13 @@ class ToolDetails(Component):
     def callback(self, *args, **kwargs) -> List[Any]:
         """Renders the parameter dependent values in the introduction markdown
         """
-        pars = kwargs["pars"]
         tool_details = read_localization_markdown(LOCALIZATION_FILE_2, self.language)
         return [
             tool_details.format(
-                recovery_days=int(pars.doubling_time),
-                doubling_time=pars.doubling_time,
+                recovery_days=int(kwargs["pars"].doubling_time),
+                doubling_time=kwargs["pars"].doubling_time,
                 r_naught=kwargs["model"].r_naught,
-                relative_contact_rate=pars.relative_contact_rate,
+                relative_contact_rate=kwargs["pars"].relative_contact_rate,
                 doubling_time_t=kwargs["model"].doubling_time_t,
                 r_t=kwargs["model"].r_t,
             )

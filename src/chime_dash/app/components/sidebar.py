@@ -39,7 +39,11 @@ _INPUTS = OrderedDict(
     current_hospitalized={"type": "number", "min": 0, "step": 1},
     ###
     spread_parameters={"type": "header", "size": "h4"},
-    date_first_hospitalized={"type": "date"},
+    date_first_hospitalized={
+        "type": "date",
+        "min_date_allowed": datetime(2019, 10, 1),
+        "max_date_allowed": datetime(2021, 12, 31),
+    },
     doubling_time={"type": "number", "min": FLOAT_INPUT_MIN, "step": FLOAT_INPUT_STEP},
     relative_contact_rate={
         "type": "number",
@@ -78,12 +82,25 @@ _INPUTS = OrderedDict(
     ###
     display_parameters={"type": "header", "size": "h4"},
     n_days={"type": "number", "min": 30, "step": 1},
-    current_date={"type": "date", "value": date.today()},
+    current_date={
+        "type": "date",
+        "min_date_allowed": datetime(2019, 10, 1),
+        "max_date_allowed": datetime(2021, 12, 31),
+        "initial_visible_month": date.today(),
+        "date": date.today(),
+    },
     max_y_axis_value={"type": "number", "min": 10, "step": 10, "value": None},
     show_tables={"type": "switch", "value": False},
     show_tool_details={"type": "switch", "value": False},
     show_additional_projections={"type": "switch", "value": False},
 )
+
+# Different kind of inputs store different kind of "values"
+## This tells the callback output for which field to look
+_PROPERTY_OUTPUT_MAP = {
+    "number": "value",
+    "date": "date",
+}
 
 
 class Sidebar(Component):
@@ -96,7 +113,15 @@ class Sidebar(Component):
     localization_file = "sidebar.yml"
 
     callback_inputs = OrderedDict(
-        (key, CallbackInput(component_id=key, component_property="value"))
+        (
+            key,
+            CallbackInput(
+                component_id=key,
+                component_property=_PROPERTY_OUTPUT_MAP.get(
+                    _INPUTS[key]["type"], "value"
+                ),
+            ),
+        )
         for key in _INPUTS
         if _INPUTS[key]["type"] not in ("header",)
     )
@@ -109,21 +134,16 @@ class Sidebar(Component):
         """
         for key in ["date_first_hospitalized", "current_date"]:
             val = kwargs.get(key, None)
-            kwargs[key] = (
-                datetime.strptime(val, "%Y-%m-%d").date() if val is not None else val
-            )
+            kwargs[key] = datetime.strptime(val, "%Y-%m-%d").date() if val else val
 
-        doubling_time = (
-            kwargs["doubling_time"]
-            if kwargs["date_first_hospitalized"] is None
-            else None
-        )
+        dt = kwargs["doubling_time"] if kwargs["doubling_time"] else None
+        dfh = kwargs["date_first_hospitalized"] if not dt else None
 
         pars = Parameters(
             population=kwargs["population"],
             current_hospitalized=kwargs["current_hospitalized"],
-            date_first_hospitalized=kwargs["date_first_hospitalized"],
-            doubling_time=doubling_time,
+            date_first_hospitalized=dfh,
+            doubling_time=dt,
             hospitalized=Disposition(
                 kwargs["hospitalized_rate"] / 100, kwargs["hospitalized_los"]
             ),
