@@ -1,6 +1,5 @@
 """Tests."""
 
-from copy import copy
 from math import ceil  # type: ignore
 from datetime import date, datetime  # type: ignore
 import pytest  # type: ignore
@@ -29,8 +28,29 @@ from src.penn_chime.presentation import display_header
 
 EPSILON = 1.e-7
 
+# set up
+
+# we just want to verify that st _attempted_ to render the right stuff
+# so we store the input, and make sure that it matches what we expect
+class MockStreamlit:
+    def __init__(self):
+        self.render_store = []
+        self.markdown = self.just_store_instead_of_rendering
+        self.latex = self.just_store_instead_of_rendering
+        self.subheader = self.just_store_instead_of_rendering
+
+    def just_store_instead_of_rendering(self, inp, *args, **kwargs):
+        self.render_store.append(inp)
+        return None
+
+@pytest.fixture
+def mock_st():
+    return MockStreamlit()
+
 # The defaults in settings will change and break the tests
-DEFAULTS = Parameters(
+@pytest.fixture
+def DEFAULTS():
+    return Parameters(
     region=Regions(
         delaware=564696,
         chester=519293,
@@ -50,7 +70,9 @@ DEFAULTS = Parameters(
     ventilated=Disposition(0.005, 10),
 )
 
-PARAM = Parameters(
+@pytest.fixture
+def param():
+    return Parameters(
     current_date=datetime(year=2020, month=3, day=28),
     current_hospitalized=100,
     doubling_time=6.0,
@@ -63,7 +85,9 @@ PARAM = Parameters(
     n_days=60,
 )
 
-HALVING_PARAM = Parameters(
+@pytest.fixture
+def halving_param():
+    return Parameters(
     current_date=datetime(year=2020, month=3, day=28),
     current_hospitalized=100,
     doubling_time=6.0,
@@ -76,86 +100,70 @@ HALVING_PARAM = Parameters(
     n_days=60,
 )
 
-MODEL = Model(copy(PARAM))
-HALVING_MODEL = Model(copy(HALVING_PARAM))
+@pytest.fixture
+def model(param):
+    return Model(param)
 
+@pytest.fixture
+def halving_model(halving_param):
+    return Model(halving_param)
 
-# set up
+@pytest.fixture
+def admits_df():
+    return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_admits.csv', parse_dates=['date'])
 
-# we just want to verify that st _attempted_ to render the right stuff
-# so we store the input, and make sure that it matches what we expect
-class MockStreamlit:
-    def __init__(self):
-        self.render_store = []
-        self.markdown = self.just_store_instead_of_rendering
-        self.latex = self.just_store_instead_of_rendering
-        self.subheader = self.just_store_instead_of_rendering
-
-    def just_store_instead_of_rendering(self, inp, *args, **kwargs):
-        self.render_store.append(inp)
-        return None
-
-    def cleanup(self):
-        """
-        Call this after every test, unless you intentionally want to accumulate stuff-to-render
-        """
-        self.render_store = []
-
-
-st = MockStreamlit()
+@pytest.fixture
+def census_df():
+    return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_census.csv', parse_dates=['date'])
 
 
 # test presentation
+def header_test_helper(expected_str, model, param, mock_st):
+    display_header(mock_st, model, param)
+    assert [s for s in mock_st.render_store if expected_str in s],\
+        f"Expected the string '{expected_str}' in the display header"
 
-
-def header_test_helper(expected_str, model, param):
-    st.cleanup()
-    display_header(st, model, param)
-    assert [s for s in st.render_store if expected_str in s],\
-        "Expected the string '{expected}' in the display header".format(expected=expected_str)
-    st.cleanup()
-
-
-def test_penn_logo_in_header():
+def test_penn_logo_in_header(model, param, mock_st):
     penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
-    header_test_helper(penn_css, MODEL, PARAM)
+    header_test_helper(penn_css, model, param, mock_st)
 
 
-def test_the_rest_of_header_shows_up():
+def test_the_rest_of_header_shows_up(model, param, mock_st):
     random_part_of_header = "implying an effective $R_t$ of"
-    header_test_helper(random_part_of_header, MODEL, PARAM)
+    header_test_helper(random_part_of_header, model, param, mock_st)
 
 
-def test_mitigation_statement():
+def test_mitigation_statement(model, param, mock_st):
     expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
+    header_test_helper(expected_doubling, model, param, mock_st)
+
+def test_mitigation_statement_halving(halving_model, halving_param, mock_st):
     expected_halving = "outbreak **halves the infections every 51.9** days"
-    header_test_helper(expected_doubling, MODEL, PARAM)
-    header_test_helper(expected_halving, HALVING_MODEL, HALVING_PARAM)
+    header_test_helper(expected_halving, halving_model, halving_param, mock_st)
 
 
-def test_growth_rate():
+def test_growth_rate(model, param, mock_st):
     initial_growth = "and daily growth rate of **12.25%**."
+    header_test_helper(initial_growth, model, param, mock_st)
+    
     mitigated_growth = "and daily growth rate of **9.34%**."
+    header_test_helper(mitigated_growth, model, param, mock_st)
+
+def test_growth_rate_halving(halving_model, halving_param, mock_st):
     mitigated_halving = "and daily growth rate of **-1.33%**."
-    header_test_helper(initial_growth, MODEL, PARAM)
-    header_test_helper(mitigated_growth, MODEL, PARAM)
-    header_test_helper(mitigated_halving, HALVING_MODEL, HALVING_PARAM)
-
-
-st.cleanup()
+    header_test_helper(mitigated_halving, halving_model, halving_param, mock_st)
 
 
 @pytest.mark.xfail()
-def test_header_fail():
+def test_header_fail(mock_st):
     """
     Just proving to myself that these tests work
     """
     some_garbage = "ajskhlaeHFPIQONOI8QH34TRNAOP8ESYAW4"
-    display_header(st, PARAM)
+    display_header(mock_st, param)
     assert len(
-        list(filter(lambda s: some_garbage in s, st.render_store))
+        list(filter(lambda s: some_garbage in s, mock_st.render_store))
     ), "This should fail"
-    st.cleanup()
 
 
 def test_defaults_repr():
@@ -163,6 +171,7 @@ def test_defaults_repr():
     Test DEFAULTS.repr
     """
     repr(DEFAULTS)
+    # TODO: Add assertions here
 
 
 # Test the math
@@ -240,9 +249,7 @@ def test_sim_sir():
 
     assert isinstance(raw_df, pd.DataFrame)
 
-
-def test_admits_chart():
-    admits_df = pd.read_csv("tests/by_doubling_time/2020-03-28_projected_admits.csv")
+def test_admits_chart(admits_df):
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
     assert isinstance(chart, (alt.Chart, alt.LayerChart))
     assert round(chart.data.iloc[40].icu, 0) == 39
@@ -251,9 +258,7 @@ def test_admits_chart():
     with pytest.raises(TypeError):
         build_admits_chart()
 
-
-def test_census_chart():
-    census_df = pd.read_csv("tests/by_doubling_time/2020-03-28_projected_census.csv")
+def test_census_chart(census_df):
     chart = build_census_chart(alt=alt, census_df=census_df)
     assert isinstance(chart, (alt.Chart, alt.LayerChart))
     assert chart.data.iloc[1].hospitalized == 3
@@ -264,10 +269,8 @@ def test_census_chart():
         build_census_chart()
 
 
-def test_model():
+def test_model(model, param):
     # test the Model
-    param = copy(PARAM)
-    model = Model(param)
 
     assert round(model.infected, 0) == 45810.0
     assert isinstance(model.infected, float)  # based off note in models.py
@@ -282,9 +285,7 @@ def test_model():
     assert model.doubling_time_t == 7.764405988534983
 
 
-def test_model_raw_start():
-    param = copy(PARAM)
-    model = Model(param)
+def test_model_raw_start(model, param):
     raw_df = model.raw_df
 
     # test the things n_days creates, which in turn tests sim_sir, sir, and get_dispositions
@@ -305,35 +306,28 @@ def test_model_raw_start():
     assert [round(v, 0) for v in (d, s, i, r)] == [17, 549.0, 220.0, 110.0]
 
 
-def test_model_conservation():
-    p = copy(PARAM)
-    m = Model(p)
-    raw_df = m.raw_df
+def test_model_conservation(param, model):
+    raw_df = model.raw_df
 
     assert (0.0 <= raw_df.susceptible).all()
     assert (0.0 <= raw_df.infected).all()
     assert (0.0 <= raw_df.recovered).all()
 
-    diff = raw_df.susceptible + raw_df.infected + raw_df.recovered - p.population
+    diff = raw_df.susceptible + raw_df.infected + raw_df.recovered - param.population
     assert (diff < 0.1).all()
 
-    assert (raw_df.susceptible <= p.population).all()
-    assert (raw_df.infected <= p.population).all()
-    assert (raw_df.recovered <= p.population).all()
+    assert (raw_df.susceptible <= param.population).all()
+    assert (raw_df.infected <= param.population).all()
+    assert (raw_df.recovered <= param.population).all()
 
 
-def test_model_raw_end():
-    param = copy(PARAM)
-    model = Model(param)
+def test_model_raw_end(param, model):
     raw_df = model.raw_df
-
     last = raw_df.iloc[-1, :]
     assert round(last.susceptible, 0) == 83391.0
 
 
-def test_model_monotonicity():
-    param = copy(PARAM)
-    model = Model(param)
+def test_model_monotonicity(param, model):
     raw_df = model.raw_df
 
     # Susceptible population should be non-increasing, and Recovered non-decreasing
@@ -341,11 +335,8 @@ def test_model_monotonicity():
     assert (raw_df.recovered  [1:] - raw_df.recovered.  shift(1)[1:] >= 0).all()
 
 
-def test_model_cumulative_census():
+def test_model_cumulative_census(param, model):
     # test that census is being properly calculated
-    param = copy(PARAM)
-    model = Model(param)
-
     raw_df = model.raw_df
     admits_df = model.admits_df
     df = pd.DataFrame({
@@ -368,13 +359,7 @@ def test_growth_rate():
     assert np.round(get_growth_rate(-4) * 100.0, decimals=4) == -15.9104
 
 
-def test_build_descriptions():
-    param = copy(PARAM)
-
-    admits_file = 'tests/by_doubling_time/2020-03-28_projected_admits.csv'
-    census_file = 'tests/by_doubling_time/2020-03-28_projected_census.csv'
-
-    admits_df = pd.read_csv(admits_file, parse_dates=['date'])
+def test_build_descriptions(admits_df, param):
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
     description = build_descriptions(chart=chart, labels=param.labels)
 
@@ -385,17 +370,15 @@ def test_build_descriptions():
 
     # TODO add test for asterisk
 
-    # test no asterisk
+def test_no_asterisk(admits_df, param):
     param.n_days = 600
 
-    admits_df = pd.read_csv(admits_file, parse_dates=['date'])
     chart = build_admits_chart(alt=alt, admits_df=admits_df)
     description = build_descriptions(chart=chart, labels=param.labels)
     assert "*" not in description
 
 
-    # census chart
-    census_df = pd.read_csv(census_file, parse_dates=['date'])
+def test_census(census_df, param):
     chart = build_census_chart(alt=alt, census_df=census_df)
     description = build_descriptions(chart=chart, labels=param.labels)
 
