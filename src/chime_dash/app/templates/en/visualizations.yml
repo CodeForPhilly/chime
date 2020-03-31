@@ -1,8 +1,12 @@
 new-admissions-title: New Admissions
 new-admissions-text: Projected number of **daily** COVID-19 admissions
-admitted-patients-title: Admitted Patients (Census)
 
+admitted-patients-title: Admitted Patients (Census)
 admitted-patients-text: Projected **census** of COVID-19 patients, accounting for arrivals and discharges
+
+SIR-title: Susceptible, Infected, and Recovered
+SIR-text: The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment
+
 download-text: Download CSV
 
 # Chart labels
@@ -13,4 +17,4 @@ icu: ICU
 vent: Ventalized
 
 # Date Localization
-date-format: "%m%d%Y" 
+date-format: "%m%d%Y"

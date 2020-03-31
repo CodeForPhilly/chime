@@ -1,9 +1,8 @@
-"""Initializes the  dash html
+"""Initializes the content dash html
 """
 from collections import OrderedDict
 
 import dash_bootstrap_components as dbc
-from chime_dash.app.components.additions import Additions
 from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.footer import Footer
 from chime_dash.app.components.header import Header
@@ -12,7 +11,7 @@ from chime_dash.app.components.visualizations import Visualizations
 
 
 class Content(Component):
-    """
+    """Glues together the individual body components
     """
 
     def __init__(self, language, defaults):
@@ -24,7 +23,6 @@ class Content(Component):
             intro=Intro(language, defaults),
             tool_details=ToolDetails(language, defaults),
             visualizations=Visualizations(language, defaults),
-            additions=Additions(language, defaults),
             footer=Footer(language, defaults),
         )
         self.callback_outputs = []
@@ -41,7 +39,6 @@ class Content(Component):
             + self.components["intro"].html
             + self.components["tool_details"].html
             + self.components["visualizations"].html
-            + self.components["additions"].html
             + self.components["footer"].html,
             width=9,
             className="ml-sm-auto p-5",
@@ -50,7 +47,7 @@ class Content(Component):
         return [content]
 
     def callback(self, *args, **kwargs):
-        """
+        """Combines individual callbacks
         """
         callback_returns = []
         for component in self.components.values():

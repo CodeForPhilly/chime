@@ -1,0 +1,7 @@
+[chime]
+plan_path = "habitat"
+paths = [
+  "habitat/*",
+  ".bldr.toml",
+  "src/*",
+]
