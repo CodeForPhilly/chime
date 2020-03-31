@@ -13,7 +13,6 @@ STYLESHEETS = Body(LANGUAGE, DEFAULTS).external_stylesheets
 SCRIPTS     = Body(LANGUAGE, DEFAULTS).external_scripts
 
 DASH = Dash(
-    __name__,
     external_stylesheets=STYLESHEETS,
     external_scripts=SCRIPTS,
 )
