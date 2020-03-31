@@ -12,4 +12,4 @@ COPY src src
 
 # EXPOSE $PORT 
 
-CMD gunicorn dash_app:server --bind 0.0.0.0:$PORT --chdir src/
+CMD gunicorn dash_app:DASH --bind 0.0.0.0:$PORT --chdir src/
