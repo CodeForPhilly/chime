@@ -22,6 +22,16 @@ TEMPLATE_DIR = path.join(
     path.abspath(path.dirname(path.dirname(__file__))), "templates"
 )
 
+LABEL_STYLE = {
+    "font-size": "0.875rem",
+    "margin-bottom": "0.3333em"
+}
+
+HEADER_STYLE = {
+    "font-size": "1rem",
+    "font-weight": "bold",
+    "margin": "2rem 0 1rem",
+}
 
 def read_localization_yml(file: str, language: str) -> Dict[str, Any]:
     """Reads localization template.
@@ -117,7 +127,7 @@ def create_number_input(
     """
     input_kwargs = data.copy()
     input_kwargs.pop("percent", None)
-    LABEL_STYLE = {"font-size": "0.8rem", "margin-bottom": "0.1rem"}
+
     if not "value" in input_kwargs:
         input_kwargs["value"] = _get_default_values(
             idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
@@ -134,7 +144,7 @@ def create_header(idx: str, content: Dict[str, str]):
     """
     Create heading element using localization map
     """
-    HEADER_STYLE = {"font-size": "1rem"}
+
     return H4(id=idx, children=content[idx], style=HEADER_STYLE)
 
 
@@ -151,7 +161,7 @@ def create_date_input(
     """
     input_kwargs = data.copy()
     input_kwargs.pop("type")
-    LABEL_STYLE = {"font-size": "0.8rem", "margin-bottom": "0.1rem"}
+
     if not "date" in input_kwargs:
         input_kwargs["date"] = input_kwargs[
             "initial_visible_month"
