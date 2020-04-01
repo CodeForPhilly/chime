@@ -26,9 +26,9 @@ Mitigation: A 0% reduction in social contact after the onset of the outbreak red
     element = test_app.driver.find_element_by_id(input_element)
 
     element.clear()
-    sleep(0.1)
+    sleep(0.5)
     element.send_keys(value)
-    sleep(0.4)
+    sleep(0.5)
 
     intro = test_app.driver.find_element_by_id('intro').text
 
