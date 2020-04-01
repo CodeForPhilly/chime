@@ -4,8 +4,7 @@ import pytest
 
 test_cases = [
     ('market_share', '100', 'Hospital market share (100%)'),
-    ('susceptible', '100', 'Region size (100)'),
-    ('known_infected', '100', 'The 100 confirmed cases'),
+    ('population', '100', 'Region size (100)'),
     ('current_hospitalized', '100', 'Hospitalizations (100)'),
 
     ('doubling_time', '100', 'of 100 days'),
@@ -29,6 +28,7 @@ Mitigation: A 0% reduction in social contact after the onset of the outbreak red
     element.clear()
     sleep(0.1)
     element.send_keys(value)
+    sleep(0.4)
 
     intro = test_app.driver.find_element_by_id('intro').text
 
