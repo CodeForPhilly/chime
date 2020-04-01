@@ -64,7 +64,7 @@ class SimSirModel:
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             # Back-projecting to when the first hospitalized case would have
             logger.info('Using doubling_time: %s', p.doubling_time)
-            self.i_day = 0
+
             self.beta = get_beta(intrinsic_growth_rate,  gamma, self.susceptible, 0.0)
 
             self.i_day = 0 # seed to the full length
