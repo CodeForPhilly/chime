@@ -113,7 +113,7 @@ def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
                     labels=kwargs.get("labels", df.columns),
                     modulo=kwargs.get("table_mod", 7),
                 ),
-                format={
+                formats={
                     float: int,
                     (date, datetime): lambda d: d.strftime(DATE_FORMAT),
                 },
