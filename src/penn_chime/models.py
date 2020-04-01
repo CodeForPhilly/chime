@@ -147,17 +147,29 @@ class SimSirModel:
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
 
     def run_projection(self, p):
+        if p.mitigation_date is not None:
+            mitigation_day = (p.current_date - p.mitigation_date).days
+        else:
+            mitigation_day = 0
+
+        total_days = self.i_day + p.n_days
+
+        if mitigation_day < -self.i_day:
+            mitigation_day = -self.i_day
+
+        pre_mitigation_days = self.i_day + mitigation_day
+        post_mitigation_days = total_days - pre_mitigation_days
+
         self.raw_df = sim_sir_df(
             self.susceptible,
             self.infected,
             p.recovered,
             self.gamma,
             -self.i_day,
-            self.beta,
-            self.i_day,
-            self.beta_t,
-            p.n_days
+            self.beta, pre_mitigation_days,
+            self.beta_t, post_mitigation_days
         )
+
         self.dispositions_df = build_dispositions_df(self.raw_df, self.rates, p.market_share, p.current_date)
         self.admits_df = build_admits_df(self.dispositions_df)
         self.census_df = build_census_df(self.admits_df, self.days)
