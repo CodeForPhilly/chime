@@ -218,6 +218,7 @@ class Sidebar(Component):
                 "top": "56px",
                 "width": "320px",
                 "zIndex": 1,
+                "padding-top": "1rem",
             },
         )
 
