@@ -62,12 +62,10 @@ class SimSirModel:
         self.recovered = p.recovered
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
+            # Back-projecting to when the first hospitalized case would have
             logger.info('Using doubling_time: %s', p.doubling_time)
             self.i_day = 0
-            self.beta = (
-                (intrinsic_growth_rate + gamma)
-                / susceptible
-            )
+            self.beta = get_beta(intrinsic_growth_rate,  gamma, self.susceptible, 0.0)
 
             self.i_day = 0 # seed to the full length
             self.beta_t = self.beta
@@ -86,6 +84,7 @@ class SimSirModel:
                 self.i_day)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
+            # Fitting spread parameter to observed hospital census (dates of 1 patient and today)
             self.i_day = (p.current_date - p.date_first_hospitalized).days
             logger.info(
                 'Using date_first_hospitalized: %s; current_date: %s; i_day: %s',
