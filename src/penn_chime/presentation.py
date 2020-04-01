@@ -356,6 +356,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         hospitalized=Disposition(hospitalized_rate, hospitalized_days),
         icu=Disposition(icu_rate, icu_days),
         relative_contact_rate=relative_contact_rate,
+        mitigation_date=mitigation_date,
         ventilated=Disposition(ventilated_rate, ventilated_days),
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,
