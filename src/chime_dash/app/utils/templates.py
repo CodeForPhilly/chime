@@ -177,7 +177,7 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
     return Checklist(
         id=idx,
         switch=True,
-        options=[{"label": content[idx], "value": data.get("value", False)}],
+        options=[{"label": content[idx],  "value": True}],
     )
 
 

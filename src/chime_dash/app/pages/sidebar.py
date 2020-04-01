@@ -3,18 +3,19 @@ Initializes the side bar containing the various inputs for the model
 
 #! _INPUTS should be considered for moving else where
 """
-from typing import List
+from dash_html_components import Nav, Div
 
+from typing import List, Dict, Any, Tuple
 from collections import OrderedDict
 from datetime import date, datetime
 
-from dash.dependencies import Input as CallbackInput
 from dash.development.base_component import ComponentMeta
-from dash_html_components import Nav, Div
 
 from penn_chime.parameters import Parameters, Disposition
 
 from chime_dash.app.components.base import Component
+from chime_dash.app.utils import parameters_serializer
+from chime_dash.app.utils.callbacks import ChimeCallback
 from chime_dash.app.utils.templates import (
     create_switch_input,
     create_number_input,
@@ -95,7 +96,7 @@ _INPUTS = OrderedDict(
 )
 
 # Different kind of inputs store different kind of "values"
-## This tells the callback output for which field to look
+# This tells the callback output for which field to look
 _PROPERTY_OUTPUT_MAP = {
     "number": "value",
     "date": "date",
@@ -111,57 +112,74 @@ class Sidebar(Component):
     # localization temp. for widget descriptions
     localization_file = "sidebar.yml"
 
-    callback_inputs = OrderedDict(
-        (
-            key,
-            CallbackInput(
-                component_id=key,
-                component_property=_PROPERTY_OUTPUT_MAP.get(
-                    _INPUTS[key]["type"], "value"
-                ),
-            ),
-        )
-        for key in _INPUTS
-        if _INPUTS[key]["type"] not in ("header",)
-    )
+    @staticmethod
+    def get_ordered_input_keys():
+        return [key for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )]
 
     @staticmethod
-    def parse_form_parameters(**kwargs) -> Parameters:
+    def get_formated_values(input_values):
+        result = dict(zip(Sidebar.get_ordered_input_keys(), input_values))
+        # todo remove this hack needed because of how Checklist type used for switch input returns values
+        for key in _INPUTS:
+            if _INPUTS[key]["type"] == "switch":
+                value = False
+                if result[key] == [True]:
+                    value = True
+                result[key] = value
+            elif _INPUTS[key]["type"] == "date":
+                value = result[key]
+                result[key] = datetime.strptime(value, "%Y-%m-%d").date() if value else value
+        return result
+
+    @staticmethod
+    def update_parameters(*input_values, **kwargs) -> List[str]:
         """Reads html form outputs and converts them to a parameter instance
 
         Returns Parameters
         """
-        for key in ["date_first_hospitalized", "current_date"]:
-            val = kwargs.get(key, None)
-            kwargs[key] = datetime.strptime(val, "%Y-%m-%d").date() if val else val
-
-        dt = kwargs["doubling_time"] if kwargs["doubling_time"] else None
-        dfh = kwargs["date_first_hospitalized"] if not dt else None
-
+        inputs_dict = Sidebar.get_formated_values(input_values)
+        dt = inputs_dict["doubling_time"] if inputs_dict["doubling_time"] else None
+        dfh = inputs_dict["date_first_hospitalized"] if not dt else None
         pars = Parameters(
-            population=kwargs["population"],
-            current_hospitalized=kwargs["current_hospitalized"],
+            population=inputs_dict["population"],
+            current_hospitalized=inputs_dict["current_hospitalized"],
             date_first_hospitalized=dfh,
             doubling_time=dt,
             hospitalized=Disposition(
-                kwargs["hospitalized_rate"] / 100, kwargs["hospitalized_los"]
+                inputs_dict["hospitalized_rate"] / 100, inputs_dict["hospitalized_los"]
             ),
-            icu=Disposition(kwargs["icu_rate"] / 100, kwargs["icu_los"]),
-            infectious_days=kwargs["infectious_days"],
-            market_share=kwargs["market_share"] / 100,
-            n_days=kwargs["n_days"],
-            relative_contact_rate=kwargs["relative_contact_rate"] / 100,
+            icu=Disposition(inputs_dict["icu_rate"] / 100, inputs_dict["icu_los"]),
+            infectious_days=inputs_dict["infectious_days"],
+            market_share=inputs_dict["market_share"] / 100,
+            n_days=inputs_dict["n_days"],
+            relative_contact_rate=inputs_dict["relative_contact_rate"] / 100,
             ventilated=Disposition(
-                kwargs["ventilated_rate"] / 100, kwargs["ventilated_los"]
+                inputs_dict["ventilated_rate"] / 100, inputs_dict["ventilated_los"]
             ),
-            max_y_axis=kwargs.get("max_y_axis_value", None),
+            max_y_axis=inputs_dict.get("max_y_axis_value", None),
         )
-        return pars
+        return [parameters_serializer(pars)]
+
+    def __init__(self, language, defaults):
+        changed_elements = OrderedDict(
+            (key, _PROPERTY_OUTPUT_MAP.get(_INPUTS[key]["type"], "value"))
+            for key in _INPUTS
+            if _INPUTS[key]["type"] not in ("header",)
+        )
+
+        input_change_callback = ChimeCallback(
+            changed_elements=changed_elements,
+            dom_updates=OrderedDict(pars="children"),
+            callback_fn=Sidebar.update_parameters,
+        )
+        super().__init__(language, defaults, [input_change_callback])
 
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the view
         """
-        elements = []
+        elements = [
+            Div(id='pars', style={'display': 'none'})
+        ]
         for idx, data in _INPUTS.items():
             if data["type"] == "number":
                 element = create_number_input(idx, data, self.content, self.defaults)
@@ -197,3 +215,4 @@ class Sidebar(Component):
         )
 
         return [sidebar]
+
