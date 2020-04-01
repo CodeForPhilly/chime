@@ -3,7 +3,7 @@ pandas
 numpy
 pytest
 altair
-dash
+dash[testing]
 dash_bootstrap_components
 pyyaml
 gunicorn
