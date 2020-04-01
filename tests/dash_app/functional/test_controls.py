@@ -23,6 +23,7 @@ def test_controls(test_app, input_element, value, control):
 An initial doubling time of 4 days and a recovery time of 14 days imply an $R_0$ of 3.65.
 Mitigation: A 0% reduction in social contact after the onset of the outbreak reduces the doubling time to 4.0 days, implying an effective $R_t$ of $3.65$.
     """
+    sleep(0.5)
     element = test_app.driver.find_element_by_id(input_element)
 
     element.clear()
