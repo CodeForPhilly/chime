@@ -16,11 +16,11 @@ context('Increment steppers', () => {
     cy.get('input.st-al').eq(0)
       .should('has.value', '3600001');
 
-    cy.contains('Hospitalized Admissions peaks at 301');
+    cy.contains('Hospitalized Admissions peaks at 300');
   });
 
   it('Increment hospital market share', () => {
-    cy.contains('Hospitalized Admissions peaks at 301');
+    cy.contains('Hospitalized Admissions peaks at 300');
 
     cy.get('input.st-al').eq(1)
       .should('has.value', '15');
@@ -34,7 +34,7 @@ context('Increment steppers', () => {
   });
 
   it('Increment doubling time', () => {
-    cy.contains('Hospitalized Admissions peaks at 301');
+    cy.contains('Hospitalized Admissions peaks at 300');
 
     cy.get('input.st-al').eq(3)
       .should('has.value', '4');
