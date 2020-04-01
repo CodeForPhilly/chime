@@ -2,7 +2,7 @@
 """
 from collections import OrderedDict
 
-import dash_bootstrap_components as dbc
+from dash_html_components import Div
 from chime_dash.app.components.base import Component, HTMLComponentError
 from chime_dash.app.components.content import Content
 from chime_dash.app.components.sidebar import Sidebar
@@ -29,12 +29,11 @@ class Container(Component):
     def get_html(self):
         """Initializes the content container dash html
         """
-        container = dbc.Container(
-            children=dbc.Row(
-                self.components["sidebar"].html + self.components["content"].html
-            ),
-            fluid=True,
-            className="mt-5",
+        container = Div(
+            className="app-content",
+            children=
+                self.components["sidebar"].html
+                + self.components["content"].html
         )
 
         return [container]

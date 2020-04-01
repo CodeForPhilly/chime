@@ -10,7 +10,7 @@ from datetime import date, datetime
 
 from dash.dependencies import Input as CallbackInput
 from dash.development.base_component import ComponentMeta
-from dash_html_components import Nav, Div
+from dash_html_components import Nav, Div, Hr
 
 from penn_chime.parameters import Parameters, Disposition
 
@@ -180,19 +180,19 @@ class Sidebar(Component):
             elements.append(element)
 
         sidebar = Nav(
+            className="bg-light border-right",
             children=Div(
                 children=elements,
-                className="p-4",
-                style={"height": "calc(100vh - 48px)", "overflowY": "auto",},
+                className="px-3 pb-5",
             ),
-            className="col-md-3",
             style={
-                "position": "fixed",
-                "top": "48px",
                 "bottom": 0,
                 "left": 0,
-                "zIndex": 100,
-                "boxShadow": "inset -1px 0 0 rgba(0, 0, 0, .1)",
+                "overflow-y": "scroll",
+                "position": "fixed",
+                "top": "56px",
+                "width": "320px",
+                "zIndex": 1,
             },
         )
 

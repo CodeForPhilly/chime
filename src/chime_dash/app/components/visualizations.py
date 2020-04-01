@@ -13,7 +13,7 @@ from dash.dependencies import Output
 from dash.development.base_component import ComponentMeta
 from dash_html_components import H2, A, Div
 from dash_core_components import Markdown, Graph
-from dash_bootstrap_components import Table
+from dash_bootstrap_components import Table, Container
 
 from penn_chime.charts import build_table
 from penn_chime.constants import DATE_FORMAT
@@ -50,66 +50,78 @@ class Visualizations(Component):
         """
         today = date.today().strftime(self.content["date-format"])
         return [
-            H2(self.content["new-admissions-title"]),
-            Markdown(self.content["new-admissions-text"]),
-            Graph(id="new-admissions-graph"),
-            A(
-                self.content["download-text"],
-                id="new-admissions-download",
-                download="admissions_{}.csv".format(today),
-                href="",
-                target="_blank",
-                className="btn btn-sm btn-info my-2",
+            Container(className="mt-5",
+                children=[
+                    H2(self.content["new-admissions-title"]),
+                    Markdown(self.content["new-admissions-text"]),
+                ]
             ),
-            Div(
-                className="row justify-content-center",
-                children=Div(
-                    className="col-auto",
-                    children=[
-                        Table(id="new-admissions-table", className="table-responsive"),
-                    ],
+            Container(fluid=True, children=Graph(id="new-admissions-graph")),
+            Container([
+                A(
+                    self.content["download-text"],
+                    id="new-admissions-download",
+                    download="admissions_{}.csv".format(today),
+                    href="",
+                    target="_blank",
+                    className="btn btn-sm btn-info",
                 ),
-            ),
-            H2(self.content["admitted-patients-title"]),
-            Markdown(self.content["admitted-patients-text"]),
-            Graph(id="admitted-patients-graph"),
-            A(
-                self.content["download-text"],
-                id="admitted-patients-download",
-                download="census_{}.csv".format(today),
-                href="",
-                target="_blank",
-                className="btn btn-sm btn-info my-4",
-            ),
-            Div(
-                className="row justify-content-center",
-                children=Div(
-                    className="col-auto",
-                    children=[
-                        Table(
-                            id="admitted-patients-table", className="table-responsive"
+                Div(className="row justify-content-center",
+                    children=Div(className="col-auto",
+                        children=Table(id="new-admissions-table",
+                            className="table-responsive mx-auto"
                         ),
-                    ],
+                    ),
                 ),
+            ]),
+            Container(className="mt-5",
+                children=[
+                    H2(self.content["admitted-patients-title"]),
+                    Markdown(self.content["admitted-patients-text"]),
+                ],
             ),
-            H2(self.content["SIR-title"]),
-            Markdown(self.content["SIR-text"]),
-            Graph(id="SIR-graph"),
-            A(
-                self.content["download-text"],
-                id="SIR-download",
-                download="SIR_{}.csv".format(today),
-                href="",
-                target="_blank",
-                className="btn btn-sm btn-info my-4",
-            ),
-            Div(
-                className="row justify-content-center",
-                children=Div(
-                    className="col-auto",
-                    children=[Table(id="SIR-table", className="table-responsive"),],
+            Container(fluid=True, children=Graph(id="admitted-patients-graph")),
+            Container([
+                A(
+                    self.content["download-text"],
+                    id="admitted-patients-download",
+                    download="census_{}.csv".format(today),
+                    href="",
+                    target="_blank",
+                    className="btn btn-sm btn-info",
                 ),
+                Div(className="row justify-content-center",
+                    children=Div(className="col-auto",
+                        children=Table(id="admitted-patients-table",
+                            className="table-responsive"
+                        ),
+                    ),
+                ),
+            ]),
+            Container(className="mt-5",
+                children=[
+                    H2(self.content["SIR-title"]),
+                    Markdown(self.content["SIR-text"]),
+                ],
             ),
+            Container(fluid=True, children=Graph(id="SIR-graph")),
+            Container([
+                A(
+                    self.content["download-text"],
+                    id="SIR-download",
+                    download="SIR_{}.csv".format(today),
+                    href="",
+                    target="_blank",
+                    className="btn btn-sm btn-info my-4",
+                ),
+                Div(className="row justify-content-center",
+                    children=Div(className="col-auto",
+                        children=Table(id="SIR-table",
+                            className="table-responsive"
+                        ),
+                    ),
+                ),
+            ])
         ]
 
     @staticmethod

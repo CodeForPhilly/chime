@@ -42,7 +42,12 @@ class Body(Component):
     def get_html(self):
         """Glues individual setup components together
         """
-        return dhc.Div(self.components["navbar"].html + self.components["container"].html)
+        return dhc.Div(
+            className="app",
+            children=
+                self.components["navbar"].html
+                + self.components["container"].html
+        )
 
     def callback(self, *args, **kwargs):
         """
