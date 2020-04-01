@@ -157,5 +157,6 @@ def build_table(
     modulo: int = 1,
 ) -> pd.DataFrame:
     table_df = df[np.mod(df.day, modulo) == 0].copy()
+    table_df.date = table_df.date.dt.strftime(DATE_FORMAT)
     table_df.rename(labels)
     return table_df

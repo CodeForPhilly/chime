@@ -30,7 +30,7 @@ context('Increment steppers', () => {
     cy.get('input.st-al').eq(1)
       .should('has.value', '15.1');
 
-    cy.contains('Hospitalized Admissions peaks at 303');
+    cy.contains('Hospitalized Admissions peaks at 302');
   });
 
   it('Increment doubling time', () => {
@@ -44,6 +44,6 @@ context('Increment steppers', () => {
     cy.get('input.st-al').eq(3)
       .should('has.value', '4.25');
 
-    cy.contains('Hospitalized Admissions peaks at 273');
+    cy.contains('Hospitalized Admissions peaks at 274');
   });
 });
