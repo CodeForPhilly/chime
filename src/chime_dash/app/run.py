@@ -11,7 +11,6 @@ from chime_dash.app.utils.callbacks import wrap_callbacks
 LANGUAGE = "en"
 
 body = Body(LANGUAGE, DEFAULTS)
-body2 = Body(LANGUAGE, DEFAULTS)
 
 DASH = Dash(
     __name__,

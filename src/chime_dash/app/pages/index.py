@@ -4,7 +4,8 @@ Homepage
 
 from collections import OrderedDict
 
-import dash_bootstrap_components as dbc
+from dash_html_components import Main
+from dash_bootstrap_components import Container
 
 from chime_dash.app.components.base import Component
 from chime_dash.app.components.footer import Footer
@@ -36,7 +37,7 @@ class Index(Component):
         """
 
         def handle_model_change_helper(pars_json):
-            model = None
+            model = {}
             pars = None
             result = []
             viz_kwargs = {}
@@ -47,13 +48,13 @@ class Index(Component):
                     labels=pars.labels,
                     table_mod=7,
                     max_y_axis=pars.max_y_axis,
-                    # show_tables=kwargs["show_tables"],
                 )
-
             result.extend(self.components["intro"].build(model, pars))
             result.extend(self.components["tool_details"].build(model, pars))
             for df_key in ["admits_df", "census_df", "sim_sir_w_date_df"]:
-                df = model.__dict__.get(df_key, None)
+                df = None
+                if model:
+                    df = model.__dict__.get(df_key, None)
                 result.extend(prepare_visualization_group(df, **viz_kwargs))
             return result
 
@@ -101,14 +102,24 @@ class Index(Component):
     def get_html(self):
         """Initializes the content container dash html
         """
-        content = dbc.Col(
-            children=self.components["header"].html
-                     + self.components["intro"].html
-                     + self.components["tool_details"].html
-                     + self.components["visualizations"].html
-                     + self.components["footer"].html,
-            width=9,
-            className="ml-sm-auto p-5",
+        content = Main(
+            className="py-5",
+            style={
+                "marginLeft": "320px",
+                "marginTop": "56px"
+            },
+            children=
+            [Container(
+                children=
+                self.components["header"].html
+                + self.components["intro"].html
+                + self.components["tool_details"].html
+            )]
+            + self.components["visualizations"].html
+            + [Container(
+                children=
+                self.components["footer"].html
+            )],
         )
 
         return [content]
