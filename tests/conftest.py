@@ -12,6 +12,12 @@ from src.penn_chime.models import SimSirModel
 
 
 class MockStreamlit:
+    """Mock implementation of streamlit
+
+    We just want to verify that st _attempted_ to render the right stuff
+    so we store the input, and make sure that it matches what we expect
+    """
+
     def __init__(self):
         self.render_store = []
         self.markdown = self.just_store_instead_of_rendering
@@ -96,9 +102,13 @@ def halving_model(halving_param):
 
 @pytest.fixture
 def admits_df():
-    return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_admits.csv', parse_dates=['date'])
+    return pd.read_csv(
+        "tests/by_doubling_time/2020-03-28_projected_admits.csv", parse_dates=["date"]
+    )
 
 
 @pytest.fixture
 def census_df():
-    return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_census.csv', parse_dates=['date'])
+    return pd.read_csv(
+        "tests/by_doubling_time/2020-03-28_projected_census.csv", parse_dates=["date"]
+    )
