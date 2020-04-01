@@ -204,6 +204,10 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         st_obj, "Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time",
         value=d.date_first_hospitalized,
     )
+    mitigation_date_input = DateInput(
+        st_obj, "Date of social distancing measures effect (may be delayed from implementation)",
+        value=d.mitigation_date
+    )
     relative_contact_pct_input = PercentInput(
         st_obj,
         "Social distancing (% reduction in social contact going forward)",
@@ -309,7 +313,14 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         doubling_time = doubling_time_input()
         date_first_hospitalized = None
 
-    relative_contact_rate = relative_contact_pct_input()
+    if st.sidebar.checkbox(
+        "Social distancing measures have been implemented"
+    ):
+        mitigation_date = mitigation_date_input()
+        relative_contact_rate = relative_contact_pct_input()
+    else:
+        mitigation_date = None
+        relative_contact_rate = 1.e-7
 
     st.sidebar.markdown(
         "### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters#severity-parameters)".format(
