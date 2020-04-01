@@ -60,7 +60,7 @@ class SimSirModel:
         self.recovered = p.recovered
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
-            # Back-projecting to when the first hospitalized case would have
+            # Back-projecting to when the first hospitalized case would have been admitted
             logger.info('Using doubling_time: %s', p.doubling_time)
 
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
