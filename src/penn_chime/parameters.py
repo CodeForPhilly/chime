@@ -67,7 +67,7 @@ class Parameters:
         recovered: int = 0,
         region: Optional[Regions] = None,
     ):
-        self.current_hospitalized = StrictlyPositive(value=current_hospitalized)
+        self.current_hospitalized = Positive(value=current_hospitalized)
         self.relative_contact_rate = Rate(value=relative_contact_rate)
 
         Rate(value=hospitalized.rate), Rate(value=icu.rate), Rate(value=ventilated.rate)
