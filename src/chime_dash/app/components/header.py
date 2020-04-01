@@ -22,7 +22,6 @@ class Header(Component):
         content = self.content
         return [Div(
             children=[
-                H1(className="penn-medicine-header__title", id="title", children=content["title"]),
                 Markdown(content["description"])
           ]
         )]
