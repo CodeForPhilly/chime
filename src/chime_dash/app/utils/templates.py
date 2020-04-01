@@ -90,7 +90,7 @@ def df_to_html_table(
     formats = formats or {}
 
     def cast_type(val):
-        for dtype, cast in format.items():
+        for dtype, cast in formats.items():
             if isinstance(val, dtype):
                 try:
                     val = cast(val)
