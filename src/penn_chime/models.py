@@ -148,7 +148,7 @@ class SimSirModel:
 
     def run_projection(self, p):
         if p.mitigation_date is not None:
-            mitigation_day = (p.current_date - p.mitigation_date).days
+            mitigation_day = -(p.current_date - p.mitigation_date).days
         else:
             mitigation_day = 0
 
