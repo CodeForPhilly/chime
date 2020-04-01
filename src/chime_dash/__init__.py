@@ -11,7 +11,7 @@ from penn_chime.settings import DEFAULTS
 from chime_dash.app.components import Body
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
-DashAppInstance = TypeVar('dash.Dash')
+DashAppInstance = TypeVar('DashAppInstance')
 
 def create_app(context:str='prod')-> DashAppInstance:
     """
@@ -19,9 +19,11 @@ def create_app(context:str='prod')-> DashAppInstance:
     
     Args:
         context (str, optional): One of either 'prod', 'dev', 'testing.
-        Defaults to 'prod'. Change to 'dev' to set debug to true.
+        Defaults to 'prod' where dash.Dash.run_server(debug=False).
+        Change to 'dev' or 'test' to set debug to true.
     
     Returns:
+        Env: Config variables based on context argument received
         DashAppInstance: Dash instance with appropriate configuration settings
     """
 
