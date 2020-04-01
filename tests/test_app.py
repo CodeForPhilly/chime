@@ -24,7 +24,6 @@ from src.penn_chime.parameters import (
     Disposition,
     Regions,
 )
-from src.penn_chime.presentation import display_header
 
 EPSILON = 1.e-7
 
@@ -32,81 +31,6 @@ EPSILON = 1.e-7
 
 # we just want to verify that st _attempted_ to render the right stuff
 # so we store the input, and make sure that it matches what we expect
-class MockStreamlit:
-    def __init__(self):
-        self.render_store = []
-        self.markdown = self.just_store_instead_of_rendering
-        self.latex = self.just_store_instead_of_rendering
-        self.subheader = self.just_store_instead_of_rendering
-
-    def just_store_instead_of_rendering(self, inp, *args, **kwargs):
-        self.render_store.append(inp)
-        return None
-
-@pytest.fixture
-def mock_st():
-    return MockStreamlit()
-
-# The defaults in settings will change and break the tests
-@pytest.fixture
-def DEFAULTS():
-    return Parameters(
-    region=Regions(
-        delaware=564696,
-        chester=519293,
-        montgomery=826075,
-        bucks=628341,
-        philly=1581000,
-    ),
-    current_date=datetime(year=2020, month=3, day=28),
-    current_hospitalized=14,
-    date_first_hospitalized=datetime(year=2020, month=3, day=7),
-    doubling_time=4.0,
-    n_days=60,
-    market_share=0.15,
-    relative_contact_rate=0.3,
-    hospitalized=Disposition(0.025, 7),
-    icu=Disposition(0.0075, 9),
-    ventilated=Disposition(0.005, 10),
-)
-
-@pytest.fixture
-def param():
-    return Parameters(
-    current_date=datetime(year=2020, month=3, day=28),
-    current_hospitalized=100,
-    doubling_time=6.0,
-    market_share=0.05,
-    relative_contact_rate=0.15,
-    population=500000,
-    hospitalized=Disposition(0.05, 7),
-    icu=Disposition(0.02, 9),
-    ventilated=Disposition(0.01, 10),
-    n_days=60,
-)
-
-@pytest.fixture
-def halving_param():
-    return Parameters(
-    current_date=datetime(year=2020, month=3, day=28),
-    current_hospitalized=100,
-    doubling_time=6.0,
-    market_share=0.05,
-    relative_contact_rate=0.7,
-    population=500000,
-    hospitalized=Disposition(0.05, 7),
-    icu=Disposition(0.02, 9),
-    ventilated=Disposition(0.01, 10),
-    n_days=60,
-)
-
-@pytest.fixture
-def model(param):
-    return Model(param)
-
-@pytest.fixture
-def halving_model(halving_param):
-    return Model(halving_param)
 
 @pytest.fixture
 def admits_df():
@@ -117,56 +41,7 @@ def census_df():
     return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_census.csv', parse_dates=['date'])
 
 
-# test presentation
-def header_test_helper(expected_str, model, param, mock_st):
-    display_header(mock_st, model, param)
-    assert [s for s in mock_st.render_store if expected_str in s],\
-        f"Expected the string '{expected_str}' in the display header"
-
-def test_penn_logo_in_header(model, param, mock_st):
-    penn_css = '<link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">'
-    header_test_helper(penn_css, model, param, mock_st)
-
-
-def test_the_rest_of_header_shows_up(model, param, mock_st):
-    random_part_of_header = "implying an effective $R_t$ of"
-    header_test_helper(random_part_of_header, model, param, mock_st)
-
-
-def test_mitigation_statement(model, param, mock_st):
-    expected_doubling = "outbreak **reduces the doubling time to 7.8** days"
-    header_test_helper(expected_doubling, model, param, mock_st)
-
-def test_mitigation_statement_halving(halving_model, halving_param, mock_st):
-    expected_halving = "outbreak **halves the infections every 51.9** days"
-    header_test_helper(expected_halving, halving_model, halving_param, mock_st)
-
-
-def test_growth_rate(model, param, mock_st):
-    initial_growth = "and daily growth rate of **12.25%**."
-    header_test_helper(initial_growth, model, param, mock_st)
-    
-    mitigated_growth = "and daily growth rate of **9.34%**."
-    header_test_helper(mitigated_growth, model, param, mock_st)
-
-def test_growth_rate_halving(halving_model, halving_param, mock_st):
-    mitigated_halving = "and daily growth rate of **-1.33%**."
-    header_test_helper(mitigated_halving, halving_model, halving_param, mock_st)
-
-
-@pytest.mark.xfail()
-def test_header_fail(mock_st):
-    """
-    Just proving to myself that these tests work
-    """
-    some_garbage = "ajskhlaeHFPIQONOI8QH34TRNAOP8ESYAW4"
-    display_header(mock_st, param)
-    assert len(
-        list(filter(lambda s: some_garbage in s, mock_st.render_store))
-    ), "This should fail"
-
-
-def test_defaults_repr():
+def test_defaults_repr(DEFAULTS):
     """
     Test DEFAULTS.repr
     """
