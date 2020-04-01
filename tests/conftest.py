@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+import pandas as pd
 
 from src.penn_chime.parameters import (
     Parameters,
@@ -91,3 +92,13 @@ def model(param):
 @pytest.fixture
 def halving_model(halving_param):
     return SimSirModel(halving_param)
+
+
+@pytest.fixture
+def admits_df():
+    return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_admits.csv', parse_dates=['date'])
+
+
+@pytest.fixture
+def census_df():
+    return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_census.csv', parse_dates=['date'])

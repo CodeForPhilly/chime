@@ -1,23 +1,6 @@
-"""Tests."""
-
-from math import ceil  # type: ignore
-from datetime import date, datetime  # type: ignore
-import pytest  # type: ignore
+from datetime import date
 import pandas as pd  # type: ignore
 import numpy as np  # type: ignore
-import altair as alt  # type: ignore
-
-from src.penn_chime.charts import (
-    build_admits_chart,
-    build_census_chart,
-    build_descriptions,
-)
-
-from src.penn_chime.parameters import (
-    Parameters,
-    Disposition,
-    Regions,
-)
 
 EPSILON = 1.e-7
 
@@ -26,14 +9,6 @@ EPSILON = 1.e-7
 # we just want to verify that st _attempted_ to render the right stuff
 # so we store the input, and make sure that it matches what we expect
 
-@pytest.fixture
-def admits_df():
-    return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_admits.csv', parse_dates=['date'])
-
-@pytest.fixture
-def census_df():
-    return pd.read_csv('tests/by_doubling_time/2020-03-28_projected_census.csv', parse_dates=['date'])
-
 
 def test_defaults_repr(DEFAULTS):
     """
@@ -41,28 +16,6 @@ def test_defaults_repr(DEFAULTS):
     """
     repr(DEFAULTS)
     # TODO: Add assertions here
-
-
-# Test the math
-
-def test_admits_chart(admits_df):
-    chart = build_admits_chart(alt=alt, admits_df=admits_df)
-    assert isinstance(chart, (alt.Chart, alt.LayerChart))
-    assert round(chart.data.iloc[40].icu, 0) == 39
-
-    # test fx call with no params
-    with pytest.raises(TypeError):
-        build_admits_chart()
-
-def test_census_chart(census_df):
-    chart = build_census_chart(alt=alt, census_df=census_df)
-    assert isinstance(chart, (alt.Chart, alt.LayerChart))
-    assert chart.data.iloc[1].hospitalized == 3
-    assert chart.data.iloc[49].ventilated == 365
-
-    # test fx call with no params
-    with pytest.raises(TypeError):
-        build_census_chart()
 
 
 def test_model(model, param):
@@ -147,31 +100,3 @@ def test_model_cumulative_census(param, model):
         0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
     )
     assert (diff.abs() < 0.1).all()
-
-
-def test_build_descriptions(admits_df, param):
-    chart = build_admits_chart(alt=alt, admits_df=admits_df)
-    description = build_descriptions(chart=chart, labels=param.labels)
-
-    hosp, icu, vent = description.split("\n\n")  # break out the description into lines
-
-    max_hosp = chart.data['hospitalized'].max()
-    assert str(ceil(max_hosp)) in hosp
-
-    # TODO add test for asterisk
-
-def test_no_asterisk(admits_df, param):
-    param.n_days = 600
-
-    chart = build_admits_chart(alt=alt, admits_df=admits_df)
-    description = build_descriptions(chart=chart, labels=param.labels)
-    assert "*" not in description
-
-
-def test_census(census_df, param):
-    chart = build_census_chart(alt=alt, census_df=census_df)
-    description = build_descriptions(chart=chart, labels=param.labels)
-
-    assert str(ceil(chart.data['ventilated'].max())) in description
-    assert str(chart.data['icu'].idxmax()) not in description
-    assert datetime.strftime(chart.data.iloc[chart.data['icu'].idxmax()].date, '%b %d') in description
