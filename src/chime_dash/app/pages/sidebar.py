@@ -22,6 +22,7 @@ from chime_dash.app.utils.templates import (
     create_number_input,
     create_date_input,
     create_header,
+    create_line_break,
 )
 
 FLOAT_INPUT_MIN = 0.001
@@ -40,6 +41,7 @@ _INPUTS = OrderedDict(
     },
     current_hospitalized={"type": "number", "min": 0, "step": 1},
     ###
+    line_break_1={"type": "linebreak"},
     spread_parameters={"type": "header", "size": "h4"},
     date_first_hospitalized={
         "type": "date",
@@ -55,6 +57,7 @@ _INPUTS = OrderedDict(
         "percent": True,
     },
     ###
+    line_break_2={"type": "linebreak"},
     severity_parameters={"type": "header", "size": "h4"},
     hospitalized_rate={
         "type": "number",
@@ -82,6 +85,7 @@ _INPUTS = OrderedDict(
     icu_los={"type": "number", "min": 0, "step": 1},
     ventilated_los={"type": "number", "min": 0, "step": 1},
     ###
+    line_break_3={"type": "linebreak"},
     display_parameters={"type": "header", "size": "h4"},
     n_days={"type": "number", "min": 30, "step": 1},
     current_date={
@@ -165,7 +169,7 @@ class Sidebar(Component):
         changed_elements = OrderedDict(
             (key, _PROPERTY_OUTPUT_MAP.get(_INPUTS[key]["type"], "value"))
             for key in _INPUTS
-            if _INPUTS[key]["type"] not in ("header",)
+            if _INPUTS[key]["type"] not in ("header", "linebreak")
         )
 
         input_change_callback = ChimeCallback(
@@ -190,6 +194,8 @@ class Sidebar(Component):
                 element = create_date_input(idx, data, self.content, self.defaults)
             elif data["type"] == "header":
                 element = create_header(idx, self.content)
+            elif data["type"] == "linebreak":
+                element = create_line_break(idx)
             else:
                 raise ValueError(
                     "Failed to parse input '{idx}' with data '{data}'".format(
