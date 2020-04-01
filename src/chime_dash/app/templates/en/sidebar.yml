@@ -25,3 +25,7 @@ max_y_axis_value: Maximal y-axis value (leave blank for no max value)
 show_tables: Show tables with data
 show_tool_details: Show more info about this tool
 show_additional_projections: Show additional projections
+
+line_break_1: Line break
+line_break_2: Line break
+line_break_3: Line break
