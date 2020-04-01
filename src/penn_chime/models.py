@@ -42,49 +42,30 @@ class SimSirModel:
 
         self.keys = ("susceptible", "infected", "recovered")
 
+        # An estimate of the number of infected people on the day that
+        # the first hospitalized case is seen
+        #
         # Note: this should not be an integer.
-        # We're appoximating infected from what we do know.
-        # TODO market_share > 0, hosp_rate > 0
         infected = (
             1.0 / p.market_share / p.hospitalized.rate
         )
 
         susceptible = p.population - infected
 
-        intrinsic_growth_rate = get_growth_rate(p.doubling_time)
-
         gamma = 1.0 / p.infectious_days
-
-        # Contact rate, beta
-        beta = (
-            (intrinsic_growth_rate + gamma)
-            / susceptible
-            * (1.0 - p.relative_contact_rate)
-        )  # {rate based on doubling time} / {initial susceptible}
-
-        # r_t is r_0 after distancing
-        r_t = beta / gamma * susceptible
-
-        # Simplify equation to avoid division by zero:
-        # self.r_naught = r_t / (1.0 - relative_contact_rate)
-        r_naught = (intrinsic_growth_rate + gamma) / gamma
+        self.gamma = gamma
 
         self.susceptible = susceptible
         self.infected = infected
         self.recovered = p.recovered
 
-        self.beta = beta
-        self.gamma = gamma
-        self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-        self.intrinsic_growth_rate = intrinsic_growth_rate
-
         if p.date_first_hospitalized is None and p.doubling_time is not None:
+            # Back-projecting to when the first hospitalized case would have been admitted
             logger.info('Using doubling_time: %s', p.doubling_time)
-            self.i_day = 0
-            self.beta = (
-                (intrinsic_growth_rate + gamma)
-                / susceptible
-            )
+
+            intrinsic_growth_rate = get_growth_rate(p.doubling_time)
+
+            self.beta = get_beta(intrinsic_growth_rate,  gamma, self.susceptible, 0.0)
 
             self.i_day = 0 # seed to the full length
             self.beta_t = self.beta
@@ -94,8 +75,6 @@ class SimSirModel:
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
             self.run_projection(p)
 
-            self.r_t = self.beta_t / gamma * susceptible
-            self.r_naught = self.beta / gamma * susceptible
             logger.info('Set i_day = %s', i_day)
             p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
             logger.info(
@@ -105,6 +84,7 @@ class SimSirModel:
                 self.i_day)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
+            # Fitting spread parameter to observed hospital census (dates of 1 patient and today)
             self.i_day = (p.current_date - p.date_first_hospitalized).days
             logger.info(
                 'Using date_first_hospitalized: %s; current_date: %s; i_day: %s',
@@ -131,7 +111,6 @@ class SimSirModel:
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
             self.run_projection(p)
 
-            self.intrinsic_growth_rate = intrinsic_growth_rate
             self.population = p.population
         else:
             logger.info(
@@ -148,6 +127,9 @@ class SimSirModel:
         self.susceptible = self.raw_df['susceptible'].values[self.i_day]
         self.recovered = self.raw_df['recovered'].values[self.i_day]
 
+        self.intrinsic_growth_rate = intrinsic_growth_rate
+
+        # r_t is r_0 after distancing
         self.r_t = self.beta_t / gamma * susceptible
         self.r_naught = self.beta / gamma * susceptible
 
