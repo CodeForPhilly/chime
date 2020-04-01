@@ -38,4 +38,11 @@ class Production(Base):
 def from_object(context: str):
 
     envs = {"dev": Development(), "test": Testing(), "prod": Production()}
-    return envs[context]
+
+    if context in envs.keys():
+        return envs[context]
+    else:
+        raise ValueError('Please select a valid environment')
+        
+
+

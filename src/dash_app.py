@@ -6,7 +6,7 @@ and testing environments
 """
 from chime_dash import create_app
 
-ENV, DASH = create_app(context='prod')
+ENV, DASH = create_app(context="prod")
 server = DASH.server
 
 if __name__ == "__main__":
