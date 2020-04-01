@@ -170,7 +170,12 @@ def create_date_input(
     return FormGroup(
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
-            DatePickerSingle(id=idx, **input_kwargs),
+            DatePickerSingle(
+                className="form-control",
+                day_size=32,
+                id=idx,
+                **input_kwargs
+            ),
         ]
     )
 
