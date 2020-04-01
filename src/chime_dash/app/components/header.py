@@ -3,11 +3,10 @@
 """
 from typing import List
 
-from dash.development.base_component import ComponentMeta
-from dash_html_components import Div, H1
-from dash_core_components import Markdown
-
 from chime_dash.app.components.base import Component
+from dash.development.base_component import ComponentMeta
+from dash_core_components import Markdown
+from dash_html_components import Div, H1
 
 
 class Header(Component):
