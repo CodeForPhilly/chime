@@ -11,7 +11,7 @@ from yaml import safe_load
 from numpy import mod
 from pandas import DataFrame
 
-from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4
+from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4, Hr
 from dash_core_components import DatePickerSingle
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
@@ -30,7 +30,13 @@ LABEL_STYLE = {
 HEADER_STYLE = {
     "fontSize": "1rem",
     "fontWeight": "bold",
-    "margin": "2rem 0 1rem",
+    "margin-bottom": "1rem",
+}
+
+LINE_STYLE = {
+    "width": "30%",
+    "text-align": "center",
+    "color": "#cccccc"
 }
 
 def read_localization_yml(file: str, language: str) -> Dict[str, Any]:
@@ -147,6 +153,8 @@ def create_header(idx: str, content: Dict[str, str]):
 
     return H4(id=idx, children=content[idx], style=HEADER_STYLE)
 
+def create_line_break(idx: str):
+    return Hr(id=idx, style=LINE_STYLE)
 
 def create_date_input(
     idx: str, data: Dict[str, Any], content: Dict[str, str], defaults: Parameters
