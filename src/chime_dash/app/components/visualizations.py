@@ -140,6 +140,7 @@ class Visualizations(Component):
                     labels=kwargs.get("labels", dataframe.columns),
                     modulo=kwargs.get("table_mod", 7),
                 ),
+                data_only=True,
                 format={
                     float: int,
                     (date, datetime): lambda d: d.strftime(DATE_FORMAT),
