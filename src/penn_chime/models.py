@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from logging import INFO, basicConfig, getLogger
 from sys import stdout
-from typing import Dict, Generator, Tuple, Optional
+from typing import Dict, Generator, Tuple, Sequence,Optional
 
 import numpy as np
 import pandas as pd
