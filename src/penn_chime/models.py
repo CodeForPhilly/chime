@@ -40,6 +40,8 @@ class SimSirModel:
             for key, d in p.dispositions.items()
         }
 
+        self.keys = ("susceptible", "infected", "recovered")
+
         # Note: this should not be an integer.
         # We're appoximating infected from what we do know.
         # TODO market_share > 0, hosp_rate > 0
@@ -153,7 +155,11 @@ class SimSirModel:
             self.beta_t * susceptible - gamma + 1)
         self.doubling_time_t = doubling_time_t
 
-        self.sim_sir_w_date_df = build_sim_sir_w_date_df(self.raw_df, p.current_date)
+        self.sim_sir_w_date_df = build_sim_sir_w_date_df(self.raw_df, p.current_date, self.keys)
+
+        self.sim_sir_w_date_floor_df = build_floor_df(self.sim_sir_w_date_df, self.keys)
+        self.admits_floor_df = build_floor_df(self.admits_df, p.dispositions.keys())
+        self.census_floor_df = build_floor_df(self.census_df, p.dispositions.keys())
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
@@ -252,7 +258,8 @@ def gen_sir(
 
 
 def sim_sir_df(
-    s: float, i: float, r: float, gamma: float, i_day: int, *args
+    s: float, i: float, r: float,
+    gamma: float, i_day: int, *args
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
@@ -264,14 +271,28 @@ def sim_sir_df(
 def build_sim_sir_w_date_df(
     raw_df: pd.DataFrame,
     current_date: datetime,
+    keys: Sequence[str],
 ) -> pd.DataFrame:
     day = raw_df.day
     return pd.DataFrame({
         "day": day,
         "date": day.astype('timedelta64[D]') + np.datetime64(current_date),
-        "susceptible": raw_df.susceptible,
-        "infected": raw_df.infected,
-        "recovered": raw_df.recovered,
+        **{
+            key: raw_df[key]
+            for key in keys
+        }
+    })
+
+
+def build_floor_df(df, keys):
+    """Build floor sim sir w date."""
+    return pd.DataFrame({
+        "day": df.day,
+        "date": df.date,
+        **{
+            key: np.floor(df[key])
+            for key in keys
+        }
     })
 
 
@@ -314,7 +335,7 @@ def build_census_df(
             key: (
                 admits_df[key].cumsum()
                 - admits_df[key].cumsum().shift(los).fillna(0)
-            ).apply(np.ceil)
+            )
             for key, los in lengths_of_stay.items()
         }
     })
