@@ -42,8 +42,10 @@ class SimSirModel:
 
         self.keys = ("susceptible", "infected", "recovered")
 
+        # An estimate of the number of infected people on the day that
+        # the first hospitalized case is seen
+        #
         # Note: this should not be an integer.
-        # We're appoximating infected from what we do know.
         infected = (
             1.0 / p.market_share / p.hospitalized.rate
         )
