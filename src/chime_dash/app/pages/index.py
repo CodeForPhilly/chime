@@ -13,7 +13,11 @@ from chime_dash.app.components.tool_details import ToolDetails
 from chime_dash.app.components.intro import Intro
 from chime_dash.app.components.visualizations import Visualizations
 
-from chime_dash.app.utils import get_n_switch_values, parameters_deserializer, prepare_visualization_group
+from chime_dash.app.utils import (
+    get_n_switch_values,
+    parameters_deserializer,
+    prepare_visualization_group,
+)
 from chime_dash.app.utils.callbacks import ChimeCallback
 
 from penn_chime.models import SimSirModel
@@ -57,39 +61,43 @@ class Index(Component):
                 result.extend(prepare_visualization_group(df, **viz_kwargs))
             return result
 
-        super().__init__(language, defaults, [
-            ChimeCallback(  # If user toggles show_additional_projections, show/hide the additional intro content
-                changed_elements=OrderedDict(show_tool_details="value"),
-                dom_updates=OrderedDict(more_intro_wrapper="hidden"),
-                callback_fn=Index.toggle_tool_details
-            ),
-            ChimeCallback(  # If user toggles show_tables, show/hide tables
-                changed_elements=OrderedDict(show_tables="value"),
-                dom_updates=OrderedDict(
-                    SIR_table_container="hidden",
-                    new_admissions_table_container="hidden",
-                    admitted_patients_table_container="hidden",
+        super().__init__(
+            language,
+            defaults,
+            [
+                ChimeCallback(  # If user toggles show_additional_projections, show/hide the additional intro content
+                    changed_elements=OrderedDict(show_tool_details="value"),
+                    dom_updates=OrderedDict(more_intro_wrapper="hidden"),
+                    callback_fn=Index.toggle_tool_details,
                 ),
-                callback_fn=Index.toggle_tables
-            ),
-            ChimeCallback(  # If the parameters or model change, update the text
-                changed_elements=OrderedDict(pars="children"),
-                dom_updates=OrderedDict(
-                    intro="children",
-                    more_intro="children",
-                    new_admissions_graph="figure",
-                    new_admissions_table="children",
-                    new_admissions_download="href",
-                    admitted_patients_graph="figure",
-                    admitted_patients_table="children",
-                    admitted_patients_download="href",
-                    SIR_graph="figure",
-                    SIR_table="children",
-                    SIR_download="href",
+                ChimeCallback(  # If user toggles show_tables, show/hide tables
+                    changed_elements=OrderedDict(show_tables="value"),
+                    dom_updates=OrderedDict(
+                        SIR_table_container="hidden",
+                        new_admissions_table_container="hidden",
+                        admitted_patients_table_container="hidden",
+                    ),
+                    callback_fn=Index.toggle_tables,
                 ),
-                callback_fn=handle_model_change_helper
-            )
-        ])
+                ChimeCallback(  # If the parameters or model change, update the text
+                    changed_elements=OrderedDict(pars="children"),
+                    dom_updates=OrderedDict(
+                        intro="children",
+                        more_intro="children",
+                        new_admissions_graph="figure",
+                        new_admissions_table="children",
+                        new_admissions_download="href",
+                        admitted_patients_graph="figure",
+                        admitted_patients_table="children",
+                        admitted_patients_download="href",
+                        SIR_graph="figure",
+                        SIR_table="children",
+                        SIR_download="href",
+                    ),
+                    callback_fn=handle_model_change_helper,
+                ),
+            ],
+        )
         self.components = OrderedDict(
             header=Header(language, defaults),
             intro=Intro(language, defaults),
@@ -103,10 +111,10 @@ class Index(Component):
         """
         content = dbc.Col(
             children=self.components["header"].html
-                     + self.components["intro"].html
-                     + self.components["tool_details"].html
-                     + self.components["visualizations"].html
-                     + self.components["footer"].html,
+            + self.components["intro"].html
+            + self.components["tool_details"].html
+            + self.components["visualizations"].html
+            + self.components["footer"].html,
             width=9,
             className="ml-sm-auto p-5",
         )
