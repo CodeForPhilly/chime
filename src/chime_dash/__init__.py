@@ -5,19 +5,43 @@ dash instance defined here
 """
 
 from dash import Dash
+from typing import TypeVar
+from chime_dash.app.config import from_object
 from penn_chime.settings import DEFAULTS
 from chime_dash.app.components import Body
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
-LANGUAGE = "en"
+DashAppInstance = TypeVar('dash.Dash')
 
-body = Body(LANGUAGE, DEFAULTS)
+def create_app(context:str='prod')-> DashAppInstance:
+    """
+    create_app initializes the app instance
+    
+    Args:
+        context (str, optional): One of either 'prod', 'dev', 'testing.
+        Defaults to 'prod'. Change to 'dev' to set debug to true.
+    
+    Returns:
+        DashAppInstance: Dash instance with appropriate configuration settings
+    """
 
-DASH = Dash(
-    __name__,
-    external_stylesheets=body.external_stylesheets,
-    external_scripts=body.external_scripts,
-)
-DASH.title = "Penn Medicine CHIME"  #! Should be moved into config / out of view
-DASH.layout = body.html
-wrap_callbacks(DASH)
+    Env = from_object(context)
+    
+    LANGUAGE = Env.LANG
+    body = Body(LANGUAGE, DEFAULTS)
+    
+    
+    App = Dash(
+        __name__,
+        external_stylesheets=body.external_stylesheets,
+        external_scripts=body.external_scripts,
+    )
+
+    App.title = Env.CHIME_TITLE
+    App.layout = body.html
+    wrap_callbacks(App)
+
+    
+
+    return Env, App
+
