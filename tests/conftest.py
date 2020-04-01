@@ -8,7 +8,7 @@ from src.penn_chime.parameters import (
     Disposition,
     Regions,
 )
-from src.penn_chime.models import SimSirModel
+from src.penn_chime.models import SimSirModel, build_floor_df
 
 
 class MockStreamlit:
@@ -108,7 +108,17 @@ def admits_df():
 
 
 @pytest.fixture
+def admits_floor_df(param, admits_df):
+    return build_floor_df(admits_df, param.dispositions.keys())
+
+
+@pytest.fixture
 def census_df():
     return pd.read_csv(
         "tests/by_doubling_time/2020-03-28_projected_census.csv", parse_dates=["date"]
     )
+
+@pytest.fixture
+def census_floor_df(param, census_df):
+    return build_floor_df(census_df, param.dispositions.keys())
+

@@ -6,7 +6,7 @@ context('Increment steppers', () => {
   });
 
   it('Increment regional population', () => {
-    cy.contains('Hospitalized Admissions peaks at 301');
+    cy.contains('Hospitalized Admissions peaks at 300');
 
     cy.get('input.st-al').eq(0)
       .should('has.value', '3600000');
@@ -16,11 +16,11 @@ context('Increment steppers', () => {
     cy.get('input.st-al').eq(0)
       .should('has.value', '3600001');
 
-    cy.contains('Hospitalized Admissions peaks at 301');
+    cy.contains('Hospitalized Admissions peaks at 300');
   });
 
   it('Increment hospital market share', () => {
-    cy.contains('Hospitalized Admissions peaks at 301');
+    cy.contains('Hospitalized Admissions peaks at 300');
 
     cy.get('input.st-al').eq(1)
       .should('has.value', '15');
@@ -30,11 +30,11 @@ context('Increment steppers', () => {
     cy.get('input.st-al').eq(1)
       .should('has.value', '15.1');
 
-    cy.contains('Hospitalized Admissions peaks at 303');
+    cy.contains('Hospitalized Admissions peaks at 302');
   });
 
   it('Increment doubling time', () => {
-    cy.contains('Hospitalized Admissions peaks at 301');
+    cy.contains('Hospitalized Admissions peaks at 300');
 
     cy.get('input.st-al').eq(3)
       .should('has.value', '4');
@@ -44,6 +44,6 @@ context('Increment steppers', () => {
     cy.get('input.st-al').eq(3)
       .should('has.value', '4.25');
 
-    cy.contains('Hospitalized Admissions peaks at 273');
+    cy.contains('Hospitalized Admissions peaks at 272');
   });
 });

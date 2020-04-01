@@ -13,18 +13,21 @@ from src.penn_chime.charts import (
 # TODO add test for asterisk
 
 
-def test_admits_chart(admits_df):
-    chart = build_admits_chart(alt=alt, admits_df=admits_df)
+DISPOSITION_KEYS = ("hospitalized", "icu", "ventilated")
+
+
+def test_admits_chart(admits_floor_df):
+    chart = build_admits_chart(alt=alt, admits_floor_df=admits_floor_df)
     assert isinstance(chart, (alt.Chart, alt.LayerChart))
-    assert round(chart.data.iloc[40].icu, 0) == 39
+    assert round(chart.data.iloc[40].icu, 0) == 38
 
     # test fx call with no params
     with pytest.raises(TypeError):
         build_admits_chart()
 
 
-def test_build_descriptions(admits_df, param):
-    chart = build_admits_chart(alt=alt, admits_df=admits_df)
+def test_build_descriptions(admits_floor_df, param):
+    chart = build_admits_chart(alt=alt, admits_floor_df=admits_floor_df)
     description = build_descriptions(chart=chart, labels=param.labels)
 
     hosp, icu, vent = description.split("\n\n")  # break out the description into lines
@@ -33,16 +36,16 @@ def test_build_descriptions(admits_df, param):
     assert str(ceil(max_hosp)) in hosp
 
 
-def test_no_asterisk(admits_df, param):
+def test_no_asterisk(admits_floor_df, param):
     param.n_days = 600
 
-    chart = build_admits_chart(alt=alt, admits_df=admits_df)
+    chart = build_admits_chart(alt=alt, admits_floor_df=admits_floor_df)
     description = build_descriptions(chart=chart, labels=param.labels)
     assert "*" not in description
 
 
-def test_census(census_df, param):
-    chart = build_census_chart(alt=alt, census_df=census_df)
+def test_census(census_floor_df, param):
+    chart = build_census_chart(alt=alt, census_floor_df=census_floor_df)
     description = build_descriptions(chart=chart, labels=param.labels)
 
     assert str(ceil(chart.data["ventilated"].max())) in description
@@ -53,8 +56,8 @@ def test_census(census_df, param):
     )
 
 
-def test_census_chart(census_df):
-    chart = build_census_chart(alt=alt, census_df=census_df)
+def test_census_chart(census_floor_df):
+    chart = build_census_chart(alt=alt, census_floor_df=census_floor_df)
     assert isinstance(chart, (alt.Chart, alt.LayerChart))
     assert chart.data.iloc[1].hospitalized == 3
     assert chart.data.iloc[49].ventilated == 365

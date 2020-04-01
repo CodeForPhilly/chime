@@ -279,7 +279,9 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     # Build in desired order
     st.sidebar.markdown(
-        """**CHIME [v1.1.0](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.0) (2020/03/30)**"""
+        """**CHIME [v1.1.1](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.1) ({change_date})**""".format(
+            change_date=CHANGE_DATE
+        )
     )
 
     st.sidebar.markdown(
