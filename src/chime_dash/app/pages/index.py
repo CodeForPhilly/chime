@@ -54,9 +54,7 @@ class Index(Component):
             result.extend(self.components["intro"].build(model, pars))
             result.extend(self.components["tool_details"].build(model, pars))
             for df_key in ["admits_df", "census_df", "sim_sir_w_date_df"]:
-                df = None
-                if model:
-                    df = model.__dict__.get(df_key, None)
+                df = model.__dict__.get(df_key, None) if model is not None else None
                 result.extend(prepare_visualization_group(df, **viz_kwargs))
             return result
 
