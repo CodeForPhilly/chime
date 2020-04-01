@@ -44,7 +44,6 @@ class SimSirModel:
 
         # Note: this should not be an integer.
         # We're appoximating infected from what we do know.
-        # TODO market_share > 0, hosp_rate > 0
         infected = (
             1.0 / p.market_share / p.hospitalized.rate
         )
