@@ -1,6 +1,6 @@
 """Script which launches dash app
 """
-from chime_dash.app.run import DASH
+from chime_dash.app import DASH
 
 server = DASH.server
 
