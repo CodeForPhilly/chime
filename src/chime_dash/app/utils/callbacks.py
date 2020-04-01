@@ -6,7 +6,7 @@ from collections import OrderedDict
 from typing import Callable, List
 from functools import lru_cache
 
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 
 class ChimeCallback:
@@ -14,7 +14,8 @@ class ChimeCallback:
                  changed_elements: OrderedDict,
                  dom_updates: OrderedDict,
                  callback_fn: Callable,
-                 memoize: bool = True
+                 memoize: bool = True,
+                 state_elements: OrderedDict = OrderedDict()
                  ):
         pass
         self.inputs = [
@@ -25,17 +26,21 @@ class ChimeCallback:
             Output(component_id=component_id, component_property=component_property)
             for component_id, component_property in dom_updates.items()
         ]
+        self.states = [
+            State(component_id=component_id, component_property=component_property)
+            for component_id, component_property in state_elements.items()
+        ]
         self.callback_fn = callback_fn
         self.memoize = memoize
 
     def wrap(self, app: Dash):
         if self.memoize:
             @lru_cache(maxsize=32)
-            @app.callback(self.outputs, self.inputs)
+            @app.callback(self.outputs, self.inputs, self.states)
             def callback_wrapper(*args, **kwargs):
                 return self.callback_fn(*args, **kwargs)
         else:
-            @app.callback(self.outputs, self.inputs)
+            @app.callback(self.outputs, self.inputs, self.states)
             def callback_wrapper(*args, **kwargs):
                 return self.callback_fn(*args, **kwargs)
 

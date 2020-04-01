@@ -3,7 +3,10 @@ Initializes the side bar containing the various inputs for the model
 
 #! _INPUTS should be considered for moving else where
 """
-from dash_html_components import Nav, Div
+from dash_html_components import Nav, Div, Button
+import dash_core_components as dcc
+
+import json
 
 from typing import List, Dict, Any, Tuple
 from collections import OrderedDict
@@ -160,6 +163,35 @@ class Sidebar(Component):
         )
         return [parameters_serializer(pars)]
 
+
+    @staticmethod
+    def load_params(*input_values, **kwargs):
+        """Batch load of parameters from the `dcc.Input`
+        """
+        state_values = input_values[1]
+        return list(json.loads(state_values)[0].values())
+
+
+    @staticmethod
+    def update_store(*input_values, **kwargs):
+        """When one of the inputs is changed, update a dcc.Store with a dict
+        containing all parameters and their values.
+        """
+        result = dict(zip(Sidebar.get_ordered_input_keys(), input_values))
+        print(result)
+        return [result]
+
+
+    @staticmethod
+    def show_params(*input_values, **kwargs):
+        """When the store is updated, display its value in a `dcc.Input`. The value of
+        the Input can be copied to be used in a future session, sent by e-mail, etc.
+        Alternatively, one can paste a valid string in the `dcc.Input` to load some
+        parameters.
+        """
+        return [json.dumps(input_values, indent=2)]
+
+
     def __init__(self, language, defaults):
         changed_elements = OrderedDict(
             (key, _PROPERTY_OUTPUT_MAP.get(_INPUTS[key]["type"], "value"))
@@ -172,7 +204,25 @@ class Sidebar(Component):
             dom_updates=OrderedDict(pars="children"),
             callback_fn=Sidebar.update_parameters,
         )
-        super().__init__(language, defaults, [input_change_callback])
+        input_store_callback = ChimeCallback(
+            changed_elements=changed_elements,
+            dom_updates=OrderedDict(store="data"),
+            callback_fn=Sidebar.update_store,
+        )
+        save_params_callback = ChimeCallback(
+            changed_elements=OrderedDict(store="data"),
+            dom_updates=OrderedDict(parameters_input="value"),
+            callback_fn=Sidebar.show_params,
+        )
+        load_params_callback = ChimeCallback(
+            changed_elements=OrderedDict(load_button="n_clicks"),
+            state_elements=OrderedDict(parameters_input="value"),
+            dom_updates=changed_elements,
+            callback_fn=Sidebar.load_params,
+        )
+
+        super().__init__(language, defaults, [input_change_callback, input_store_callback,
+                                              save_params_callback, load_params_callback])
 
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the view
@@ -196,7 +246,12 @@ class Sidebar(Component):
                     )
                 )
             elements.append(element)
-
+        parameters_input = dcc.Input(id='parameters_input')
+        elements.append(parameters_input)
+        store = dcc.Store(id='store')
+        elements.append(store)
+        load_button = Button("Load parameters", id='load_button')
+        elements.append(load_button)
         sidebar = Nav(
             children=Div(
                 children=elements,
