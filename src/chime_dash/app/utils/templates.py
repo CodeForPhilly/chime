@@ -23,13 +23,13 @@ TEMPLATE_DIR = path.join(
 )
 
 LABEL_STYLE = {
-    "font-size": "0.875rem",
-    "margin-bottom": "0.3333em"
+    "fontSize": "0.875rem",
+    "marginBottom": "0.3333em"
 }
 
 HEADER_STYLE = {
-    "font-size": "1rem",
-    "font-weight": "bold",
+    "fontSize": "1rem",
+    "fontWeight": "bold",
     "margin": "2rem 0 1rem",
 }
 
@@ -192,7 +192,7 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
     return Checklist(
         id=idx,
         switch=True,
-        options=[{"label": content[idx], "value": data.get("value", False)}],
+        options=[{"label": content[idx],  "value": True}],
     )
 
 

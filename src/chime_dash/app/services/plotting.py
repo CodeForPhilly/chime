@@ -4,10 +4,10 @@ Logic for data manipulation needed when new call backs are executed
 """
 from typing import Dict, Any
 
-import pandas as pd
+from pandas import DataFrame
 
 
-def plot_dataframe(dataframe: pd.DataFrame, max_y_axis: int = None,) -> Dict[str, Any]:
+def plot_dataframe(dataframe: DataFrame, max_y_axis: int = None,) -> Dict[str, Any]:
     """
     """
     if max_y_axis is None:

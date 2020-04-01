@@ -35,9 +35,7 @@ class Navbar(Component):
                 children=[
                     html.Div(
                         className="px-3",
-                        style={
-                            "width": "320px",
-                        },
+                        style={"width": "320px"},
                         children=html.A(
                             href="https://www.pennmedicine.org",
                             className="penn-medicine-header__logo",
@@ -49,7 +47,7 @@ class Navbar(Component):
                         children=dbc.Container(
                             children=[dbc.NavbarBrand(
                                 children=html.H1(
-                                    style={ "font": "inherit", "margin": "0" },
+                                    style={"font": "inherit", "margin": "0"},
                                     children="COVID-19 Hospital Impact Model for Epidemics (CHIME)"
                                 ),
                                 href="/"

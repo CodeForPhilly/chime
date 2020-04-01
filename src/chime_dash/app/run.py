@@ -6,15 +6,19 @@ Defines the Dash instance
 from dash import Dash
 from penn_chime.settings import DEFAULTS
 from chime_dash.app.components import Body
+from chime_dash.app.utils.callbacks import wrap_callbacks
+
 LANGUAGE = "en"
 
-
-STYLESHEETS = Body(LANGUAGE, DEFAULTS).external_stylesheets
-SCRIPTS     = Body(LANGUAGE, DEFAULTS).external_scripts
+body = Body(LANGUAGE, DEFAULTS)
 
 DASH = Dash(
-    external_stylesheets=STYLESHEETS,
-    external_scripts=SCRIPTS,
+    __name__,
+    external_stylesheets=body.external_stylesheets,
+    external_scripts=body.external_scripts,
 )
+DASH.title = "Penn Medicine CHIME"  #! Should be moved into config / out of view
+DASH.layout = body.html
+wrap_callbacks(DASH)
 
 # server = DASH.server
