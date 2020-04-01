@@ -1,4 +1,11 @@
-"""Builds the root component
+"""Combines all components
+
+The `sidebar` component combines all the inputs while other components potentially
+have callbacks.
+
+To add or remove components, adjust the `setup`.
+If callbacks are present, also adjust `CALLBACK_INPUTS`, `CALLBACK_OUTPUTS` and
+`callback_body`.
 """
 from collections import OrderedDict
 
@@ -28,6 +35,7 @@ class Body(Component):
     """
     external_stylesheets = [
         BOOTSTRAP,
+        'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap',
     ]
 
     def __init__(self, language, defaults):
@@ -42,6 +50,21 @@ class Body(Component):
         )
 
     def get_html(self):
+        """Glues individual setup components together
+        """
+        return Div(
+            className="app",
+            children=self.components["navbar"].html + [
+                Div(
+                    className="app-content",
+                    children=
+                    self.components["sidebar"].html
+                    + self.components["index"].html
+                )
+            ]
+        )
+
+    def get_html_old(self):
         """Glues individual setup components together
         """
         return Div(children=

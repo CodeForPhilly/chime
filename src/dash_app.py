@@ -5,5 +5,4 @@ from chime_dash.app.run import DASH
 server = DASH.server
 
 if __name__ == "__main__":
-    #    main()
-    DASH.run_server(host="0.0.0.0")
+    DASH.run_server(host="0.0.0.0")  #, debug=True)
