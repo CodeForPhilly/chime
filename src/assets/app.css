@@ -23,3 +23,14 @@ main h4 {
 	margin-top: 1.5rem;
 }
 
+/* hide spinner arrows */
+input[type="number"] {
+	-moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+	display: none;
+}
+/* end hide spinner arrows */
+
