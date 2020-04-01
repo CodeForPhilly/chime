@@ -6,7 +6,7 @@ context('Increment steppers', () => {
   });
 
   it('Increment regional population', () => {
-    cy.contains('Hospitalized Admissions peaks at 301');
+    cy.contains('Hospitalized Admissions peaks at 300');
 
     cy.get('input.st-al').eq(0)
       .should('has.value', '3600000');
