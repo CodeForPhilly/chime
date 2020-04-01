@@ -41,7 +41,7 @@ def parameters_serializer(p: Parameters):
 
 def parameters_deserializer(p_json: str):
     values = loads(p_json)
-    dft = (
+    dfh = (
         parse_date(values["date_first_hospitalized"])
         if values["date_first_hospitalized"]
         else None
@@ -53,7 +53,7 @@ def parameters_deserializer(p_json: str):
         relative_contact_rate=values["relative_contact_rate"],
         ventilated=Disposition(*values["ventilated"]),
         current_date=parse_date(values["current_date"]),
-        date_first_hospitalized=dft,
+        date_first_hospitalized=dfh,
         doubling_time=values["doubling_time"],
         infectious_days=values["infectious_days"],
         market_share=values["market_share"],
