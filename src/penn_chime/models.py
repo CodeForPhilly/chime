@@ -52,31 +52,14 @@ class SimSirModel:
         susceptible = p.population - infected
 
         intrinsic_growth_rate = get_growth_rate(p.doubling_time)
+        self.intrinsic_growth_rate = intrinsic_growth_rate
 
         gamma = 1.0 / p.infectious_days
-
-        # Contact rate, beta
-        beta = (
-            (intrinsic_growth_rate + gamma)
-            / susceptible
-            * (1.0 - p.relative_contact_rate)
-        )  # {rate based on doubling time} / {initial susceptible}
-
-        # r_t is r_0 after distancing
-        r_t = beta / gamma * susceptible
-
-        # Simplify equation to avoid division by zero:
-        # self.r_naught = r_t / (1.0 - relative_contact_rate)
-        r_naught = (intrinsic_growth_rate + gamma) / gamma
+        self.gamma = gamma
 
         self.susceptible = susceptible
         self.infected = infected
         self.recovered = p.recovered
-
-        self.beta = beta
-        self.gamma = gamma
-        self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-        self.intrinsic_growth_rate = intrinsic_growth_rate
 
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             logger.info('Using doubling_time: %s', p.doubling_time)
@@ -94,8 +77,6 @@ class SimSirModel:
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
             self.run_projection(p)
 
-            self.r_t = self.beta_t / gamma * susceptible
-            self.r_naught = self.beta / gamma * susceptible
             logger.info('Set i_day = %s', i_day)
             p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
             logger.info(
@@ -148,6 +129,7 @@ class SimSirModel:
         self.susceptible = self.raw_df['susceptible'].values[self.i_day]
         self.recovered = self.raw_df['recovered'].values[self.i_day]
 
+        # r_t is r_0 after distancing
         self.r_t = self.beta_t / gamma * susceptible
         self.r_naught = self.beta / gamma * susceptible
 
