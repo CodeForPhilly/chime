@@ -44,6 +44,6 @@ context('Increment steppers', () => {
     cy.get('input.st-al').eq(3)
       .should('has.value', '4.25');
 
-    cy.contains('Hospitalized Admissions peaks at 274');
+    cy.contains('Hospitalized Admissions peaks at 272');
   });
 });
