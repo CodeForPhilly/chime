@@ -11,6 +11,7 @@ from .constants import (
     CHANGE_DATE,
     DATE_FORMAT,
     DOCS_URL,
+    EPSILON,
     FLOAT_INPUT_MIN,
     FLOAT_INPUT_STEP,
 )
@@ -314,13 +315,14 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         date_first_hospitalized = None
 
     if st.sidebar.checkbox(
-        "Social distancing measures have been implemented"
+        "Social distancing measures have been implemented",
+        value=(d.relative_contact_rate > EPSILON)
     ):
         mitigation_date = mitigation_date_input()
         relative_contact_rate = relative_contact_pct_input()
     else:
         mitigation_date = None
-        relative_contact_rate = 1.e-7
+        relative_contact_rate = EPSILON
 
     st.sidebar.markdown(
         "### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters#severity-parameters)".format(
