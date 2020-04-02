@@ -7,11 +7,12 @@ dash instance defined here
 from dash import Dash
 from typing import TypeVar
 from chime_dash.app.config import from_object
-from penn_chime.settings import DEFAULTS
+from penn_chime.settings import get_defaults
 from chime_dash.app.components import Body
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
 DashAppInstance = TypeVar('DashAppInstance')
+DEFAULTS = get_defaults()
 
 def create_app(context:str='prod')-> DashAppInstance:
     """

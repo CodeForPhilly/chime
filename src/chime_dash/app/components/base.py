@@ -13,10 +13,12 @@ from dash.development.base_component import ComponentMeta
 from dash_html_components import Div
 
 from penn_chime.parameters import Parameters
-from penn_chime.settings import DEFAULTS
+from penn_chime.settings import get_defaults
 
 from chime_dash.app.utils.templates import read_localization_yml, read_localization_markdown
 from chime_dash.app.utils.callbacks import ChimeCallback, register_callbacks
+
+DEFAULTS = get_defaults()
 
 
 class Component(ABC):
