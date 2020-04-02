@@ -12,3 +12,6 @@ plotting            graphs / charts
 #! call back logic should be moved here
 #! logic for updating text should be moved here
 """
+from . import plotting
+
+

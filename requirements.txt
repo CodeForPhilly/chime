@@ -1,10 +1,1 @@
-streamlit
-pandas
-numpy
-pytest
-altair
-dash[testing]
-dash_bootstrap_components
-pyyaml
-gunicorn
-selenium
+-e .
