@@ -2,7 +2,7 @@
 
 This directory provides the interface for the dash app.
 
-![Current interface](docs/assets/interface.png)
+![Current interface](docs/interface.png)
 
 ## Tree
 Structure of the app

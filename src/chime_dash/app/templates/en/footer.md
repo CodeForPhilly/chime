@@ -1,4 +1,5 @@
 ## Guidance on Selecting Inputs
+
 **This information has been moved to the [User Documentation](https://code-for-philly.gitbook.io/chime/what-is-chime/parameters#guidance-on-selecting-inputs)**
 
 ## References & Acknowledgements

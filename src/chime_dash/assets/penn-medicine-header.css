@@ -1,0 +1,28 @@
+
+/*
+------------------------------------------------------------------
+Place a link to this file in you source code before your site's
+CSS files.
+
+This will allow you to make style overrides if any of the
+Penn Medicine Masthead CSS rules conflict with those of you site.
+
+If you have questions or need assistance, contact us at
+PennMedicineWebMaster@uphs.upenn.edu
+------------------------------------------------------------------
+*/
+
+.penn-medicine-header {
+	background-color: #2a3980;
+}
+
+.penn-medicine-header__logo {
+	background-image: url(https://www.pennmedicine.org/Assets/PennMedicine/built/images/assets/logo-white.svg);
+	background-repeat: no-repeat;
+	background-size: 90%;
+	display: block;
+	height: 33px;
+	width: 230px;
+	text-indent: -999999px;
+	margin-bottom: -2px;
+}
