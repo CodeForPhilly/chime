@@ -166,8 +166,10 @@ class SimSirModel:
             p.recovered,
             self.gamma,
             -self.i_day,
-            self.beta, pre_mitigation_days,
-            self.beta_t, post_mitigation_days
+            [
+                (self.beta, pre_mitigation_days),
+                (self.beta_t, post_mitigation_days),
+             ]
         )
 
         self.dispositions_df = build_dispositions_df(self.raw_df, self.rates, p.market_share, p.current_date)
@@ -233,7 +235,7 @@ def sir(
 
 
 def gen_sir(
-    s: float, i: float, r: float, gamma: float, i_day: int, *args
+    s: float, i: float, r: float, gamma: float, i_day: int, policies: List[Tuple[float, int]]
 ) -> Generator[Tuple[int, float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples.
     Parameter order has changed to allow multiple (beta, n_days)
@@ -242,8 +244,7 @@ def gen_sir(
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
     d = i_day
-    while args:
-        beta, n_days, *args = args
+    for beta, n_days in policies:
         for _ in range(n_days):
             yield d, s, i, r
             s, i, r = sir(s, i, r, beta, gamma, n)
@@ -253,11 +254,11 @@ def gen_sir(
 
 def sim_sir_df(
     s: float, i: float, r: float,
-    gamma: float, i_day: int, *args
+    gamma: float, i_day: int, policies: List[Tuple[float, int]]
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
-        data=gen_sir(s, i, r, gamma, i_day, *args),
+        data=gen_sir(s, i, r, gamma, i_day, policies),
         columns=("day", "susceptible", "infected", "recovered"),
     )
 

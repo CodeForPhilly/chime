@@ -64,7 +64,7 @@ def test_sim_sir():
     Rounding to move fast past decimal place issues
     """
     raw_df = sim_sir_df(
-        5, 6, 7, 0.1, 0, 0.1, 40,  # s  # i  # r  # gamma  # i_day  # beta1  # n_days1
+        5, 6, 7, 0.1, 0, [(0.1, 40)],  # s  # i  # r  # gamma  # i_day  # beta1  # n_days1
     )
 
     first = raw_df.iloc[0, :]
