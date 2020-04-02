@@ -28,6 +28,25 @@ logger = getLogger(__name__)
 
 class SimSirModel:
 
+    def gen_policy(self, p: Parameters) -> List[Tuple[float, int]]:
+        if p.mitigation_date is not None:
+            mitigation_day = -(p.current_date - p.mitigation_date).days
+        else:
+            mitigation_day = 0
+
+        total_days = self.i_day + p.n_days
+
+        if mitigation_day < -self.i_day:
+            mitigation_day = -self.i_day
+
+        pre_mitigation_days = self.i_day + mitigation_day
+        post_mitigation_days = total_days - pre_mitigation_days
+
+        return [
+            (self.beta,   pre_mitigation_days),
+            (self.beta_t, post_mitigation_days),
+        ]
+
     def __init__(self, p: Parameters):
 
         self.rates = {
@@ -66,14 +85,13 @@ class SimSirModel:
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
 
             self.beta = get_beta(intrinsic_growth_rate,  gamma, self.susceptible, 0.0)
+            self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
             self.i_day = 0 # seed to the full length
-            self.beta_t = self.beta
-            self.run_projection(p)
+            self.run_projection(p, [(self.beta, p.n_days)])
             self.i_day = i_day = int(get_argmin_ds(self.census_df, p.current_hospitalized))
 
-            self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-            self.run_projection(p)
+            self.run_projection(p, self.gen_policy(p))
 
             logger.info('Set i_day = %s', i_day)
             p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
@@ -100,7 +118,7 @@ class SimSirModel:
                 self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
                 self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
-                self.run_projection(p)
+                self.run_projection(p, self.gen_policy(p))
                 loss = self.get_loss()
                 losses[i] = loss
 
@@ -109,7 +127,7 @@ class SimSirModel:
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-            self.run_projection(p)
+            self.run_projection(p, self.gen_policy(p))
 
             self.population = p.population
         else:
@@ -146,30 +164,14 @@ class SimSirModel:
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
 
-    def run_projection(self, p):
-        if p.mitigation_date is not None:
-            mitigation_day = -(p.current_date - p.mitigation_date).days
-        else:
-            mitigation_day = 0
-
-        total_days = self.i_day + p.n_days
-
-        if mitigation_day < -self.i_day:
-            mitigation_day = -self.i_day
-
-        pre_mitigation_days = self.i_day + mitigation_day
-        post_mitigation_days = total_days - pre_mitigation_days
-
+    def run_projection(self, p: Parameters, policy: List[Tuple[float, int]]):
         self.raw_df = sim_sir_df(
             self.susceptible,
             self.infected,
             p.recovered,
             self.gamma,
             -self.i_day,
-            [
-                (self.beta, pre_mitigation_days),
-                (self.beta_t, post_mitigation_days),
-             ]
+            policy
         )
 
         self.dispositions_df = build_dispositions_df(self.raw_df, self.rates, p.market_share, p.current_date)
