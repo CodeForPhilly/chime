@@ -85,31 +85,26 @@ class SimSirModel:
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
             # Fitting spread parameter to observed hospital census (dates of 1 patient and today)
             self.i_day = (p.current_date - p.date_first_hospitalized).days
+            self.current_hospitalized = p.current_hospitalized
             logger.info(
-                'Using date_first_hospitalized: %s; current_date: %s; i_day: %s',
+                'Using date_first_hospitalized: %s; current_date: %s; i_day: %s, current_hospitalized: %s',
                 p.date_first_hospitalized,
                 p.current_date,
-                self.i_day)
-            min_loss = 2.0**99
-            dts = np.linspace(1, 15, 29)
-            losses = np.full(dts.shape[0], np.inf)
-            self.current_hospitalized = p.current_hospitalized
-            for i, i_dt in enumerate(dts):
-                intrinsic_growth_rate = get_growth_rate(i_dt)
-                self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
-                self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
+                self.i_day,
+                p.current_hospitalized,
+            )
 
-                self.run_projection(p, self.gen_policy(p))
+            # Make an initial coarse estimate
+            dts = np.linspace(1, 15, 15)
+            min_loss = self.get_argmin_doubling_time(p, dts)
 
-                # Skip values the would put the fit past peak
-                peak_admits_day = self.admits_df.hospitalized.argmax()
-                if peak_admits_day < 0:
-                    continue
+            # Refine the coarse estimate
+            for iteration in range(4):
+                dts = np.linspace(dts[min_loss-1], dts[min_loss+1], 15)
+                min_loss = self.get_argmin_doubling_time(p, dts)
 
-                loss = self.get_loss()
-                losses[i] = loss
+            p.doubling_time = dts[min_loss]
 
-            p.doubling_time = dts[pd.Series(losses).argmin()]
             logger.info('Estimated doubling_time: %s', p.doubling_time)
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
@@ -150,6 +145,26 @@ class SimSirModel:
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
+
+    def get_argmin_doubling_time(self, p: Parameters, dts):
+        losses = np.full(dts.shape[0], np.inf)
+        for i, i_dt in enumerate(dts):
+            intrinsic_growth_rate = get_growth_rate(i_dt)
+            self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
+            self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
+
+            self.run_projection(p, self.gen_policy(p))
+
+            # Skip values the would put the fit past peak
+            peak_admits_day = self.admits_df.hospitalized.argmax()
+            if peak_admits_day < 0:
+                continue
+
+            loss = self.get_loss()
+            losses[i] = loss
+
+        min_loss = pd.Series(losses).argmin()
+        return min_loss
 
     def gen_policy(self, p: Parameters) -> Sequence[Tuple[float, int]]:
         if p.mitigation_date is not None:
