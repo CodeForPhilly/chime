@@ -314,7 +314,7 @@ def build_dispositions_df(
 
 def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
     """Build admits dataframe from dispositions."""
-    admits_df = dispositions_df.iloc[:, :] - dispositions_df.shift(1)
+    admits_df = dispositions_df - dispositions_df.shift(1)
     admits_df.day = dispositions_df.day
     admits_df.date = dispositions_df.date
     return admits_df
