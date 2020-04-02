@@ -27,26 +27,6 @@ logger = getLogger(__name__)
 
 
 class SimSirModel:
-
-    def gen_policy(self, p: Parameters) -> List[Tuple[float, int]]:
-        if p.mitigation_date is not None:
-            mitigation_day = -(p.current_date - p.mitigation_date).days
-        else:
-            mitigation_day = 0
-
-        total_days = self.i_day + p.n_days
-
-        if mitigation_day < -self.i_day:
-            mitigation_day = -self.i_day
-
-        pre_mitigation_days = self.i_day + mitigation_day
-        post_mitigation_days = total_days - pre_mitigation_days
-
-        return [
-            (self.beta,   pre_mitigation_days),
-            (self.beta_t, post_mitigation_days),
-        ]
-
     def __init__(self, p: Parameters):
 
         self.rates = {
@@ -163,6 +143,25 @@ class SimSirModel:
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
+
+    def gen_policy(self, p: Parameters) -> List[Tuple[float, int]]:
+        if p.mitigation_date is not None:
+            mitigation_day = -(p.current_date - p.mitigation_date).days
+        else:
+            mitigation_day = 0
+
+        total_days = self.i_day + p.n_days
+
+        if mitigation_day < -self.i_day:
+            mitigation_day = -self.i_day
+
+        pre_mitigation_days = self.i_day + mitigation_day
+        post_mitigation_days = total_days - pre_mitigation_days
+
+        return [
+            (self.beta,   pre_mitigation_days),
+            (self.beta_t, post_mitigation_days),
+        ]
 
     def run_projection(self, p: Parameters, policy: List[Tuple[float, int]]):
         self.raw_df = sim_sir_df(
