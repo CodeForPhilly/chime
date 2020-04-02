@@ -11,6 +11,7 @@ from .constants import (
     CHANGE_DATE,
     DATE_FORMAT,
     DOCS_URL,
+    EPSILON,
     FLOAT_INPUT_MIN,
     FLOAT_INPUT_STEP,
 )
@@ -58,9 +59,12 @@ def display_header(st, m, p):
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine to assist hospitals and public health officials with hospital capacity planning,
-    but can be used anywhere in the world.
-    Customize it for your region by modifying data inputs in the left panel.*
+    Penn Medicine to assist hospitals and public health officials with hospital capacity planning.*"""
+    )
+    st.markdown(
+        """**Notice**: *There is a high 
+    degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing 
+    measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
     """
     )
 
@@ -204,6 +208,10 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         st_obj, "Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time",
         value=d.date_first_hospitalized,
     )
+    mitigation_date_input = DateInput(
+        st_obj, "Date of social distancing measures effect (may be delayed from implementation)",
+        value=d.mitigation_date
+    )
     relative_contact_pct_input = PercentInput(
         st_obj,
         "Social distancing (% reduction in social contact going forward)",
@@ -279,7 +287,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     # Build in desired order
     st.sidebar.markdown(
-        """**CHIME [v1.1.1](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.1) ({change_date})**""".format(
+        """**CHIME [v1.1.2](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.1) ({change_date})**""".format(
             change_date=CHANGE_DATE
         )
     )
@@ -309,7 +317,15 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         doubling_time = doubling_time_input()
         date_first_hospitalized = None
 
-    relative_contact_rate = relative_contact_pct_input()
+    if st.sidebar.checkbox(
+        "Social distancing measures have been implemented",
+        value=(d.relative_contact_rate > EPSILON)
+    ):
+        mitigation_date = mitigation_date_input()
+        relative_contact_rate = relative_contact_pct_input()
+    else:
+        mitigation_date = None
+        relative_contact_rate = EPSILON
 
     st.sidebar.markdown(
         "### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters#severity-parameters)".format(
@@ -343,6 +359,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         hospitalized=Disposition(hospitalized_rate, hospitalized_days),
         icu=Disposition(icu_rate, icu_days),
         relative_contact_rate=relative_contact_rate,
+        mitigation_date=mitigation_date,
         ventilated=Disposition(ventilated_rate, ventilated_days),
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,

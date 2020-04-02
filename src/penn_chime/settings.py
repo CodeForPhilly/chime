@@ -16,6 +16,7 @@ def get_defaults():
         infectious_days=14,
         market_share=0.15,
         n_days=100,
+        mitigation_date=date.today(),
         relative_contact_rate=0.3,
         ventilated=Disposition(0.005, 10),
     )
