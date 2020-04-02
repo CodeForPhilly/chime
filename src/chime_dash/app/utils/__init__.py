@@ -40,7 +40,7 @@ class ReadOnlyDict(Mapping):
     def __iter__(self):
         return iter(self._data)
 
-    def __keys__(self):
+    def keys(self):
         return self._data.keys()
 
 

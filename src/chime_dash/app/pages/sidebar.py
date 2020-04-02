@@ -9,6 +9,7 @@ from datetime import date, datetime
 
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Nav, Div
+from dash_core_components import Store
 
 from chime_dash.app.components.base import Page
 from chime_dash.app.utils import ReadOnlyDict
@@ -117,7 +118,9 @@ class Sidebar(Page):
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the view
         """
-        elements = []
+        elements = [
+            Store(id="sidebar-store")
+        ]
         for idx, data in _SIDEBAR_ELEMENTS.items():
             if data["type"] == "number":
                 element = create_number_input(idx, data, self.content, self.defaults)

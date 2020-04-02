@@ -7,10 +7,9 @@ To add or remove components, adjust the `setup`.
 """
 from collections import OrderedDict
 
-from dash_bootstrap_components import Container, Row
 from dash_bootstrap_components.themes import BOOTSTRAP
 from dash_html_components import Div
-from dash_core_components import Store
+from dash_core_components import Location, Store
 
 from chime_dash.app.components.base import Page
 from chime_dash.app.components.navbar import Navbar
@@ -32,13 +31,13 @@ class Root(Page):
     def __init__(self, language, defaults):
         """
         """
-        super().__init__(language, defaults)
         self.components = OrderedDict(
             navbar=Navbar(language, defaults),
             sidebar=Sidebar(language, defaults),
             # todo subscribe to changes to URL and select page appropriately
             index=Index(language, defaults),
         )
+        super().__init__(language, defaults)
 
     def get_html(self):
         """Glues individual setup components together
@@ -51,6 +50,7 @@ class Root(Page):
                     children=self.components["sidebar"].html
                              + self.components["index"].html
                 ),
-                Store(id="root-store")
+                Store(id="root-store"),
+                Location(id='location')
             ]
         )
