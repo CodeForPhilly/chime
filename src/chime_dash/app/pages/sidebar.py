@@ -119,7 +119,7 @@ class Sidebar(Component):
 
     @staticmethod
     def get_ordered_input_keys():
-        return [key for key in _INPUTS if _INPUTS[key]["type"] not in ("header", )]
+        return [key for key in _INPUTS if _INPUTS[key]["type"] not in ("header", "linebreak",)]
 
     @staticmethod
     def get_formated_values(input_values):
