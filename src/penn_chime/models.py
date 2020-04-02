@@ -95,12 +95,13 @@ class SimSirModel:
             )
 
             # Make an initial coarse estimate
-            dts = np.linspace(1, 15, 29)
+            dts = np.linspace(1, 15, 15)
             min_loss = self.get_argmin_doubling_time(p, dts)
 
             # Refine the coarse estimate
-            dts = np.linspace(dts[min_loss-1], dts[min_loss+1], 29)
-            min_loss = self.get_argmin_doubling_time(p, dts)
+            for iteration in range(4):
+                dts = np.linspace(dts[min_loss-1], dts[min_loss+1], 15)
+                min_loss = self.get_argmin_doubling_time(p, dts)
 
             p.doubling_time = dts[min_loss]
 
