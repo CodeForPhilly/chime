@@ -1,4 +1,7 @@
-"""Initializes dropdown menu
+"""component/menu
+Dropdown menu which appears on the navigation bar at the top of the screen
+
+refactor incoming
 """
 from typing import List
 
@@ -44,5 +47,6 @@ class Menu(Component):
             in_navbar=True,
             label="Learn More",
             color="light",
+            right=True
         )
         return [menu]

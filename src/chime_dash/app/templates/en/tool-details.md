@@ -60,4 +60,3 @@ $$\\beta = (g + \\gamma)$$.
 ### Initial Conditions
 
 - The total size of the susceptible population will be the entire catchment area for Penn Medicine entities (HUP, PAH, PMC, CCH)
-{regions}

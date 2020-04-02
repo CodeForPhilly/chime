@@ -30,7 +30,8 @@ setup(
         "dash",
         "dash_bootstrap_components",
         "pyyaml",
-        "gunicorn"
+        "gunicorn", 
+        "selenium"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -44,3 +45,4 @@ setup(
     keywords=[],
     include_package_data=True,
 )
+

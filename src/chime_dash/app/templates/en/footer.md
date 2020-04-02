@@ -1,3 +1,7 @@
+## Guidance on Selecting Inputs
+
+**This information has been moved to the [User Documentation](https://code-for-philly.gitbook.io/chime/what-is-chime/parameters#guidance-on-selecting-inputs)**
+
 ## References & Acknowledgements
 
 * AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
