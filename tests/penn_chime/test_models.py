@@ -3,11 +3,13 @@ from datetime import date
 import pytest
 import pandas as pd
 import numpy as np
+from datetime import timedelta
 
 from src.penn_chime.models import (
     sir,
     sim_sir_df,
     get_growth_rate,
+    SimSirModel,
 )
 
 from src.penn_chime.constants import EPSILON
@@ -100,6 +102,20 @@ def test_model(model, param):
     assert model.r_t == 2.307298374881539
     assert model.r_naught == 2.7144686763312222
     assert model.doubling_time_t == 7.764405988534983
+    assert model.i_day == 43
+
+
+def test_model_first_hosp_fit(param):
+    param.date_first_hospitalized = param.current_date - timedelta(days=43)
+    param.doubling_time = None
+
+    my_model = SimSirModel(param)
+
+    assert my_model.intrinsic_growth_rate == 0.12246204830937302
+    assert abs(my_model.beta - 4.21501347256401e-07) < EPSILON
+    assert my_model.r_t == 2.307298374881539
+    assert my_model.r_naught == 2.7144686763312222
+    assert my_model.doubling_time_t == 7.764405988534983
 
 
 def test_model_raw_start(model, param):
