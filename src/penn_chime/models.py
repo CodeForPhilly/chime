@@ -92,7 +92,7 @@ class SimSirModel:
                 self.i_day)
             min_loss = 2.0**99
             dts = np.linspace(1, 15, 29)
-            losses = np.zeros(dts.shape[0])
+            losses = np.full(dts.shape[0], np.inf)
             self.current_hospitalized = p.current_hospitalized
             for i, i_dt in enumerate(dts):
                 intrinsic_growth_rate = get_growth_rate(i_dt)
@@ -100,6 +100,12 @@ class SimSirModel:
                 self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
                 self.run_projection(p, self.gen_policy(p))
+
+                # Skip values the would put the fit past peak
+                peak_admits_day = self.admits_df.hospitalized.argmax()
+                if peak_admits_day < 0:
+                    continue
+
                 loss = self.get_loss()
                 losses[i] = loss
 
