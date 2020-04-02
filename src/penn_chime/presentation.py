@@ -58,9 +58,12 @@ def display_header(st, m, p):
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine to assist hospitals and public health officials with hospital capacity planning,
-    but can be used anywhere in the world.
-    Customize it for your region by modifying data inputs in the left panel.*
+    Penn Medicine to assist hospitals and public health officials with hospital capacity planning.*"""
+    )
+    st.markdown(
+        """**Notice**: *There is a high 
+    degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing 
+    measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
     """
     )
 
