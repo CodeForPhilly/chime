@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from logging import INFO, basicConfig, getLogger
 from sys import stdout
-from typing import Dict, Generator, Tuple, Optional
+from typing import Dict, Generator, Tuple, Sequence,Optional
 
 import numpy as np
 import pandas as pd
@@ -40,49 +40,32 @@ class SimSirModel:
             for key, d in p.dispositions.items()
         }
 
+        self.keys = ("susceptible", "infected", "recovered")
+
+        # An estimate of the number of infected people on the day that
+        # the first hospitalized case is seen
+        #
         # Note: this should not be an integer.
-        # We're appoximating infected from what we do know.
-        # TODO market_share > 0, hosp_rate > 0
         infected = (
             1.0 / p.market_share / p.hospitalized.rate
         )
 
         susceptible = p.population - infected
 
-        intrinsic_growth_rate = get_growth_rate(p.doubling_time)
-
         gamma = 1.0 / p.infectious_days
-
-        # Contact rate, beta
-        beta = (
-            (intrinsic_growth_rate + gamma)
-            / susceptible
-            * (1.0 - p.relative_contact_rate)
-        )  # {rate based on doubling time} / {initial susceptible}
-
-        # r_t is r_0 after distancing
-        r_t = beta / gamma * susceptible
-
-        # Simplify equation to avoid division by zero:
-        # self.r_naught = r_t / (1.0 - relative_contact_rate)
-        r_naught = (intrinsic_growth_rate + gamma) / gamma
+        self.gamma = gamma
 
         self.susceptible = susceptible
         self.infected = infected
         self.recovered = p.recovered
 
-        self.beta = beta
-        self.gamma = gamma
-        self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-        self.intrinsic_growth_rate = intrinsic_growth_rate
-
         if p.date_first_hospitalized is None and p.doubling_time is not None:
+            # Back-projecting to when the first hospitalized case would have been admitted
             logger.info('Using doubling_time: %s', p.doubling_time)
-            self.i_day = 0
-            self.beta = (
-                (intrinsic_growth_rate + gamma)
-                / susceptible
-            )
+
+            intrinsic_growth_rate = get_growth_rate(p.doubling_time)
+
+            self.beta = get_beta(intrinsic_growth_rate,  gamma, self.susceptible, 0.0)
 
             self.i_day = 0 # seed to the full length
             self.beta_t = self.beta
@@ -92,8 +75,6 @@ class SimSirModel:
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
             self.run_projection(p)
 
-            self.r_t = self.beta_t / gamma * susceptible
-            self.r_naught = self.beta / gamma * susceptible
             logger.info('Set i_day = %s', i_day)
             p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
             logger.info(
@@ -103,6 +84,7 @@ class SimSirModel:
                 self.i_day)
 
         elif p.date_first_hospitalized is not None and p.doubling_time is None:
+            # Fitting spread parameter to observed hospital census (dates of 1 patient and today)
             self.i_day = (p.current_date - p.date_first_hospitalized).days
             logger.info(
                 'Using date_first_hospitalized: %s; current_date: %s; i_day: %s',
@@ -129,7 +111,6 @@ class SimSirModel:
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
             self.run_projection(p)
 
-            self.intrinsic_growth_rate = intrinsic_growth_rate
             self.population = p.population
         else:
             logger.info(
@@ -146,6 +127,9 @@ class SimSirModel:
         self.susceptible = self.raw_df['susceptible'].values[self.i_day]
         self.recovered = self.raw_df['recovered'].values[self.i_day]
 
+        self.intrinsic_growth_rate = intrinsic_growth_rate
+
+        # r_t is r_0 after distancing
         self.r_t = self.beta_t / gamma * susceptible
         self.r_naught = self.beta / gamma * susceptible
 
@@ -153,7 +137,11 @@ class SimSirModel:
             self.beta_t * susceptible - gamma + 1)
         self.doubling_time_t = doubling_time_t
 
-        self.sim_sir_w_date_df = build_sim_sir_w_date_df(self.raw_df, p.current_date)
+        self.sim_sir_w_date_df = build_sim_sir_w_date_df(self.raw_df, p.current_date, self.keys)
+
+        self.sim_sir_w_date_floor_df = build_floor_df(self.sim_sir_w_date_df, self.keys)
+        self.admits_floor_df = build_floor_df(self.admits_df, p.dispositions.keys())
+        self.census_floor_df = build_floor_df(self.census_df, p.dispositions.keys())
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
@@ -252,7 +240,8 @@ def gen_sir(
 
 
 def sim_sir_df(
-    s: float, i: float, r: float, gamma: float, i_day: int, *args
+    s: float, i: float, r: float,
+    gamma: float, i_day: int, *args
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
@@ -264,14 +253,28 @@ def sim_sir_df(
 def build_sim_sir_w_date_df(
     raw_df: pd.DataFrame,
     current_date: datetime,
+    keys: Sequence[str],
 ) -> pd.DataFrame:
     day = raw_df.day
     return pd.DataFrame({
         "day": day,
         "date": day.astype('timedelta64[D]') + np.datetime64(current_date),
-        "susceptible": raw_df.susceptible,
-        "infected": raw_df.infected,
-        "recovered": raw_df.recovered,
+        **{
+            key: raw_df[key]
+            for key in keys
+        }
+    })
+
+
+def build_floor_df(df, keys):
+    """Build floor sim sir w date."""
+    return pd.DataFrame({
+        "day": df.day,
+        "date": df.date,
+        **{
+            key: np.floor(df[key])
+            for key in keys
+        }
     })
 
 
@@ -296,7 +299,7 @@ def build_dispositions_df(
 
 def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
     """Build admits dataframe from dispositions."""
-    admits_df = dispositions_df.iloc[:-1, :] - dispositions_df.shift(1)
+    admits_df = dispositions_df.iloc[:, :] - dispositions_df.shift(1)
     admits_df.day = dispositions_df.day
     admits_df.date = dispositions_df.date
     return admits_df
@@ -314,7 +317,7 @@ def build_census_df(
             key: (
                 admits_df[key].cumsum()
                 - admits_df[key].cumsum().shift(los).fillna(0)
-            ).apply(np.ceil)
+            )
             for key, los in lengths_of_stay.items()
         }
     })

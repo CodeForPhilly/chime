@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Setup file for chime
 """
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "Predictive Healthcare @ Penn Medicine"
 
 from os import path
