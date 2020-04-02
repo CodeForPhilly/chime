@@ -111,11 +111,11 @@ def test_model_first_hosp_fit(param):
 
     my_model = SimSirModel(param)
 
-    assert my_model.intrinsic_growth_rate == 0.12246204830937302
+    assert my_model.intrinsic_growth_rate == 0.1232387953882732
     assert abs(my_model.beta - 4.21501347256401e-07) < EPSILON
-    assert my_model.r_t == 2.307298374881539
-    assert my_model.r_naught == 2.7144686763312222
-    assert my_model.doubling_time_t == 7.764405988534983
+    assert my_model.r_t == 2.316541665120451
+    assert my_model.r_naught == 2.7253431354358253
+    assert my_model.doubling_time_t == 7.712255171528787
 
 
 def test_model_raw_start(model, param):
