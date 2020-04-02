@@ -55,6 +55,7 @@ class Parameters:
         hospitalized: Disposition,
         icu: Disposition,
         relative_contact_rate: float,
+        mitigation_date: Optional[date] = None,
         ventilated: Disposition,
         current_date: date = date.today(),
         date_first_hospitalized: Optional[date] = None,
@@ -67,8 +68,7 @@ class Parameters:
         recovered: int = 0,
         region: Optional[Regions] = None,
     ):
-        self.current_hospitalized = StrictlyPositive(value=current_hospitalized)
-        self.relative_contact_rate = Rate(value=relative_contact_rate)
+        self.current_hospitalized = Positive(value=current_hospitalized)
 
         Rate(value=hospitalized.rate), Rate(value=icu.rate), Rate(value=ventilated.rate)
         StrictlyPositive(value=hospitalized.days), StrictlyPositive(value=icu.days),
@@ -91,6 +91,9 @@ class Parameters:
        
         self.date_first_hospitalized = OptionalDate(value=date_first_hospitalized)
         self.doubling_time = OptionalStrictlyPositive(value=doubling_time)
+
+        self.relative_contact_rate = Rate(value=relative_contact_rate)
+        self.mitigation_date = OptionalDate(value=mitigation_date)
 
         self.infectious_days = StrictlyPositive(value=infectious_days)
         self.market_share = Rate(value=market_share)

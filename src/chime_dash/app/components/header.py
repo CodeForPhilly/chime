@@ -1,11 +1,12 @@
-"""Initializes the header dash html
+"""Initializes the Penn Medicine masthead
+#! consider moving this into navbar or static
 """
 from typing import List
 
-from dash.development.base_component import ComponentMeta
-from dash_html_components import Div, A
-
 from chime_dash.app.components.base import Component
+from dash.development.base_component import ComponentMeta
+from dash_core_components import Markdown
+from dash_html_components import Div, H1
 
 
 class Header(Component):
@@ -18,21 +19,8 @@ class Header(Component):
         """Initializes the header dash html
         """
         content = self.content
-        return [
-            Div(
-                className="penn-medicine-header__content",
-                children=[
-                    A(
-                        href="https://www.pennmedicine.org",
-                        className="penn-medicine-header__logo",
-                        title=content["logo-title"],
-                        children=content["logo-text"],
-                    ),
-                    A(
-                        className="penn-medicine-header__title",
-                        id="title",
-                        children=content["title"],
-                    ),
-                ],
-            )
-        ]
+        return [Div(
+            children=[
+                Markdown(content["description"])
+          ]
+        )]

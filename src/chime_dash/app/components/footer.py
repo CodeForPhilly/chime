@@ -1,4 +1,7 @@
-"""Initializes the  dash html
+"""component/footer
+appears at the bottom of the page
+
+source text located in app/templates/en/footer.md
 """
 from typing import List
 
