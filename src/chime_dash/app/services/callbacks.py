@@ -53,7 +53,8 @@ class IndexCallbacks(ComponentCallbacks):
         return result
 
     def __init__(self, component_instance):
-        def handle_model_change_helper(pars_json):
+        def handle_model_change_helper(*args, **kwargs):
+            pars_json = args[1]
             return IndexCallbacks.handle_model_change(component_instance, pars_json)
 
         super().__init__(
@@ -74,7 +75,7 @@ class IndexCallbacks(ComponentCallbacks):
                     callback_fn=IndexCallbacks.toggle_tables
                 ),
                 ChimeCallback(  # If the parameters or model change, update the text
-                    changed_elements={"pars": "children"},
+                    changed_elements={"root-store": "modified_timestamp"},
                     dom_updates={
                         "intro": "children",
                         "more_intro": "children",
@@ -88,7 +89,8 @@ class IndexCallbacks(ComponentCallbacks):
                         "SIR_table": "children",
                         "SIR_download": "href",
                     },
-                    callback_fn=handle_model_change_helper
+                    callback_fn=handle_model_change_helper,
+                    stores=['root-store'],
                 )
             ]
         )
@@ -146,8 +148,17 @@ class SidebarCallbacks(ComponentCallbacks):
             callbacks=[
                 ChimeCallback(
                     changed_elements=component_instance.input_value_map,
-                    dom_updates={"pars": "children"},
-                    callback_fn=update_parameters_helper
+                    dom_updates={"root-store": "data"},
+                    callback_fn=update_parameters_helper,
+                    stores=['root-store'],
                 )
             ]
+        )
+
+
+class RootCallbacks(ComponentCallbacks):
+    def __init__(self, component_instance):
+        super().__init__(
+            component_instance=component_instance,
+            callbacks=[]
         )

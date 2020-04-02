@@ -117,9 +117,7 @@ class Sidebar(Page):
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the view
         """
-        elements = [
-            Div(id='pars', style={'display': 'none'})
-        ]
+        elements = []
         for idx, data in _SIDEBAR_ELEMENTS.items():
             if data["type"] == "number":
                 element = create_number_input(idx, data, self.content, self.defaults)

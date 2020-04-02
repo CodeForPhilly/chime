@@ -5,12 +5,12 @@ Defines the Dash instance
 
 from dash import Dash
 from penn_chime.settings import DEFAULTS
-from chime_dash.app.components import Body
+from chime_dash.app.pages.root import Root
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
 LANGUAGE = "en"
 
-body = Body(LANGUAGE, DEFAULTS)
+body = Root(LANGUAGE, DEFAULTS)
 
 DASH = Dash(
     __name__,

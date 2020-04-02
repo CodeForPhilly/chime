@@ -1,41 +1,45 @@
 from dash import Dash
-from dash.exceptions import DuplicateCallbackOutput
-# todo Change to `from collections.abc import Iterable`. Using OrderedDict prevents multiple outputs to same DOM element
-# todo e.g., update children and toggle hidden
-from collections import OrderedDict
+from dash.dependencies import Input, Output, State
+from collections.abc import Iterable, Mapping
 from typing import Callable, List
 from functools import lru_cache
-
-from dash.dependencies import Input, Output
 
 
 class ChimeCallback:
     def __init__(self,
-                 changed_elements: OrderedDict,
-                 dom_updates: OrderedDict,
+                 changed_elements: Mapping,
                  callback_fn: Callable,
+                 dom_updates: Mapping = None,
+                 stores: Iterable = None,
                  memoize: bool = True
                  ):
-        pass
         self.inputs = [
             Input(component_id=component_id, component_property=component_property)
             for component_id, component_property in changed_elements.items()
         ]
-        self.outputs = [
-            Output(component_id=component_id, component_property=component_property)
-            for component_id, component_property in dom_updates.items()
-        ]
+        self.outputs = []
+        self.stores = []
         self.callback_fn = callback_fn
         self.memoize = memoize
+        if dom_updates:
+            self.outputs.extend(
+                Output(component_id=component_id, component_property=component_property)
+                for component_id, component_property in dom_updates.items()
+            )
+        if stores:
+            self.stores.extend(
+                State(component_id=component_id, component_property="data")
+                for component_id in stores
+            )
 
     def wrap(self, app: Dash):
         if self.memoize:
             @lru_cache(maxsize=32)
-            @app.callback(self.outputs, self.inputs)
+            @app.callback(self.outputs, self.inputs, self.stores)
             def callback_wrapper(*args, **kwargs):
                 return self.callback_fn(*args, **kwargs)
         else:
-            @app.callback(self.outputs, self.inputs)
+            @app.callback(self.outputs, self.inputs, self.stores)
             def callback_wrapper(*args, **kwargs):
                 return self.callback_fn(*args, **kwargs)
 
