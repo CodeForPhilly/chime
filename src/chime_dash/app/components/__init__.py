@@ -4,8 +4,6 @@ The `sidebar` component combines all the inputs while other components potential
 have callbacks.
 
 To add or remove components, adjust the `setup`.
-If callbacks are present, also adjust `CALLBACK_INPUTS`, `CALLBACK_OUTPUTS` and
-`callback_body`.
 """
 from collections import OrderedDict
 
@@ -57,8 +55,7 @@ class Body(Component):
             children=self.components["navbar"].html + [
                 Div(
                     className="app-content",
-                    children=
-                    self.components["sidebar"].html
+                    children=self.components["sidebar"].html
                     + self.components["index"].html
                 )
             ]
@@ -67,8 +64,7 @@ class Body(Component):
     def get_html_old(self):
         """Glues individual setup components together
         """
-        return Div(children=
-                   self.components["navbar"].html
+        return Div(children=self.components["navbar"].html
                    + [Container(
                        children=Row(self.components["sidebar"].html + [Div(
                            id="page-wrapper",

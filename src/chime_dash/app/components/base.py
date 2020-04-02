@@ -4,11 +4,10 @@ Abstract base class for components
 
 #! candidate for moving into utils/components
 """
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Union
 
 from abc import ABC
 
-from dash import Dash
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Div
 
@@ -16,7 +15,6 @@ from penn_chime.parameters import Parameters
 from penn_chime.settings import DEFAULTS
 
 from chime_dash.app.utils.templates import read_localization_yml, read_localization_markdown
-from chime_dash.app.utils.callbacks import ChimeCallback, register_callbacks
 
 
 class Component(ABC):
@@ -32,19 +30,13 @@ class Component(ABC):
     external_stylesheets: List[str] = []
     external_scripts: List[str] = []
 
-    def __init__(
-            self,
-            language: str = "en",
-            defaults: Parameters = DEFAULTS,
-            callbacks: List[ChimeCallback] = None
-    ):
+    def __init__(self, language: str = "en", defaults: Parameters = DEFAULTS):
         """Initializes the component
         """
         self.language = language
         self.defaults = defaults
         self._content = None
         self._html = None
-        register_callbacks(callbacks)
 
     def get_html(self) -> List[ComponentMeta]:  # pylint: disable=R0201
         """Function which is called to render html elements.
@@ -95,6 +87,14 @@ class Component(ABC):
                         )
                     )
         return self._content
+
+
+class Page(Component):
+    callbacks_cls = None
+
+    def __init__(self, language: str = "en", defaults: Parameters = DEFAULTS):
+        super().__init__(language, defaults)
+        self.callbacks_cls(self)
 
 
 class HTMLComponentError(Exception):

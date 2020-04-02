@@ -16,6 +16,7 @@ from json import dumps, loads
 from typing import Any, List
 from datetime import date, datetime
 from dateutil.parser import parse as parse_date
+from collections import Mapping
 from pandas import DataFrame
 
 from chime_dash.app.services.plotting import plot_dataframe
@@ -24,6 +25,23 @@ from chime_dash.app.utils.templates import df_to_html_table
 from penn_chime.parameters import Parameters, Disposition
 from penn_chime.constants import DATE_FORMAT
 from penn_chime.charts import build_table
+
+
+class ReadOnlyDict(Mapping):
+    def __init__(self, data):
+        self._data = data
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __keys__(self):
+        return self._data.keys()
 
 
 def _parameters_serializer_helper(obj):
@@ -62,7 +80,13 @@ def parameters_deserializer(p_json: str):
 
     for key, value in values.items():
 
-        if result.__dict__[key] != value and key not in ("dispositions", "hospitalized", "icu", "ventilated", "current_date"):
+        if result.__dict__[key] != value and key not in (
+                "dispositions",
+                "hospitalized",
+                "icu",
+                "ventilated",
+                "current_date"
+        ):
             result.__dict__[key] = value
 
     return result
