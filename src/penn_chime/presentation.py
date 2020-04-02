@@ -70,7 +70,7 @@ def display_header(st, m, p):
 
     st.markdown(
         """The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
-    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
+    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Regional population (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
 
 {infected_population_warning_str}
