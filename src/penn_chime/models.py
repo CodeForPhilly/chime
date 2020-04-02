@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from logging import INFO, basicConfig, getLogger
 from sys import stdout
-from typing import Dict, Generator, Tuple, Sequence,Optional
+from typing import Dict, Generator, Tuple, Sequence, Optional
 
 import numpy as np
 import pandas as pd
@@ -145,7 +145,7 @@ class SimSirModel:
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
 
-    def gen_policy(self, p: Parameters) -> List[Tuple[float, int]]:
+    def gen_policy(self, p: Parameters) -> Sequence[Tuple[float, int]]:
         if p.mitigation_date is not None:
             mitigation_day = -(p.current_date - p.mitigation_date).days
         else:
@@ -164,7 +164,7 @@ class SimSirModel:
             (self.beta_t, post_mitigation_days),
         ]
 
-    def run_projection(self, p: Parameters, policy: List[Tuple[float, int]]):
+    def run_projection(self, p: Parameters, policy: Sequence[Tuple[float, int]]):
         self.raw_df = sim_sir_df(
             self.susceptible,
             self.infected,
@@ -237,7 +237,7 @@ def sir(
 
 
 def gen_sir(
-    s: float, i: float, r: float, gamma: float, i_day: int, policies: List[Tuple[float, int]]
+    s: float, i: float, r: float, gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
 ) -> Generator[Tuple[int, float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples.
     Parameter order has changed to allow multiple (beta, n_days)
@@ -256,7 +256,7 @@ def gen_sir(
 
 def sim_sir_df(
     s: float, i: float, r: float,
-    gamma: float, i_day: int, policies: List[Tuple[float, int]]
+    gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
