@@ -41,15 +41,19 @@ def parameters_serializer(p: Parameters):
 
 def parameters_deserializer(p_json: str):
     values = loads(p_json)
+    dfh = (
+        parse_date(values["date_first_hospitalized"])
+        if values["date_first_hospitalized"]
+        else None
+    )
     result = Parameters(
         current_hospitalized=values["current_hospitalized"],
         hospitalized=Disposition(*values["hospitalized"]),
         icu=Disposition(*values["icu"]),
         relative_contact_rate=values["relative_contact_rate"],
         ventilated=Disposition(*values["ventilated"]),
-
         current_date=parse_date(values["current_date"]),
-        date_first_hospitalized=values["date_first_hospitalized"],
+        date_first_hospitalized=dfh,
         doubling_time=values["doubling_time"],
         infectious_days=values["infectious_days"],
         market_share=values["market_share"],
@@ -62,14 +66,23 @@ def parameters_deserializer(p_json: str):
 
     for key, value in values.items():
 
-        if result.__dict__[key] != value and key not in ("dispositions", "hospitalized", "icu", "ventilated", "current_date"):
+        if result.__dict__[key] != value and key not in (
+            "dispositions",
+            "hospitalized",
+            "icu",
+            "ventilated",
+            "current_date",
+            "date_first_hospitalized",
+        ):
             result.__dict__[key] = value
 
     return result
 
 
 def build_csv_download(df):
-    return "data:text/csv;charset=utf-8,{csv}".format(csv=quote(df.to_csv(index=True, encoding="utf-8")))
+    return "data:text/csv;charset=utf-8,{csv}".format(
+        csv=quote(df.to_csv(index=True, encoding="utf-8"))
+    )
 
 
 def get_n_switch_values(input_value, elements_to_update) -> List[bool]:
@@ -100,7 +113,7 @@ def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
                     labels=kwargs.get("labels", df.columns),
                     modulo=kwargs.get("table_mod", 7),
                 ),
-                format={
+                formats={
                     float: int,
                     (date, datetime): lambda d: d.strftime(DATE_FORMAT),
                 },

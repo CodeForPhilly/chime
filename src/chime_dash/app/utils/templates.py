@@ -89,16 +89,20 @@ def df_to_html_table(
     dataframe: DataFrame,
     data_only: bool = False,
     n_mod: Optional[int] = None,
-    format: Optional[Dict[Any, str]] = None,
+    formats: Optional[Dict[Any, str]] = None,
 ) -> Table:
     """Converts pandas data frame to html table
     """
-    format = format or {}
+    formats = formats or {}
 
     def cast_type(val):
-        for dtype, cast in format.items():
+        for dtype, cast in formats.items():
             if isinstance(val, dtype):
-                return cast(val)
+                try:
+                    val = cast(val)
+                    break
+                except ValueError:
+                    break
         return val
 
     index_name = dataframe.index.name
@@ -198,9 +202,7 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
         defaults: Parameters to infer defaults
     """
     return Checklist(
-        id=idx,
-        switch=True,
-        options=[{"label": content[idx],  "value": True}],
+        id=idx, switch=True, options=[{"label": content[idx], "value": True}],
     )
 
 
