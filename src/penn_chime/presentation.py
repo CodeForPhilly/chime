@@ -70,7 +70,7 @@ def display_header(st, m, p):
 
     st.markdown(
         """The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
-    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
+    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Regional population (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
 
 {infected_population_warning_str}
@@ -179,7 +179,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     st_obj = st.sidebar
     current_hospitalized_input = NumberInput(
         st_obj,
-        "Currently Hospitalized COVID-19 Patients",
+        "Currently hospitalized COVID-19 patients",
         min_value=0,
         value=d.current_hospitalized,
         step=1,
@@ -202,10 +202,10 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         format="%f",
     )
     current_date_input = DateInput(
-        st_obj, "Current date (Default is today)", value=d.current_date,
+        st_obj, "Current date (default is today)", value=d.current_date,
     )
     date_first_hospitalized_input = DateInput(
-        st_obj, "Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time",
+        st_obj, "Date of first hospitalized case (enter this date to have CHIME estimate the initial doubling time)",
         value=d.date_first_hospitalized,
     )
     mitigation_date_input = DateInput(
@@ -234,7 +234,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     hospitalized_days_input = NumberInput(
         st_obj,
-        "Average Hospital Length of Stay (days)",
+        "Average hospital length of stay (in days)",
         min_value=0,
         value=d.hospitalized.days,
         step=1,
@@ -242,7 +242,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     icu_days_input = NumberInput(
         st_obj,
-        "Average Days in ICU",
+        "Average days in ICU",
         min_value=0,
         value=d.icu.days,
         step=1,
@@ -250,7 +250,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     ventilated_days_input = NumberInput(
         st_obj,
-        "Average Days on Ventilator",
+        "Average days on ventilator",
         min_value=0,
         value=d.ventilated.days,
         step=1,
@@ -258,13 +258,13 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     market_share_pct_input = PercentInput(
         st_obj,
-        "Hospital Market Share (%)",
+        "Hospital market share (%)",
         min_value=0.5,
         value=d.market_share,
     )
     population_input = NumberInput(
         st_obj,
-        "Regional Population",
+        "Regional population",
         min_value=1,
         value=(d.population),
         step=1,
@@ -272,7 +272,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     infectious_days_input = NumberInput(
         st_obj,
-        "Infectious Days",
+        "Infectious days",
         min_value=0,
         value=d.infectious_days,
         step=1,
