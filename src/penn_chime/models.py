@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from logging import INFO, basicConfig, getLogger
 from sys import stdout
-from typing import Dict, Generator, Tuple, Sequence,Optional
+from typing import Dict, Generator, Tuple, Sequence, Optional
 
 import numpy as np
 import pandas as pd
@@ -66,14 +66,13 @@ class SimSirModel:
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
 
             self.beta = get_beta(intrinsic_growth_rate,  gamma, self.susceptible, 0.0)
+            self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
             self.i_day = 0 # seed to the full length
-            self.beta_t = self.beta
-            self.run_projection(p)
+            self.run_projection(p, [(self.beta, p.n_days)])
             self.i_day = i_day = int(get_argmin_ds(self.census_df, p.current_hospitalized))
 
-            self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-            self.run_projection(p)
+            self.run_projection(p, self.gen_policy(p))
 
             logger.info('Set i_day = %s', i_day)
             p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
@@ -100,7 +99,7 @@ class SimSirModel:
                 self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
                 self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
-                self.run_projection(p)
+                self.run_projection(p, self.gen_policy(p))
                 loss = self.get_loss()
                 losses[i] = loss
 
@@ -109,7 +108,7 @@ class SimSirModel:
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-            self.run_projection(p)
+            self.run_projection(p, self.gen_policy(p))
 
             self.population = p.population
         else:
@@ -146,18 +145,35 @@ class SimSirModel:
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
 
-    def run_projection(self, p):
+    def gen_policy(self, p: Parameters) -> Sequence[Tuple[float, int]]:
+        if p.mitigation_date is not None:
+            mitigation_day = -(p.current_date - p.mitigation_date).days
+        else:
+            mitigation_day = 0
+
+        total_days = self.i_day + p.n_days
+
+        if mitigation_day < -self.i_day:
+            mitigation_day = -self.i_day
+
+        pre_mitigation_days = self.i_day + mitigation_day
+        post_mitigation_days = total_days - pre_mitigation_days
+
+        return [
+            (self.beta,   pre_mitigation_days),
+            (self.beta_t, post_mitigation_days),
+        ]
+
+    def run_projection(self, p: Parameters, policy: Sequence[Tuple[float, int]]):
         self.raw_df = sim_sir_df(
             self.susceptible,
             self.infected,
             p.recovered,
             self.gamma,
             -self.i_day,
-            self.beta,
-            self.i_day,
-            self.beta_t,
-            p.n_days
+            policy
         )
+
         self.dispositions_df = build_dispositions_df(self.raw_df, self.rates, p.market_share, p.current_date)
         self.admits_df = build_admits_df(self.dispositions_df)
         self.census_df = build_census_df(self.admits_df, self.days)
@@ -221,7 +237,7 @@ def sir(
 
 
 def gen_sir(
-    s: float, i: float, r: float, gamma: float, i_day: int, *args
+    s: float, i: float, r: float, gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
 ) -> Generator[Tuple[int, float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples.
     Parameter order has changed to allow multiple (beta, n_days)
@@ -230,8 +246,7 @@ def gen_sir(
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
     d = i_day
-    while args:
-        beta, n_days, *args = args
+    for beta, n_days in policies:
         for _ in range(n_days):
             yield d, s, i, r
             s, i, r = sir(s, i, r, beta, gamma, n)
@@ -241,11 +256,11 @@ def gen_sir(
 
 def sim_sir_df(
     s: float, i: float, r: float,
-    gamma: float, i_day: int, *args
+    gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
 ) -> pd.DataFrame:
     """Simulate the SIR model forward in time."""
     return pd.DataFrame(
-        data=gen_sir(s, i, r, gamma, i_day, *args),
+        data=gen_sir(s, i, r, gamma, i_day, policies),
         columns=("day", "susceptible", "infected", "recovered"),
     )
 
