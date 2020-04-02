@@ -27,6 +27,7 @@ logger = getLogger(__name__)
 
 
 class SimSirModel:
+
     def __init__(self, p: Parameters):
 
         self.rates = {
