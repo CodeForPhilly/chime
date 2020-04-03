@@ -53,7 +53,7 @@ def new_admissions_chart(
                 "key:N",
             ],
         )
-        .interactive()
+        .configure_legend(orient='bottom').interactive()
     )
 
 
@@ -93,7 +93,7 @@ def admitted_patients_chart(
                 "key:N",
             ],
         )
-        .interactive()
+        .configure_legend(orient='bottom').interactive()
     )
 
 
@@ -133,7 +133,7 @@ def additional_projections_chart(
             tooltip=["key:N", "value:Q"],
             color="key:N",
         )
-        .interactive()
+            .configure_legend (orient='bottom').interactive()
     )
 
 
