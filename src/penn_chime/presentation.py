@@ -11,6 +11,7 @@ from .constants import (
     CHANGE_DATE,
     DATE_FORMAT,
     DOCS_URL,
+    EPSILON,
     FLOAT_INPUT_MIN,
     FLOAT_INPUT_STEP,
 )
@@ -58,15 +59,18 @@ def display_header(st, m, p):
     )
     st.markdown(
         """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine to assist hospitals and public health officials with hospital capacity planning,
-    but can be used anywhere in the world.
-    Customize it for your region by modifying data inputs in the left panel.*
+    Penn Medicine to assist hospitals and public health officials with hospital capacity planning.*"""
+    )
+    st.markdown(
+        """**Notice**: *There is a high 
+    degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing 
+    measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
     """
     )
 
     st.markdown(
         """The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
-    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Region size (**{S}**),
+    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Regional population (**{S}**),
     and Hospital market share (**{market_share:.0%}**).
 
 {infected_population_warning_str}
@@ -175,7 +179,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     st_obj = st.sidebar
     current_hospitalized_input = NumberInput(
         st_obj,
-        "Currently Hospitalized COVID-19 Patients",
+        "Currently hospitalized COVID-19 patients",
         min_value=0,
         value=d.current_hospitalized,
         step=1,
@@ -198,11 +202,15 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         format="%f",
     )
     current_date_input = DateInput(
-        st_obj, "Current date (Default is today)", value=d.current_date,
+        st_obj, "Current date (default is today)", value=d.current_date,
     )
     date_first_hospitalized_input = DateInput(
-        st_obj, "Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time",
+        st_obj, "Date of first hospitalized case (enter this date to have CHIME estimate the initial doubling time)",
         value=d.date_first_hospitalized,
+    )
+    mitigation_date_input = DateInput(
+        st_obj, "Date of social distancing measures effect (may be delayed from implementation)",
+        value=d.mitigation_date
     )
     relative_contact_pct_input = PercentInput(
         st_obj,
@@ -226,7 +234,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     hospitalized_days_input = NumberInput(
         st_obj,
-        "Average Hospital Length of Stay (days)",
+        "Average hospital length of stay (in days)",
         min_value=0,
         value=d.hospitalized.days,
         step=1,
@@ -234,7 +242,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     icu_days_input = NumberInput(
         st_obj,
-        "Average Days in ICU",
+        "Average days in ICU",
         min_value=0,
         value=d.icu.days,
         step=1,
@@ -242,7 +250,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     ventilated_days_input = NumberInput(
         st_obj,
-        "Average Days on Ventilator",
+        "Average days on ventilator",
         min_value=0,
         value=d.ventilated.days,
         step=1,
@@ -250,13 +258,13 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     market_share_pct_input = PercentInput(
         st_obj,
-        "Hospital Market Share (%)",
+        "Hospital market share (%)",
         min_value=0.5,
         value=d.market_share,
     )
     population_input = NumberInput(
         st_obj,
-        "Regional Population",
+        "Regional population",
         min_value=1,
         value=(d.population),
         step=1,
@@ -264,7 +272,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     infectious_days_input = NumberInput(
         st_obj,
-        "Infectious Days",
+        "Infectious days",
         min_value=0,
         value=d.infectious_days,
         step=1,
@@ -279,7 +287,9 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     # Build in desired order
     st.sidebar.markdown(
-        """**CHIME [v1.1.0](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.0) (2020/03/30)**"""
+        """**CHIME [v1.1.2](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.1) ({change_date})**""".format(
+            change_date=CHANGE_DATE
+        )
     )
 
     st.sidebar.markdown(
@@ -307,7 +317,15 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         doubling_time = doubling_time_input()
         date_first_hospitalized = None
 
-    relative_contact_rate = relative_contact_pct_input()
+    if st.sidebar.checkbox(
+        "Social distancing measures have been implemented",
+        value=(d.relative_contact_rate > EPSILON)
+    ):
+        mitigation_date = mitigation_date_input()
+        relative_contact_rate = relative_contact_pct_input()
+    else:
+        mitigation_date = None
+        relative_contact_rate = EPSILON
 
     st.sidebar.markdown(
         "### Severity Parameters [ℹ]({docs_url}/what-is-chime/parameters#severity-parameters)".format(
@@ -341,6 +359,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         hospitalized=Disposition(hospitalized_rate, hospitalized_days),
         icu=Disposition(icu_rate, icu_days),
         relative_contact_rate=relative_contact_rate,
+        mitigation_date=mitigation_date,
         ventilated=Disposition(ventilated_rate, ventilated_days),
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,

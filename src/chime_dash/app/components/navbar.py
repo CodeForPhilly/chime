@@ -11,7 +11,9 @@ from chime_dash.app.components.base import Component
 from chime_dash.app.components.menu import Menu
 
 from penn_chime.parameters import Parameters
-from penn_chime.settings import DEFAULTS
+from penn_chime.settings import get_defaults
+
+DEFAULTS = get_defaults()
 
 
 class Navbar(Component):
