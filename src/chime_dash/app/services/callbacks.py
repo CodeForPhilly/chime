@@ -24,9 +24,6 @@ class ComponentCallbacks:
 
 
 class IndexCallbacks(ComponentCallbacks):
-    @staticmethod
-    def toggle_tool_details(switch_value):
-        return get_n_switch_values(switch_value, 1)
 
     @staticmethod
     def toggle_tables(switch_value):
@@ -47,7 +44,6 @@ class IndexCallbacks(ComponentCallbacks):
                 max_y_axis=pars.max_y_axis,
             )
         result.extend(i.components["intro"].build(model, pars))
-        result.extend(i.components["tool_details"].build(model, pars))
         for df_key in ["admits_df", "census_df", "sim_sir_w_date_df"]:
             df = None
             if model:
@@ -62,11 +58,6 @@ class IndexCallbacks(ComponentCallbacks):
         super().__init__(
             component_instance=component_instance,
             callbacks=[
-                ChimeCallback(  # If user toggles show_additional_projections, show/hide the additional intro content
-                    changed_elements={"show_tool_details": "value"},
-                    dom_updates={"more_intro_wrapper": "hidden"},
-                    callback_fn=IndexCallbacks.toggle_tool_details
-                ),
                 ChimeCallback(  # If user toggles show_tables, show/hide tables
                     changed_elements={"show_tables": "value"},
                     dom_updates={
@@ -80,7 +71,6 @@ class IndexCallbacks(ComponentCallbacks):
                     changed_elements={"sidebar-store": "modified_timestamp"},
                     dom_updates={
                         "intro": "children",
-                        "more_intro": "children",
                         "new_admissions_graph": "figure",
                         "new_admissions_table": "children",
                         "new_admissions_download": "href",
