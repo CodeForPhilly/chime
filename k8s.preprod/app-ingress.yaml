@@ -1,0 +1,75 @@
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: chime
+  namespace: chime
+  labels:
+    app: chime
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    # allow requests larger than 1MiB
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location / {
+      sub_filter </head>
+        '<!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KBZ6ZKX');</script>
+        <!-- End Google Tag Manager -->';
+      sub_filter </body>
+        '<!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KBZ6ZKX"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->'
+        sub_filter_once on;
+      }
+spec:
+  tls:
+  - hosts:
+    - penn-chime.bus.phl.io
+    secretName: tls-secret
+  rules:
+  - host: penn-chime.bus.phl.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: chime
+          servicePort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: chime-static
+  namespace: chime
+  labels:
+    app: chime
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"  # Important!
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_cache static-cache;
+      proxy_cache_valid 404 1m;
+      proxy_cache_valid 200 10m;
+      proxy_cache_use_stale error timeout updating http_404 http_500 http_502 http_503 http_504;
+      proxy_cache_bypass $http_x_purge;
+      proxy_cache_key $proxy_upstream_name$request_uri;
+      proxy_cache_lock on;
+      proxy_cache_use_stale updating;
+      add_header X-Cache-Status $upstream_cache_status;
+spec:
+  rules:
+  - host: penn-chime.bus.phl.io
+    http:
+      paths:
+      - path: /static/
+        backend:
+          serviceName: chime
+          servicePort: 80

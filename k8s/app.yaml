@@ -15,7 +15,7 @@ metadata:
 spec:
   replicas: 15
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app: chime
@@ -25,7 +25,7 @@ spec:
         app: chime
     spec:
       containers:
-      - image: docker.pkg.github.com/codeforphilly/chime/penn-chime:1.0.0
+      - image: docker.pkg.github.com/codeforphilly/chime/penn-chime:1.1.2
         name: chime
         ports:
         - containerPort: 8000
@@ -33,6 +33,7 @@ spec:
           protocol: TCP
       imagePullSecrets:
       - name: regcred
+
 ---
 
 apiVersion: v1
@@ -50,94 +51,3 @@ spec:
     port: 80
     protocol: TCP
     targetPort: 8000
-
----
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: chime
-  namespace: chime
-  labels:
-    app: chime
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-    # allow requests larger than 1MiB
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-spec:
-  tls:
-  - hosts:
-    - penn-chime.phl.io
-    secretName: tls-secret
-  rules:
-  - host: penn-chime.phl.io
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: chime
-          servicePort: 80
-
----
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: chime-alt
-  namespace: chime
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-    # allow requests larger than 1MiB
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-spec:
-  tls:
-  - hosts:
-    - lke.penn-chime.phl.io
-    secretName: tls-chime-alt
-  rules:
-  - host: lke.penn-chime.phl.io
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: chime
-          servicePort: 80
-
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: chime-static
-  namespace: chime
-  labels:
-    app: chime
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-buffering: "on"  # Important!
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_cache static-cache;
-      proxy_cache_valid 404 1m;
-      proxy_cache_valid 200 10m;
-      proxy_cache_use_stale error timeout updating http_404 http_500 http_502 http_503 http_504;
-      proxy_cache_bypass $http_x_purge;
-      proxy_cache_key $proxy_upstream_name$request_uri;
-      proxy_cache_lock on;
-      proxy_cache_use_stale updating;
-      add_header X-Cache-Status $upstream_cache_status;
-spec:
-  rules:
-  - host: penn-chime.phl.io
-    http:
-      paths:
-      - path: /static/
-        backend:
-          serviceName: chime
-          servicePort: 80
-  - host: lke.penn-chime.phl.io
-    http:
-      paths:
-      - path: /static/
-        backend:
-          serviceName: chime
-          servicePort: 80

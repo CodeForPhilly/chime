@@ -1,0 +1,107 @@
+name: Deploy to production
+
+on:
+  pull_request:
+    branches:
+      - releases/v1
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+env:
+  # Required for action steebchen/kubectl
+  KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_prod }}
+
+jobs:
+  show-changes:
+    if: github.event.pull_request.state != 'closed'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/setup-kubectl@v1
+        with:
+          version: v1.18.0
+
+      - name: Get resource diffs
+        run: |
+          set -e
+          comment_file=/tmp/k8s_diff.txt
+          app_manifest=k8s/app.yaml
+          prod_manifest_dir=k8s.prod
+
+          test -e ~/.kube || mkdir ~/.kube
+          cat <<EOF > ~/.kube/config
+          $(printf '%s' "$KUBE_CONFIG_DATA" | base64 -d)
+          EOF
+
+          app_diff=$(kubectl diff -f $app_manifest || true)
+          if [ -n "$app_diff" ]; then
+            app_diff_msg=$(cat <<EOF
+          To be applied to prod from $app_manifest:
+          \`\`\`diff
+          $app_diff
+          \`\`\`
+
+          EOF)
+          fi
+
+          prod_diff=$(kubectl diff -Rf $prod_manifest_dir || true)
+          if [ -n "$prod_diff" ]; then
+            prod_diff_msg=$(cat <<EOF
+          To be applied to prod from $prod_manifest_dir:
+          \`\`\`diff
+          $prod_diff
+          \`\`\`
+
+          EOF)
+          fi
+
+          cat <<EOF > $comment_file
+          $app_diff_msg
+          $prod_diff_msg
+          EOF
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: comment
+          path: /tmp/k8s_diff.txt
+      - uses: actions/download-artifact@v1
+        with:
+          name: comment
+
+      - name: Publish resource diffs
+        uses: machine-learning-apps/pr-comment@1.0.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          path: comment/k8s_diff.txt
+
+  deploy-prod:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy to prod
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: apply -f k8s/app.yaml
+
+      - name: Sync prod resources
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: apply -Rf k8s.prod
+
+      - name: Wait for deploy to complete
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: -n chime rollout status deployment.v1.apps/chime
+
+      - name: Show completed deployment
+        uses: steebchen/kubectl@v1.0.0
+        with:
+          args: -n chime get deployment chime -o yaml

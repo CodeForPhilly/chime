@@ -1,17 +1,25 @@
-current_hospitalized: Currently Hospitalized COVID-19 Patients
-doubling_time: Doubling time before social distancing (days)
-relative_contact_rate: Social distancing (% reduction in social contact)
-hospitalized_rate: Hospitalization %(total infections)
-icu_rate: ICU %(total infections)
-ventilated_rate: Ventilated %(total infections)
-hospitalized_los: Hospital Length of Stay
-icu_los: ICU Length of Stay
-ventilated_los: Vent Length of Stay
-market_share: Hospital Market Share (%)
-susceptible: Regional Population
-known_infected: Currently Known Regional Infections (only used to compute detection rate - does not change projections)
+hospital_parameters: Hospital Parameters
+population: Regional population
+market_share: Hospital market share (%)
+current_hospitalized: Currently hospitalized COVID-19 patients
+
+spread_parameters: Spread and Contact Parameters
+date_first_hospitalized: Date of first hospitalized case (enter this date to have CHIME estimate the initial doubling time)
+doubling_time: Doubling time in days (up to today. This overwrites date of first hospitalized estimation)
+relative_contact_rate: Social distancing (% reduction in social contact going forward)
+
+severity_parameters: Severity Parameters
+hospitalized_rate: Hospitalization rate (% of total infections)
+icu_rate: ICU (% of total infections)
+ventilated_rate: Ventilated (% of total infections)
+infectious_days: Infectious days
+hospitalized_los: Average hospital length of stay (in days)
+icu_los: Average days in ICU
+ventilated_los: Average days on ventilator
+
+display_parameters: Display Parameters
 n_days: Number of days to project
-as_date: Present results as dates
+current_date: Current date (default is today)
 max_y_axis: Set the Y-axis on graphs to a static
 max_y_axis_value: Maximal y-axis value (leave blank for no max value)
 show_tables: Show tables with data

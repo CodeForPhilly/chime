@@ -9,7 +9,8 @@
   - [Data Analysis](contributing/data-analysis.md)
   - [Operations Support](contributing/operations-support.md)
 - Operations
-  - [Release Process](./operations/release-process.md)
+  - [Preparing a new release](./operations/prepare-new-chime-release.md)
+  - [Release Process](./operations/release=process.md)
   - [The `chime-live` Cluster](./operations/chime-live-cluster.md)
   - [Deploy to Heroku](./operations/heroku.md)
   - [Deploy with Chef Habitat](./operations/habitat.md)
