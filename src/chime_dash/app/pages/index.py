@@ -9,7 +9,6 @@ from dash_bootstrap_components import Container
 from chime_dash.app.components.base import Page
 from chime_dash.app.components.footer import Footer
 from chime_dash.app.components.header import Header
-from chime_dash.app.components.tool_details import ToolDetails
 from chime_dash.app.components.intro import Intro
 from chime_dash.app.components.visualizations import Visualizations
 from chime_dash.app.services.callbacks import IndexCallbacks
@@ -27,7 +26,6 @@ class Index(Page):
         self.components = OrderedDict(
             header=Header(language, defaults),
             intro=Intro(language, defaults),
-            tool_details=ToolDetails(language, defaults),
             visualizations=Visualizations(language, defaults),
             footer=Footer(language, defaults),
         )
@@ -44,7 +42,6 @@ class Index(Page):
             children=[Container(
                 children=self.components["header"].html
                 + self.components["intro"].html
-                + self.components["tool_details"].html
             )]
             + self.components["visualizations"].html
             + [Container(

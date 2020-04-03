@@ -12,7 +12,6 @@ from chime_dash.app.pages.root import Root
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
 DashAppInstance = TypeVar('DashAppInstance')
-DEFAULTS = get_defaults()
 
 
 def create_app(context: str = 'prod') -> DashAppInstance:
@@ -32,8 +31,7 @@ def create_app(context: str = 'prod') -> DashAppInstance:
     Env = from_object(context)
 
     LANGUAGE = Env.LANG
-    body = Root(LANGUAGE, DEFAULTS)
-
+    body = Root(LANGUAGE, get_defaults())
 
     App = Dash(
         __name__,
@@ -45,7 +43,4 @@ def create_app(context: str = 'prod') -> DashAppInstance:
     App.layout = body.html
     wrap_callbacks(App)
 
-
-
     return Env, App
-

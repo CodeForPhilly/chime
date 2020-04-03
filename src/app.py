@@ -6,7 +6,6 @@ import streamlit as st  # type: ignore
 from penn_chime.presentation import (
     display_download_link,
     display_header,
-    display_more_info,
     display_sidebar,
     hide_menu_style,
     write_definitions,
@@ -33,10 +32,6 @@ p = display_sidebar(st, d)
 m = SimSirModel(p)
 
 display_header(st, m, p)
-
-if st.checkbox("Show more info about this tool"):
-    notes = "The total size of the susceptible population will be the entire catchment area for our hospitals."
-    display_more_info(st=st, model=m, parameters=p, defaults=d, notes=notes)
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions. \n\n _NOTE: Now including estimates of prior admissions for comparison._")
