@@ -30,14 +30,10 @@ def build_admits_chart(
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
         .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Daily admissions", scale=y_scale),
-            color="key:N",
-            tooltip=[
-                tooltip_dict[as_date],
-                alt.Tooltip("value:Q", format=".0f", title="Admissions"),
-                "key:N",
-            ],
+            x=alt.X(**x),
+            y=alt.Y(**y),
+            color=color,
+            tooltip=tooltip,
         )
         .configure_legend(orient="bottom")
         .interactive()
@@ -71,14 +67,10 @@ def build_census_chart(
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
         .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Census", scale=y_scale),
-            color="key:N",
-            tooltip=[
-                idx,
-                alt.Tooltip("value:Q", format=".0f", title="Census"),
-                "key:N",
-            ],
+            x=alt.X(**x),
+            y=alt.Y(**y),
+            color=color,
+            tooltip=tooltip,
         )
         .configure_legend(orient="bottom")
         .interactive()
@@ -112,10 +104,10 @@ def build_sim_sir_w_date_chart(
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line()
         .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Case Volume", scale=y_scale),
-            tooltip=["key:N", "value:Q"],
-            color="key:N",
+            x=alt.X(**x),
+            y=alt.Y(**y),
+            color=color,
+            tooltip=tooltip,
         )
         .configure_legend(orient="bottom")
         .interactive()
