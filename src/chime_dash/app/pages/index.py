@@ -10,7 +10,6 @@ from dash_bootstrap_components import Container
 from chime_dash.app.components.base import Component
 from chime_dash.app.components.footer import Footer
 from chime_dash.app.components.header import Header
-from chime_dash.app.components.tool_details import ToolDetails
 from chime_dash.app.components.intro import Intro
 from chime_dash.app.components.visualizations import Visualizations
 
@@ -50,7 +49,6 @@ class Index(Component):
                     max_y_axis=pars.max_y_axis,
                 )
             result.extend(self.components["intro"].build(model, pars))
-            result.extend(self.components["tool_details"].build(model, pars))
             for df_key in ["admits_df", "census_df", "sim_sir_w_date_df"]:
                 df = None
                 if model:
@@ -59,11 +57,6 @@ class Index(Component):
             return result
 
         super().__init__(language, defaults, [
-            ChimeCallback(  # If user toggles show_additional_projections, show/hide the additional intro content
-                changed_elements=OrderedDict(show_tool_details="value"),
-                dom_updates=OrderedDict(more_intro_wrapper="hidden"),
-                callback_fn=Index.toggle_tool_details
-            ),
             ChimeCallback(  # If user toggles show_tables, show/hide tables
                 changed_elements=OrderedDict(show_tables="value"),
                 dom_updates=OrderedDict(
@@ -77,7 +70,6 @@ class Index(Component):
                 changed_elements=OrderedDict(pars="children"),
                 dom_updates=OrderedDict(
                     intro="children",
-                    more_intro="children",
                     new_admissions_graph="figure",
                     new_admissions_table="children",
                     new_admissions_download="href",
@@ -94,7 +86,6 @@ class Index(Component):
         self.components = OrderedDict(
             header=Header(language, defaults),
             intro=Intro(language, defaults),
-            tool_details=ToolDetails(language, defaults),
             visualizations=Visualizations(language, defaults),
             footer=Footer(language, defaults),
         )
@@ -113,7 +104,6 @@ class Index(Component):
                 children=
                 self.components["header"].html
                 + self.components["intro"].html
-                + self.components["tool_details"].html
             )]
             + self.components["visualizations"].html
             + [Container(
