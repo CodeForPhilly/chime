@@ -5,6 +5,7 @@ Initializes the side bar containing the various inputs for the model
 """
 from dash_html_components import Nav, Div, Button
 import dash_core_components as dcc
+import dash
 
 import json
 
@@ -169,6 +170,9 @@ class Sidebar(Component):
         """Batch load of parameters from the `dcc.Input`
         """
         state_values = input_values[1]
+        if not state_values:
+            return [dash.no_update,] * len([key for key in _INPUTS
+                if _INPUTS[key]["type"] not in ("header", )])
         return list(json.loads(state_values)[0].values())
 
 
@@ -209,12 +213,12 @@ class Sidebar(Component):
             dom_updates=OrderedDict(store="data"),
             callback_fn=Sidebar.update_store,
         )
-        save_params_callback = ChimeCallback(
+        update_store_callback = ChimeCallback(
             changed_elements=OrderedDict(store="data"),
             dom_updates=OrderedDict(parameters_input="value"),
             callback_fn=Sidebar.show_params,
         )
-        load_params_callback = ChimeCallback(
+        show_params_callback = ChimeCallback(
             changed_elements=OrderedDict(load_button="n_clicks"),
             state_elements=OrderedDict(parameters_input="value"),
             dom_updates=changed_elements,
@@ -222,7 +226,7 @@ class Sidebar(Component):
         )
 
         super().__init__(language, defaults, [input_change_callback, input_store_callback,
-                                              save_params_callback, load_params_callback])
+                                              update_store_callback, show_params_callback])
 
     def get_html(self) -> List[ComponentMeta]:
         """Initializes the view
@@ -247,11 +251,9 @@ class Sidebar(Component):
                 )
             elements.append(element)
         parameters_input = dcc.Input(id='parameters_input')
-        elements.append(parameters_input)
         store = dcc.Store(id='store')
-        elements.append(store)
         load_button = Button("Load parameters", id='load_button')
-        elements.append(load_button)
+        elements.extend([parameters_input, store, load_button])
         sidebar = Nav(
             children=Div(
                 children=elements,
