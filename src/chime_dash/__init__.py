@@ -8,7 +8,7 @@ from dash import Dash
 from typing import TypeVar
 from chime_dash.app.config import from_object
 from penn_chime.settings import get_defaults
-from chime_dash.app.components import Body
+from chime_dash.app.pages.root import Root
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
 DashAppInstance = TypeVar('DashAppInstance')
@@ -32,7 +32,7 @@ def create_app(context: str = 'prod') -> DashAppInstance:
     Env = from_object(context)
 
     LANGUAGE = Env.LANG
-    body = Body(LANGUAGE, DEFAULTS)
+    body = Root(LANGUAGE, DEFAULTS)
 
 
     App = Dash(
