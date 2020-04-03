@@ -12,7 +12,7 @@ from penn_chime.presentation import (
     write_definitions,
     write_footer,
 )
-from penn_chime.settings import DEFAULTS
+from penn_chime.settings import get_defaults
 from penn_chime.models import SimSirModel
 from penn_chime.charts import (
     build_admits_chart,
@@ -28,18 +28,19 @@ from penn_chime.charts import (
 # In dev, this should be shown
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-p = display_sidebar(st, DEFAULTS)
+d = get_defaults()
+p = display_sidebar(st, d)
 m = SimSirModel(p)
 
 display_header(st, m, p)
 
 if st.checkbox("Show more info about this tool"):
     notes = "The total size of the susceptible population will be the entire catchment area for our hospitals."
-    display_more_info(st=st, model=m, parameters=p, defaults=DEFAULTS, notes=notes)
+    display_more_info(st=st, model=m, parameters=p, defaults=d, notes=notes)
 
 st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions. \n\n _NOTE: Now including estimates of prior admissions for comparison._")
-admits_chart = build_admits_chart(alt=alt, admits_df=m.admits_df, max_y_axis=p.max_y_axis)
+admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis)
 st.altair_chart(admits_chart, use_container_width=True)
 st.markdown(build_descriptions(chart=admits_chart, labels=p.labels, suffix=" Admissions"))
 display_download_link(
@@ -53,7 +54,7 @@ if st.checkbox("Show Projected Admissions in tabular form"):
     if not st.checkbox("Show Daily Counts"):
         admits_modulo = 7
     table_df = build_table(
-        df=m.admits_df,
+        df=m.admits_floor_df,
         labels=p.labels,
         modulo=admits_modulo)
     st.table(table_df)
@@ -61,7 +62,7 @@ if st.checkbox("Show Projected Admissions in tabular form"):
 
 st.subheader("Admitted Patients (Census)")
 st.markdown("Projected **census** of COVID-19 patients, accounting for arrivals and discharges \n\n _NOTE: Now including estimates of prior census for comparison._")
-census_chart = build_census_chart(alt=alt, census_df=m.census_df, max_y_axis=p.max_y_axis)
+census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis)
 st.altair_chart(census_chart, use_container_width=True)
 st.markdown(build_descriptions(chart=census_chart, labels=p.labels, suffix=" Census"))
 display_download_link(
@@ -75,7 +76,7 @@ if st.checkbox("Show Projected Census in tabular form"):
     if not st.checkbox("Show Daily Census Counts"):
         census_modulo = 7
     table_df = build_table(
-        df=m.census_df,
+        df=m.census_floor_df,
         labels=p.labels,
         modulo=census_modulo)
     st.table(table_df)
@@ -83,7 +84,7 @@ if st.checkbox("Show Projected Census in tabular form"):
 
 st.subheader("Susceptible, Infected, and Recovered")
 st.markdown("The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment")
-sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_df=m.sim_sir_w_date_df)
+sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_floor_df=m.sim_sir_w_date_floor_df)
 st.altair_chart(sim_sir_w_date_chart, use_container_width=True)
 display_download_link(
     st,
@@ -93,7 +94,7 @@ display_download_link(
 
 if st.checkbox("Show SIR Simulation in tabular form"):
     table_df = build_table(
-        df=m.sim_sir_w_date_df,
+        df=m.sim_sir_w_date_floor_df,
         labels=p.labels)
     st.table(table_df)
 

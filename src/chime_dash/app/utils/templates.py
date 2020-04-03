@@ -22,6 +22,16 @@ TEMPLATE_DIR = path.join(
     path.abspath(path.dirname(path.dirname(__file__))), "templates"
 )
 
+LABEL_STYLE = {
+    "fontSize": "0.875rem",
+    "marginBottom": "0.3333em"
+}
+
+HEADER_STYLE = {
+    "fontSize": "1rem",
+    "fontWeight": "bold",
+    "margin": "2rem 0 1rem",
+}
 
 def read_localization_yml(file: str, language: str) -> Dict[str, Any]:
     """Reads localization template.
@@ -73,16 +83,20 @@ def df_to_html_table(
     dataframe: DataFrame,
     data_only: bool = False,
     n_mod: Optional[int] = None,
-    format: Optional[Dict[Any, str]] = None,
+    formats: Optional[Dict[Any, str]] = None,
 ) -> Table:
     """Converts pandas data frame to html table
     """
-    format = format or {}
+    formats = formats or {}
 
     def cast_type(val):
-        for dtype, cast in format.items():
+        for dtype, cast in formats.items():
             if isinstance(val, dtype):
-                return cast(val)
+                try:
+                    val = cast(val)
+                    break
+                except ValueError:
+                    break
         return val
 
     index_name = dataframe.index.name
@@ -117,7 +131,7 @@ def create_number_input(
     """
     input_kwargs = data.copy()
     input_kwargs.pop("percent", None)
-    LABEL_STYLE = {"font-size": "0.8rem", "margin-bottom": "0.1rem"}
+
     if not "value" in input_kwargs:
         input_kwargs["value"] = _get_default_values(
             idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
@@ -134,7 +148,7 @@ def create_header(idx: str, content: Dict[str, str]):
     """
     Create heading element using localization map
     """
-    HEADER_STYLE = {"font-size": "1rem"}
+
     return H4(id=idx, children=content[idx], style=HEADER_STYLE)
 
 
@@ -151,7 +165,7 @@ def create_date_input(
     """
     input_kwargs = data.copy()
     input_kwargs.pop("type")
-    LABEL_STYLE = {"font-size": "0.8rem", "margin-bottom": "0.1rem"}
+
     if not "date" in input_kwargs:
         input_kwargs["date"] = input_kwargs[
             "initial_visible_month"
@@ -160,7 +174,12 @@ def create_date_input(
     return FormGroup(
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
-            DatePickerSingle(id=idx, **input_kwargs),
+            DatePickerSingle(
+                className="form-control",
+                day_size=32,
+                id=idx,
+                **input_kwargs
+            ),
         ]
     )
 
@@ -175,9 +194,7 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
         defaults: Parameters to infer defaults
     """
     return Checklist(
-        id=idx,
-        switch=True,
-        options=[{"label": content[idx],  "value": True}],
+        id=idx, switch=True, options=[{"label": content[idx], "value": True}],
     )
 
 
