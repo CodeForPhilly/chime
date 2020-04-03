@@ -265,10 +265,10 @@ def sir(
     return s_n * scale, i_n * scale, r_n * scale
 
 
-def gen_sir(
+def sim_sir(
     s: float, i: float, r: float, gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
 ):
-    """Simulate SIR model forward in time yielding tuples.
+    """Simulate SIR model forward in time, returning a dictionary of daily arrays
     Parameter order has changed to allow multiple (beta, n_days)
     to reflect multiple changing social distancing policies.
     """
@@ -308,15 +308,6 @@ def gen_sir(
         "recovered": r_a,
         "ever_infected": i_a + r_a
     }
-
-
-def sim_sir(
-    s: float, i: float, r: float,
-    gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
-) -> pd.DataFrame:
-    """Simulate the SIR model forward in time."""
-    data = gen_sir(s, i, r, gamma, i_day, policies)
-    return data
 
 
 def build_sim_sir_w_date_df(
