@@ -37,6 +37,7 @@ class ChimeCallback:
             @lru_cache(maxsize=32)
             @app.callback(self.outputs, self.inputs, self.stores)
             def callback_wrapper(*args, **kwargs):
+                print(str(self.callback_fn))
                 return self.callback_fn(*args, **kwargs)
         else:
             @app.callback(self.outputs, self.inputs, self.stores)

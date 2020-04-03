@@ -3,7 +3,6 @@ from datetime import datetime
 from collections import OrderedDict
 from urllib.parse import parse_qsl, urlencode
 from dash.exceptions import PreventUpdate
-from dateutil.parser import parse as parse_date
 
 from chime_dash.app.utils.callbacks import ChimeCallback, register_callbacks
 from chime_dash.app.utils import (
@@ -147,6 +146,11 @@ class SidebarCallbacks(ComponentCallbacks):
 
     def __init__(self, component_instance):
         def update_parameters_helper(*args, **kwargs):
+            input_values = list(args)
+            input_dict = dict(zip(component_instance.input_value_map.keys(), input_values))
+            sidebar_data = input_values.pop(-1)
+            if sidebar_data and input_dict and input_dict == sidebar_data["inputs_dict"]:
+                raise PreventUpdate
             return SidebarCallbacks.update_parameters(component_instance, *args)
 
         super().__init__(
@@ -156,6 +160,7 @@ class SidebarCallbacks(ComponentCallbacks):
                     changed_elements=component_instance.input_value_map,
                     dom_updates={"sidebar-store": "data"},
                     callback_fn=update_parameters_helper,
+                    stores=["sidebar-store"],
                 )
             ]
         )
@@ -165,13 +170,17 @@ class SidebarCallbacks(ComponentCallbacks):
 class RootCallbacks(ComponentCallbacks):
     @staticmethod
     def try_parsing_number(v):
-        try:
-            return int(v)
-        except ValueError:
+        if v == 'None':
+            result = None
+        else:
             try:
-                return float(v)
+                result = int(v)
             except ValueError:
-                return v
+                try:
+                    result = float(v)
+                except ValueError:
+                    result = v
+        return result
 
     @staticmethod
     def get_inputs(val_dict, inputs_keys):
@@ -185,8 +194,6 @@ class RootCallbacks(ComponentCallbacks):
             value_type = sidebar_input_types[key]
             if value_type == "number":
                 parsed_value = RootCallbacks.try_parsing_number(value)
-            # elif value_type == "date":
-            #     parsed_value = parse_date(value)
             else:
                 parsed_value = value
             hash_dict[key] = parsed_value
@@ -208,10 +215,12 @@ class RootCallbacks(ComponentCallbacks):
     def stores_changed(inputs_keys, root_mod, sidebar_mod, root_data, sidebar_data):
         root_modified = root_mod or 0
         sidebar_modified = sidebar_mod or 0
-        if root_modified < sidebar_modified:
+        if root_data and sidebar_data and root_data == sidebar_data.get("inputs_dict", None):
+            raise PreventUpdate
+        if (root_modified + 100) < sidebar_modified:
             inputs_dict = sidebar_data["inputs_dict"]
             new_val = RootCallbacks.get_inputs(inputs_dict, inputs_keys)
-        elif root_modified > sidebar_modified:
+        elif root_modified > (sidebar_modified + 100):
             new_val = RootCallbacks.get_inputs(root_data, inputs_keys)
         else:
             raise PreventUpdate
