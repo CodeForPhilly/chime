@@ -35,8 +35,6 @@ def build_admits_chart(
             color=color,
             tooltip=tooltip,
         )
-        .configure_legend(orient="bottom")
-        .interactive()
     )
     bar = (
         alt.Chart()
@@ -44,7 +42,11 @@ def build_admits_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
-    return alt.layer(points, bar, data=admits_floor_df)
+    return (
+        alt.layer(points, bar, data=admits_floor_df)
+        .configure_legend(orient="bottom")
+        .interactive()
+    )
 
 
 def build_census_chart(
@@ -72,8 +74,6 @@ def build_census_chart(
             color=color,
             tooltip=tooltip,
         )
-        .configure_legend(orient="bottom")
-        .interactive()
     )
     bar = (
         alt.Chart()
@@ -81,7 +81,11 @@ def build_census_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
-    return alt.layer(points, bar, data=census_floor_df)
+    return (
+        alt.layer(points, bar, data=census_floor_df)
+        .configure_legend(orient="bottom")
+        .interactive()
+    )
 
 
 def build_sim_sir_w_date_chart(
@@ -109,8 +113,6 @@ def build_sim_sir_w_date_chart(
             color=color,
             tooltip=tooltip,
         )
-        .configure_legend(orient="bottom")
-        .interactive()
     )
     bar = (
         alt.Chart()
@@ -118,7 +120,11 @@ def build_sim_sir_w_date_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
-    return alt.layer(points, bar, data=sim_sir_w_date_floor_df)
+    return (
+        alt.layer(points, bar, data=sim_sir_w_date_floor_df)
+        .configure_legend(orient="bottom")
+        .interactive()
+    )
 
 
 def build_descriptions(
