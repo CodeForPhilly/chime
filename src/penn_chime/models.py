@@ -235,44 +235,89 @@ def get_growth_rate(doubling_time: Optional[float]) -> float:
 
 
 def sir(
-    s: float, i: float, r: float, beta: float, gamma: float, n: float
+    susceptible: float, 
+    infected: float, 
+    recovered: float, 
+    beta: float, 
+    gamma: float,
+    n=None
 ) -> Tuple[float, float, float]:
-    """The SIR model, one time step."""
-    s_n = (-beta * s * i) + s
-    i_n = (beta * s * i - gamma * i) + i
-    r_n = gamma * i + r
+    """The SIR model, one time step.
+    
+    Arguments:
+        susceptible: Number of susceptible individuals
+        infected: Number of infected individuals
+        recovered: Number of recovered individuals
+        beta: How often a susceptible-infected contact results in a new infection
+        gamma: The rate an infected recovers and moves into the resistant phase
+        Optional n: defaults to s + i + r, but can optionally be provided to
+            avoid floating point math errors when performing this calculation 
+            over time.
+
+    Returns:
+        Tuple representing the new number of susceptible, infected, and 
+        recovered individuals
+    """
+
+    if n is None:
+        n = susceptible + infected + recovered
+
+    susceptible_n = (-beta * susceptible * infected) + susceptible
+    infected_n = (beta * susceptible * infected - gamma * infected) + infected
+    recovered_n = gamma * infected + recovered
 
     # TODO:
     #   Post check dfs for negative values and
     #   warn the user that their input data is bad.
     #   JL: I suspect that these adjustments covered bugs.
 
-    #if s_n < 0.0:
-    #    s_n = 0.0
-    #if i_n < 0.0:
-    #    i_n = 0.0
-    #if r_n < 0.0:
-    #    r_n = 0.0
-    scale = n / (s_n + i_n + r_n)
-    return s_n * scale, i_n * scale, r_n * scale
+    n = susceptible + infected + recovered
+    scale = n / (susceptible_n + infected_n + recovered_n)
+    return tuple(v * scale for v in (susceptible_n, infected_n, recovered_n))
 
 
 def gen_sir(
-    s: float, i: float, r: float, gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
+    susceptible: float,
+    infected: float,
+    recovered: float,
+    gamma: float,
+    i_day: int,
+    policies: Sequence[Tuple[float, int]],
 ) -> Generator[Tuple[int, float, float, float], None, None]:
     """Simulate SIR model forward in time yielding tuples.
-    Parameter order has changed to allow multiple (beta, n_days)
-    to reflect multiple changing social distancing policies.
+    
+    Arguments:
+        susceptible: Number of susceptible individuals
+        infected: Number of infected individuals
+        recovered: Number of recovered individuals
+        gamma: The rate an infected recovers and moves into the resistant phase
+        i_day: The number of days after the first hospitalization
+        policies: A sequences of tuples that represent a new value of beta (how
+            often a susceptible-infected contact results in a new infection),
+            and how many days that value of beta will last
+    
+    Yields:
+        Tuples representing the day and the projected number of susceptible, 
+        infected, and recovered individuals, where day 0 is the current_date of
+        the simulation
+    
+    Returns:
+        A generator of such tuples
+        
     """
-    s, i, r = (float(v) for v in (s, i, r))
-    n = s + i + r
+    susceptible, infected, recovered = (
+        float(v) for v in (susceptible, infected, recovered)
+    )
+    n = susceptible + infected + recovered
     d = i_day
     for beta, n_days in policies:
         for _ in range(n_days):
-            yield d, s, i, r
-            s, i, r = sir(s, i, r, beta, gamma, n)
+            yield d, susceptible, infected, recovered
+            susceptible, infected, recovered = sir(
+                susceptible, infected, recovered, beta, gamma, n=n
+            )
             d += 1
-    yield d, s, i, r
+    yield d, susceptible, infected, recovered
 
 
 def sim_sir_df(
