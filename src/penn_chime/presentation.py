@@ -52,21 +52,16 @@ def display_header(st, m, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """[Documentation]({docs_url}) | [Github](https://github.com/CodeForPhilly/chime/) |
-[Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)""".format(
-            docs_url=DOCS_URL
-        )
-    )
-    st.markdown(
-        """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine to assist hospitals and public health officials with hospital capacity planning.*"""
-    )
-    st.markdown(
         """**Notice**: *There is a high
-    degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing
-    measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
+degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing
+measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
     """
     )
+    st.markdown(
+        """
+This tool was developed by [Predictive Healthcare](http://predictivehealthcare.pennmedicine.org/) at
+Penn Medicine to assist hospitals and public health officials with hospital capacity planning.
+Please read [How to Use CHIME]({docs_url}) to customize inputs for your region.""".format(docs_url=DOCS_URL))
 
     st.markdown(
         """The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
