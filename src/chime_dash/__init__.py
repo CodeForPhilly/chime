@@ -8,32 +8,31 @@ from dash import Dash
 from typing import TypeVar
 from chime_dash.app.config import from_object
 from penn_chime.settings import get_defaults
-from chime_dash.app.components import Body
+from chime_dash.app.pages.root import Root
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
 DashAppInstance = TypeVar('DashAppInstance')
-DEFAULTS = get_defaults()
 
-def create_app(context:str='prod')-> DashAppInstance:
+
+def create_app(context: str = 'prod') -> DashAppInstance:
     """
     create_app initializes the app instance
-    
+
     Args:
         context (str, optional): One of either 'prod', 'dev', 'testing.
         Defaults to 'prod' where dash.Dash.run_server(debug=False).
         Change to 'dev' or 'test' to set debug to true.
-    
+
     Returns:
         Env: Config variables based on context argument received
         DashAppInstance: Dash instance with appropriate configuration settings
     """
 
     Env = from_object(context)
-    
+
     LANGUAGE = Env.LANG
-    body = Body(LANGUAGE, DEFAULTS)
-    
-    
+    body = Root(LANGUAGE, get_defaults())
+
     App = Dash(
         __name__,
         external_stylesheets=body.external_stylesheets,
@@ -44,7 +43,4 @@ def create_app(context:str='prod')-> DashAppInstance:
     App.layout = body.html
     wrap_callbacks(App)
 
-    
-
     return Env, App
-
