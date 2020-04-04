@@ -14,6 +14,7 @@ from .constants import (
     EPSILON,
     FLOAT_INPUT_MIN,
     FLOAT_INPUT_STEP,
+    VERSION,
 )
 
 from .utils import dataframe_to_base64
@@ -282,8 +283,9 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     # Build in desired order
     st.sidebar.markdown(
-        """**CHIME [v1.1.2](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.1) ({change_date})**""".format(
-            change_date=CHANGE_DATE
+        """**CHIME [{version}](https://github.com/CodeForPhilly/chime/releases/tag/{version}) ({change_date})**""".format(
+            change_date=CHANGE_DATE,
+            version=VERSION,
         )
     )
 
