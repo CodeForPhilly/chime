@@ -1,6 +1,6 @@
 """Setup file for chime
 """
-__version__ = "1.1.2"
+__version__ = "1.1.2"  # update VERSION in constants.py
 __author__ = "Predictive Healthcare @ Penn Medicine"
 
 from os import path
@@ -30,7 +30,7 @@ setup(
         "dash",
         "dash_bootstrap_components",
         "pyyaml",
-        "gunicorn", 
+        "gunicorn",
         "selenium"
     ],
     classifiers=[
