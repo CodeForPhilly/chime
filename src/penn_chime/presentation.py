@@ -52,21 +52,16 @@ def display_header(st, m, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """[Documentation]({docs_url}) | [Github](https://github.com/CodeForPhilly/chime/) |
-[Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)""".format(
-            docs_url=DOCS_URL
-        )
-    )
-    st.markdown(
-        """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine to assist hospitals and public health officials with hospital capacity planning.*"""
-    )
-    st.markdown(
-        """**Notice**: *There is a high 
-    degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing 
-    measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
+        """**Notice**: *There is a high
+degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing
+measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
     """
     )
+    st.markdown(
+        """
+This tool was developed by [Predictive Healthcare](http://predictivehealthcare.pennmedicine.org/) at
+Penn Medicine to assist hospitals and public health officials with hospital capacity planning.
+Please read [How to Use CHIME]({docs_url}) to customize inputs for your region.""".format(docs_url=DOCS_URL))
 
     st.markdown(
         """The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
@@ -370,103 +365,6 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         n_days=n_days,
         population=population,
     )
-
-
-def display_more_info(
-    st, model: Model, parameters: Parameters, defaults: Parameters, notes: str = "",
-):
-    """a lot of streamlit writing to screen."""
-    st.subheader(
-        "[Discrete-time SIR modeling](https://mathworld.wolfram.com/SIRModel.html) of infections/recovery"
-    )
-    st.markdown(
-        """The model consists of individuals who are either _Susceptible_ ($S$), _Infected_ ($I$), or _Recovered_ ($R$).
-
-The epidemic proceeds via a growth and decline process. This is the core model of infectious disease spread and has been in use in epidemiology for many years."""
-    )
-    st.markdown("""The dynamics are given by the following 3 equations.""")
-
-    st.latex("S_{t+1} = (-\\beta S_t I_t) + S_t")
-    st.latex("I_{t+1} = (\\beta S_t I_t - \\gamma I_t) + I_t")
-    st.latex("R_{t+1} = (\\gamma I_t) + R_t")
-
-    st.markdown(
-        """To project the expected impact to Penn Medicine, we estimate the terms of the model.
-
-To do this, we use a combination of estimates from other locations, informed estimates based on logical reasoning, and best guesses from the American Hospital Association.
-
-
-### Parameters
-
-The model's parameters, $\\beta$ and $\\gamma$, determine the virulence of the epidemic.
-
-$$\\beta$$ can be interpreted as the _effective contact rate_:
-"""
-    )
-    st.latex("\\beta = \\tau \\times c")
-
-    st.markdown(
-        """which is the transmissibility ($\\tau$) multiplied by the average number of people exposed ($$c$$).  The transmissibility is the basic virulence of the pathogen.  The number of people exposed $c$ is the parameter that can be changed through social distancing.
-
-
-$\\gamma$ is the inverse of the mean recovery time, in days.  I.e.: if $\\gamma = 1/{recovery_days}$, then the average infection will clear in {recovery_days} days.
-
-An important descriptive parameter is the _basic reproduction number_, or $R_0$.  This represents the average number of people who will be infected by any given infected person.  When $R_0$ is greater than 1, it means that a disease will grow.  Higher $R_0$'s imply more rapid growth.  It is defined as """.format(
-            recovery_days=int(parameters.infectious_days)
-        )
-    )
-    st.latex("R_0 = \\beta /\\gamma")
-
-    st.markdown(
-        """
-
-$R_0$ gets bigger when
-
-- there are more contacts between people
-- when the pathogen is more virulent
-- when people have the pathogen for longer periods of time
-
-A doubling time of {doubling_time} days and a recovery time of {recovery_days} days imply an $R_0$ of {r_naught:.2f}.
-
-#### Effect of social distancing
-
-After the beginning of the outbreak, actions to reduce social contact will lower the parameter $c$.  If this happens at
-time $t$, then the number of people infected by any given infected person is $R_t$, which will be lower than $R_0$.
-
-A {relative_contact_rate:.0%} reduction in social contact would increase the time it takes for the outbreak to double,
-to {doubling_time_t:.2f} days from {doubling_time:.2f} days, with a $R_t$ of {r_t:.2f}.
-
-#### Using the model
-
-We need to express the two parameters $\\beta$ and $\\gamma$ in terms of quantities we can estimate.
-
-- $\\gamma$:  the CDC is recommending 14 days of self-quarantine, we'll use $\\gamma = 1/{recovery_days}$.
-- To estimate $$\\beta$$ directly, we'd need to know transmissibility and social contact rates.  since we don't know these things, we can extract it from known _doubling times_.  The AHA says to expect a doubling time $T_d$ of 7-10 days. That means an early-phase rate of growth can be computed by using the doubling time formula:
-""".format(
-            doubling_time=parameters.doubling_time,
-            recovery_days=parameters.infectious_days,
-            r_naught=model.r_naught,
-            relative_contact_rate=parameters.relative_contact_rate,
-            doubling_time_t=model.doubling_time_t,
-            r_t=model.r_t,
-        )
-    )
-    st.latex("g = 2^{1/T_d} - 1")
-
-    st.markdown(
-        """
-- Since the rate of new infections in the SIR model is $g = \\beta S - \\gamma$, and we've already computed $\\gamma$, $\\beta$ becomes a function of the initial population size of susceptible individuals.
-$$\\beta = (g + \\gamma)$$.
-
-
-### Initial Conditions
-
-- {notes} \n
-""".format(
-            notes=notes
-        )
-    )
-    return None
 
 
 def write_definitions(st):
