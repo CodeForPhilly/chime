@@ -5,11 +5,10 @@ import streamlit as st  # type: ignore
 
 from penn_chime.presentation import (
     display_download_link,
+    display_footer,
     display_header,
     display_sidebar,
     hide_menu_style,
-    write_definitions,
-    write_footer,
 )
 from penn_chime.settings import get_defaults
 from penn_chime.models import SimSirModel
@@ -93,5 +92,4 @@ if st.checkbox("Show SIR Simulation in tabular form"):
         labels=p.labels)
     st.table(table_df)
 
-write_definitions(st)
-write_footer(st)
+display_footer(st)
