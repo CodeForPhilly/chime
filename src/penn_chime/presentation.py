@@ -369,17 +369,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
 
 
-def write_definitions(st):
-    st.subheader("Guidance on Selecting Inputs")
-    st.markdown(
-        """**This information has been moved to the
-[User Documentation]({docs_url}/what-is-chime/parameters)**""".format(
-            docs_url=DOCS_URL
-        )
-    )
-
-
-def write_footer(st):
+def display_footer(st):
     st.subheader("References & Acknowledgements")
     st.markdown(
         """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
