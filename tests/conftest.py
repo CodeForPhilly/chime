@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from dash import Dash
 import pytest
 import pandas as pd
 
@@ -28,6 +29,10 @@ class MockStreamlit:
         self.render_store.append(inp)
         return None
 
+
+@pytest.fixture()
+def dash_app():
+    return Dash()
 
 @pytest.fixture
 def mock_st():
