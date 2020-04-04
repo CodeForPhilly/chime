@@ -18,6 +18,7 @@ from chime_dash.app.utils.templates import (
     create_number_input,
     create_date_input,
     create_header,
+    create_button,
 )
 from chime_dash.app.services.callbacks import SidebarCallbacks
 
@@ -90,6 +91,9 @@ _SIDEBAR_ELEMENTS = ReadOnlyDict(OrderedDict(
     },
     max_y_axis_value={"type": "number", "min": 10, "step": 10, "value": None},
     show_tables={"type": "switch", "value": False},
+
+    copy_params={"type": "button"},
+    reset_params={"type": "button"},
 ))
 
 
@@ -107,7 +111,7 @@ class Sidebar(Page):
     input_type_map = ReadOnlyDict(OrderedDict(
         (key, value["type"])
         for key, value in _SIDEBAR_ELEMENTS.items()
-        if value["type"] not in ("header",)
+        if value["type"] not in ("header", "button")
     ))
     input_value_map = ReadOnlyDict(OrderedDict(
         (key, {"number": "value", "date": "date"}.get(value, "value"))
@@ -129,6 +133,8 @@ class Sidebar(Page):
                 element = create_date_input(idx, data, self.content, self.defaults)
             elif data["type"] == "header":
                 element = create_header(idx, self.content)
+            elif data["type"] == "button":
+                element = create_button(idx, self.content)
             else:
                 raise ValueError(
                     "Failed to parse input '{idx}' with data '{data}'".format(

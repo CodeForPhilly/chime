@@ -25,3 +25,6 @@ max_y_axis_value: Maximal y-axis value (leave blank for no max value)
 show_tables: Show tables with data
 show_tool_details: Show more info about this tool
 show_additional_projections: Show additional projections
+
+copy_params: Copy parameters
+reset_params: Reset parameters

@@ -13,7 +13,7 @@ from pandas import DataFrame
 
 from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4
 from dash_core_components import DatePickerSingle
-from dash_bootstrap_components import FormGroup, Label, Input, Checklist
+from dash_bootstrap_components import FormGroup, Label, Input, Checklist, Button
 
 from penn_chime.parameters import Parameters
 
@@ -150,6 +150,14 @@ def create_header(idx: str, content: Dict[str, str]):
     """
 
     return H4(id=idx, children=content[idx], style=HEADER_STYLE)
+
+
+def create_button(idx: str, content: Dict[str, str]):
+    """
+    Create button element
+    """
+    
+    return Button(id=idx, children=content[idx])
 
 
 def create_date_input(

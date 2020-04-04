@@ -71,3 +71,7 @@ input[type="number"]::-webkit-outer-spin-button {
 	margin-top: calc(-.75rem - 1px); /* 1px connects with pointer */
 }
 /* end date picker wrangling */
+
+button#copy_params, button#sidebar_params {
+	margin: 15px 0;
+}
