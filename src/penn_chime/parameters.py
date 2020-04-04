@@ -57,7 +57,7 @@ class Parameters:
         relative_contact_rate: float,
         mitigation_date: Optional[date] = None,
         ventilated: Disposition,
-        current_date: date = date.today(),
+        current_date: Optional[date] = None,
         date_first_hospitalized: Optional[date] = None,
         doubling_time: Optional[float] = None,
         infectious_days: int = 14,
@@ -69,7 +69,6 @@ class Parameters:
         region: Optional[Regions] = None,
     ):
         self.current_hospitalized = Positive(value=current_hospitalized)
-
         Rate(value=hospitalized.rate), Rate(value=icu.rate), Rate(value=ventilated.rate)
         StrictlyPositive(value=hospitalized.days), StrictlyPositive(value=icu.days),
         StrictlyPositive(value=ventilated.days)
@@ -87,8 +86,10 @@ class Parameters:
         else:
             raise AssertionError('population or regions must be provided.')
 
+        if current_date is None:
+            current_date = date.today()
         self.current_date = Date(value=current_date)
-       
+
         self.date_first_hospitalized = OptionalDate(value=date_first_hospitalized)
         self.doubling_time = OptionalStrictlyPositive(value=doubling_time)
 
