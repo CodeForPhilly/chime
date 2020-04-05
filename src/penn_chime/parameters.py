@@ -9,7 +9,7 @@ from datetime import date
 from typing import Optional
 
 from .validators import (
-    Positive, OptionalStrictlyPositive, StrictlyPositive, Rate, Date, OptionalDate, ValDisposition
+    OptionalValue, Positive, OptionalStrictlyPositive, StrictlyPositive, Rate, Date, OptionalDate, ValDisposition
     )
 
 # Parameters for each disposition (hospitalized, icu, ventilated)
@@ -45,62 +45,55 @@ class Regions:
         self.population = population
 
 
+ACCEPTED_PARAMETERS = {
+    "current_hospitalized": (Positive, None),
+    "current_date": (OptionalDate, None),
+    "date_first_hospitalized": (OptionalDate, None),
+    "doubling_time": (OptionalStrictlyPositive, None),
+    "relative_contact_rate": (Rate, None),
+    "mitigation_date": (OptionalDate, None),
+    "infectious_days": (StrictlyPositive, 14),
+    "market_share": (Rate, 1.0),
+    "max_y_axis": (OptionalStrictlyPositive, None),
+    "n_days": (StrictlyPositive, 100),
+    "recovered": (Positive, 0),
+    "population": (OptionalStrictlyPositive, None),
+    "region": (OptionalValue, None),
+
+    "hospitalized": (ValDisposition, None),
+    "icu": (ValDisposition, None),
+    "ventilated": (ValDisposition, None),
+}
+
+
 class Parameters:
     """Parameters."""
 
-    def __init__(
-        self,
-        *,
-        current_hospitalized: int,
-        hospitalized: Disposition,
-        icu: Disposition,
-        relative_contact_rate: float,
-        mitigation_date: Optional[date] = None,
-        ventilated: Disposition,
-        current_date: Optional[date] = None,
-        date_first_hospitalized: Optional[date] = None,
-        doubling_time: Optional[float] = None,
-        infectious_days: int = 14,
-        market_share: float = 1.0,
-        max_y_axis: Optional[int] = None,
-        n_days: int = 100,
-        population: Optional[int] = None,
-        recovered: int = 0,
-        region: Optional[Regions] = None,
-    ):
-        self.current_hospitalized = Positive(value=current_hospitalized)
-        ValDisposition(value=hospitalized)
-        ValDisposition(value=icu)
-        ValDisposition(value=ventilated)
+    def __init__(self, **kwargs):
+        passed_and_default_parameters = {}
+        for key, value in kwargs.items():
+            if key not in ACCEPTED_PARAMETERS:
+                raise ValueError(f"Unexpected parameter {key}")
+            passed_and_default_parameters[key] = value
 
-        self.hospitalized = hospitalized
-        self.icu = icu
-        self.ventilated = ventilated
+        for key, (validator, default_value) in ACCEPTED_PARAMETERS.items():
+            if key not in passed_and_default_parameters:
+                passed_and_default_parameters[key] = default_value
 
-        if region is not None and population is None:
-            self.region = region
-            self.population = StrictlyPositive(value=region.population)
-        elif population is not None:
-            self.region = None
-            self.population = StrictlyPositive(value=population)
-        else:
+        for key, value in passed_and_default_parameters.items():
+            validator = ACCEPTED_PARAMETERS[key][0]
+            try:
+                validator(value=value)
+            except (TypeError, ValueError) as ve:
+                raise ValueError(f"For parameter {key}, with value {value}, validation returned error \"{ve}\"")
+            setattr(self, key, value)
+
+        if self.region is  None and self.population is None:
             raise AssertionError('population or regions must be provided.')
 
-        if current_date is None:
-            current_date = date.today()
-        self.current_date = Date(value=current_date)
-
-        self.date_first_hospitalized = OptionalDate(value=date_first_hospitalized)
-        self.doubling_time = OptionalStrictlyPositive(value=doubling_time)
-
-        self.relative_contact_rate = Rate(value=relative_contact_rate)
-        self.mitigation_date = OptionalDate(value=mitigation_date)
-
-        self.infectious_days = StrictlyPositive(value=infectious_days)
-        self.market_share = Rate(value=market_share)
-        self.max_y_axis = OptionalStrictlyPositive(value=max_y_axis)
-        self.n_days = StrictlyPositive(value=n_days)
-        self.recovered = Positive(value=recovered)
+        if self.current_date is None:
+            self.current_date = date.today()
+        Date(value=self.current_date)
 
         self.labels = {
             "hospitalized": "Hospitalized",
@@ -114,7 +107,7 @@ class Parameters:
         }
 
         self.dispositions = {
-            "hospitalized": hospitalized,
-            "icu": icu,
-            "ventilated": ventilated,
+            "hospitalized": self.hospitalized,
+            "icu": self.icu,
+            "ventilated": self.ventilated,
         }

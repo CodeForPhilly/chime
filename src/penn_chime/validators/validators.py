@@ -7,6 +7,14 @@ from .base import Validator
 
 EPSILON = 1.e-7
 
+class OptionalValue(Validator):
+    """Any value at all"""
+    def __init__(self) -> None:
+        pass
+
+    def validate(self, value):
+        pass
+
 class Bounded(Validator):
     """A bounded number."""
     def __init__(
