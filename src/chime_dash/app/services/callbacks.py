@@ -82,7 +82,7 @@ class IndexCallbacks(ComponentCallbacks):
                         "SIR_download": "href",
                     },
                     callback_fn=handle_model_change_helper,
-                    stores=["sidebar-store"],
+                    state={"sidebar-store": "data"},
                 )
             ]
         )
@@ -150,7 +150,7 @@ class SidebarCallbacks(ComponentCallbacks):
                     changed_elements=component_instance.input_value_map,
                     dom_updates={"sidebar-store": "data"},
                     callback_fn=update_parameters_helper,
-                    stores=["sidebar-store"],
+                    state={"sidebar-store": "data"},
                 )
             ]
         )
@@ -207,10 +207,10 @@ class RootCallbacks(ComponentCallbacks):
         sidebar_modified = sidebar_mod or 0
         if root_data and sidebar_data and root_data == sidebar_data.get("inputs_dict", None):
             raise PreventUpdate
-        if (root_modified + 100) < sidebar_modified:
+        if root_modified < sidebar_modified:
             inputs_dict = sidebar_data["inputs_dict"]
             new_val = RootCallbacks.get_inputs(inputs_dict, inputs_keys)
-        elif root_modified > (sidebar_modified + 100):
+        elif root_modified > sidebar_modified:
             new_val = RootCallbacks.get_inputs(root_data, inputs_keys)
         else:
             raise PreventUpdate
@@ -233,13 +233,13 @@ class RootCallbacks(ComponentCallbacks):
                     changed_elements={"location": "hash"},
                     dom_updates={"root-store": "data"},
                     callback_fn=hash_changed_helper,
-                    stores=["root-store"],
+                    state={"root-store": "data"},
                 ),
                 ChimeCallback(
                     changed_elements={"root-store": "modified_timestamp", "sidebar-store": "modified_timestamp"},
                     dom_updates={"location": "hash", **sidebar_inputs},
                     callback_fn=stores_changed_helper,
-                    stores=["root-store", "sidebar-store"],
+                    state={"root-store": "data", "sidebar-store": "data"},
                 ),
             ]
         )

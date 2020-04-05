@@ -1,6 +1,6 @@
 from dash import Dash
 from dash.dependencies import Input, Output, State
-from collections.abc import Iterable, Mapping
+from collections.abc import Mapping
 from typing import Callable, List
 from functools import lru_cache
 
@@ -10,7 +10,7 @@ class ChimeCallback:
                  changed_elements: Mapping,
                  callback_fn: Callable,
                  dom_updates: Mapping = None,
-                 stores: Iterable = None,
+                 state: Mapping = None,
                  memoize: bool = True
                  ):
         self.inputs = [
@@ -26,10 +26,10 @@ class ChimeCallback:
                 Output(component_id=component_id, component_property=component_property)
                 for component_id, component_property in dom_updates.items()
             )
-        if stores:
+        if state:
             self.stores.extend(
-                State(component_id=component_id, component_property="data")
-                for component_id in stores
+                State(component_id=component_id, component_property=component_property)
+                for component_id, component_property in state.items()
             )
 
     def wrap(self, app: Dash):
@@ -37,7 +37,6 @@ class ChimeCallback:
             @lru_cache(maxsize=32)
             @app.callback(self.outputs, self.inputs, self.stores)
             def callback_wrapper(*args, **kwargs):
-                print(str(self.callback_fn))
                 return self.callback_fn(*args, **kwargs)
         else:
             @app.callback(self.outputs, self.inputs, self.stores)
