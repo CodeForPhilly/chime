@@ -193,7 +193,7 @@ class SimSirModel:
         ]
 
     def run_projection(self, p: Parameters, policy: Sequence[Tuple[float, int]]):
-        self.raw = sim_sir(
+        raw = sim_sir(
             self.susceptible,
             self.infected,
             p.recovered,
@@ -202,11 +202,12 @@ class SimSirModel:
             policy
         )
 
-        calculate_dispositions(self.raw, self.rates, p.market_share)
-        calculate_admits(self.raw, self.rates)
-        calculate_census(self.raw, self.days)
+        calculate_dispositions(raw, self.rates, p.market_share)
+        calculate_admits(raw, self.rates)
+        calculate_census(raw, self.days)
 
-        self.current_infected = self.raw["infected"][self.i_day]
+        self.current_infected = raw["infected"][self.i_day]
+        self.raw = raw
 
     def get_loss(self) -> float:
         """Squared error: predicted vs. actual current hospitalized."""
