@@ -355,16 +355,9 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         max_y_axis = max_y_axis_input()
 
     current_date = current_date_input()
-    ####ToDo
     #Subscribe implementation
-    st_obj.subheader ("Subscribe")
-    email = st_obj.text_input (label="Enter Email", value="", key="na_lower_1")
-    name = st_obj.text_input (label="Enter Name", value="", key="na_upper_1")
-    affiliation = st_obj.text_input (label="Enter Affiliation", value="", key="na_upper_2")
-    if st_obj.button (label="Submit", key="ta_submit_1"):
-        send_subscription_to_google_sheet (st_obj, email, name, affiliation)
+    subscribe(st_obj)
 
-    #####ToDo
     return Parameters(
         current_hospitalized=current_hospitalized,
         hospitalized=Disposition(hospitalized_rate, hospitalized_days),
@@ -382,14 +375,18 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         population=population,
     )
 
-#ToDo
-def send_subscription_to_google_sheet(st_obj,email, name, affiliation):
-    print ("send email:" + email + " name:" + name + " affiliation:" + affiliation + " to google sheet")
-    spr = sp.spreadsheet (st_obj, 'penn_chime/client_secret.json')
-    header = ["ContactEmail","Name","Affiliation"]
-    sheet = spr.createsheet("SheetnameToDo", header)
-    row = [email,name,affiliation]
-    spr.writeToSheet(sheet, row)
+def subscribe(st_obj):
+    st_obj.subheader ("Subscribe")
+    email = st_obj.text_input (label="Enter Email", value="", key="na_lower_1")
+    name = st_obj.text_input (label="Enter Name", value="", key="na_upper_1")
+    affiliation = st_obj.text_input (label="Enter Affiliation", value="", key="na_upper_2")
+    if st_obj.button (label="Submit", key="ta_submit_1"):
+        row = [email, name, affiliation]
+        send_subscription_to_google_sheet(st_obj, row)
+
+def send_subscription_to_google_sheet(st_obj, row):
+    spr = sp.spreadsheet (st_obj, 'client_secret.json')
+    spr.writeToSheet("CHIME Form Submissions", row)
 
 def write_definitions(st):
     st.subheader("Guidance on Selecting Inputs")
@@ -399,7 +396,6 @@ def write_definitions(st):
             docs_url=DOCS_URL
         )
     )
-
 
 def write_footer(st):
     st.subheader("References & Acknowledgements")
