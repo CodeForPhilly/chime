@@ -82,7 +82,7 @@ class IndexCallbacks(ComponentCallbacks):
                         "SIR_download": "href",
                     },
                     callback_fn=handle_model_change_helper,
-                    stores=["sidebar-store"],
+                    state={"sidebar-store": "data"},
                 )
             ]
         )
@@ -150,7 +150,7 @@ class SidebarCallbacks(ComponentCallbacks):
                     changed_elements=component_instance.input_value_map,
                     dom_updates={"sidebar-store": "data"},
                     callback_fn=update_parameters_helper,
-                    stores=["sidebar-store"],
+                    state={"sidebar-store": "data"},
                 )
             ]
         )
@@ -233,13 +233,13 @@ class RootCallbacks(ComponentCallbacks):
                     changed_elements={"location": "search"},
                     dom_updates={"root-store": "data"},
                     callback_fn=hash_changed_helper,
-                    stores=["root-store"],
+                    state={"root-store": "data"},
                 ),
                 ChimeCallback(
                     changed_elements={"root-store": "modified_timestamp", "sidebar-store": "modified_timestamp"},
                     dom_updates={"location": "search", **sidebar_inputs},
                     callback_fn=stores_changed_helper,
-                    stores=["root-store", "sidebar-store"],
+                    state={"root-store": "data", "sidebar-store": "data"},
                 ),
             ]
         )

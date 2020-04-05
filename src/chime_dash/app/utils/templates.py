@@ -132,10 +132,12 @@ def create_number_input(
     input_kwargs = data.copy()
     input_kwargs.pop("percent", None)
 
-    if not "value" in input_kwargs:
+    if "value" not in input_kwargs:
         input_kwargs["value"] = _get_default_values(
             idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
         )
+    if "debounce" not in input_kwargs:
+        input_kwargs["debounce"] = True
     return FormGroup(
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
@@ -166,7 +168,7 @@ def create_date_input(
     input_kwargs = data.copy()
     input_kwargs.pop("type")
 
-    if not "date" in input_kwargs:
+    if "date" not in input_kwargs:
         input_kwargs["date"] = input_kwargs[
             "initial_visible_month"
         ] = _get_default_values(idx, defaults)
@@ -191,7 +193,6 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
         idx: The name of the varibale (html id)
         data: Input form kwargs.
         content: Localization text
-        defaults: Parameters to infer defaults
     """
     return Checklist(
         id=idx, switch=True, options=[{"label": content[idx], "value": True}],
