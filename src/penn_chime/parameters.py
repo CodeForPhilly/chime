@@ -85,7 +85,7 @@ class Parameters:
             try:
                 validator(value=value)
             except (TypeError, ValueError) as ve:
-                raise ValueError(f"For parameter {key}, with value {value}, validation returned error \"{ve}\"")
+                raise ValueError(f"For parameter '{key}', with value '{value}', validation returned error \"{ve}\"")
             setattr(self, key, value)
 
         if self.region is  None and self.population is None:

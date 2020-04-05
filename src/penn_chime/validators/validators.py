@@ -32,6 +32,8 @@ class Bounded(Validator):
 
     def validate(self, value):
         """This method implicitly validates isinstance(value, (float, int)) because it will throw a TypeError on comparison"""
+        if value is None:
+            raise ValueError(f"This parameter must be set")
         if (self.upper_bound is not None and value > self.upper_bound) \
            or (self.lower_bound is not None and value < self.lower_bound):
             raise ValueError(f"{value} needs to be {self.message[(self.lower_bound, self.upper_bound)]}.")
@@ -56,6 +58,8 @@ class Rate(Validator):
         pass
    
     def validate(self, value):
+        if value is None:
+            raise ValueError(f"This parameter must be set")
         if 0 > value or value > 1:
             raise ValueError(f"{value} needs to be a rate (i.e. in [0,1]).")
 
@@ -65,6 +69,8 @@ class Date(Validator):
         pass
 
     def validate(self, value):
+        if value is None:
+            raise ValueError(f"This parameter must be set")
         if not isinstance(value, (date, datetime)):
             raise (ValueError(f"{value} must be a date or datetime object."))
 
@@ -82,5 +88,7 @@ class ValDisposition(Validator):
         pass
 
     def validate(self, value):
+        if value is None:
+            raise ValueError(f"This parameter must be set")
         Bounded(lower_bound=EPSILON)(value=value.days)
         Rate()(value=value.rate)
