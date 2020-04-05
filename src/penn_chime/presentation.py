@@ -217,7 +217,11 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=1.0,
     )
     hospitalized_pct_input = PercentInput(
-        st_obj, "Hospitalization %(total infections)", value=d.hospitalized.rate,
+        st_obj,
+        "Hospitalization %(total infections)",
+        value=d.hospitalized.rate,
+        min_value=FLOAT_INPUT_MIN,
+        max_value=100.0
     )
     icu_pct_input = PercentInput(st_obj,
         "ICU %(total infections)",
@@ -231,7 +235,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     hospitalized_days_input = NumberInput(
         st_obj,
         "Average hospital length of stay (in days)",
-        min_value=0,
+        min_value=1,
         value=d.hospitalized.days,
         step=1,
         format="%i",
@@ -239,7 +243,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     icu_days_input = NumberInput(
         st_obj,
         "Average days in ICU",
-        min_value=0,
+        min_value=1,
         value=d.icu.days,
         step=1,
         format="%i",
@@ -247,7 +251,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     ventilated_days_input = NumberInput(
         st_obj,
         "Average days on ventilator",
-        min_value=0,
+        min_value=1,
         value=d.ventilated.days,
         step=1,
         format="%i",
@@ -269,7 +273,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     infectious_days_input = NumberInput(
         st_obj,
         "Infectious days",
-        min_value=0,
+        min_value=1,
         value=d.infectious_days,
         step=1,
         format="%i",
