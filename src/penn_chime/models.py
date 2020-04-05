@@ -203,7 +203,7 @@ class SimSirModel:
         )
 
         calculate_dispositions(self.raw, self.rates, p.market_share)
-        calculate_admits(self.rates, self.raw)
+        calculate_admits(self.raw, self.rates)
         calculate_census(self.raw, self.days)
 
         self.current_infected = self.raw["infected"][self.i_day]
@@ -349,7 +349,7 @@ def calculate_dispositions(
         raw[key] = raw["ever_infected"] * rate * market_share
 
 
-def calculate_admits(rates, raw: Dict):
+def calculate_admits(raw: Dict, rates):
     """Build admits dataframe from dispositions."""
     for key in rates.keys():
         ever = raw["ever_" + key]
