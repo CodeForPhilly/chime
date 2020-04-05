@@ -177,6 +177,8 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     # it's kindof like ember or angular if you are familiar with those
 
     st_obj = st.sidebar
+    # used_widget_key = st.get_last_used_widget_key ( )
+
     current_hospitalized_input = NumberInput(
         st_obj,
         "Currently hospitalized COVID-19 patients",
@@ -353,6 +355,13 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         max_y_axis = max_y_axis_input()
 
     current_date = current_date_input()
+    #Subscribe implementation
+    st_obj.subheader ("Subscribe")
+    email = st_obj.text_input (label="Enter Email", value="", key="na_lower_1")
+    name = st_obj.text_input (label="Enter Name", value="", key="na_upper_1")
+    affiliation = st_obj.text_input (label="Enter Affiliation", value="", key="na_upper_2")
+    if st_obj.button (label="Submit", key="ta_submit_1"):
+        send_subscription_to_google_sheet (email, name, affiliation)
 
     return Parameters(
         current_hospitalized=current_hospitalized,
@@ -371,6 +380,9 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         population=population,
     )
 
+def send_subscription_to_google_sheet(email, name, affiliation):
+    print ("send email:" + email + " name:" + name + " affiliation:" + affiliation + " to google sheet")
+    #implement sending the data to googlesheet
 
 def write_definitions(st):
     st.subheader("Guidance on Selecting Inputs")
