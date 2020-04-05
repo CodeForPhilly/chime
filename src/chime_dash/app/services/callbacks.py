@@ -214,7 +214,7 @@ class RootCallbacks(ComponentCallbacks):
             new_val = RootCallbacks.get_inputs(root_data, inputs_keys)
         else:
             raise PreventUpdate
-        return ["#{}".format(urlencode(new_val))] + list(new_val.values())
+        return ["?{}".format(urlencode(new_val))] + list(new_val.values())
 
     def __init__(self, component_instance):
         sidebar = component_instance.components["sidebar"]
@@ -230,14 +230,14 @@ class RootCallbacks(ComponentCallbacks):
             component_instance=component_instance,
             callbacks=[
                 ChimeCallback(
-                    changed_elements={"location": "hash"},
+                    changed_elements={"location": "search"},
                     dom_updates={"root-store": "data"},
                     callback_fn=hash_changed_helper,
                     stores=["root-store"],
                 ),
                 ChimeCallback(
                     changed_elements={"root-store": "modified_timestamp", "sidebar-store": "modified_timestamp"},
-                    dom_updates={"location": "hash", **sidebar_inputs},
+                    dom_updates={"location": "search", **sidebar_inputs},
                     callback_fn=stores_changed_helper,
                     stores=["root-store", "sidebar-store"],
                 ),
