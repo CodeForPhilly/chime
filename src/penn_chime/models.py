@@ -69,10 +69,10 @@ class SimSirModel:
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
             self.i_day = 0 # seed to the full length
-            self.run_projection(p, [(self.beta, p.n_days)])
-            self.i_day = i_day = int(get_argmin_ds(self.raw["census_hospitalized"], p.current_hospitalized))
+            raw = self.run_projection(p, [(self.beta, p.n_days)])
+            self.i_day = i_day = int(get_argmin_ds(raw["census_hospitalized"], p.current_hospitalized))
 
-            self.run_projection(p, self.gen_policy(p))
+            self.raw = self.run_projection(p, self.gen_policy(p))
 
             logger.info('Set i_day = %s', i_day)
             p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
@@ -109,7 +109,7 @@ class SimSirModel:
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-            self.run_projection(p, self.gen_policy(p))
+            self.raw = self.run_projection(p, self.gen_policy(p))
 
             self.population = p.population
         else:
@@ -160,14 +160,14 @@ class SimSirModel:
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
-            self.run_projection(p, self.gen_policy(p))
+            raw = self.run_projection(p, self.gen_policy(p))
 
             # Skip values the would put the fit past peak
-            peak_admits_day = self.raw["admits_hospitalized"].argmax()
+            peak_admits_day = raw["admits_hospitalized"].argmax()
             if peak_admits_day < 0:
                 continue
 
-            loss = self.get_loss()
+            loss = self.get_loss(raw)
             losses[i] = loss
 
         min_loss = pd.Series(losses).argmin()
@@ -206,11 +206,11 @@ class SimSirModel:
         calculate_admits(raw, self.rates)
         calculate_census(raw, self.days)
 
-        self.raw = raw
+        return raw
 
-    def get_loss(self) -> float:
+    def get_loss(self, raw) -> float:
         """Squared error: predicted vs. actual current hospitalized."""
-        predicted = self.raw["census_hospitalized"][self.i_day]
+        predicted = raw["census_hospitalized"][self.i_day]
         return (self.current_hospitalized - predicted) ** 2.0
 
 
