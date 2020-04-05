@@ -5,6 +5,7 @@ from datetime import date, datetime
 
 from .base import Validator
 
+EPSILON = 1.e-7
 
 class Bounded(Validator):
     """A bounded number."""
@@ -67,3 +68,11 @@ class OptionalDate(Date):
         if value is None:
             return None
         super().validate(value)
+
+class ValDisposition(Validator):
+    def __init__(self) -> None:
+        pass
+
+    def validate(self, value):
+        Bounded(lower_bound=EPSILON)(value=value.days)
+        Rate()(value=value.rate)

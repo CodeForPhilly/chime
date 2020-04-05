@@ -9,7 +9,7 @@ from datetime import date
 from typing import Optional
 
 from .validators import (
-    Positive, OptionalStrictlyPositive, StrictlyPositive, Rate, Date, OptionalDate
+    Positive, OptionalStrictlyPositive, StrictlyPositive, Rate, Date, OptionalDate, ValDisposition
     )
 
 # Parameters for each disposition (hospitalized, icu, ventilated)
@@ -69,9 +69,9 @@ class Parameters:
         region: Optional[Regions] = None,
     ):
         self.current_hospitalized = Positive(value=current_hospitalized)
-        Rate(value=hospitalized.rate), Rate(value=icu.rate), Rate(value=ventilated.rate)
-        StrictlyPositive(value=hospitalized.days), StrictlyPositive(value=icu.days),
-        StrictlyPositive(value=ventilated.days)
+        ValDisposition(value=hospitalized)
+        ValDisposition(value=icu)
+        ValDisposition(value=ventilated)
 
         self.hospitalized = hospitalized
         self.icu = icu
