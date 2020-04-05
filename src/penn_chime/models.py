@@ -167,7 +167,8 @@ class SimSirModel:
             if peak_admits_day < 0:
                 continue
 
-            loss = self.get_loss(raw)
+            predicted = raw["census_hospitalized"][self.i_day]
+            loss = get_loss(self.current_hospitalized, predicted)
             losses[i] = loss
 
         min_loss = pd.Series(losses).argmin()
@@ -208,10 +209,10 @@ class SimSirModel:
 
         return raw
 
-    def get_loss(self, raw) -> float:
-        """Squared error: predicted vs. actual current hospitalized."""
-        predicted = raw["census_hospitalized"][self.i_day]
-        return (self.current_hospitalized - predicted) ** 2.0
+
+def get_loss(current_hospitalized, predicted) -> float:
+    """Squared error: predicted vs. actual current hospitalized."""
+    return (current_hospitalized - predicted) ** 2.0
 
 
 def get_argmin_ds(census, current_hospitalized: float) -> float:
