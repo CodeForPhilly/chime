@@ -206,7 +206,6 @@ class SimSirModel:
         calculate_admits(raw, self.rates)
         calculate_census(raw, self.days)
 
-        self.current_infected = raw["infected"][self.i_day]
         self.raw = raw
 
     def get_loss(self) -> float:
