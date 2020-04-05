@@ -207,10 +207,10 @@ class RootCallbacks(ComponentCallbacks):
         sidebar_modified = sidebar_mod or 0
         if root_data and sidebar_data and root_data == sidebar_data.get("inputs_dict", None):
             raise PreventUpdate
-        if (root_modified + 100) < sidebar_modified:
+        if root_modified < sidebar_modified:
             inputs_dict = sidebar_data["inputs_dict"]
             new_val = RootCallbacks.get_inputs(inputs_dict, inputs_keys)
-        elif root_modified > (sidebar_modified + 100):
+        elif root_modified >= sidebar_modified:
             new_val = RootCallbacks.get_inputs(root_data, inputs_keys)
         else:
             raise PreventUpdate
