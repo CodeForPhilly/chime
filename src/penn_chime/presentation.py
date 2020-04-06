@@ -353,19 +353,26 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     return Parameters(
         current_hospitalized=current_hospitalized,
-        hospitalized=Disposition(hospitalized_rate, hospitalized_days),
-        icu=Disposition(icu_rate, icu_days),
-        relative_contact_rate=relative_contact_rate,
-        mitigation_date=mitigation_date,
-        ventilated=Disposition(ventilated_rate, ventilated_days),
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,
         doubling_time=doubling_time,
+        hospitalized=Disposition.create(
+            rate=hospitalized_rate,
+            days=hospitalized_days),
+        icu=Disposition.create(
+            rate=icu_rate,
+            days=icu_days),
         infectious_days=infectious_days,
         market_share=market_share,
         max_y_axis=max_y_axis,
+        mitigation_date=mitigation_date,
         n_days=n_days,
         population=population,
+        recovered=d.recovered,
+        relative_contact_rate=relative_contact_rate,
+        ventilated=Disposition.create(
+            rate=ventilated_rate,
+            days=ventilated_days),
     )
 
 

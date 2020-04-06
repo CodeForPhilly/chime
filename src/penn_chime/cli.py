@@ -9,7 +9,7 @@ from .models import SimSirModel as Model
 
 def main():
     """Main."""
-    p = Parameters.create(os.environ, sys.argv)
+    p = Parameters.create(os.environ, sys.argv[1:])
     m = Model(p)
 
     for df, name in (
