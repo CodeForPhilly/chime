@@ -123,9 +123,27 @@ class SimSirModel:
         self.raw["date"] = self.raw["day"].astype("timedelta64[D]") + np.datetime64(p.current_date)
 
         self.raw_df = pd.DataFrame(data=self.raw)
-        self.dispositions_df = self.raw_df
-        self.admits_df = self.raw_df
-        self.census_df = self.raw_df
+        self.dispositions_df = pd.DataFrame(data={
+            'day': self.raw['day'],
+            'date': self.raw['date'],
+            'ever_hospitalized': self.raw['ever_hospitalized'],
+            'ever_icu': self.raw['ever_icu'],
+            'ever_ventilated': self.raw['ever_ventilated'],
+        })
+        self.admits_df = pd.DataFrame(data={
+            'day': self.raw['day'],
+            'date': self.raw['date'],
+            'admits_hospitalized': self.raw['admits_hospitalized'],
+            'admits_icu': self.raw['admits_icu'],
+            'admits_ventilated': self.raw['admits_ventilated'],
+        })
+        self.census_df = pd.DataFrame(data={
+            'day': self.raw['day'],
+            'date': self.raw['date'],
+            'census_hospitalized': self.raw['census_hospitalized'],
+            'census_icu': self.raw['census_icu'],
+            'census_ventilated': self.raw['census_ventilated'],
+        })
 
         logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))
         logger.info('len(raw_df): %s', len(self.raw_df))

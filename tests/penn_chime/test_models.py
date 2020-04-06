@@ -187,9 +187,9 @@ def test_model_cumulative_census(param, model):
     admits_df = model.admits_df
     df = pd.DataFrame(
         {
-            "hospitalized": admits_df.hospitalized,
-            "icu": admits_df.icu,
-            "ventilated": admits_df.ventilated,
+            "hospitalized": admits_df.admits_hospitalized,
+            "icu": admits_df.admits_icu,
+            "ventilated": admits_df.admits_ventilated,
         }
     )
     admits = df.cumsum()
