@@ -12,7 +12,7 @@ from argparse import (
 )
 from collections import namedtuple
 from datetime import date, datetime
-from typing import Dict
+from typing import Dict, List
 
 from .constants import (
     CHANGE_DATE,
@@ -48,17 +48,17 @@ from .validators import (
 # Be sure to multiply by 100 when using the parameter as a default to a percent widget!
 
 
-Disposition = namedtuple("Disposition", ("days", "rate"))
+_Disposition = namedtuple("_Disposition", ("days", "rate"))
 
 
-def _create_disposition(*, days: int, rate: float):
-    """Mandate key word arguments."""
-    Positive(key='days', value=days)
-    Rate(key='rate', value=rate)
-    return Disposition(days, rate)
+class Disposition(_Disposition):
 
-
-Disposition.create = _create_disposition
+    @classmethod
+    def create(cls, *, days: int, rate: float):
+        """Mandate key word arguments."""
+        Positive(key='days', value=days)
+        Rate(key='rate', value=rate)
+        return cls(days, rate)
 
 
 class Regions:
@@ -230,23 +230,29 @@ class Parameters:
 
     def __init__(self, **kwargs):
         today = date.today()
+
+        self.current_date = None
+        self.current_hospitalized = None
+        self.date_first_hospitalized = None
+        self.doubling_time = None
+        self.hospitalized = None
+        self.icu = None
+        self.infectious_days = None
+        self.market_share = None
+        self.max_y_axis = None
+        self.mitigation_date = None
+        self.n_days = None
+        self.population = None
+        self.region = None
+        self.relative_contact_rate = None
+        self.recovered = None
+        self.ventilated = None
+
         passed_and_default_parameters = {}
         for key, value in kwargs.items():
             if key not in ACCEPTED_PARAMETERS:
                 raise ValueError(f"Unexpected parameter {key}")
             passed_and_default_parameters[key] = value
-
-        self.current_date = None
-        self.hospitalized = None
-        self.icu = None
-        self.max_y_axis = None
-        self.mitigation_date = None
-        self.population = None
-        self.region = None
-        self.ventilated = None
-
-        for key in ACCEPTED_PARAMETERS:
-            setattr(self, key, None)
 
         for key, value in passed_and_default_parameters.items():
             validator = ACCEPTED_PARAMETERS[key][0]
