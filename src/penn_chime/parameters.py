@@ -336,8 +336,6 @@ class Parameters:
 
         del a.parameters
 
-        logger.info(vars(a))
-
         Positive(key='hospitalized_days', value=a.hospitalized_days)
         Positive(key='icu_days', value=a.icu_days)
         Positive(key='ventilated_days', value=a.ventilated_days)
