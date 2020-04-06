@@ -9,7 +9,6 @@ import pandas as pd
 
 from .constants import (
     CHANGE_DATE,
-    DATE_FORMAT,
     DOCS_URL,
     EPSILON,
     FLOAT_INPUT_MIN,
