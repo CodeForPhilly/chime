@@ -62,14 +62,14 @@ def parameters_deserializer(p_json: str):
     values = loads(p_json)
 
     dates = {
-        key: parse_date(values[key]) if values[key] else None
+        key: parse_date(values[key]).date() if values[key] else None
         for key in (
             "current_date",
             "date_first_hospitalized",
             "mitigation_date",
         )
     }
-    result = Parameters(
+    return Parameters(
         current_date=dates["current_date"],
         current_hospitalized=values["current_hospitalized"],
         hospitalized=Disposition.create(
@@ -85,7 +85,7 @@ def parameters_deserializer(p_json: str):
         doubling_time=values["doubling_time"],
         market_share=values["market_share"],
         max_y_axis=values["max_y_axis"],
-        mitigation_date=values["mitigation_date"],
+        mitigation_date=dates["mitigation_date"],
         n_days=values["n_days"],
         population=values["population"],
         recovered=values["recovered"],
@@ -96,23 +96,6 @@ def parameters_deserializer(p_json: str):
             rate=values["ventilated"][1],
         ),
     )
-
-    # FIXME: parameters should be immutable
-    #  Working around validators in __init__
-    for key, value in values.items():
-
-        if result.__dict__[key] != value and key not in (
-            "current_date",
-            "date_first_hospitalized",
-            "dispositions",
-            "hospitalized",
-            "icu",
-            "mitigation_date",
-            "ventilated",
-        ):
-            result.__dict__[key] = value
-
-    return result
 
 
 def build_csv_download(df):
