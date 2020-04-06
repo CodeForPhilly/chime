@@ -8,7 +8,7 @@ def test_cli_defaults():
     _ = Parameters.create({'PARAMETERS': './defaults/cli.cfg'}, [])
 
 
-def test_streamlit_defaults():
-    """Ensure the streamlit defaults have beedn updated."""
+def test_webapp_defaults():
+    """Ensure the webapp defaults have been updated."""
     # TODO how to make this work when the module is installed?
-    _ = Parameters.create({'PARAMETERS': './defaults/streamlit.cfg'}, [])
+    _ = Parameters.create({'PARAMETERS': './defaults/webapp.cfg'}, [])
