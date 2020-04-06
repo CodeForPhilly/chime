@@ -38,12 +38,19 @@ _SIDEBAR_ELEMENTS = ReadOnlyDict(OrderedDict(
     current_hospitalized={"type": "number", "min": 0, "step": 1},
     ###
     spread_parameters={"type": "header", "size": "h4"},
+    spread_parameters_checkbox={"type": "switch", "value": False},
     date_first_hospitalized={
         "type": "date",
         "min_date_allowed": datetime(2019, 10, 1),
         "max_date_allowed": datetime(2021, 12, 31),
     },
     doubling_time={"type": "number", "min": FLOAT_INPUT_MIN, "step": FLOAT_INPUT_STEP},
+    social_distancing_checkbox={"type": "switch", "value": False},
+    social_distancing_start_date={
+        "type": "date",
+        "min_date_allowed": datetime(2019, 10, 1),
+        "max_date_allowed": datetime(2021, 12, 31),
+    },
     relative_contact_rate={
         "type": "number",
         "min": 0.0,

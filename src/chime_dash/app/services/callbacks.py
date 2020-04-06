@@ -1,19 +1,38 @@
-from typing import List
+from collections import OrderedDict, defaultdict
 from datetime import datetime
-from collections import OrderedDict
+from typing import List
 from urllib.parse import parse_qsl, urlencode
+
 from dash.exceptions import PreventUpdate
 
-from chime_dash.app.utils.callbacks import ChimeCallback, register_callbacks
 from chime_dash.app.utils import (
     get_n_switch_values,
     parameters_deserializer,
     parameters_serializer,
     prepare_visualization_group
 )
-
+from chime_dash.app.utils.callbacks import ChimeCallback, register_callbacks
 from penn_chime.models import SimSirModel
 from penn_chime.parameters import Parameters, Disposition
+
+
+class Multidict(defaultdict):
+
+    def __init__(self, obj):
+        super(Multidict, self).__init__(set)
+        for el in obj:
+            self.__setitem__(*el)
+
+    def __setitem__(self, key, value):
+        if isinstance(value, (self.default_factory)):  # self.default_factory is `set`
+            super().__setitem__(key, value)
+        else:
+            self[key].add(value)
+
+    def items(self):
+        for key in self.keys():
+            for v in self[key]:
+                yield key, v
 
 
 class ComponentCallbacks:
@@ -153,6 +172,19 @@ class SidebarCallbacks(ComponentCallbacks):
                 raise PreventUpdate
             return SidebarCallbacks.update_parameters(component_instance, *args)
 
+        def hospitalized_checkbox_to_first_date(i_know_first_hospitalized):
+            if not i_know_first_hospitalized:
+                return
+            else:
+                raise ValueError('Do not update')
+
+
+        def hospitalized_checkbox_to_doubling_time(i_know_first_hospitalized):
+            if i_know_first_hospitalized:
+                return
+            else:
+                raise ValueError('Do not update')
+
         super().__init__(
             component_instance=component_instance,
             callbacks=[
@@ -161,7 +193,17 @@ class SidebarCallbacks(ComponentCallbacks):
                     dom_updates={"sidebar-store": "data"},
                     callback_fn=update_parameters_helper,
                     stores=["sidebar-store"],
-                )
+                ),
+                ChimeCallback(
+                    changed_elements={'spread_parameters_checkbox': 'value'},
+                    dom_updates={'date_first_hospitalized': 'date'},
+                    callback_fn=hospitalized_checkbox_to_first_date
+                ),
+                ChimeCallback(
+                    changed_elements={'spread_parameters_checkbox': 'value'},
+                    dom_updates={'doubling_time': 'value'},
+                    callback_fn=hospitalized_checkbox_to_doubling_time
+                ),
             ]
         )
 
@@ -236,6 +278,7 @@ class RootCallbacks(ComponentCallbacks):
 
         def stores_changed_helper(root_mod, sidebar_mod, root_data, sidebar_data):
             return RootCallbacks.stores_changed(sidebar_inputs.keys(), root_mod, sidebar_mod, root_data, sidebar_data)
+
         super().__init__(
             component_instance=component_instance,
             callbacks=[
