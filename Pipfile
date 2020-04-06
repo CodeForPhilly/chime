@@ -4,12 +4,13 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+black = "==19.10b0"
+pytest = "*"
 
 [packages]
 streamlit = "*"
 pandas = "*"
 numpy = "*"
-pytest = "*"
 altair = "*"
 dash = "*"
 dash-bootstrap-components = "*"
@@ -18,3 +19,6 @@ PyYAML = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

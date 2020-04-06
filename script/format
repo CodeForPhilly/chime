@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# script/format: Format python code
+
+set -e
+cd "$(dirname "$0")/.."
+
+FILES_TO_FORMAT="src/ tests/ setup.py"
+
+if [ "$1" = "--check" ]; then
+  python -m black --check ${FILES_TO_FORMAT}
+else
+  python -m black ${FILES_TO_FORMAT}
+fi
