@@ -8,7 +8,7 @@ from argparse import (
 from pandas import DataFrame
 
 from .constants import CHANGE_DATE
-from .parameters import Parameters, Disposition
+from .parameters import Parameters, Disposition, ACCEPTED_PARAMETERS
 from .models import SimSirModel as Model
 
 
