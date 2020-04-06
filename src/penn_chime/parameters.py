@@ -5,7 +5,7 @@ constants.py `change_date``.
 """
 
 from collections import namedtuple
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from .validators import (
@@ -45,24 +45,29 @@ class Regions:
         self.population = population
 
 
-ACCEPTED_PARAMETERS = {
-    "current_hospitalized": (Positive, None),
-    "current_date": (OptionalDate, None),
-    "date_first_hospitalized": (OptionalDate, None),
-    "doubling_time": (OptionalStrictlyPositive, None),
-    "relative_contact_rate": (Rate, None),
-    "mitigation_date": (OptionalDate, None),
-    "infectious_days": (StrictlyPositive, 14),
-    "market_share": (Rate, 1.0),
-    "max_y_axis": (OptionalStrictlyPositive, None),
-    "n_days": (StrictlyPositive, 100),
-    "recovered": (Positive, 0),
-    "population": (OptionalStrictlyPositive, None),
-    "region": (OptionalValue, None),
+def cast_date(string):
+    return datetime.strptime(string, '%Y-%m-%d').date()
 
-    "hospitalized": (ValDisposition, None),
-    "icu": (ValDisposition, None),
-    "ventilated": (ValDisposition, None),
+
+# Dictionary from parameter names to Tuples containing (validator, default value, cast function, help text)
+ACCEPTED_PARAMETERS = {
+    "current_hospitalized": (Positive, None, int, "Currently hospitalized COVID-19 patients (>= 0)"),
+    "current_date": (OptionalDate, None, cast_date, "Date on which the forecast should be based"),
+    "date_first_hospitalized": (OptionalDate, None, cast_date, "Date the first patient was hospitalized"),
+    "doubling_time": (OptionalStrictlyPositive, None, float, "Doubling time before social distancing (days)"),
+    "relative_contact_rate": (Rate, None, float, "Social distancing reduction rate: 0.0 - 1.0"),
+    "mitigation_date": (OptionalDate, None, cast_date, "Date on which social distancing measures too effect"),
+    "infectious_days": (StrictlyPositive, 14, int, "Infectious days"),
+    "market_share": (Rate, 1.0, float, "Hospital market share (0.00001 - 1.0)"),
+    "max_y_axis": (OptionalStrictlyPositive, None, int, None),
+    "n_days": (StrictlyPositive, 100, int, "Number of days to project >= 0"),
+    "recovered": (Positive, 0, int, "Number of patients already recovered (not yet implemented)"),
+    "population": (OptionalStrictlyPositive, None, int, "Regional population >= 1"),
+    "region": (OptionalValue, None, None, "No help available"),
+
+    "hospitalized": (ValDisposition, None, None, None),
+    "icu": (ValDisposition, None, None, None),
+    "ventilated": (ValDisposition, None, None, None),
 }
 
 
@@ -76,7 +81,7 @@ class Parameters:
                 raise ValueError(f"Unexpected parameter {key}")
             passed_and_default_parameters[key] = value
 
-        for key, (validator, default_value) in ACCEPTED_PARAMETERS.items():
+        for key, (validator, default_value, cast, help) in ACCEPTED_PARAMETERS.items():
             if key not in passed_and_default_parameters:
                 passed_and_default_parameters[key] = default_value
 
