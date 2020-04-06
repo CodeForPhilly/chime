@@ -11,12 +11,13 @@ from . import callbacks
 from . import templates
 
 from itertools import repeat
-from urllib.parse import quote
 from json import dumps, loads
-from typing import Any, List
-from datetime import date, datetime
-from dateutil.parser import parse as parse_date
 from collections import Mapping
+from datetime import date, datetime
+from typing import Any, List
+from urllib.parse import quote
+
+from dateutil.parser import parse as parse_date
 from pandas import DataFrame
 
 from chime_dash.app.services.plotting import plot_dataframe

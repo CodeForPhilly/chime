@@ -1,6 +1,6 @@
 """Setup file for chime
 """
-__version__ = "1.1.2"  # update VERSION in constants.py
+__version__ = "1.1.3"  # update VERSION in constants.py
 __author__ = "Predictive Healthcare @ Penn Medicine"
 
 from os import path
