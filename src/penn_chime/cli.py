@@ -4,12 +4,11 @@ from argparse import (
     Action,
     ArgumentParser,
 )
-from datetime import datetime
 
 from pandas import DataFrame
 
 from .constants import CHANGE_DATE
-from .parameters import Parameters, Disposition
+from .parameters import Parameters, Disposition, ACCEPTED_PARAMETERS
 from .models import SimSirModel as Model
 
 
@@ -21,8 +20,16 @@ class FromFile(Action):
             parser.parse_args(f.read().split(), namespace)
 
 
-def cast_date(string):
-    return datetime.strptime(string, '%Y-%m-%d').date()
+def declarative_validator(cast):
+    """Validator."""
+
+    def validate(string):
+        """Validate."""
+        if string == '' and cast != str:
+            return None
+        return cast(string)
+
+    return validate
 
 
 def validator(arg, cast, min_value, max_value, required=True):
@@ -49,31 +56,18 @@ def parse_args():
     parser = ArgumentParser(description=f"penn_chime: {CHANGE_DATE}")
     parser.add_argument("--file", type=open, action=FromFile)
 
+    for name, (params_validator, default, cast, help) in ACCEPTED_PARAMETERS.items():
+        if cast is None:
+            continue
+
+        parser.add_argument(
+            "--" + name.replace('_', '-'),
+            type=declarative_validator(cast),
+            default=default,
+            help=help
+        )
+
     for arg, cast, min_value, max_value, help, required in (
-        (
-            "--current-hospitalized",
-            int,
-            0,
-            None,
-            "Currently hospitalized COVID-19 patients (>= 0)",
-            True,
-        ),
-        (
-            "--date-first-hospitalized",
-            cast_date,
-            None,
-            None,
-            "Current date",
-            False,
-        ),
-        (
-            "--doubling-time",
-            float,
-            0.0,
-            None,
-            "Doubling time before social distancing (days)",
-            True,
-        ),
         ("--hospitalized-days", int, 0, None, "Average hospital length of stay (in days)", True),
         (
             "--hospitalized-rate",
@@ -85,25 +79,7 @@ def parse_args():
         ),
         ("--icu-days", int, 0, None, "Average days in ICU", True),
         ("--icu-rate", float, 0.0, 1.0, "ICU rate: 0.0 - 1.0", True),
-        (
-            "--market_share",
-            float,
-            0.00001,
-            1.0,
-            "Hospital market share (0.00001 - 1.0)",
-            True,
-        ),
-        ("--infectious-days", float, 0.0, None, "Infectious days", True),
-        ("--n-days", int, 0, None, "Number of days to project >= 0", True),
-        (
-            "--relative-contact-rate",
-            float,
-            0.0,
-            1.0,
-            "Social distancing reduction rate: 0.0 - 1.0",
-            True,
-        ),
-        ("--population", int, 1, None, "Regional population >= 1", True),
+
         ("--ventilated-days", int, 0, None, "Average days on ventilator", True),
         ("--ventilated-rate", float, 0.0, 1.0, "Ventilated Rate: 0.0 - 1.0", True),
     ):
@@ -119,19 +95,24 @@ def main():
     """Main."""
     a = parse_args()
 
-    p = Parameters(
-        current_hospitalized=a.current_hospitalized,
-        date_first_hospitalized=a.date_first_hospitalized,
-        doubling_time=a.doubling_time,
-        infectious_days=a.infectious_days,
-        market_share=a.market_share,
-        n_days=a.n_days,
-        relative_contact_rate=a.relative_contact_rate,
-        population=a.population,
+    del a.file
 
-        hospitalized=Disposition(a.hospitalized_rate, a.hospitalized_days),
-        icu=Disposition(a.icu_rate, a.icu_days),
-        ventilated=Disposition(a.ventilated_rate, a.ventilated_days),
+    hospitalized = Disposition(a.hospitalized_rate, a.hospitalized_days)
+    icu = Disposition(a.icu_rate, a.icu_days)
+    ventilated = Disposition(a.ventilated_rate, a.ventilated_days)
+
+    del a.hospitalized_days
+    del a.hospitalized_rate
+    del a.icu_days
+    del a.icu_rate
+    del a.ventilated_days
+    del a.ventilated_rate
+
+    p = Parameters(
+        hospitalized=hospitalized,
+        icu=icu,
+        ventilated=ventilated,
+        **vars(a)
     )
 
     m = Model(p)
