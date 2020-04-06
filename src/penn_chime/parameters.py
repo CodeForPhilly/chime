@@ -12,6 +12,8 @@ from argparse import (
 )
 from collections import namedtuple
 from datetime import date, datetime
+from logging import INFO, basicConfig, getLogger
+from sys import stdout
 from typing import Dict, List
 
 from .constants import (
@@ -28,6 +30,15 @@ from .validators import (
     StrictlyPositive,
     ValDisposition,
 )
+
+
+basicConfig(
+    level=INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=stdout,
+)
+logger = getLogger(__name__)
+
 
 # Parameters for each disposition (hospitalized, icu, ventilated)
 #   The rate of disposition within the population of infected
@@ -132,6 +143,7 @@ class FromFile(Action):
     """From File."""
 
     def __call__(self, parser, namespace, values, option_string=None):
+        logger.info('Using file: %s', values)
         with values as f:
             parser.parse_args(f.read().split(), namespace)
 
@@ -231,6 +243,7 @@ class Parameters:
     def __init__(self, **kwargs):
         today = date.today()
 
+        # mypy needs properties
         self.current_date = None
         self.current_hospitalized = None
         self.date_first_hospitalized = None
