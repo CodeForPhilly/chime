@@ -177,6 +177,7 @@ def create_date_input(
             DatePickerSingle(
                 className="form-control",
                 day_size=32,
+                display_format='YYYY-MM-DD',
                 id=idx,
                 **input_kwargs
             ),
