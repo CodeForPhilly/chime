@@ -5,6 +5,8 @@ from datetime import date
 
 import altair as alt
 import numpy as np
+import os
+import json
 import pandas as pd
 import penn_chime.spreadsheet as sp
 from .constants import (
@@ -375,6 +377,52 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         population=population,
     )
 
+#Read the environment variables and cteate json key object to use with ServiceAccountCredentials
+def readGoogleApiSecrets():
+    client_secret = {}
+    os.getenv
+    type = os.getenv ('GAPI_CRED_TYPE').strip()
+    print (type)
+    client_secret['type'] = type,
+    client_secret['project_id'] = os.getenv ('GAPI_CRED_PROJECT_ID'),
+    client_secret['private_key_id'] = os.getenv ('GAPI_CRED_PRIVATE_KEY_ID'),
+    client_secret['private_key'] = os.getenv ('GAPI_CRED_PRIVATE_KEY'),
+    client_secret['client_email'] = os.getenv ('GAPI_CRED_CLIENT_EMAIL'),
+    client_secret['client_id'] = os.getenv ('GAPI_CRED_CLIENT_ID'),
+    client_secret['auth_uri'] = os.getenv ('GAPI_CRED_AUTH_URI'),
+    client_secret['token_uri'] = os.getenv ('GAPI_CRED_TOKEN_URI'),
+    client_secret['auth_provider_x509_cert_url'] =  os.getenv ('GAPI_CRED_AUTH_PROVIDER_X509_CERT_URL'),
+    client_secret['client_x509_cert_url'] = os.getenv ('GAPI_CRED_CLIENT_X509_CERT_URI'),
+    json_data = json.dumps (client_secret)
+    print(json_data)
+    return json_data
+
+def readGoogleApiSecretsDict():
+    type = os.getenv ('GAPI_CRED_TYPE')
+    project_id = os.getenv ('GAPI_CRED_PROJECT_ID')
+    private_key_id =  os.getenv ('GAPI_CRED_PRIVATE_KEY_ID')
+    private_key = os.getenv ('GAPI_CRED_PRIVATE_KEY')
+    client_email = os.getenv ('GAPI_CRED_CLIENT_EMAIL')
+    client_id = os.getenv ('GAPI_CRED_CLIENT_ID')
+    auth_uri = os.getenv ('GAPI_CRED_AUTH_URI')
+    token_uri = os.getenv ('GAPI_CRED_TOKEN_URI')
+    auth_provider_x509_cert_url = os.getenv ('GAPI_CRED_AUTH_PROVIDER_X509_CERT_URL')
+    client_x509_cert_url = os.getenv ('GAPI_CRED_CLIENT_X509_CERT_URI')
+
+    secret = {
+        'type' : type,
+        'project_id' : project_id,
+        'private_key_id' : private_key_id,
+        'private_key':private_key,
+        'client_email': client_email,
+        'client_id': client_id,
+        'auth_uri': auth_uri,
+        'token_uri': token_uri,
+        'auth_provider_x509_cert_url':auth_provider_x509_cert_url,
+        'client_x509_cert_url':client_x509_cert_url
+    }
+    return secret
+
 def subscribe(st_obj):
     st_obj.subheader ("Subscribe")
     email = st_obj.text_input (label="Enter Email", value="", key="na_lower_1")
@@ -385,7 +433,9 @@ def subscribe(st_obj):
         send_subscription_to_google_sheet(st_obj, row)
 
 def send_subscription_to_google_sheet(st_obj, row):
-    spr = sp.spreadsheet (st_obj, 'client_secret.json')
+    json_secret = readGoogleApiSecretsDict()
+    #print(json_secret)
+    spr = sp.spreadsheet (st_obj, json_secret)
     spr.writeToSheet("CHIME Form Submissions", row)
 
 def write_definitions(st):
