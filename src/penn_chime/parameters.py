@@ -6,10 +6,7 @@ constants.py `change_date``.
 
 from __future__ import annotations
 
-from argparse import (
-    Action,
-    ArgumentParser,
-)
+from argparse import ArgumentParser
 from collections import namedtuple
 from datetime import date, datetime
 from logging import INFO, basicConfig, getLogger
@@ -118,182 +115,188 @@ def validator(arg, cast, min_value, max_value, required=True):
     return validate
 
 
-# Dictionary from parameter names to Tuples containing (validator, cast function, help text)
-ACCEPTED_PARAMETERS = {
-    "current_hospitalized": (Positive, int, "Currently hospitalized COVID-19 patients (>= 0)"),
-    "current_date": (OptionalDate, cast_date, "Date on which the forecast should be based"),
-    "date_first_hospitalized": (OptionalDate, cast_date, "Date the first patient was hospitalized"),
-    "doubling_time": (OptionalStrictlyPositive, float, "Doubling time before social distancing (days)"),
-    "infectious_days": (StrictlyPositive, int, "Infectious days"),
-    "mitigation_date": (OptionalDate, cast_date, "Date on which social distancing measures too effect"),
-    "market_share": (Rate, float, "Hospital market share (0.00001 - 1.0)"),
-    "max_y_axis": (OptionalStrictlyPositive, int, None),
-    "n_days": (StrictlyPositive, int, "Number of days to project >= 0"),
-    "population": (OptionalStrictlyPositive, int, "Regional population >= 1"),
-    "recovered": (Positive, int, "Number of patients already recovered (not yet implemented)"),
-    "region": (OptionalValue, None, "No help available"),
-    "relative_contact_rate": (Rate, float, "Social distancing reduction rate: 0.0 - 1.0"),
-    "ventilated": (ValDisposition, None, None),
-    "hospitalized": (ValDisposition, None, None),
-    "icu": (ValDisposition, None, None),
+# TODO make validators cast and report properties for args
+
+
+VALIDATORS = {
+    "current_hospitalized": Positive,
+    "current_date": OptionalDate,
+    "date_first_hospitalized": OptionalDate,
+    "doubling_time": OptionalStrictlyPositive,
+    "infectious_days": StrictlyPositive,
+    "mitigation_date": OptionalDate,
+    "market_share": Rate,
+    "max_y_axis": OptionalStrictlyPositive,
+    "n_days": StrictlyPositive,
+    "population": OptionalStrictlyPositive,
+    "recovered": Positive,
+    "region": OptionalValue,
+    "relative_contact_rate": Rate,
+    "ventilated": ValDisposition,
+    "hospitalized": ValDisposition,
+    "icu": ValDisposition,
 }
 
 
-def cli_args():
-    return (
-        (
-            "parameters",
-            str,
-            None,
-            None,
-            "Parameters file.",
-            False,
-        ),
-        (
-            "current_hospitalized",
-            int,
-            0,
-            None,
-            "Currently hospitalized COVID-19 patients (>= 0)",
-            True,
-        ),
-        (
-            "current_date",
-            cast_date,
-            None,
-            None,
-            "Current date (default is today)",
-            False,
-        ),
-        (
-            "date_first_hospitalized",
-            cast_date,
-            None,
-            None,
-            "Date of first hospitalization",
-            False,
-        ),
-        (
-            "doubling_time",
-            float,
-            0.0,
-            None,
-            "Doubling time before social distancing (days)",
-            True,
-        ),
-        (
-            "hospitalized_days",
-            int,
-            0,
-            None,
-            "Average hospital length of stay (in days)",
-            True,
-        ),
-        (
-            "hospitalized_rate",
-            float,
-            0.00001,
-            1.0,
-            "Hospitalized Rate: 0.00001 - 1.0",
-            True,
-        ),
-        (
-            "icu_days",
-            int,
-            0,
-            None,
-            "Average days in ICU",
-            True,
-        ),
-        (
-            "icu_rate",
-            float,
-            0.0,
-            1.0,
-            "ICU rate: 0.0 - 1.0",
-            True,
-        ),
-        (
-            "market_share",
-            float,
-            0.00001,
-            1.0,
-            "Hospital market share (0.00001 - 1.0)",
-            True,
-        ),
-        (
-            "infectious_days",
-            int,
-            0.0,
-            None,
-            "Infectious days",
-            True,
-        ),
-        (
-            "mitigation_date",
-            cast_date,
-            None,
-            None,
-            "Mitigation date for social distancing.",
-            False,
-        ),
-        (
-            "max_y_axis",
-            int,
-            0,
-            None,
-            "Maximum y axis",
-            True,
-        ),
-        (
-            "n-days",
-            int,
-            0,
-            None,
-            "Number of days to project >= 0",
-            True,
-        ),
-        (
-            "recovered",
-            int,
-            0,
-            None,
-            "Initial recovered >= 0",
-            True,
-        ),
-        (
-            "relative-contact-rate",
-            float,
-            0.0,
-            1.0,
-            "Social distancing reduction rate: 0.0 - 1.0",
-            True,
-        ),
-        (
-            "population",
-            int,
-            1,
-            None,
-            "Regional population >= 1",
-            True,
-        ),
-        (
-            "ventilated_days",
-            int,
-            0,
-            None,
-            "Average days on ventilator",
-            True,
-        ),
-        (
-            "ventilated_rate",
-            float,
-            0.0,
-            1.0,
-            "Ventilated Rate: 0.0 - 1.0",
-            True,
-        ),
-    )
+HELP = {
+    "current_hospitalized": "Currently hospitalized COVID-19 patients (>= 0)",
+    "current_date": "Date on which the projection should be based (default is today)",
+    "date_first_hospitalized": "Date the first patient was hospitalized",
+    "doubling_time": "Doubling time before social distancing (days)",
+    "hospitalized_days": "Average hospital length of stay (in days)",
+    "hospitalized_rate": "Hospitalized Rate: 0.00001 - 1.0",
+    "icu_days": "Average days in ICU",
+    "icu_rate": "ICU rate: 0.0 - 1.0",
+    "infectious_days": "Infectious days",
+    "mitigation_date": "Date on which social distancing measures too effect",
+    "market_share": "Hospital market share (0.00001 - 1.0)",
+    "max_y_axis": "Max y-axis",
+    "n_days": "Number of days to project >= 0",
+    "parameters": "Parameters file",
+    "population": "Regional population >= 1",
+    "recovered": "Number of patients already recovered (not yet implemented)",
+    "region": "No help available",
+    "relative_contact_rate": "Social distancing reduction rate: 0.0 - 1.0",
+    "ventilated_days": "Average days on ventilator",
+    "ventilated_rate": "Ventilated Rate: 0.0 - 1.0",
+}
+
+
+ARGS = (
+    (
+        "parameters",
+        str,
+        None,
+        None,
+        False,
+    ),
+    (
+        "current_hospitalized",
+        int,
+        0,
+        None,
+        True,
+    ),
+    (
+        "current_date",
+        cast_date,
+        None,
+        None,
+        False,
+    ),
+    (
+        "date_first_hospitalized",
+        cast_date,
+        None,
+        None,
+        False,
+    ),
+    (
+        "doubling_time",
+        float,
+        0.0,
+        None,
+        True,
+    ),
+    (
+        "hospitalized_days",
+        int,
+        0,
+        None,
+        True,
+    ),
+    (
+        "hospitalized_rate",
+        float,
+        0.00001,
+        1.0,
+        True,
+    ),
+    (
+        "icu_days",
+        int,
+        0,
+        None,
+        True,
+    ),
+    (
+        "icu_rate",
+        float,
+        0.0,
+        1.0,
+        True,
+    ),
+    (
+        "market_share",
+        float,
+        0.00001,
+        1.0,
+        True,
+    ),
+    (
+        "infectious_days",
+        int,
+        0.0,
+        None,
+        True,
+    ),
+    (
+        "mitigation_date",
+        cast_date,
+        None,
+        None,
+        False,
+    ),
+    (
+        "max_y_axis",
+        int,
+        0,
+        None,
+        True,
+    ),
+    (
+        "n-days",
+        int,
+        0,
+        None,
+        True,
+    ),
+    (
+        "recovered",
+        int,
+        0,
+        None,
+        True,
+    ),
+    (
+        "relative-contact-rate",
+        float,
+        0.0,
+        1.0,
+        True,
+    ),
+    (
+        "population",
+        int,
+        1,
+        None,
+        True,
+    ),
+    (
+        "ventilated_days",
+        int,
+        0,
+        None,
+        True,
+    ),
+    (
+        "ventilated_rate",
+        float,
+        0.0,
+        1.0,
+        True,
+    ),
+)
 
 
 def to_cli(name):
@@ -308,12 +311,12 @@ class Parameters:
         parser = ArgumentParser(
             description=f"penn_chime: {VERSION} {CHANGE_DATE}")
 
-        for name, cast, min_value, max_value, help, required in cli_args():
+        for name, cast, min_value, max_value, required in ARGS:
             arg = to_cli(name)
             parser.add_argument(
                 arg,
                 type=validator(arg, cast, min_value, max_value, required),
-                help=help,
+                help=HELP.get(name),
             )
         return parser
 
@@ -394,12 +397,12 @@ class Parameters:
 
         passed_and_default_parameters = {}
         for key, value in kwargs.items():
-            if key not in ACCEPTED_PARAMETERS:
+            if key not in VALIDATORS:
                 raise ValueError(f"Unexpected parameter {key}")
             passed_and_default_parameters[key] = value
 
         for key, value in passed_and_default_parameters.items():
-            validator = ACCEPTED_PARAMETERS[key][0]
+            validator = VALIDATORS[key]
             try:
                 validator(key=key, value=value)
             except TypeError as ve:
