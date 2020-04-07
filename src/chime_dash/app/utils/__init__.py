@@ -153,12 +153,13 @@ def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
             max_y_axis=kwargs.get("max_y_axis", None),
         )
 
+
+        # translate back for backwards compability of build_table
+        column_map = {day_column: "day", date_column: "date"}
         table = (
             df_to_html_table(
                 build_table(
-                    df=df.rename( # translate back for backwards compability
-                        columns={day_column: "day", date_column: "date"}
-                    ),
+                    df=df.rename(columns=column_map),
                     labels=kwargs.get("labels", df.columns),
                     modulo=kwargs.get("table_mod", 7),
                 ),
@@ -171,7 +172,9 @@ def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
             # else None
         )
 
-        csv = build_csv_download(df)
+        # Convert columnnames to lowercase
+        column_map = {col: col.lower() for col in df.columns}
+        csv = build_csv_download(df.rename(columns=column_map))
         result = [plot_data, table, csv]
 
     return result
