@@ -178,7 +178,11 @@ def create_date_input(
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
             DatePickerSingle(
-                className="form-control", day_size=32, id=idx, **input_kwargs
+                className="form-control",
+                day_size=32,
+                display_format='YYYY-MM-DD',
+                id=idx,
+                **input_kwargs
             ),
         ]
     )
