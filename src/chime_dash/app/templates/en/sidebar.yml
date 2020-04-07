@@ -1,31 +1,27 @@
 hospital_parameters: Hospital Parameters
-population: Regional Population
-market_share: Hospital Market Share (%)
-current_hospitalized: Currently Hospitalized COVID-19 Patients
+population: Regional population
+market_share: Hospital market share (%)
+current_hospitalized: Currently hospitalized COVID-19 patients
 
 spread_parameters: Spread and Contact Parameters
-date_first_hospitalized: Date of first hospitalized case - Enter this date to have chime estimate the initial doubling time
+date_first_hospitalized: Date of first hospitalized case (enter this date to have CHIME estimate the initial doubling time)
 doubling_time: Doubling time in days (up to today. This overwrites date of first hospitalized estimation)
 relative_contact_rate: Social distancing (% reduction in social contact going forward)
 
 severity_parameters: Severity Parameters
-hospitalized_rate: Hospitalization %(total infections)
-icu_rate: ICU %(total infections)
-ventilated_rate: Ventilated %(total infections)
-infectious_days: Infectious Days
-hospitalized_los: Average Hospital Length of Stay (days)
-icu_los: Average Days in ICU
-ventilated_los: Average Days on Ventilator
+hospitalized_rate: Hospitalization rate (% of total infections)
+icu_rate: ICU (% of total infections)
+ventilated_rate: Ventilated (% of total infections)
+infectious_days: Infectious days
+hospitalized_los: Average hospital length of stay (in days)
+icu_los: Average days in ICU
+ventilated_los: Average days on ventilator
 
-display_parameters: Display parameters
+display_parameters: Display Parameters
 n_days: Number of days to project
-current_date: Current date (Default is today)
+current_date: Current date (default is today)
 max_y_axis: Set the Y-axis on graphs to a static
 max_y_axis_value: Maximal y-axis value (leave blank for no max value)
 show_tables: Show tables with data
 show_tool_details: Show more info about this tool
 show_additional_projections: Show additional projections
-
-line_break_1: Line break
-line_break_2: Line break
-line_break_3: Line break

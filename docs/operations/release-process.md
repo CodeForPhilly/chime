@@ -1,9 +1,6 @@
 # Operations: Release Process
 
-1. Merge pull requests into `develop`
-2. Chose a new version number by incrementing the previous release according to [semver](https://semver.org/)
-   - Do not bump the MAJOR version unless the team is ready to create a new `releases/v#` branch
-3. Open a pull request to merge `develop` into `releases/v1`
+1. Open a pull request to merge `develop` into `releases/v1`
    - **Title**: `Release: CHIME v1.#.#`
    - **Description**: Generate with this command:
 
@@ -22,4 +19,3 @@
    - **Tag version:** `v1.#.#`
    - **Release Title:** `CHIME v1.#.#`
    - **Description:** Copy release notes from pull request
-7. [Deploy to the `chime-live` cluster](chime-live-cluster.md)
