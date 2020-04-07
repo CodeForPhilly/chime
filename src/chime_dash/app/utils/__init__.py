@@ -116,18 +116,49 @@ def get_n_switch_values(input_value, elements_to_update) -> List[bool]:
 
 def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
     """Creates plot, table and download link for data frame.
+
+    Arguments:
+        df: The Dataframe to plot
+        content: Dict[str, str]
+            Mapping for translating columns and index.
+        max_y_axis:  int
+            Maximal value on y-axis
+        labels: List[str]
+            Columns to display
+        table_mod: int
+            Displays only each `table_mod` row in table
+
     """
     result = [{}, None, None]
     if df is not None and isinstance(df, DataFrame):
+
+        date_column = "date"
+        day_column = "day"
+
+        # Translate column and index if specified
+        content = kwargs.get("content", None)
+        if content:
+            columns = {col: content[col] for col in df.columns if col in content}
+            index = (
+                {df.index.name: content[df.index.name]}
+                if df.index.name and df.index.name in content
+                else None
+            )
+            df = df.rename(columns=columns, index=index)
+            date_column = content.get(date_column, date_column)
+            day_column = content.get(day_column, day_column)
+
         plot_data = plot_dataframe(
-            df.dropna().set_index("date").drop(columns=["day"]),
+            df.dropna().set_index(date_column).drop(columns=[day_column]),
             max_y_axis=kwargs.get("max_y_axis", None),
         )
 
         table = (
             df_to_html_table(
                 build_table(
-                    df=df,
+                    df=df.rename( # translate back for backwards compability
+                        columns={day_column: "day", date_column: "date"}
+                    ),
                     labels=kwargs.get("labels", df.columns),
                     modulo=kwargs.get("table_mod", 7),
                 ),
@@ -153,4 +184,5 @@ def singleton(class_):
         if class_ not in instances:
             instances[class_] = class_(*args, **kwargs)
         return instances[class_]
+
     return get_instance
