@@ -9,8 +9,8 @@ ENV PARAMETERS=./defaults/webapp.cfg
 COPY README.md .
 COPY setup.py .
 COPY setup.cfg .
-COPY defaults defaults
 COPY src src 
+COPY defaults ./src/defaults
 RUN pip install -q .
 
 # EXPOSE $PORT 
