@@ -11,12 +11,13 @@ from . import callbacks
 from . import templates
 
 from itertools import repeat
-from urllib.parse import quote
 from json import dumps, loads
-from typing import Any, List
-from datetime import date, datetime
-from dateutil.parser import parse as parse_date
 from collections import Mapping
+from datetime import date, datetime
+from typing import Any, List
+from urllib.parse import quote
+
+from dateutil.parser import parse as parse_date
 from pandas import DataFrame
 
 from chime_dash.app.services.plotting import plot_dataframe
@@ -59,42 +60,42 @@ def parameters_serializer(p: Parameters):
 
 def parameters_deserializer(p_json: str):
     values = loads(p_json)
-    dfh = (
-        parse_date(values["date_first_hospitalized"])
-        if values["date_first_hospitalized"]
-        else None
-    )
-    result = Parameters(
+
+    dates = {
+        key: parse_date(values[key]).date() if values[key] else None
+        for key in (
+            "current_date",
+            "date_first_hospitalized",
+            "mitigation_date",
+        )
+    }
+    return Parameters(
+        current_date=dates["current_date"],
         current_hospitalized=values["current_hospitalized"],
-        hospitalized=Disposition(*values["hospitalized"]),
-        icu=Disposition(*values["icu"]),
-        relative_contact_rate=values["relative_contact_rate"],
-        ventilated=Disposition(*values["ventilated"]),
-        current_date=parse_date(values["current_date"]),
-        date_first_hospitalized=dfh,
-        doubling_time=values["doubling_time"],
+        hospitalized=Disposition.create(
+            days=values["hospitalized"][0],
+            rate=values["hospitalized"][1],
+        ),
+        icu=Disposition.create(
+            days=values["icu"][0],
+            rate=values["icu"][1],
+        ),
         infectious_days=values["infectious_days"],
+        date_first_hospitalized=dates["date_first_hospitalized"],
+        doubling_time=values["doubling_time"],
         market_share=values["market_share"],
         max_y_axis=values["max_y_axis"],
+        mitigation_date=dates["mitigation_date"],
         n_days=values["n_days"],
         population=values["population"],
         recovered=values["recovered"],
         region=values["region"],
+        relative_contact_rate=values["relative_contact_rate"],
+        ventilated=Disposition.create(
+            days=values["ventilated"][0],
+            rate=values["ventilated"][1],
+        ),
     )
-
-    for key, value in values.items():
-
-        if result.__dict__[key] != value and key not in (
-            "dispositions",
-            "hospitalized",
-            "icu",
-            "ventilated",
-            "current_date",
-            "date_first_hospitalized",
-        ):
-            result.__dict__[key] = value
-
-    return result
 
 
 def build_csv_download(df):
