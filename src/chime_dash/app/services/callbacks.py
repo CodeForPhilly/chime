@@ -38,10 +38,14 @@ class IndexCallbacks(ComponentCallbacks):
         if sidebar_data:
             pars = parameters_deserializer(sidebar_data["parameters"])
             model = SimSirModel(pars)
+            vis = i.components.get("visualizations", None) if i else None
+            vis_content = vis.content if vis else None
+
             viz_kwargs = dict(
                 labels=pars.labels,
                 table_mod=7,
                 max_y_axis=pars.max_y_axis,
+                content=vis_content
             )
         result.extend(i.components["intro"].build(model, pars))
         for df_key in ["admits_df", "census_df", "sim_sir_w_date_df"]:

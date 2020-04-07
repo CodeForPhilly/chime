@@ -16,5 +16,20 @@ hosp: Hospitalized
 icu: ICU
 vent: Ventalized
 
+# Admits df column translations
+admits_hospitalized: Hospitalized
+admits_icu: ICU
+admits_ventilated: Ventilated
+
+# Admits df column translations
+census_hospitalized: Hospitalized
+census_icu: ICU
+census_ventilated: Ventilated
+
+# SIR df column translations
+susceptible: Susceptible
+infected: Infected
+recovered: Recovered
+
 # Date Localization
 date-format: "%m%d%Y"

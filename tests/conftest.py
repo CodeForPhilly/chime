@@ -117,7 +117,7 @@ def admits_df():
 
 @pytest.fixture
 def admits_floor_df(param, admits_df):
-    return build_floor_df(admits_df, param.dispositions.keys())
+    return build_floor_df(admits_df, param.dispositions.keys(), "admits_")
 
 
 @pytest.fixture
@@ -128,5 +128,5 @@ def census_df():
 
 @pytest.fixture
 def census_floor_df(param, census_df):
-    return build_floor_df(census_df, param.dispositions.keys())
+    return build_floor_df(census_df, param.dispositions.keys(), "census_")
 
