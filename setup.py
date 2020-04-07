@@ -22,16 +22,17 @@ setup(
     package_dir={'': 'src'},
     packages=find_namespace_packages(where='src', exclude=('tests')),
     install_requires=[
-        "streamlit",
-        "pandas",
-        "numpy",
         "altair",
-        "pytest",
+        "black",
+        "gunicorn",
         "dash",
         "dash_bootstrap_components",
+        "numpy",
+        "pandas",
+        "pytest",
         "pyyaml",
-        "gunicorn",
-        "selenium"
+        "selenium",
+        "streamlit",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

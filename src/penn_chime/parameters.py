@@ -5,11 +5,11 @@ constants.py `change_date``.
 """
 
 from collections import namedtuple
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from .validators import (
-    Positive, OptionalStrictlyPositive, StrictlyPositive, Rate, Date, OptionalDate
+    OptionalValue, Positive, OptionalStrictlyPositive, StrictlyPositive, Rate, Date, OptionalDate, ValDisposition
     )
 
 # Parameters for each disposition (hospitalized, icu, ventilated)
@@ -45,61 +45,60 @@ class Regions:
         self.population = population
 
 
+def cast_date(string):
+    return datetime.strptime(string, '%Y-%m-%d').date()
+
+
+# Dictionary from parameter names to Tuples containing (validator, default value, cast function, help text)
+ACCEPTED_PARAMETERS = {
+    "current_hospitalized": (Positive, None, int, "Currently hospitalized COVID-19 patients (>= 0)"),
+    "current_date": (OptionalDate, None, cast_date, "Date on which the forecast should be based"),
+    "date_first_hospitalized": (OptionalDate, None, cast_date, "Date the first patient was hospitalized"),
+    "doubling_time": (OptionalStrictlyPositive, None, float, "Doubling time before social distancing (days)"),
+    "relative_contact_rate": (Rate, None, float, "Social distancing reduction rate: 0.0 - 1.0"),
+    "mitigation_date": (OptionalDate, None, cast_date, "Date on which social distancing measures too effect"),
+    "infectious_days": (StrictlyPositive, 14, int, "Infectious days"),
+    "market_share": (Rate, 1.0, float, "Hospital market share (0.00001 - 1.0)"),
+    "max_y_axis": (OptionalStrictlyPositive, None, int, None),
+    "n_days": (StrictlyPositive, 100, int, "Number of days to project >= 0"),
+    "recovered": (Positive, 0, int, "Number of patients already recovered (not yet implemented)"),
+    "population": (OptionalStrictlyPositive, None, int, "Regional population >= 1"),
+    "region": (OptionalValue, None, None, "No help available"),
+
+    "hospitalized": (ValDisposition, None, None, None),
+    "icu": (ValDisposition, None, None, None),
+    "ventilated": (ValDisposition, None, None, None),
+}
+
+
 class Parameters:
     """Parameters."""
 
-    def __init__(
-        self,
-        *,
-        current_hospitalized: int,
-        hospitalized: Disposition,
-        icu: Disposition,
-        relative_contact_rate: float,
-        mitigation_date: Optional[date] = None,
-        ventilated: Disposition,
-        current_date: date = date.today(),
-        date_first_hospitalized: Optional[date] = None,
-        doubling_time: Optional[float] = None,
-        infectious_days: int = 14,
-        market_share: float = 1.0,
-        max_y_axis: Optional[int] = None,
-        n_days: int = 100,
-        population: Optional[int] = None,
-        recovered: int = 0,
-        region: Optional[Regions] = None,
-    ):
-        self.current_hospitalized = Positive(value=current_hospitalized)
+    def __init__(self, **kwargs):
+        passed_and_default_parameters = {}
+        for key, value in kwargs.items():
+            if key not in ACCEPTED_PARAMETERS:
+                raise ValueError(f"Unexpected parameter {key}")
+            passed_and_default_parameters[key] = value
 
-        Rate(value=hospitalized.rate), Rate(value=icu.rate), Rate(value=ventilated.rate)
-        StrictlyPositive(value=hospitalized.days), StrictlyPositive(value=icu.days),
-        StrictlyPositive(value=ventilated.days)
+        for key, (validator, default_value, cast, help) in ACCEPTED_PARAMETERS.items():
+            if key not in passed_and_default_parameters:
+                passed_and_default_parameters[key] = default_value
 
-        self.hospitalized = hospitalized
-        self.icu = icu
-        self.ventilated = ventilated
+        for key, value in passed_and_default_parameters.items():
+            validator = ACCEPTED_PARAMETERS[key][0]
+            try:
+                validator(value=value)
+            except (TypeError, ValueError) as ve:
+                raise ValueError(f"For parameter '{key}', with value '{value}', validation returned error \"{ve}\"")
+            setattr(self, key, value)
 
-        if region is not None and population is None:
-            self.region = region
-            self.population = StrictlyPositive(value=region.population)
-        elif population is not None:
-            self.region = None
-            self.population = StrictlyPositive(value=population)
-        else:
+        if self.region is  None and self.population is None:
             raise AssertionError('population or regions must be provided.')
 
-        self.current_date = Date(value=current_date)
-       
-        self.date_first_hospitalized = OptionalDate(value=date_first_hospitalized)
-        self.doubling_time = OptionalStrictlyPositive(value=doubling_time)
-
-        self.relative_contact_rate = Rate(value=relative_contact_rate)
-        self.mitigation_date = OptionalDate(value=mitigation_date)
-
-        self.infectious_days = StrictlyPositive(value=infectious_days)
-        self.market_share = Rate(value=market_share)
-        self.max_y_axis = OptionalStrictlyPositive(value=max_y_axis)
-        self.n_days = StrictlyPositive(value=n_days)
-        self.recovered = Positive(value=recovered)
+        if self.current_date is None:
+            self.current_date = date.today()
+        Date(value=self.current_date)
 
         self.labels = {
             "hospitalized": "Hospitalized",
@@ -113,7 +112,7 @@ class Parameters:
         }
 
         self.dispositions = {
-            "hospitalized": hospitalized,
-            "icu": icu,
-            "ventilated": ventilated,
+            "hospitalized": self.hospitalized,
+            "icu": self.icu,
+            "ventilated": self.ventilated,
         }
