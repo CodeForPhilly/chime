@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 
-from src.penn_chime.models import (
+from penn_chime.models import (
     sir,
     sim_sir,
     get_growth_rate,
