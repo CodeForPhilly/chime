@@ -4,7 +4,7 @@ from datetime import datetime
 import altair as alt
 import pytest
 
-from src.penn_chime.charts import (
+from penn_chime.charts import (
     build_admits_chart,
     build_census_chart,
     build_descriptions,
