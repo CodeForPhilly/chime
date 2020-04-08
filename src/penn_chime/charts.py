@@ -26,7 +26,7 @@ def build_admits_chart(
     # TODO fix the fold to allow any number of dispositions
     points = (
         alt.Chart()
-        .transform_fold(fold=["hospitalized", "icu", "ventilated"])
+        .transform_fold(fold=["admits_hospitalized", "admits_icu", "admits_ventilated"])
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
         .encode(
@@ -65,7 +65,7 @@ def build_census_chart(
     # TODO fix the fold to allow any number of dispositions
     points = (
         alt.Chart()
-        .transform_fold(fold=["hospitalized", "icu", "ventilated"])
+        .transform_fold(fold=["census_hospitalized", "census_icu", "census_ventilated"])
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
         .encode(
@@ -128,7 +128,11 @@ def build_sim_sir_w_date_chart(
 
 
 def build_descriptions(
-    *, chart: Chart, labels: Dict[str, str], suffix: str = ""
+    *,
+    chart: Chart,
+    labels: Dict[str, str],
+    prefix: str = "",
+    suffix: str = ""
 ) -> str:
     """
 
@@ -145,17 +149,17 @@ def build_descriptions(
     day = "date" if "date" in chart.data.columns else "day"
 
     for col in cols:
-        if chart.data[col].idxmax() + 1 == len(chart.data):
+        if chart.data[prefix+col].idxmax() + 1 == len(chart.data):
             asterisk = True
 
         # todo: bring this to an optional arg / i18n
-        on = datetime.strftime(chart.data[day][chart.data[col].idxmax()], "%b %d")
+        on = datetime.strftime(chart.data[day][chart.data[prefix+col].idxmax()], "%b %d")
 
         messages.append(
             "{}{} peaks at {:,} on {}{}".format(
                 labels[col],
                 suffix,
-                ceil(chart.data[col].max()),
+                ceil(chart.data[prefix+col].max()),
                 on,
                 "*" if asterisk else "",
             )

@@ -12,11 +12,8 @@ from dash.development.base_component import ComponentMeta
 from dash_html_components import Div
 
 from penn_chime.parameters import Parameters
-from penn_chime.settings import get_defaults
 
 from chime_dash.app.utils.templates import read_localization_yml, read_localization_markdown
-
-DEFAULTS = get_defaults()
 
 
 class Component(ABC):
@@ -32,7 +29,7 @@ class Component(ABC):
     external_stylesheets: List[str] = []
     external_scripts: List[str] = []
 
-    def __init__(self, language: str = "en", defaults: Parameters = DEFAULTS):
+    def __init__(self, language: str = "en", defaults: Parameters = None):
         """Initializes the component
         """
         self.language = language
@@ -94,7 +91,7 @@ class Component(ABC):
 class Page(Component):
     callbacks_cls = None
 
-    def __init__(self, language: str = "en", defaults: Parameters = DEFAULTS):
+    def __init__(self, language: str = "en", defaults: Parameters = None):
         super().__init__(language, defaults)
         self.callbacks_cls(self)
 
