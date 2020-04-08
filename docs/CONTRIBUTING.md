@@ -26,6 +26,7 @@ As of March 21, help is especially wanted from contributors with experience in K
 
 - [Fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) the [CodeforPhilly/chime](https://github.com/CodeForPhilly/chime) repo.
 - Base your work on the `develop` branch.
+- Take a few minutes to review this [resource](https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Reviewer_Checklist) for contributors and reviewers, to accelerate the adoption of your contribution (thanks to the good folks at Mozilla for this).
 - Submit pull requests from your fork, also against the `develop` branch of the `CodeforPhilly/chime` repo.
 - Request review from the relevant maintainer(s).
 - Check your pull request periodically to see if any changes have been requested or any merge conflicts have arisen.
