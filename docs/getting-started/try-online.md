@@ -6,9 +6,9 @@ This instance is subject to unpredictable load though, and work to stabilize its
 
 ## Alternatives
 
-### Public Heroku Instance
+### Public Linode Instance
 
-Try this link: https://pennchime.herokuapp.com/
+Try this link: https://penn-chime.phl.io/
 
 ### Run Your Own Copy Locally
 
