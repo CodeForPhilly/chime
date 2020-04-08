@@ -5,6 +5,7 @@
 - [Developer Requirements](#developer-requirements)
 - [Project Layout](#project-layout)
 - [Running CHIME Locally](#running-chime-locally)
+- [Running CHIME in a Debugger](#running-chime-debugger)
 - [Testing](#testing)
 - [Validating CHIME](#validating-chime)
 
@@ -16,34 +17,6 @@ The application is built with [Streamlit](https://www.streamlit.io/), Streamlit 
 - PIP
 
 See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_started.html) for detailed information on prerequisites and setup
-
-## Running CHIME Locally
-
-### With `pipenv`
-
-```bash
-pipenv shell
-pipenv sync --dev
-streamlit run src/app.py
-```
-
-### With `conda`
-
-```bash
-conda env create -f environment.yml
-source activate chime
-pip install streamlit
-streamlit run src/app.py
-```
-
-### Choosing a Different Port
-
-If you need to run the application on a different port than the default (8000), you can export a variable in your shell session to override it with any port number of your choice before running:
-
-```bash
-export STREAMLIT_SERVER_PORT=1234
-streamlit run src/app.py
-```
 
 ## Project Layout
 
@@ -74,6 +47,73 @@ streamlit run src/app.py
 - `docker-compose.yml`: Runtime container configuration for running the application locally via Docker
 - `Dockerfile`: Recipe for building Docker container that runs the application
 - `Procfile`: Supports running the application on Heroku
+
+## Running CHIME Locally
+
+### With `pipenv`
+
+```bash
+pipenv shell
+pipenv sync --dev
+streamlit run src/app.py
+```
+
+### With `conda`
+
+```bash
+conda env create -f environment.yml
+source activate chime
+pip install streamlit
+streamlit run src/app.py
+```
+
+### Choosing a Different Port
+
+If you need to run the application on a different port than the default (8000), you can export a variable in your shell session to override it with any port number of your choice before running:
+
+```bash
+export STREAMLIT_SERVER_PORT=1234
+streamlit run src/app.py
+```
+
+## Running CHIME in a Debugger
+
+### In Visual Studio Code
+
+To set up CHIME for debugging under VS Code, it is necessary to create the file `launch.json` under the root of the CHIME repo's `.vscode` directory.
+
+The following example demonstrates how to setup VS Code to debug the DASH version of CHIME.
+
+```bash
+cat > <CHIME_REPO>/.vscode/launch.json <<'EOF'
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387 2
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: CHIME",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "dash_app.py",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "run",
+                "--no-reload"
+            ],
+            "jinja": true
+        }
+    ]
+}
+EOF
+```
+
+Next, you open a source file in the repo, such as `CHIME_REPO/src/dash_app.py`. Then, using the nagivation bar on the left hand side of VS Code, you select the Debugger.  This will create an action at the top of the next column labled "Run > Python:CHIME".  Select the arrow to launch the dash_app under the debugger.
 
 ## Testing
 
