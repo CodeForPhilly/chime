@@ -100,7 +100,8 @@ cat > <CHIME_REPO>/.vscode/launch.json <<'EOF'
             "env": {
                 "FLASK_APP": "dash_app.py",
                 "FLASK_ENV": "development",
-                "FLASK_DEBUG": "1"
+                "FLASK_DEBUG": "1",
+                "PARAMETERS": "defaults/webapp.cfg"
             },
             "args": [
                 "run",
