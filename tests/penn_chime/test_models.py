@@ -196,6 +196,6 @@ def test_model_cumulative_census(param, model):
 
     # TODO: is 1.0 for ceil function?
     diff = admits.hospitalized[1:-1] - (
-        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
+        param.market_share * param.hospitalized.rate * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
     )
     assert (diff.abs() < 0.1).all()
