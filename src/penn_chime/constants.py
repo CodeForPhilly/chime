@@ -7,7 +7,7 @@ This reflects a date from which previously-run reports will no
 longer match current results, indicating when users should
 re-run their reports
 """
-CHANGE_DATE = date(year=2020, month=4, day=6)
+CHANGE_DATE = date(year=2020, month=4, day=8)
 VERSION = 'v1.1.3'
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
