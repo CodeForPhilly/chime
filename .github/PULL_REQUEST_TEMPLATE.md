@@ -7,7 +7,7 @@
 - [ ] Documentation  revised /  included
 - [ ] Unit tests included
 - [ ] Issues referenced
-- [ ] Doesn't create new bugs / issues
+- [ ] Does not create new bugs / issues
 ---
 ### References
 <!-- Include the issues or other pull requests that this pull requests addresses, make sure to use keywords e.g. Fixes #123, #125. Also see #117 so that the issues close automatically as your PR is merged https://github.blog/2013-05-14-closing-issues-via-pull-requests/ -->
