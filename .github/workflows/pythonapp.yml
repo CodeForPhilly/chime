@@ -15,7 +15,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
@@ -33,17 +32,31 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Check formatting with black
+      run: |
+        # exit if any files still need formatting
+        bash script/format --check
+      continue-on-error: true
     - name: Test with pytest
       run: |
         pip install pytest
         python -m pytest
     - name: Run App
       run: |
-        streamlit run src/app.py &
+        PARAMETERS=./defaults/cypress.cfg streamlit run src/app.py &
     - name: Cypress
-      uses: cypress-io/github-action@v1.23.2
+      uses: cypress-io/github-action@v1
       with:
         working-directory: e2e
         wait-on: 'http://localhost:8000'
         wait-on-timeout: 300
-
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: e2e/cypress/screenshots
+    - uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: cypress-videos
+        path: e2e/cypress/videos

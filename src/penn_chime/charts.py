@@ -26,21 +26,15 @@ def build_admits_chart(
     # TODO fix the fold to allow any number of dispositions
     points = (
         alt.Chart()
-        .transform_fold(fold=["hospitalized", "icu", "ventilated"])
+        .transform_fold(fold=["admits_hospitalized", "admits_icu", "admits_ventilated"])
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
         .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Daily admissions", scale=y_scale),
-            color="key:N",
-            tooltip=[
-                tooltip_dict[as_date],
-                alt.Tooltip("value:Q", format=".0f", title="Admissions"),
-                "key:N",
-            ],
+            x=alt.X(**x),
+            y=alt.Y(**y),
+            color=color,
+            tooltip=tooltip,
         )
-        .configure_legend(orient="bottom")
-        .interactive()
     )
     bar = (
         alt.Chart()
@@ -48,7 +42,11 @@ def build_admits_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
-    return alt.layer(points, bar, data=admits_floor_df)
+    return (
+        alt.layer(points, bar, data=admits_floor_df)
+        .configure_legend(orient="bottom")
+        .interactive()
+    )
 
 
 def build_census_chart(
@@ -67,21 +65,15 @@ def build_census_chart(
     # TODO fix the fold to allow any number of dispositions
     points = (
         alt.Chart()
-        .transform_fold(fold=["hospitalized", "icu", "ventilated"])
+        .transform_fold(fold=["census_hospitalized", "census_icu", "census_ventilated"])
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
         .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Census", scale=y_scale),
-            color="key:N",
-            tooltip=[
-                idx,
-                alt.Tooltip("value:Q", format=".0f", title="Census"),
-                "key:N",
-            ],
+            x=alt.X(**x),
+            y=alt.Y(**y),
+            color=color,
+            tooltip=tooltip,
         )
-        .configure_legend(orient="bottom")
-        .interactive()
     )
     bar = (
         alt.Chart()
@@ -89,7 +81,11 @@ def build_census_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
-    return alt.layer(points, bar, data=census_floor_df)
+    return (
+        alt.layer(points, bar, data=census_floor_df)
+        .configure_legend(orient="bottom")
+        .interactive()
+    )
 
 
 def build_sim_sir_w_date_chart(
@@ -112,13 +108,11 @@ def build_sim_sir_w_date_chart(
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line()
         .encode(
-            x=alt.X(**x_kwargs),
-            y=alt.Y("value:Q", title="Case Volume", scale=y_scale),
-            tooltip=["key:N", "value:Q"],
-            color="key:N",
+            x=alt.X(**x),
+            y=alt.Y(**y),
+            color=color,
+            tooltip=tooltip,
         )
-        .configure_legend(orient="bottom")
-        .interactive()
     )
     bar = (
         alt.Chart()
@@ -126,11 +120,19 @@ def build_sim_sir_w_date_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
-    return alt.layer(points, bar, data=sim_sir_w_date_floor_df)
+    return (
+        alt.layer(points, bar, data=sim_sir_w_date_floor_df)
+        .configure_legend(orient="bottom")
+        .interactive()
+    )
 
 
 def build_descriptions(
-    *, chart: Chart, labels: Dict[str, str], suffix: str = ""
+    *,
+    chart: Chart,
+    labels: Dict[str, str],
+    prefix: str = "",
+    suffix: str = ""
 ) -> str:
     """
 
@@ -147,17 +149,17 @@ def build_descriptions(
     day = "date" if "date" in chart.data.columns else "day"
 
     for col in cols:
-        if chart.data[col].idxmax() + 1 == len(chart.data):
+        if chart.data[prefix+col].idxmax() + 1 == len(chart.data):
             asterisk = True
 
         # todo: bring this to an optional arg / i18n
-        on = datetime.strftime(chart.data[day][chart.data[col].idxmax()], "%b %d")
+        on = datetime.strftime(chart.data[day][chart.data[prefix+col].idxmax()], "%b %d")
 
         messages.append(
             "{}{} peaks at {:,} on {}{}".format(
                 labels[col],
                 suffix,
-                ceil(chart.data[col].max()),
+                ceil(chart.data[prefix+col].max()),
                 on,
                 "*" if asterisk else "",
             )

@@ -1,6 +1,6 @@
 """Setup file for chime
 """
-__version__ = "1.1.2"
+__version__ = "1.1.3"  # update VERSION in constants.py
 __author__ = "Predictive Healthcare @ Penn Medicine"
 
 from os import path
@@ -22,16 +22,17 @@ setup(
     package_dir={'': 'src'},
     packages=find_namespace_packages(where='src', exclude=('tests')),
     install_requires=[
-        "streamlit",
-        "pandas",
-        "numpy",
         "altair",
-        "pytest",
+        "black",
+        "gunicorn",
         "dash",
         "dash_bootstrap_components",
+        "numpy",
+        "pandas",
+        "pytest",
         "pyyaml",
-        "gunicorn", 
-        "selenium"
+        "selenium",
+        "streamlit",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

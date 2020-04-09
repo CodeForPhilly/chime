@@ -11,11 +11,11 @@ import pandas as pd
 import penn_chime.spreadsheet as sp
 from .constants import (
     CHANGE_DATE,
-    DATE_FORMAT,
     DOCS_URL,
     EPSILON,
     FLOAT_INPUT_MIN,
     FLOAT_INPUT_STEP,
+    VERSION,
 )
 
 from .utils import dataframe_to_base64
@@ -54,21 +54,16 @@ def display_header(st, m, p):
         unsafe_allow_html=True,
     )
     st.markdown(
-        """[Documentation]({docs_url}) | [Github](https://github.com/CodeForPhilly/chime/) |
-[Slack](https://codeforphilly.org/chat?channel=covid19-chime-penn)""".format(
-            docs_url=DOCS_URL
-        )
-    )
-    st.markdown(
-        """*This tool was developed by the [Predictive Healthcare team](http://predictivehealthcare.pennmedicine.org/) at
-    Penn Medicine to assist hospitals and public health officials with hospital capacity planning.*"""
-    )
-    st.markdown(
         """**Notice**: *There is a high
-    degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing
-    measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
+degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing
+measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
     """
     )
+    st.markdown(
+        """
+This tool was developed by [Predictive Healthcare](http://predictivehealthcare.pennmedicine.org/) at
+Penn Medicine to assist hospitals and public health officials with hospital capacity planning.
+Please read [How to Use CHIME]({docs_url}) to customize inputs for your region.""".format(docs_url=DOCS_URL))
 
     st.markdown(
         """The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
@@ -291,8 +286,9 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     # Build in desired order
     st.sidebar.markdown(
-        """**CHIME [v1.1.2](https://github.com/CodeForPhilly/chime/releases/tag/v1.1.1) ({change_date})**""".format(
-            change_date=CHANGE_DATE
+        """**CHIME [{version}](https://github.com/CodeForPhilly/chime/releases/tag/{version}) ({change_date})**""".format(
+            change_date=CHANGE_DATE,
+            version=VERSION,
         )
     )
 
@@ -362,19 +358,26 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     return Parameters(
         current_hospitalized=current_hospitalized,
-        hospitalized=Disposition(hospitalized_rate, hospitalized_days),
-        icu=Disposition(icu_rate, icu_days),
-        relative_contact_rate=relative_contact_rate,
-        mitigation_date=mitigation_date,
-        ventilated=Disposition(ventilated_rate, ventilated_days),
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,
         doubling_time=doubling_time,
+        hospitalized=Disposition.create(
+            rate=hospitalized_rate,
+            days=hospitalized_days),
+        icu=Disposition.create(
+            rate=icu_rate,
+            days=icu_days),
         infectious_days=infectious_days,
         market_share=market_share,
         max_y_axis=max_y_axis,
+        mitigation_date=mitigation_date,
         n_days=n_days,
         population=population,
+        recovered=d.recovered,
+        relative_contact_rate=relative_contact_rate,
+        ventilated=Disposition.create(
+            rate=ventilated_rate,
+            days=ventilated_days),
     )
 
 #Read the environment variables and cteate json key object to use with ServiceAccountCredentials
@@ -438,16 +441,7 @@ def send_subscription_to_google_sheet(st_obj, row):
     spr = sp.spreadsheet (st_obj, json_secret)
     spr.writeToSheet("CHIME Form Submissions", row)
 
-def write_definitions(st):
-    st.subheader("Guidance on Selecting Inputs")
-    st.markdown(
-        """**This information has been moved to the
-[User Documentation]({docs_url}/what-is-chime/parameters)**""".format(
-            docs_url=DOCS_URL
-        )
-    )
-
-def write_footer(st):
+def display_footer(st):
     st.subheader("References & Acknowledgements")
     st.markdown(
         """* AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19

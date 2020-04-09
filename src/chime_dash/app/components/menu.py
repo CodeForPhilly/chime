@@ -23,25 +23,13 @@ class Menu(Component):
                     "Predictive Healthcare",
                     href="http://predictivehealthcare.pennmedicine.org/",
                     external_link=True,
+                    target="_blank",
                 ),
                 dbc.DropdownMenuItem(
-                    "Contact Us",
-                    href="http://predictivehealthcare.pennmedicine.org/contact/",
-                    external_link=True,
-                ),
-                dbc.DropdownMenuItem(
-                    "User Docs",
+                    "How to Use CHIME",
                     href="https://code-for-philly.gitbook.io/chime/",
                     external_link=True,
-                ),
-                dbc.DropdownMenuItem(
-                    "GitHub",
-                    href="https://github.com/CodeForPhilly/chime",
-                    external_link=True,
-                ),
-                dbc.DropdownMenuItem(
-                    "Slack",
-                    href="https://codeforphilly.org/chat?channel=covid19-chime-penn",
+                    target="_blank",
                 ),
             ],
             in_navbar=True,
