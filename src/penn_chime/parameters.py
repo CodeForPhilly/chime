@@ -19,6 +19,7 @@ from .constants import (
 )
 from .validators import (
     Date,
+    GteOne,
     OptionalDate,
     OptionalValue,
     OptionalStrictlyPositive,
@@ -64,7 +65,7 @@ class Disposition(_Disposition):
     @classmethod
     def create(cls, *, days: int, rate: float):
         """Mandate key word arguments."""
-        Positive(key="days", value=days)
+        GteOne(key="days", value=days)
         Rate(key="rate", value=rate)
         return cls(days, rate)
 
@@ -201,7 +202,7 @@ ARGS = (
     (
         "hospitalized_days",
         int,
-        0,
+        1,
         None,
         True,
     ),
@@ -215,7 +216,7 @@ ARGS = (
     (
         "icu_days",
         int,
-        0,
+        1,
         None,
         True,
     ),
@@ -285,7 +286,7 @@ ARGS = (
     (
         "ventilated_days",
         int,
-        0,
+        1,
         None,
         True,
     ),
