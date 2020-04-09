@@ -1,21 +1,15 @@
 # Operations: Release Process
 
-1. Open a pull request to merge `develop` into `releases/v1`
-   - **Title**: `Release: CHIME v1.#.#`
-   - **Description**: Generate with this command:
+## Full release
 
-        ```bash
-        git fetch origin
-        git log \
-            --first-parent \
-            --reverse \
-            --pretty=format:"- %s" \
-            "origin/releases/v1..origin/develop"
-        ```
+1. [Create a GitHub release](https://help.github.com/en/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release)
+  * Must be a full release, i.e., not tagged as a pre-release
+2. Wait for CI to open a Pull Request titled "Deploy CHIME vX.X.X"
+3. Have a release manager approve & merge the PR
 
-4. Get release pull request approved by [`@cjbayesian`](https://github.com/cjbayesian) or [`@mdbecker`](https://github.com/mdbecker)
-5. Merge the pull request
-6. [Create a new release against `releases/v1`](https://github.com/CodeForPhilly/chime/releases/new?target=releases/v1)
-   - **Tag version:** `v1.#.#`
-   - **Release Title:** `CHIME v1.#.#`
-   - **Description:** Copy release notes from pull request
+## Release Candidate
+
+1. [Create a GitHub release](https://help.github.com/en/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release)
+  * Must be marked as a pre-release
+2. Wait for CI to build/deploy to pre-production environment
+
