@@ -1,8 +1,11 @@
 """App."""
 
+import os
+
 import altair as alt  # type: ignore
 import streamlit as st  # type: ignore
 
+from penn_chime.parameters import Parameters
 from penn_chime.presentation import (
     display_download_link,
     display_footer,
@@ -10,7 +13,6 @@ from penn_chime.presentation import (
     display_sidebar,
     hide_menu_style,
 )
-from penn_chime.settings import get_defaults
 from penn_chime.models import SimSirModel
 from penn_chime.charts import (
     build_admits_chart,
@@ -26,7 +28,7 @@ from penn_chime.charts import (
 # In dev, this should be shown
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-d = get_defaults()
+d = Parameters.create(os.environ, [])
 p = display_sidebar(st, d)
 m = SimSirModel(p)
 
@@ -36,7 +38,7 @@ st.subheader("New Admissions")
 st.markdown("Projected number of **daily** COVID-19 admissions. \n\n _NOTE: Now including estimates of prior admissions for comparison._")
 admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis)
 st.altair_chart(admits_chart, use_container_width=True)
-st.markdown(build_descriptions(chart=admits_chart, labels=p.labels, suffix=" Admissions"))
+st.markdown(build_descriptions(chart=admits_chart, labels=p.labels, prefix="admits_", suffix=" Admissions"))
 display_download_link(
     st,
     filename=f"{p.current_date}_projected_admits.csv",
@@ -58,7 +60,7 @@ st.subheader("Admitted Patients (Census)")
 st.markdown("Projected **census** of COVID-19 patients, accounting for arrivals and discharges \n\n _NOTE: Now including estimates of prior census for comparison._")
 census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis)
 st.altair_chart(census_chart, use_container_width=True)
-st.markdown(build_descriptions(chart=census_chart, labels=p.labels, suffix=" Census"))
+st.markdown(build_descriptions(chart=census_chart, labels=p.labels, prefix="census_", suffix=" Census"))
 display_download_link(
     st,
     filename=f"{p.current_date}_projected_census.csv",
