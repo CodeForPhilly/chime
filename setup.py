@@ -33,6 +33,8 @@ setup(
         "pyyaml",
         "selenium",
         "streamlit",
+        "gspread",
+        "oauth2client"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
