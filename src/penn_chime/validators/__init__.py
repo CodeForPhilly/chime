@@ -1,14 +1,24 @@
 """the callable validator design pattern"""
 
-from .validators import Bounded, OptionalBounded, Rate, Date, OptionalDate
+from ..constants import EPSILON
+from .validators import (
+    OptionalValue as ValOptionalValue,
+    Bounded as ValBounded,
+    OptionalBounded as ValOptionalBounded,
+    Rate as ValRate,
+    Date as ValDate,
+    OptionalDate as ValOptionalDate,
+    ValDisposition as ValValDisposition,
+)
 
-EPSILON = 1.e-7
-
-OptionalStrictlyPositive = OptionalBounded(lower_bound=EPSILON)
-StrictlyPositive = Bounded(lower_bound=EPSILON)
-Positive = Bounded(lower_bound=-EPSILON)
-Rate = Rate()  # type: ignore
-Date = Date()  # type: ignore
-OptionalDate = OptionalDate()  # type: ignore
+OptionalValue = ValOptionalValue()
+OptionalStrictlyPositive = ValOptionalBounded(lower_bound=EPSILON)
+StrictlyPositive = ValBounded(lower_bound=EPSILON)
+Positive = ValBounded(lower_bound=-EPSILON)
+GteOne = ValBounded(lower_bound=1)
+Rate = ValRate()
+Date = ValDate()
+OptionalDate = ValOptionalDate()
+ValDisposition = ValValDisposition()
 # # rolling a custom validator for doubling time in case DS wants to add upper bound
 # DoublingTime = OptionalBounded(lower_bound=0-EPSILON, upper_bound=None)
