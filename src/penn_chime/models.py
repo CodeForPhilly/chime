@@ -82,6 +82,11 @@ class SimSirModel:
                 for i_day in range(p.n_days):
                     self.i_day = i_day
                     raw = self.run_projection(p, self.gen_policy(p))
+
+                    # Don't fit against results that put the peak before the present day
+                    if raw["census_hospitalized"].argmax() < i_day:
+                        continue
+
                     loss = get_loss(raw["census_hospitalized"][i_day], p.current_hospitalized)
                     if loss < best_i_day_loss:
                         best_i_day_loss = loss
