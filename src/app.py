@@ -1,8 +1,11 @@
 """App."""
 
+import os
+
 import altair as alt  # type: ignore
 import streamlit as st  # type: ignore
 
+from penn_chime.parameters import Parameters
 from penn_chime.presentation import (
     display_download_link,
     display_footer,
@@ -10,7 +13,6 @@ from penn_chime.presentation import (
     display_sidebar,
     hide_menu_style,
 )
-from penn_chime.settings import get_defaults
 from penn_chime.models import SimSirModel
 from penn_chime.charts import (
     build_admits_chart,
@@ -26,7 +28,7 @@ from penn_chime.charts import (
 # In dev, this should be shown
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-d = get_defaults()
+d = Parameters.create(os.environ, [])
 p = display_sidebar(st, d)
 m = SimSirModel(p)
 

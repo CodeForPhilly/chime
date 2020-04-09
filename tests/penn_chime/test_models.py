@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 
-from src.penn_chime.models import (
+from penn_chime.models import (
     sir,
     sim_sir,
     get_growth_rate,
@@ -194,8 +194,8 @@ def test_model_cumulative_census(param, model):
     )
     admits = df.cumsum()
 
-    # TODO: is 1.0 for ceil function?
+    # 1.0 is for the one hospital patient on the first day, who won't appear in the admissions
     diff = admits.hospitalized[1:-1] - (
-        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
+        param.market_share * param.hospitalized.rate * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
     )
     assert (diff.abs() < 0.1).all()
