@@ -15,7 +15,7 @@ from chime_dash.app.components.base import Component
 class Intro(Component):
     """
     """
-    localization_file = "intro.md"
+    localization_file = "intro.yml"
 
     def get_html(self) -> List[ComponentMeta]:  # pylint: disable=W0613
         """Initializes the header dash html
@@ -28,33 +28,31 @@ class Intro(Component):
         if model and pars:
             intro = self.content
             infected_population_warning_str = (
-                "(Warning:"
-                " The number of estimated infections is greater than"
-                " the total regional population."
-                " Please verify the values entered in the sidebar.)"
-                ""
+                intro["infected-population-warning"]
                 if model.infected > pars.population
                 else ""
             )
-            result = intro.format(
+            mitigation_rt_str = (
+                intro["mitigation-rt-less-than-1"]
+                if model.r_t < 1
+                else intro["mitigation-rt-more-than-equal-1"]
+            )
+
+            result = intro["description-total-infection"].format(
                 total_infections=model.infected,
                 current_hosp=pars.current_hospitalized,
                 hosp_rate=pars.hospitalized.rate,
                 S=pars.population,
-                market_share=pars.market_share,
+                market_share=pars.market_share
+            ) + "\n\n" + infected_population_warning_str + "\n\n" + intro["description-doubling-time"].format(
+                doubling_time=pars.doubling_time,
                 recovery_days=pars.infectious_days,
                 r_naught=model.r_naught,
-                doubling_time=pars.doubling_time,
+                daily_growth=model.daily_growth_rate * 100.0
+            ) + "\n\n" + mitigation_rt_str.format(
                 relative_contact_rate=pars.relative_contact_rate,
-                r_t=model.r_t,
                 doubling_time_t=model.doubling_time_t,
-                impact_statement=(
-                    "halves the infections every"
-                    if model.r_t < 1
-                    else "reduces the doubling time to"
-                ),
-                daily_growth=model.daily_growth_rate * 100.0,
-                daily_growth_t=model.daily_growth_rate_t * 100.0,
-                infected_population_warning_str=infected_population_warning_str,
+                r_t=model.r_t,
+                daily_growth_t=model.daily_growth_rate_t * 100.0
             )
         return [result]
