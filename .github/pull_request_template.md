@@ -5,10 +5,11 @@
 - Update the user or developer documentation, if affected.
 -->
 
-### Link to issue number
+### Link to issue
 - Fixes #(issue number)
 
 ### Changelog entry
 - Short description of problem & solution (1-3 sentences, depending on scope of change)
 
 ### Additional info
+- Anything else reviewers and future readers should know
