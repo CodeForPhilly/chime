@@ -28,6 +28,10 @@ As of March 21, help is especially wanted from contributors with experience in K
 - Base your work on the `develop` branch.
 - Take a few minutes to review this [resource](https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Reviewer_Checklist) for contributors and reviewers, to accelerate the adoption of your contribution (thanks to the good folks at Mozilla for this).
 - Submit pull requests from your fork, also against the `develop` branch of the `CodeforPhilly/chime` repo.
+- As part of your pull request, please ensure you provide the following information
+  - References to the issue/PR resolved with your contribution(s) (use key word e.g. Fixes #123, #321 See #213)
+  - Explicitly identify the scope/area the change impacts (ex: Operations/Deployment/Model/Documentation)
+  - Describe any necessary follow on work, ideally with links to any already open issues
 - Request review from the relevant maintainer(s).
 - Check your pull request periodically to see if any changes have been requested or any merge conflicts have arisen.
 - If a merge conflict arises, rebase against the latest `develop` branch and force-push the new branch as early as you can. You may need to do this more than once before your changes get merged. Do your best to keep your branch in a mergeable state until it is finished being reviewed and accepted.
