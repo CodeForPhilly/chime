@@ -287,18 +287,6 @@ def sir(
     s_n = (-beta * s * i) + s
     i_n = (beta * s * i - gamma * i) + i
     r_n = gamma * i + r
-
-    # TODO:
-    #   Post check dfs for negative values and
-    #   warn the user that their input data is bad.
-    #   JL: I suspect that these adjustments covered bugs.
-
-    #if s_n < 0.0:
-    #    s_n = 0.0
-    #if i_n < 0.0:
-    #    i_n = 0.0
-    #if r_n < 0.0:
-    #    r_n = 0.0
     scale = n / (s_n + i_n + r_n)
     return s_n * scale, i_n * scale, r_n * scale
 
