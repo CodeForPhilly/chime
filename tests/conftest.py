@@ -34,9 +34,8 @@ def mock_st():
     return MockStreamlit()
 
 
-# The defaults in settings will change and break the tests
 @pytest.fixture
-def DEFAULTS():
+def defaults():
     return Parameters(
         region=Regions(
             delaware=564696,
@@ -49,12 +48,15 @@ def DEFAULTS():
         current_hospitalized=14,
         date_first_hospitalized=datetime(year=2020, month=3, day=7),
         doubling_time=4.0,
+        hospitalized=Disposition.create(rate=0.025, days=7),
+        icu=Disposition.create(rate=0.0075, days=9),
+        infectious_days=14,
         n_days=60,
         market_share=0.15,
+        mitigation_date=datetime(year=2020, month=3, day=28),
+        recovered=0,
         relative_contact_rate=0.3,
-        hospitalized=Disposition(0.025, 7),
-        icu=Disposition(0.0075, 9),
-        ventilated=Disposition(0.005, 10),
+        ventilated=Disposition.create(rate=0.005, days=10),
     )
 
 
@@ -64,13 +66,16 @@ def param():
         current_date=datetime(year=2020, month=3, day=28),
         current_hospitalized=100,
         doubling_time=6.0,
+        hospitalized=Disposition.create(rate=0.05, days=7),
+        infectious_days=14,
+        icu=Disposition.create(rate=0.02, days=9),
         market_share=0.05,
-        relative_contact_rate=0.15,
-        population=500000,
-        hospitalized=Disposition(0.05, 7),
-        icu=Disposition(0.02, 9),
-        ventilated=Disposition(0.01, 10),
+        mitigation_date=datetime(year=2020, month=3, day=28),
         n_days=60,
+        population=500000,
+        recovered=0,
+        relative_contact_rate=0.15,
+        ventilated=Disposition.create(rate=0.01, days=10),
     )
 
 
@@ -80,13 +85,16 @@ def halving_param():
         current_date=datetime(year=2020, month=3, day=28),
         current_hospitalized=100,
         doubling_time=6.0,
+        hospitalized=Disposition.create(rate=0.05, days=7),
+        icu=Disposition.create(rate=0.02, days=9),
+        infectious_days=14,
         market_share=0.05,
-        relative_contact_rate=0.7,
-        population=500000,
-        hospitalized=Disposition(0.05, 7),
-        icu=Disposition(0.02, 9),
-        ventilated=Disposition(0.01, 10),
+        mitigation_date=datetime(year=2020, month=3, day=28),
         n_days=60,
+        population=500000,
+        recovered=0,
+        relative_contact_rate=0.7,
+        ventilated=Disposition.create(rate=0.01, days=10),
     )
 
 
@@ -109,7 +117,7 @@ def admits_df():
 
 @pytest.fixture
 def admits_floor_df(param, admits_df):
-    return build_floor_df(admits_df, param.dispositions.keys())
+    return build_floor_df(admits_df, param.dispositions.keys(), "admits_")
 
 
 @pytest.fixture
@@ -120,5 +128,5 @@ def census_df():
 
 @pytest.fixture
 def census_floor_df(param, census_df):
-    return build_floor_df(census_df, param.dispositions.keys())
+    return build_floor_df(census_df, param.dispositions.keys(), "census_")
 

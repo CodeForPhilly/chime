@@ -2,10 +2,16 @@ FROM python:3.7.7-slim-buster
 
 WORKDIR /code 
 
-COPY requirements.txt requirements.txt
-RUN pip install -q -r requirements.txt
+ARG PORT
+ENV PORT $PORT
+ENV PARAMETERS=./defaults/webapp.cfg
 
+COPY README.md .
+COPY setup.py .
+COPY setup.cfg .
 COPY src src 
+COPY defaults ./src/defaults
+RUN pip install -q .
 
 # EXPOSE $PORT 
 

@@ -2,7 +2,7 @@
 
 This directory provides the interface for the dash app.
 
-![Current interface](docs/assets/interface.png)
+![Current interface](docs/interface.png)
 
 ## Tree
 Structure of the app
@@ -119,7 +119,7 @@ Install the chime base module
 ```
 and run
 ```bash
-> python src/dash_app.py
+> PARAMETERS=defaults/webapp.cfg python src/dash_app.py
 ```
 in the project root and visit the local url.
 

@@ -1,5 +1,6 @@
 # Editors
 .idea/
+.vscode/settings.json
 
 # Environments
 .env
@@ -26,3 +27,4 @@ devel.ipynb
 
 # build artifacts
 results/
+runtime.txt

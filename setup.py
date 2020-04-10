@@ -1,10 +1,9 @@
 """Setup file for chime
 """
-__version__ = "1.1.2"
+__version__ = "1.1.3"  # update VERSION in constants.py
 __author__ = "Predictive Healthcare @ Penn Medicine"
 
-from os import path
-from setuptools import setup, find_packages, find_namespace_packages
+from setuptools import setup, find_namespace_packages
 
 
 setup(
@@ -22,15 +21,20 @@ setup(
     package_dir={'': 'src'},
     packages=find_namespace_packages(where='src', exclude=('tests')),
     install_requires=[
-        "streamlit",
-        "pandas",
-        "numpy",
         "altair",
-        "pytest",
+        "black",
+        "gspread",
+        "gunicorn",
         "dash",
         "dash_bootstrap_components",
+        "numpy",
+        "pandas",
+        "pytest",
         "pyyaml",
-        "gunicorn"
+        "selenium",
+        "streamlit",
+        "gspread",
+        "oauth2client"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -38,7 +42,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
-    entry_points = {
+    entry_points={
         'console_scripts': ['penn_chime=penn_chime.cli:main'],
     },
     keywords=[],

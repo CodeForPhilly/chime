@@ -1,3 +1,5 @@
-logo-title: Go to the Penn Medicine home page
-logo-text: Penn Medicine
-title: Penn Medicine - COVID-19 Hospital Impact Model for Epidemics
+title: "CHIME: COVID-19 Hospital Impact Model for Epidemics"
+description: "
+**Notice**: *There is a high degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*\n
+
+This tool was developed by [Predictive Healthcare](http://predictivehealthcare.pennmedicine.org/) at Penn Medicine to assist hospitals and public health officials with hospital capacity planning. Please read [How to Use CHIME](https://code-for-philly.gitbook.io/chime/) to customize inputs for your region."

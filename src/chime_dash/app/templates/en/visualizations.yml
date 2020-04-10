@@ -1,7 +1,13 @@
 new-admissions-title: New Admissions
-new-admissions-text: Projected number of **daily** COVID-19 admissions at Penn hospitals
+new-admissions-text: Projected number of **daily** COVID-19 admissions
+
 admitted-patients-title: Admitted Patients (Census)
-admitted-patients-text: Projected **census** of COVID-19 patients, accounting for arrivals and discharges at Penn hospitals
+admitted-patients-text: Projected **census** of COVID-19 patients, accounting for arrivals and discharges
+
+SIR-title: Susceptible, Infected, and Recovered
+SIR-text: The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment
+
+download-text: Download CSV
 
 # Chart labels
 day: Day
@@ -9,3 +15,21 @@ date: Date
 hosp: Hospitalized
 icu: ICU
 vent: Ventalized
+
+# Admits df column translations
+admits_hospitalized: Hospitalized
+admits_icu: ICU
+admits_ventilated: Ventilated
+
+# Admits df column translations
+census_hospitalized: Hospitalized
+census_icu: ICU
+census_ventilated: Ventilated
+
+# SIR df column translations
+susceptible: Susceptible
+infected: Infected
+recovered: Recovered
+
+# Date Localization
+date-format: "%m%d%Y"

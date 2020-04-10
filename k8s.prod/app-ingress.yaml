@@ -12,6 +12,14 @@ metadata:
     certmanager.k8s.io/cluster-issuer: letsencrypt-prod
     # allow requests larger than 1MiB
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      # Inject Google Tag Manager:
+
+      proxy_set_header Accept-Encoding ""; # upstream compression must be disabled
+
+      sub_filter '</head>' '<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({"gtm.start": new Date().getTime(),event:"gtm.js"});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!="dataLayer"?"&l="+l:"";j.async=true;j.src="https://www.googletagmanager.com/gtm.js?id="+i+dl;f.parentNode.insertBefore(j,f); })(window,document,"script","dataLayer","GTM-KBZ6ZKX");</script></head>';
+
+      sub_filter '</body>' '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KBZ6ZKX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript></body>';
 spec:
   tls:
   - hosts:
@@ -71,7 +79,6 @@ metadata:
       proxy_cache_bypass $http_x_purge;
       proxy_cache_key $proxy_upstream_name$request_uri;
       proxy_cache_lock on;
-      proxy_cache_use_stale updating;
       add_header X-Cache-Status $upstream_cache_status;
 spec:
   rules:

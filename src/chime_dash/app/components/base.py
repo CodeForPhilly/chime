@@ -1,75 +1,41 @@
-"""Module provides abstract base component needed for rendering
+"""app/components/base
+
+Abstract base class for components
+
+#! candidate for moving into utils/components
 """
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Union
 
 from abc import ABC
 
-from dash.dependencies import Output, Input
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Div
 
-from penn_chime.defaults import Constants
-from penn_chime.settings import DEFAULTS
+from penn_chime.parameters import Parameters
 
-from chime_dash.app.utils.templates import read_localization_yml
-from chime_dash.app.utils.templates import read_localization_markdown
+from chime_dash.app.utils.templates import read_localization_yml, read_localization_markdown
 
 
 class Component(ABC):
-    """Base component for rendering dash html objects and callbacks
+    """Base component for rendering dash html objects and registering callbacks
 
     Attributes:
         localization_file: File name for rendering localized strings
-        callback_outputs: List of callback outputs needed for rendering html.
-            Must be used together with `callback()` which provides callback data.
-        callback_inputs: Ordered dictionary for element id's and input types.
-            Must be used if component contains widgets.
         external_stylesheets: External stylesheets. Just a storage container.
         external_scripts: External scripts. Just a storage container.
     """
 
     localization_file: str = None
-
-    callback_outputs: List[Output] = []  # must be same length as callback return
-    callback_inputs: Dict[str, Input] = {}  # Must be ordered!
-
     external_stylesheets: List[str] = []
     external_scripts: List[str] = []
 
-    def __init__(self, language: str = "en", defaults: Constants = DEFAULTS):
+    def __init__(self, language: str = "en", defaults: Parameters = None):
         """Initializes the component
         """
         self.language = language
         self.defaults = defaults
         self._content = None
         self._html = None
-
-    def callback(  # pylint: disable=W0613, R0201
-        self, *args, **kwargs
-    ) -> List[Dict[str, Any]]:
-        """Function which is called whenever a web-input element is triggered.
-
-        Overwrite this function for custom actions.
-        To render arguments, add (or modify)
-        ```
-        @app.callback(component.callback_outputs, component.callback_inputs.values()):
-        def callback_body(*args):
-            return component.callback(*args)
-        ```
-        Args come from the specified forms in order as `callback_outputs`.
-
-        Arguments:
-            args: Form parameters specified in `callback_outputs` order
-            kwargs: Additional arguments supplied by the user when modifying the
-                decorated `callback_body`.
-
-        Result should be the data (usually dictionaries) passed to the Dash element
-        of given id. The number of arguments and order must match the elements in
-        `callback_outputs`.
-
-        See also https://dash.plotly.com/getting-started-part-2
-        """
-        return []
 
     def get_html(self) -> List[ComponentMeta]:  # pylint: disable=R0201
         """Function which is called to render html elements.
@@ -120,6 +86,14 @@ class Component(ABC):
                         )
                     )
         return self._content
+
+
+class Page(Component):
+    callbacks_cls = None
+
+    def __init__(self, language: str = "en", defaults: Parameters = None):
+        super().__init__(language, defaults)
+        self.callbacks_cls(self)
 
 
 class HTMLComponentError(Exception):
