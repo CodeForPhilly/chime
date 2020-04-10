@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 context('Increment steppers', () => {
-  beiforeEach(() => {
+  beforeEach(() => {
     cy.visit('/')
   });
 
