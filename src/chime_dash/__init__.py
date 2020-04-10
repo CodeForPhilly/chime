@@ -4,10 +4,13 @@ chime_dash/app
 dash instance defined here
 """
 
-from dash import Dash
+import os
 from typing import TypeVar
+
+from dash import Dash
+from penn_chime.parameters import Parameters
+
 from chime_dash.app.config import from_object
-from penn_chime.settings import get_defaults
 from chime_dash.app.pages.root import Root
 from chime_dash.app.utils.callbacks import wrap_callbacks
 
@@ -31,7 +34,10 @@ def create_app(context: str = 'prod') -> DashAppInstance:
     Env = from_object(context)
 
     LANGUAGE = Env.LANG
-    body = Root(LANGUAGE, get_defaults())
+    body = Root(
+        LANGUAGE,
+        Parameters.create(os.environ, []),
+    )
 
     App = Dash(
         __name__,

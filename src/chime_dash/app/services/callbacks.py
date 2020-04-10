@@ -38,10 +38,14 @@ class IndexCallbacks(ComponentCallbacks):
         if sidebar_data:
             pars = parameters_deserializer(sidebar_data["parameters"])
             model = SimSirModel(pars)
+            vis = i.components.get("visualizations", None) if i else None
+            vis_content = vis.content if vis else None
+
             viz_kwargs = dict(
                 labels=pars.labels,
                 table_mod=7,
                 max_y_axis=pars.max_y_axis,
+                content=vis_content
             )
         result.extend(i.components["intro"].build(model, pars))
         for df_key in ["admits_df", "census_df", "sim_sir_w_date_df"]:
@@ -115,20 +119,26 @@ class SidebarCallbacks(ComponentCallbacks):
         dt = inputs_dict["doubling_time"] if inputs_dict["doubling_time"] else None
         dfh = inputs_dict["date_first_hospitalized"] if not dt else None
         pars = Parameters(
-            population=inputs_dict["population"],
             current_hospitalized=inputs_dict["current_hospitalized"],
             date_first_hospitalized=dfh,
             doubling_time=dt,
-            hospitalized=Disposition(
-                inputs_dict["hospitalized_rate"] / 100, inputs_dict["hospitalized_los"]
+            hospitalized=Disposition.create(
+                days=inputs_dict["hospitalized_los"],
+                rate=inputs_dict["hospitalized_rate"] / 100,
             ),
-            icu=Disposition(inputs_dict["icu_rate"] / 100, inputs_dict["icu_los"]),
+            icu=Disposition(
+                days=inputs_dict["icu_los"],
+                rate=inputs_dict["icu_rate"] / 100,
+            ),
             infectious_days=inputs_dict["infectious_days"],
             market_share=inputs_dict["market_share"] / 100,
             n_days=inputs_dict["n_days"],
+            population=inputs_dict["population"],
+            recovered=0,  #FIXME input or pass through from defaults is required!
             relative_contact_rate=inputs_dict["relative_contact_rate"] / 100,
-            ventilated=Disposition(
-                inputs_dict["ventilated_rate"] / 100, inputs_dict["ventilated_los"]
+            ventilated=Disposition.create(
+                days=inputs_dict["ventilated_los"],
+                rate=inputs_dict["ventilated_rate"] / 100,
             ),
             max_y_axis=inputs_dict.get("max_y_axis_value", None),
         )
