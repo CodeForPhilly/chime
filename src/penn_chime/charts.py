@@ -125,3 +125,12 @@ def build_sim_sir_w_date_chart(
         .configure_legend(orient="bottom")
         .interactive()
     )
+
+
+def build_table(
+    *, df: pd.DataFrame, labels: Dict[str, str], modulo: int = 1
+) -> pd.DataFrame:
+    table_df = df[np.mod(df.day, modulo) == 0].copy()
+    table_df.date = table_df.date.dt.strftime(DATE_FORMAT)
+    table_df.rename(labels)
+    return table_df
