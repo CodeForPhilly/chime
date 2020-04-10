@@ -24,7 +24,7 @@ See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_starte
 ```bash
 pipenv shell
 pipenv sync --dev
-streamlit run src/app.py
+PARAMETERS=defaults/webapp.cfg streamlit run src/app.py
 ```
 
 ### With `conda`
@@ -33,7 +33,7 @@ streamlit run src/app.py
 conda env create -f environment.yml
 source activate chime
 pip install streamlit
-streamlit run src/app.py
+PARAMETERS=defaults/webapp.cfg streamlit run src/app.py
 ```
 
 ### Choosing a Different Port
@@ -41,8 +41,7 @@ streamlit run src/app.py
 If you need to run the application on a different port than the default (8000), you can export a variable in your shell session to override it with any port number of your choice before running:
 
 ```bash
-export STREAMLIT_SERVER_PORT=1234
-streamlit run src/app.py
+STREAMLIT_SERVER_PORT=1234 PARAMETERS=defaults/webapp.cfg streamlit run src/app.py
 ```
 
 ## Project Layout
