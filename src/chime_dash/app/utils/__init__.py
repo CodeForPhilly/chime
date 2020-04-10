@@ -11,12 +11,13 @@ from . import callbacks
 from . import templates
 
 from itertools import repeat
-from urllib.parse import quote
 from json import dumps, loads
-from typing import Any, List
-from datetime import date, datetime
-from dateutil.parser import parse as parse_date
 from collections import Mapping
+from datetime import date, datetime
+from typing import Any, List
+from urllib.parse import quote
+
+from dateutil.parser import parse as parse_date
 from pandas import DataFrame
 
 from chime_dash.app.services.plotting import plot_dataframe
@@ -59,42 +60,42 @@ def parameters_serializer(p: Parameters):
 
 def parameters_deserializer(p_json: str):
     values = loads(p_json)
-    dfh = (
-        parse_date(values["date_first_hospitalized"])
-        if values["date_first_hospitalized"]
-        else None
-    )
-    result = Parameters(
+
+    dates = {
+        key: parse_date(values[key]).date() if values[key] else None
+        for key in (
+            "current_date",
+            "date_first_hospitalized",
+            "mitigation_date",
+        )
+    }
+    return Parameters(
+        current_date=dates["current_date"],
         current_hospitalized=values["current_hospitalized"],
-        hospitalized=Disposition(*values["hospitalized"]),
-        icu=Disposition(*values["icu"]),
-        relative_contact_rate=values["relative_contact_rate"],
-        ventilated=Disposition(*values["ventilated"]),
-        current_date=parse_date(values["current_date"]),
-        date_first_hospitalized=dfh,
-        doubling_time=values["doubling_time"],
+        hospitalized=Disposition.create(
+            days=values["hospitalized"][0],
+            rate=values["hospitalized"][1],
+        ),
+        icu=Disposition.create(
+            days=values["icu"][0],
+            rate=values["icu"][1],
+        ),
         infectious_days=values["infectious_days"],
+        date_first_hospitalized=dates["date_first_hospitalized"],
+        doubling_time=values["doubling_time"],
         market_share=values["market_share"],
         max_y_axis=values["max_y_axis"],
+        mitigation_date=dates["mitigation_date"],
         n_days=values["n_days"],
         population=values["population"],
         recovered=values["recovered"],
         region=values["region"],
+        relative_contact_rate=values["relative_contact_rate"],
+        ventilated=Disposition.create(
+            days=values["ventilated"][0],
+            rate=values["ventilated"][1],
+        ),
     )
-
-    for key, value in values.items():
-
-        if result.__dict__[key] != value and key not in (
-            "dispositions",
-            "hospitalized",
-            "icu",
-            "ventilated",
-            "current_date",
-            "date_first_hospitalized",
-        ):
-            result.__dict__[key] = value
-
-    return result
 
 
 def build_csv_download(df):
@@ -116,18 +117,50 @@ def get_n_switch_values(input_value, elements_to_update) -> List[bool]:
 
 def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
     """Creates plot, table and download link for data frame.
+
+    Arguments:
+        df: The Dataframe to plot
+        content: Dict[str, str]
+            Mapping for translating columns and index.
+        max_y_axis:  int
+            Maximal value on y-axis
+        labels: List[str]
+            Columns to display
+        table_mod: int
+            Displays only each `table_mod` row in table
+
     """
     result = [{}, None, None]
     if df is not None and isinstance(df, DataFrame):
+
+        date_column = "date"
+        day_column = "day"
+
+        # Translate column and index if specified
+        content = kwargs.get("content", None)
+        if content:
+            columns = {col: content[col] for col in df.columns if col in content}
+            index = (
+                {df.index.name: content[df.index.name]}
+                if df.index.name and df.index.name in content
+                else None
+            )
+            df = df.rename(columns=columns, index=index)
+            date_column = content.get(date_column, date_column)
+            day_column = content.get(day_column, day_column)
+
         plot_data = plot_dataframe(
-            df.dropna().set_index("date").drop(columns=["day"]),
+            df.dropna().set_index(date_column).drop(columns=[day_column]),
             max_y_axis=kwargs.get("max_y_axis", None),
         )
 
+
+        # translate back for backwards compability of build_table
+        column_map = {day_column: "day", date_column: "date"}
         table = (
             df_to_html_table(
                 build_table(
-                    df=df,
+                    df=df.rename(columns=column_map),
                     labels=kwargs.get("labels", df.columns),
                     modulo=kwargs.get("table_mod", 7),
                 ),
@@ -140,7 +173,9 @@ def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
             # else None
         )
 
-        csv = build_csv_download(df)
+        # Convert columnnames to lowercase
+        column_map = {col: col.lower() for col in df.columns}
+        csv = build_csv_download(df.rename(columns=column_map))
         result = [plot_data, table, csv]
 
     return result
@@ -153,4 +188,5 @@ def singleton(class_):
         if class_ not in instances:
             instances[class_] = class_(*args, **kwargs)
         return instances[class_]
+
     return get_instance

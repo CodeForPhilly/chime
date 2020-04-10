@@ -11,9 +11,6 @@ from chime_dash.app.components.base import Component
 from chime_dash.app.components.menu import Menu
 
 from penn_chime.parameters import Parameters
-from penn_chime.settings import get_defaults
-
-DEFAULTS = get_defaults()
 
 
 class Navbar(Component):
@@ -21,7 +18,7 @@ class Navbar(Component):
     TODO refactor / design input on style and layout
     """
 
-    def __init__(self, language: str = "en", defaults: Parameters = DEFAULTS):
+    def __init__(self, language: str = "en", defaults: Parameters = None):
         """Sets up self, menu and header
         """
         super().__init__(language, defaults=defaults)

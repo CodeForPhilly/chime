@@ -5,11 +5,12 @@ from datetime import date
 
 import altair as alt
 import numpy as np
+import os
+import json
 import pandas as pd
-
+import penn_chime.spreadsheet as sp
 from .constants import (
     CHANGE_DATE,
-    DATE_FORMAT,
     DOCS_URL,
     EPSILON,
     FLOAT_INPUT_MIN,
@@ -173,6 +174,8 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     # it's kindof like ember or angular if you are familiar with those
 
     st_obj = st.sidebar
+    # used_widget_key = st.get_last_used_widget_key ( )
+
     current_hospitalized_input = NumberInput(
         st_obj,
         "Currently hospitalized COVID-19 patients",
@@ -217,7 +220,11 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         step=1.0,
     )
     hospitalized_pct_input = PercentInput(
-        st_obj, "Hospitalization %(total infections)", value=d.hospitalized.rate,
+        st_obj,
+        "Hospitalization %(total infections)",
+        value=d.hospitalized.rate,
+        min_value=FLOAT_INPUT_MIN,
+        max_value=100.0
     )
     icu_pct_input = PercentInput(st_obj,
         "ICU %(total infections)",
@@ -231,7 +238,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     hospitalized_days_input = NumberInput(
         st_obj,
         "Average hospital length of stay (in days)",
-        min_value=0,
+        min_value=1,
         value=d.hospitalized.days,
         step=1,
         format="%i",
@@ -239,7 +246,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     icu_days_input = NumberInput(
         st_obj,
         "Average days in ICU",
-        min_value=0,
+        min_value=1,
         value=d.icu.days,
         step=1,
         format="%i",
@@ -247,7 +254,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     ventilated_days_input = NumberInput(
         st_obj,
         "Average days on ventilator",
-        min_value=0,
+        min_value=1,
         value=d.ventilated.days,
         step=1,
         format="%i",
@@ -269,7 +276,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     infectious_days_input = NumberInput(
         st_obj,
         "Infectious days",
-        min_value=0,
+        min_value=1,
         value=d.infectious_days,
         step=1,
         format="%i",
@@ -350,24 +357,93 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         max_y_axis = max_y_axis_input()
 
     current_date = current_date_input()
+    #Subscribe implementation
+    subscribe(st_obj)
 
     return Parameters(
         current_hospitalized=current_hospitalized,
-        hospitalized=Disposition(hospitalized_rate, hospitalized_days),
-        icu=Disposition(icu_rate, icu_days),
-        relative_contact_rate=relative_contact_rate,
-        mitigation_date=mitigation_date,
-        ventilated=Disposition(ventilated_rate, ventilated_days),
         current_date=current_date,
         date_first_hospitalized=date_first_hospitalized,
         doubling_time=doubling_time,
+        hospitalized=Disposition.create(
+            rate=hospitalized_rate,
+            days=hospitalized_days),
+        icu=Disposition.create(
+            rate=icu_rate,
+            days=icu_days),
         infectious_days=infectious_days,
         market_share=market_share,
         max_y_axis=max_y_axis,
+        mitigation_date=mitigation_date,
         n_days=n_days,
         population=population,
+        recovered=d.recovered,
+        relative_contact_rate=relative_contact_rate,
+        ventilated=Disposition.create(
+            rate=ventilated_rate,
+            days=ventilated_days),
     )
 
+#Read the environment variables and cteate json key object to use with ServiceAccountCredentials
+def readGoogleApiSecrets():
+    client_secret = {}
+    os.getenv
+    type = os.getenv ('GAPI_CRED_TYPE').strip()
+    print (type)
+    client_secret['type'] = type,
+    client_secret['project_id'] = os.getenv ('GAPI_CRED_PROJECT_ID'),
+    client_secret['private_key_id'] = os.getenv ('GAPI_CRED_PRIVATE_KEY_ID'),
+    client_secret['private_key'] = os.getenv ('GAPI_CRED_PRIVATE_KEY'),
+    client_secret['client_email'] = os.getenv ('GAPI_CRED_CLIENT_EMAIL'),
+    client_secret['client_id'] = os.getenv ('GAPI_CRED_CLIENT_ID'),
+    client_secret['auth_uri'] = os.getenv ('GAPI_CRED_AUTH_URI'),
+    client_secret['token_uri'] = os.getenv ('GAPI_CRED_TOKEN_URI'),
+    client_secret['auth_provider_x509_cert_url'] =  os.getenv ('GAPI_CRED_AUTH_PROVIDER_X509_CERT_URL'),
+    client_secret['client_x509_cert_url'] = os.getenv ('GAPI_CRED_CLIENT_X509_CERT_URI'),
+    json_data = json.dumps (client_secret)
+    print(json_data)
+    return json_data
+
+def readGoogleApiSecretsDict():
+    type = os.getenv ('GAPI_CRED_TYPE')
+    project_id = os.getenv ('GAPI_CRED_PROJECT_ID')
+    private_key_id =  os.getenv ('GAPI_CRED_PRIVATE_KEY_ID')
+    private_key = os.getenv ('GAPI_CRED_PRIVATE_KEY')
+    client_email = os.getenv ('GAPI_CRED_CLIENT_EMAIL')
+    client_id = os.getenv ('GAPI_CRED_CLIENT_ID')
+    auth_uri = os.getenv ('GAPI_CRED_AUTH_URI')
+    token_uri = os.getenv ('GAPI_CRED_TOKEN_URI')
+    auth_provider_x509_cert_url = os.getenv ('GAPI_CRED_AUTH_PROVIDER_X509_CERT_URL')
+    client_x509_cert_url = os.getenv ('GAPI_CRED_CLIENT_X509_CERT_URI')
+
+    secret = {
+        'type' : type,
+        'project_id' : project_id,
+        'private_key_id' : private_key_id,
+        'private_key':private_key,
+        'client_email': client_email,
+        'client_id': client_id,
+        'auth_uri': auth_uri,
+        'token_uri': token_uri,
+        'auth_provider_x509_cert_url':auth_provider_x509_cert_url,
+        'client_x509_cert_url':client_x509_cert_url
+    }
+    return secret
+
+def subscribe(st_obj):
+    st_obj.subheader ("Subscribe")
+    email = st_obj.text_input (label="Enter Email", value="", key="na_lower_1")
+    name = st_obj.text_input (label="Enter Name", value="", key="na_upper_1")
+    affiliation = st_obj.text_input (label="Enter Affiliation", value="", key="na_upper_2")
+    if st_obj.button (label="Submit", key="ta_submit_1"):
+        row = [email, name, affiliation]
+        send_subscription_to_google_sheet(st_obj, row)
+
+def send_subscription_to_google_sheet(st_obj, row):
+    json_secret = readGoogleApiSecretsDict()
+    #print(json_secret)
+    spr = sp.spreadsheet (st_obj, json_secret)
+    spr.writeToSheet("CHIME Form Submissions", row)
 
 def display_footer(st):
     st.subheader("References & Acknowledgements")

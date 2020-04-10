@@ -64,21 +64,40 @@ class SimSirModel:
             logger.info('Using doubling_time: %s', p.doubling_time)
 
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
-
             self.beta = get_beta(intrinsic_growth_rate,  gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
-            self.i_day = 0 # seed to the full length
-            self.run_projection(p, [(self.beta, p.n_days)])
-            self.i_day = i_day = int(get_argmin_ds(self.census_df, p.current_hospitalized))
+            if p.mitigation_date is None:
+                self.i_day = 0 # seed to the full length
+                raw = self.run_projection(p, [(self.beta, p.n_days)])
+                self.i_day = i_day = int(get_argmin_ds(raw["census_hospitalized"], p.current_hospitalized))
 
-            self.run_projection(p, self.gen_policy(p))
+                self.raw = self.run_projection(p, self.gen_policy(p))
 
-            logger.info('Set i_day = %s', i_day)
-            p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
+                logger.info('Set i_day = %s', i_day)
+            else:
+                projections = {}
+                best_i_day = -1
+                best_i_day_loss = float('inf')
+                for i_day in range(p.n_days):
+                    self.i_day = i_day
+                    raw = self.run_projection(p, self.gen_policy(p))
+
+                    # Don't fit against results that put the peak before the present day
+                    if raw["census_hospitalized"].argmax() < i_day:
+                        continue
+
+                    loss = get_loss(raw["census_hospitalized"][i_day], p.current_hospitalized)
+                    if loss < best_i_day_loss:
+                        best_i_day_loss = loss
+                        best_i_day = i_day
+                        self.raw = raw
+
+                self.i_day = best_i_day
+
             logger.info(
                 'Estimated date_first_hospitalized: %s; current_date: %s; i_day: %s',
-                p.date_first_hospitalized,
+                p.current_date - timedelta(days=self.i_day),
                 p.current_date,
                 self.i_day)
 
@@ -109,7 +128,7 @@ class SimSirModel:
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-            self.run_projection(p, self.gen_policy(p))
+            self.raw = self.run_projection(p, self.gen_policy(p))
 
             self.population = p.population
         else:
@@ -119,6 +138,31 @@ class SimSirModel:
                 p.date_first_hospitalized,
             )
             raise AssertionError('doubling_time or date_first_hospitalized must be provided.')
+
+        self.raw["date"] = self.raw["day"].astype("timedelta64[D]") + np.datetime64(p.current_date)
+
+        self.raw_df = pd.DataFrame(data=self.raw)
+        self.dispositions_df = pd.DataFrame(data={
+            'day': self.raw['day'],
+            'date': self.raw['date'],
+            'ever_hospitalized': self.raw['ever_hospitalized'],
+            'ever_icu': self.raw['ever_icu'],
+            'ever_ventilated': self.raw['ever_ventilated'],
+        })
+        self.admits_df = pd.DataFrame(data={
+            'day': self.raw['day'],
+            'date': self.raw['date'],
+            'admits_hospitalized': self.raw['admits_hospitalized'],
+            'admits_icu': self.raw['admits_icu'],
+            'admits_ventilated': self.raw['admits_ventilated'],
+        })
+        self.census_df = pd.DataFrame(data={
+            'day': self.raw['day'],
+            'date': self.raw['date'],
+            'census_hospitalized': self.raw['census_hospitalized'],
+            'census_icu': self.raw['census_icu'],
+            'census_ventilated': self.raw['census_ventilated'],
+        })
 
         logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))
         logger.info('len(raw_df): %s', len(self.raw_df))
@@ -139,9 +183,9 @@ class SimSirModel:
 
         self.sim_sir_w_date_df = build_sim_sir_w_date_df(self.raw_df, p.current_date, self.keys)
 
-        self.sim_sir_w_date_floor_df = build_floor_df(self.sim_sir_w_date_df, self.keys)
-        self.admits_floor_df = build_floor_df(self.admits_df, p.dispositions.keys())
-        self.census_floor_df = build_floor_df(self.census_df, p.dispositions.keys())
+        self.sim_sir_w_date_floor_df = build_floor_df(self.sim_sir_w_date_df, self.keys, "")
+        self.admits_floor_df = build_floor_df(self.admits_df, p.dispositions.keys(), "admits_")
+        self.census_floor_df = build_floor_df(self.census_df, p.dispositions.keys(), "census_")
 
         self.daily_growth_rate = get_growth_rate(p.doubling_time)
         self.daily_growth_rate_t = get_growth_rate(self.doubling_time_t)
@@ -153,14 +197,15 @@ class SimSirModel:
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
-            self.run_projection(p, self.gen_policy(p))
+            raw = self.run_projection(p, self.gen_policy(p))
 
             # Skip values the would put the fit past peak
-            peak_admits_day = self.admits_df.hospitalized.argmax()
+            peak_admits_day = raw["admits_hospitalized"].argmax()
             if peak_admits_day < 0:
                 continue
 
-            loss = self.get_loss()
+            predicted = raw["census_hospitalized"][self.i_day]
+            loss = get_loss(self.current_hospitalized, predicted)
             losses[i] = loss
 
         min_loss = pd.Series(losses).argmin()
@@ -186,7 +231,7 @@ class SimSirModel:
         ]
 
     def run_projection(self, p: Parameters, policy: Sequence[Tuple[float, int]]):
-        self.raw_df = sim_sir_df(
+        raw = sim_sir(
             self.susceptible,
             self.infected,
             p.recovered,
@@ -195,23 +240,24 @@ class SimSirModel:
             policy
         )
 
-        self.dispositions_df = build_dispositions_df(self.raw_df, self.rates, p.market_share, p.current_date)
-        self.admits_df = build_admits_df(self.dispositions_df)
-        self.census_df = build_census_df(self.admits_df, self.days)
-        self.current_infected = self.raw_df.infected.loc[self.i_day]
+        calculate_dispositions(raw, self.rates, p.market_share)
+        calculate_admits(raw, self.rates)
+        calculate_census(raw, self.days)
 
-    def get_loss(self) -> float:
-        """Squared error: predicted vs. actual current hospitalized."""
-        predicted = self.census_df.hospitalized.loc[self.i_day]
-        return (self.current_hospitalized - predicted) ** 2.0
+        return raw
 
 
-def get_argmin_ds(census_df: pd.DataFrame, current_hospitalized: float) -> float:
+def get_loss(current_hospitalized, predicted) -> float:
+    """Squared error: predicted vs. actual current hospitalized."""
+    return (current_hospitalized - predicted) ** 2.0
+
+
+def get_argmin_ds(census, current_hospitalized: float) -> float:
     # By design, this forbids choosing a day after the peak
     # If that's a problem, see #381
-    peak_day = census_df.hospitalized.argmax()
-    losses_df = (census_df.hospitalized[:peak_day] - current_hospitalized) ** 2.0
-    return losses_df.argmin()
+    peak_day = census.argmax()
+    losses = (census[:peak_day] - current_hospitalized) ** 2.0
+    return losses.argmin()
 
 
 def get_beta(
@@ -257,33 +303,49 @@ def sir(
     return s_n * scale, i_n * scale, r_n * scale
 
 
-def gen_sir(
+def sim_sir(
     s: float, i: float, r: float, gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
-) -> Generator[Tuple[int, float, float, float], None, None]:
-    """Simulate SIR model forward in time yielding tuples.
+):
+    """Simulate SIR model forward in time, returning a dictionary of daily arrays
     Parameter order has changed to allow multiple (beta, n_days)
     to reflect multiple changing social distancing policies.
     """
     s, i, r = (float(v) for v in (s, i, r))
     n = s + i + r
     d = i_day
+
+    total_days = 1
+    for beta, days in policies:
+        total_days += days
+
+    d_a = np.empty(total_days, "int")
+    s_a = np.empty(total_days, "float")
+    i_a = np.empty(total_days, "float")
+    r_a = np.empty(total_days, "float")
+
+    index = 0
     for beta, n_days in policies:
         for _ in range(n_days):
-            yield d, s, i, r
+            d_a[index] = d
+            s_a[index] = s
+            i_a[index] = i
+            r_a[index] = r
+            index += 1
+
             s, i, r = sir(s, i, r, beta, gamma, n)
             d += 1
-    yield d, s, i, r
 
-
-def sim_sir_df(
-    s: float, i: float, r: float,
-    gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
-) -> pd.DataFrame:
-    """Simulate the SIR model forward in time."""
-    return pd.DataFrame(
-        data=gen_sir(s, i, r, gamma, i_day, policies),
-        columns=("day", "susceptible", "infected", "recovered"),
-    )
+    d_a[index] = d
+    s_a[index] = s
+    i_a[index] = i
+    r_a[index] = r
+    return {
+        "day": d_a,
+        "susceptible": s_a,
+        "infected": i_a,
+        "recovered": r_a,
+        "ever_infected": i_a + r_a
+    }
 
 
 def build_sim_sir_w_date_df(
@@ -302,58 +364,50 @@ def build_sim_sir_w_date_df(
     })
 
 
-def build_floor_df(df, keys):
+def build_floor_df(df, keys, prefix):
     """Build floor sim sir w date."""
     return pd.DataFrame({
         "day": df.day,
         "date": df.date,
         **{
-            key: np.floor(df[key])
+            prefix + key: np.floor(df[prefix+key])
             for key in keys
         }
     })
 
 
-def build_dispositions_df(
-    raw_df: pd.DataFrame,
+def calculate_dispositions(
+    raw: Dict,
     rates: Dict[str, float],
     market_share: float,
-    current_date: datetime,
-) -> pd.DataFrame:
+):
     """Build dispositions dataframe of patients adjusted by rate and market_share."""
-    patients = raw_df.infected + raw_df.recovered
-    day = raw_df.day
-    return pd.DataFrame({
-        "day": day,
-        "date": day.astype('timedelta64[D]') + np.datetime64(current_date),
-        **{
-            key: patients * rate * market_share
-            for key, rate in rates.items()
-        }
-    })
+    for key, rate in rates.items():
+        raw["ever_" + key] = raw["ever_infected"] * rate * market_share
+        raw[key] = raw["ever_infected"] * rate * market_share
 
 
-def build_admits_df(dispositions_df: pd.DataFrame) -> pd.DataFrame:
+def calculate_admits(raw: Dict, rates):
     """Build admits dataframe from dispositions."""
-    admits_df = dispositions_df - dispositions_df.shift(1)
-    admits_df.day = dispositions_df.day
-    admits_df.date = dispositions_df.date
-    return admits_df
+    for key in rates.keys():
+        ever = raw["ever_" + key]
+        admit = np.empty_like(ever)
+        admit[0] = np.nan
+        admit[1:] = ever[1:] - ever[:-1]
+        raw["admits_"+key] = admit
+        raw[key] = admit
 
 
-def build_census_df(
-    admits_df: pd.DataFrame,
+def calculate_census(
+    raw: Dict,
     lengths_of_stay: Dict[str, int],
-) -> pd.DataFrame:
+):
     """Average Length of Stay for each disposition of COVID-19 case (total guesses)"""
-    return pd.DataFrame({
-        'day': admits_df.day,
-        'date': admits_df.date,
-        **{
-            key: (
-                admits_df[key].cumsum()
-                - admits_df[key].cumsum().shift(los).fillna(0)
-            )
-            for key, los in lengths_of_stay.items()
-        }
-    })
+    n_days = raw["day"].shape[0]
+    for key, los in lengths_of_stay.items():
+        cumsum = np.empty(n_days + los)
+        cumsum[:los+1] = 0.0
+        cumsum[los+1:] = raw["admits_" + key][1:].cumsum()
+
+        census = cumsum[los:] - cumsum[:-los]
+        raw["census_" + key] = census

@@ -5,9 +5,9 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 
-from src.penn_chime.models import (
+from penn_chime.models import (
     sir,
-    sim_sir_df,
+    sim_sir,
     get_growth_rate,
     SimSirModel,
 )
@@ -65,21 +65,16 @@ def test_sim_sir():
     """
     Rounding to move fast past decimal place issues
     """
-    raw_df = sim_sir_df(
+    raw = sim_sir(
         5, 6, 7, 0.1, 0, [(0.1, 40)],  # s  # i  # r  # gamma  # i_day  # beta1  # n_days1
     )
 
-    first = raw_df.iloc[0, :]
-    last = raw_df.iloc[-1, :]
-
-    assert round(first.susceptible, 0) == 5
-    assert round(first.infected, 2) == 6
-    assert round(first.recovered, 0) == 7
-    assert round(last.susceptible, 2) == 0
-    assert round(last.infected, 2) == 0.18
-    assert round(last.recovered, 2) == 17.82
-
-    assert isinstance(raw_df, pd.DataFrame)
+    assert round(raw["susceptible"][0], 0) == 5
+    assert round(raw["infected"][0], 2) == 6
+    assert round(raw["recovered"][0], 0) == 7
+    assert round(raw["susceptible"][-1], 2) == 0
+    assert round(raw["infected"][-1], 2) == 0.18
+    assert round(raw["recovered"][-1], 2) == 17.82
 
 
 def test_growth_rate():
@@ -131,7 +126,13 @@ def test_model_raw_start(model, param):
 
     assert first.susceptible == 499600.0
     assert round(second.infected, 0) == 449.0
-    assert list(model.dispositions_df.iloc[0, :]) == [
+    assert list(model.dispositions_df.loc[0, [
+        "day",
+        "date",
+        "ever_hospitalized",
+        "ever_icu",
+        "ever_ventilated",
+    ]]) == [
         -43,
         date(year=2020, month=2, day=14),
         1.0,
@@ -140,9 +141,15 @@ def test_model_raw_start(model, param):
     ]
     assert round(raw_df.recovered[30], 0) == 7083.0
 
-    d, dt, s, i, r = list(model.dispositions_df.iloc[60, :])
+    d, dt, hosp, icu, vent = list(model.dispositions_df.loc[60, [
+        "day",
+        "date",
+        "ever_hospitalized",
+        "ever_icu",
+        "ever_ventilated",
+    ]])
     assert dt == date(year=2020, month=4, day=14)
-    assert [round(v, 0) for v in (d, s, i, r)] == [17, 549.0, 220.0, 110.0]
+    assert [round(v, 0) for v in (d, hosp, icu, vent)] == [17, 549.0, 220.0, 110.0]
 
 
 def test_model_conservation(param, model):
@@ -180,15 +187,15 @@ def test_model_cumulative_census(param, model):
     admits_df = model.admits_df
     df = pd.DataFrame(
         {
-            "hospitalized": admits_df.hospitalized,
-            "icu": admits_df.icu,
-            "ventilated": admits_df.ventilated,
+            "hospitalized": admits_df.admits_hospitalized,
+            "icu": admits_df.admits_icu,
+            "ventilated": admits_df.admits_ventilated,
         }
     )
     admits = df.cumsum()
 
-    # TODO: is 1.0 for ceil function?
+    # 1.0 is for the one hospital patient on the first day, who won't appear in the admissions
     diff = admits.hospitalized[1:-1] - (
-        0.05 * 0.05 * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
+        param.market_share * param.hospitalized.rate * (raw_df.infected[1:-1] + raw_df.recovered[1:-1]) - 1.0
     )
     assert (diff.abs() < 0.1).all()
