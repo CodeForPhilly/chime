@@ -29,7 +29,7 @@ As of March 21, help is especially wanted from contributors with experience in K
 - Take a few minutes to review this [resource](https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Reviewer_Checklist) for contributors and reviewers, to accelerate the adoption of your contribution (thanks to the good folks at Mozilla for this).
 - Submit pull requests from your fork, also against the `develop` branch of the `CodeforPhilly/chime` repo.
 - As part of your pull request, please ensure you provide the following information
-  - Traceability of a change to a described issue (ex: Fixes issue # 100)
+  - References to the issue/PR resolved with your contribution(s) (use key word e.g. Fixes #123, #321 See #213)
   - Explicitly identify the scope/area the change impacts (ex: Operations/Deployment/Model/Documentation)
   - Describe any necessary follow on work, ideally with links to any already open issues
 - Request review from the relevant maintainer(s).
