@@ -37,4 +37,4 @@ At the end of following this process you will have deployed a new CHIME version 
  the review of another DevOps admin whenever possible. Ensure to link
  to the PR in the deployment issue previously opened on GitHub.
 
-6. One approved you will need to [create a release to auto deploy](release-process.md)
+6. Once approved, you will need to [create a release to auto deploy](release-process.md)
