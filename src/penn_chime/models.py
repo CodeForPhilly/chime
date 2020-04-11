@@ -64,21 +64,40 @@ class SimSirModel:
             logger.info('Using doubling_time: %s', p.doubling_time)
 
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
-
             self.beta = get_beta(intrinsic_growth_rate,  gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
-            self.i_day = 0 # seed to the full length
-            raw = self.run_projection(p, [(self.beta, p.n_days)])
-            self.i_day = i_day = int(get_argmin_ds(raw["census_hospitalized"], p.current_hospitalized))
+            if p.mitigation_date is None:
+                self.i_day = 0 # seed to the full length
+                raw = self.run_projection(p, [(self.beta, p.n_days)])
+                self.i_day = i_day = int(get_argmin_ds(raw["census_hospitalized"], p.current_hospitalized))
 
-            self.raw = self.run_projection(p, self.gen_policy(p))
+                self.raw = self.run_projection(p, self.gen_policy(p))
 
-            logger.info('Set i_day = %s', i_day)
-            p.date_first_hospitalized = p.current_date - timedelta(days=i_day)
+                logger.info('Set i_day = %s', i_day)
+            else:
+                projections = {}
+                best_i_day = -1
+                best_i_day_loss = float('inf')
+                for i_day in range(p.n_days):
+                    self.i_day = i_day
+                    raw = self.run_projection(p, self.gen_policy(p))
+
+                    # Don't fit against results that put the peak before the present day
+                    if raw["census_hospitalized"].argmax() < i_day:
+                        continue
+
+                    loss = get_loss(raw["census_hospitalized"][i_day], p.current_hospitalized)
+                    if loss < best_i_day_loss:
+                        best_i_day_loss = loss
+                        best_i_day = i_day
+                        self.raw = raw
+
+                self.i_day = best_i_day
+
             logger.info(
                 'Estimated date_first_hospitalized: %s; current_date: %s; i_day: %s',
-                p.date_first_hospitalized,
+                p.current_date - timedelta(days=self.i_day),
                 p.current_date,
                 self.i_day)
 
@@ -268,18 +287,6 @@ def sir(
     s_n = (-beta * s * i) + s
     i_n = (beta * s * i - gamma * i) + i
     r_n = gamma * i + r
-
-    # TODO:
-    #   Post check dfs for negative values and
-    #   warn the user that their input data is bad.
-    #   JL: I suspect that these adjustments covered bugs.
-
-    #if s_n < 0.0:
-    #    s_n = 0.0
-    #if i_n < 0.0:
-    #    i_n = 0.0
-    #if r_n < 0.0:
-    #    r_n = 0.0
     scale = n / (s_n + i_n + r_n)
     return s_n * scale, i_n * scale, r_n * scale
 

@@ -3,8 +3,7 @@
 __version__ = "1.1.3"  # update VERSION in constants.py
 __author__ = "Predictive Healthcare @ Penn Medicine"
 
-from os import path
-from setuptools import setup, find_packages, find_namespace_packages
+from setuptools import setup, find_namespace_packages
 
 
 setup(
@@ -24,6 +23,7 @@ setup(
     install_requires=[
         "altair",
         "black",
+        "gspread",
         "gunicorn",
         "dash",
         "dash_bootstrap_components",
@@ -33,6 +33,8 @@ setup(
         "pyyaml",
         "selenium",
         "streamlit",
+        "gspread",
+        "oauth2client"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -40,10 +42,9 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
-    entry_points = {
+    entry_points={
         'console_scripts': ['penn_chime=penn_chime.cli:main'],
     },
     keywords=[],
     include_package_data=True,
 )
-
