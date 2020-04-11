@@ -1,6 +1,6 @@
 # Operations guide to resources
 
-This guide will show you where nodes, and k8s clusters are stored and their heirarchy.
+This guide will show you where nodes, and k8s clusters are stored and their hierarchy.
 
 ## Production
 

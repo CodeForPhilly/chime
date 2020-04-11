@@ -25,53 +25,21 @@ spec:
         app: chime
     spec:
       containers:
-      - image: docker.pkg.github.com/codeforphilly/chime/penn-chime:1.1.2
+      - image: docker.pkg.github.com/codeforphilly/chime/penn-chime:1.1.3
         name: chime
-        env:
-          - name: GAPI_CRED_TYPE
-            valueFrom:
-              secretKeyRef:
-                name: google-api-creds
-                key: type
-          - name: GAPI_CRED_PROJECT_ID
-            valueFrom:
-              secretKeyRef:
-                name: google-api-creds
-                key: project_id
-          - name: GAPI_CRED_PRIVATE_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                name: google-api-creds
-                key: private_key_id
-          - name: GAPI_CRED_PRIVATE_KEY
-            valueFrom:
-              secretKeyRef:
-                name: google-api-creds
-                key: private_key
-          - name: GAPI_CRED_CLIENT_EMAIL
-            valueFrom:
-              secretKeyRef:
-                name: google-api-creds
-                key: client_email
-          - name: GAPI_CRED_CLIENT_ID
-            valueFrom:
-              secretKeyRef:
-                name: google-api-creds
-                key: client_id
-          - name: GAPI_CRED_AUTH_PROVIDER_X509_CERT_URL
-            valueFrom:
-              secretKeyRef:
-                name: google-api-creds
-                key: auth_provider_x509_cert_url
-          - name: GAPI_CRED_CLIENT_X509_CERT_URL
-            valueFrom:
-              secretKeyRef:
-                name: google-api-creds
-                key: client_x509_cert_url
         ports:
         - containerPort: 8000
           name: http
           protocol: TCP
+        volumeMounts:
+          - name: google-api-creds
+            mountPath: "/mnt/google-api-creds"
+            readOnly: true
+      volumes:
+        - name: google-api-creds
+          secret:
+            secretName: google-api-creds-json
+        
           
       imagePullSecrets:
       - name: regcred
