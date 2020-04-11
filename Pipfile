@@ -16,6 +16,9 @@ dash = "*"
 dash-bootstrap-components = "*"
 gunicorn = "*"
 PyYAML = "*"
+python-i18n = "*"
+gspread="*"
+oauth2client="*"
 
 [requires]
 python_version = "3.7"
