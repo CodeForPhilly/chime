@@ -12,6 +12,8 @@ on:
 
 env:
   KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_prod }}
+  # For hub CLI tool
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   deploy-prod:
@@ -46,6 +48,23 @@ jobs:
             exit 1
           fi
 
+      - name: Get deployment information
+        run: |
+          hub api /repos/${{ github.repository }}/deployments?ref=$DEPLOY_REF -X GET | jq .[0] > /tmp/deployment.json
+
+      - name: Mark deployment as started
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "in_progress",
+            "description": "Rolling out $DEPLOY_REF",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
       - name: Get manifest archive
         run: |
           set -e
@@ -66,3 +85,30 @@ jobs:
         run: |
           kubectl -n chime rollout status deployment.v1.apps/chime
           kubectl -n chime get deployment chime -o yaml
+
+      - name: Mark deployment as failed
+        if: failure()
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "failure",
+            "description": "Error in job deploy-prod",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+      - name: Mark deployment completed
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "success",
+            "description": "$DEPLOY_REF deployed",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
