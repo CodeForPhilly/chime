@@ -409,6 +409,6 @@ jobs:
           {
             "state": "queued",
             "description": "Awaiting approval/merge of deployment Pull Request",
-            "log_url": "$(jq < /tmp/pr.json .html_url)"
+            "log_url": "$(jq .html_url < /tmp/pr.json)"
           }
           EOF)
