@@ -16,25 +16,6 @@ from penn_chime.models import SimSirModel
 from penn_chime.parameters import Parameters, Disposition
 
 
-class Multidict(defaultdict):
-
-    def __init__(self, obj):
-        super(Multidict, self).__init__(set)
-        for el in obj:
-            self.__setitem__(*el)
-
-    def __setitem__(self, key, value):
-        if isinstance(value, (self.default_factory)):  # self.default_factory is `set`
-            super().__setitem__(key, value)
-        else:
-            self[key].add(value)
-
-    def items(self):
-        for key in self.keys():
-            for v in self[key]:
-                yield key, v
-
-
 class ComponentCallbacks:
     def __init__(self, callbacks: List[ChimeCallback], component_instance):
         self._callbacks = callbacks
