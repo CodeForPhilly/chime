@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: chime
+spec:
+  tls:
+  - hosts:
+    - penn-chime.phl.io
+    secretName: tls-secret
+  rules:
+  - host: penn-chime.phl.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: chime
+          servicePort: 80
+
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: chime-static
+spec:
+  rules:
+  - host: penn-chime.phl.io
+    http:
+      paths:
+      - path: /static/
+        backend:
+          serviceName: chime
+          servicePort: 80
+  - host: lke.penn-chime.phl.io
+    http:
+      paths:
+      - path: /static/
+        backend:
+          serviceName: chime
+          servicePort: 80

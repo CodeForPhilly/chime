@@ -1,15 +1,7 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: chime
-
----
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: chime
-  namespace: chime
   labels:
     app: chime
 spec:
@@ -43,21 +35,3 @@ spec:
           
       imagePullSecrets:
       - name: regcred
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: chime
-  namespace: chime
-  labels:
-    app: chime
-spec:
-  selector:
-    app: chime
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: 8000
