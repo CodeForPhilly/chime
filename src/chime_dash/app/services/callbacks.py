@@ -1,5 +1,5 @@
 from collections import OrderedDict, defaultdict
-from datetime import datetime
+from datetime import datetime, date
 from typing import List
 from urllib.parse import parse_qsl, urlencode
 
@@ -46,7 +46,7 @@ class IndexCallbacks(ComponentCallbacks):
 
     @staticmethod
     def toggle_tables(switch_value):
-        return get_n_switch_values(switch_value, 3)
+        return get_n_switch_values(not switch_value, 3)
 
     @staticmethod
     def handle_model_change(i, sidebar_data):
@@ -82,7 +82,7 @@ class IndexCallbacks(ComponentCallbacks):
             component_instance=component_instance,
             callbacks=[
                 ChimeCallback(  # If user toggles show_tables, show/hide tables
-                    changed_elements={"show_tables": "value"},
+                    changed_elements={"show_tables": "on"},
                     dom_updates={
                         "SIR_table_container": "hidden",
                         "new_admissions_table_container": "hidden",
@@ -117,10 +117,7 @@ class SidebarCallbacks(ComponentCallbacks):
     def get_formated_values(i, input_values):
         result = dict(zip(i.input_value_map.keys(), input_values))
         for key, input_type in i.input_type_map.items():
-            # todo remove this hack needed because of how Checklist type (used for switch input) returns values
-            if input_type == "switch":
-                result[key] = False if result[key] == [True] else True
-            elif input_type == "date":
+            if input_type == "date":
                 value = result[key]
                 try:
                     result[key] = datetime.strptime(value, "%Y-%m-%d").date() if value else value
@@ -172,19 +169,6 @@ class SidebarCallbacks(ComponentCallbacks):
                 raise PreventUpdate
             return SidebarCallbacks.update_parameters(component_instance, *args)
 
-        def hospitalized_checkbox_to_first_date(i_know_first_hospitalized):
-            if not i_know_first_hospitalized:
-                return
-            else:
-                raise ValueError('Do not update')
-
-
-        def hospitalized_checkbox_to_doubling_time(i_know_first_hospitalized):
-            if i_know_first_hospitalized:
-                return
-            else:
-                raise ValueError('Do not update')
-
         super().__init__(
             component_instance=component_instance,
             callbacks=[
@@ -193,17 +177,7 @@ class SidebarCallbacks(ComponentCallbacks):
                     dom_updates={"sidebar-store": "data"},
                     callback_fn=update_parameters_helper,
                     stores=["sidebar-store"],
-                ),
-                ChimeCallback(
-                    changed_elements={'spread_parameters_checkbox': 'value'},
-                    dom_updates={'date_first_hospitalized': 'date'},
-                    callback_fn=hospitalized_checkbox_to_first_date
-                ),
-                ChimeCallback(
-                    changed_elements={'spread_parameters_checkbox': 'value'},
-                    dom_updates={'doubling_time': 'value'},
-                    callback_fn=hospitalized_checkbox_to_doubling_time
-                ),
+                )
             ]
         )
 
@@ -236,6 +210,12 @@ class RootCallbacks(ComponentCallbacks):
             value_type = sidebar_input_types[key]
             if value_type == "number":
                 parsed_value = RootCallbacks.try_parsing_number(value)
+            elif value == 'None':
+                parsed_value = None
+            elif value == 'True':
+                parsed_value = True
+            elif value == 'False':
+                parsed_value = False
             else:
                 parsed_value = value
             hash_dict[key] = parsed_value
@@ -245,6 +225,7 @@ class RootCallbacks(ComponentCallbacks):
     def hash_changed(sidebar_input_types, hash_str=None, root_data=None):
         if hash_str:
             hash_dict = RootCallbacks.parse_hash(hash_str, sidebar_input_types)
+            # Fix that empty values encodes to 'None' string in url
             result = RootCallbacks.get_inputs(hash_dict, sidebar_input_types.keys())
             # Don't update the data store if it already contains the same data
             if result == root_data:
@@ -266,7 +247,42 @@ class RootCallbacks(ComponentCallbacks):
             new_val = RootCallbacks.get_inputs(root_data, inputs_keys)
         else:
             raise PreventUpdate
-        return ["#{}".format(urlencode(new_val))] + list(new_val.values())
+
+        # Spread parameters toggle handling
+        if sidebar_data.get('inputs_dict', {}).get('spread_parameters_checkbox'):
+            styles = {
+                'date_first_hospitalized': None,
+                'doubling_time': {'display': 'none'}
+            }
+            new_val['doubling_time'] = None
+            new_val['date_first_hospitalized'] = date(year=2020, month=4, day=1)
+        else:
+            styles = {
+                'date_first_hospitalized': {'display': 'none'},
+                'doubling_time': None
+            }
+            new_val['date_first_hospitalized'] = None
+            if new_val['doubling_time'] is None:
+                new_val['doubling_time'] = 1
+
+        # Social distancing handler
+        if sidebar_data.get('inputs_dict', {}).get('social_distancing_checkbox'):
+            styles.update({
+                'social_distancing_start_date': None,
+                'relative_contact_rate': None
+            })
+            if not new_val['social_distancing_start_date']:
+                new_val['social_distancing_start_date'] = new_val['current_date']
+        else:
+            styles.update({
+                'social_distancing_start_date': {'display': 'none'},
+                'relative_contact_rate': {'display': 'none'}
+            })
+            new_val['relative_contact_rate'] = 0
+
+        if not styles['date_first_hospitalized']:
+            print(sidebar_data.get('inputs_dict', {}).get('spread_parameters_checkbox'))
+        return ["#{}".format(urlencode(new_val))] + list(new_val.values()) + list(styles.values())
 
     def __init__(self, component_instance):
         sidebar = component_instance.components["sidebar"]
@@ -277,7 +293,11 @@ class RootCallbacks(ComponentCallbacks):
             return RootCallbacks.hash_changed(sidebar_input_types, hash_str, root_data)
 
         def stores_changed_helper(root_mod, sidebar_mod, root_data, sidebar_data):
-            return RootCallbacks.stores_changed(sidebar_inputs.keys(), root_mod, sidebar_mod, root_data, sidebar_data)
+            return RootCallbacks.stores_changed(sidebar_inputs.keys(),
+                                                root_mod,
+                                                sidebar_mod,
+                                                root_data,
+                                                sidebar_data)
 
         super().__init__(
             component_instance=component_instance,
@@ -291,6 +311,7 @@ class RootCallbacks(ComponentCallbacks):
                 ChimeCallback(
                     changed_elements={"root-store": "modified_timestamp", "sidebar-store": "modified_timestamp"},
                     dom_updates={"location": "hash", **sidebar_inputs},
+                    dom_states=sidebar.input_state_map,
                     callback_fn=stores_changed_helper,
                     stores=["root-store", "sidebar-store"],
                 ),
