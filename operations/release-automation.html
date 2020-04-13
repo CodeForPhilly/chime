@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Run Locally · GitBook</title>
+        <title>Release Automation · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -57,10 +57,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="../CONTRIBUTING.html" />
+    <link rel="next" href="chime-live-cluster.html" />
     
     
-    <link rel="prev" href="try-online.html" />
+    <link rel="prev" href="release-process.html" />
     
 
     </head>
@@ -116,9 +116,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.2.1" data-path="try-online.html">
+        <li class="chapter " data-level="1.2.1" data-path="../getting-started/try-online.html">
             
-                <a href="try-online.html">
+                <a href="../getting-started/try-online.html">
             
                     
                     Try Online
@@ -129,9 +129,9 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.2" data-path="run-locally.html">
+        <li class="chapter " data-level="1.2.2" data-path="../getting-started/run-locally.html">
             
-                <a href="run-locally.html">
+                <a href="../getting-started/run-locally.html">
             
                     
                     Run Locally
@@ -219,9 +219,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.4.1" data-path="../operations/release-process.html">
+        <li class="chapter " data-level="1.4.1" data-path="release-process.html">
             
-                <a href="../operations/release-process.html">
+                <a href="release-process.html">
             
                     
                     Release Process
@@ -232,9 +232,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.2" data-path="../operations/release-automation.html">
+        <li class="chapter active" data-level="1.4.2" data-path="release-automation.html">
             
-                <a href="../operations/release-automation.html">
+                <a href="release-automation.html">
             
                     
                     Release Automation
@@ -245,9 +245,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.3" data-path="../operations/chime-live-cluster.html">
+        <li class="chapter " data-level="1.4.3" data-path="chime-live-cluster.html">
             
-                <a href="../operations/chime-live-cluster.html">
+                <a href="chime-live-cluster.html">
             
                     
                     The chime-live Cluster
@@ -258,9 +258,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.4" data-path="../operations/heroku.html">
+        <li class="chapter " data-level="1.4.4" data-path="heroku.html">
             
-                <a href="../operations/heroku.html">
+                <a href="heroku.html">
             
                     
                     Deploy to Heroku
@@ -271,9 +271,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.5" data-path="../operations/habitat.html">
+        <li class="chapter " data-level="1.4.5" data-path="habitat.html">
             
-                <a href="../operations/habitat.html">
+                <a href="habitat.html">
             
                     
                     Deploy with Chef Habitat
@@ -284,9 +284,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.6" data-path="../operations/byok8s.html">
+        <li class="chapter " data-level="1.4.6" data-path="byok8s.html">
             
-                <a href="../operations/byok8s.html">
+                <a href="byok8s.html">
             
                     
                     Deploy to Your Own Cluster
@@ -297,9 +297,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.7" data-path="../operations/manual-validation.html">
+        <li class="chapter " data-level="1.4.7" data-path="manual-validation.html">
             
-                <a href="../operations/manual-validation.html">
+                <a href="manual-validation.html">
             
                     
                     Manual Validation
@@ -310,9 +310,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.8" data-path="../operations/limited-kubeconfigs/limited-kubeconfigs.html">
+        <li class="chapter " data-level="1.4.8" data-path="limited-kubeconfigs/limited-kubeconfigs.html">
             
-                <a href="../operations/limited-kubeconfigs/limited-kubeconfigs.html">
+                <a href="limited-kubeconfigs/limited-kubeconfigs.html">
             
                     
                     Limited Cluster Access for Deployment
@@ -397,7 +397,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Run Locally</a>
+        <a href=".." >Release Automation</a>
     </h1>
 </div>
 
@@ -412,30 +412,21 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="getting-started-run-locally">Getting Started: Run Locally</h1>
-<p>This guide aims to provide the easiest and most reliable method for getting a copy of the application running locally.</p>
-<p>If you&apos;re a developer looking to do heavier work on the application, check out the <a href="../contributing/app-dev.html">Contributing: Application Development</a> for a more advanced guide covering practical developer workflows.</p>
-<h2 id="quickstart-with-docker">Quickstart with Docker</h2>
-<p>From the root directory of the repository, you should be able to get up and running with one command:</p>
-<pre><code class="lang-bash">./script/server
-</code></pre>
-<p>This script will:</p>
-<ul>
-<li>Verify that <code>docker</code> and <code>docker-compose</code> are available on your system</li>
-<li>Initialize <code>.env</code> if needed from <code>.env.example</code></li>
-<li>Use <code>docker-compose up</code> to build and start an instance of the application as a background daemon</li>
-<li>Print out the URL you can open the app at (usually <a href="http://localhost:8000" target="_blank">http://localhost:8000</a>)</li>
-</ul>
-<h3 id="running-on-a-different-port">Running on a Different Port</h3>
-<p>If you need to run the server on a different, edit the <code>PORT</code> option in your <code>.env</code> file. You might need to do this if you have something else already running on the default port (8000).</p>
-<h2 id="updating-after-changing-code">Updating After Changing Code</h2>
-<p>If you edit code, or checkout a new branch, the update script will handle all needed steps to refresh your running instance:</p>
-<pre><code class="lang-bash">./script/update
-</code></pre>
-<h2 id="shutdown-and-cleanup">Shutdown and Cleanup</h2>
-<p>From the same directory, run this command to shut down the Docker container and clean up any volumes:</p>
-<pre><code class="lang-bash">docker-compose down -v
-</code></pre>
+                                <h1 id="operations-release-deployment">Operations: Release Deployment</h1>
+<p>The release deployment is an automated process which tracks the following steps:</p>
+<ol>
+<li><strong>human</strong>: Create a GitHub Release</li>
+<li><em>bot</em>: Build a container image from the release</li>
+<li><em>bot</em>: Push container image to GitHub packages</li>
+<li><em>bot</em>: Generate manifest files to deploy release</li>
+<li><em>bot</em>: Publish manifest files to GitHub release</li>
+<li><em>bot</em>: Open Pull Request into <code>releases/v1</code> from <code>develop</code></li>
+<li><em>bot</em>: Comment on PR showing changes to be applied by deployment</li>
+<li><strong>human</strong>: Approve/merge release</li>
+<li><em>bot</em>: Download manifest files from GitHub release</li>
+<li><em>bot</em>: Apply manifest files for release to cluster</li>
+</ol>
+<p>The automated portions are implemented in .github/workflows/infra-release.yml and .github/workflows/infra-deploy.yml</p>
 
                                 
                                 </section>
@@ -463,12 +454,12 @@
 
             
                 
-                <a href="try-online.html" class="navigation navigation-prev " aria-label="Previous page: Try Online">
+                <a href="release-process.html" class="navigation navigation-prev " aria-label="Previous page: Release Process">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="../CONTRIBUTING.html" class="navigation navigation-next " aria-label="Next page: Contributing">
+                <a href="chime-live-cluster.html" class="navigation navigation-next " aria-label="Next page: The chime-live Cluster">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -479,7 +470,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Run Locally","level":"1.2.2","depth":2,"next":{"title":"Contributing","level":"1.3","depth":1,"path":"CONTRIBUTING.md","ref":"CONTRIBUTING.md","articles":[{"title":"Application Development","level":"1.3.1","depth":2,"path":"contributing/app-dev.md","ref":"contributing/app-dev.md","articles":[]},{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},{"title":"Operations Support","level":"1.3.3","depth":2,"path":"contributing/operations-support.md","ref":"contributing/operations-support.md","articles":[]}]},"previous":{"title":"Try Online","level":"1.2.1","depth":2,"path":"getting-started/try-online.md","ref":"getting-started/try-online.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"getting-started/run-locally.md","mtime":"2020-04-13T19:22:38.705Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-04-13T19:22:48.372Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Release Automation","level":"1.4.2","depth":2,"next":{"title":"The chime-live Cluster","level":"1.4.3","depth":2,"path":"operations/chime-live-cluster.md","ref":"./operations/chime-live-cluster.md","articles":[]},"previous":{"title":"Release Process","level":"1.4.1","depth":2,"path":"operations/release-process.md","ref":"./operations/release-process.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"operations/release-automation.md","mtime":"2020-04-13T19:22:38.705Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-04-13T19:22:48.372Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
