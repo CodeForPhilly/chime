@@ -19,12 +19,20 @@ See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_starte
 
 ## Running CHIME Locally
 
+
+### With `venv`
+
+```bash
+python3 -m venv ~.venv
+. ~.venv/bin/activate
+pip install -e .
+```
+
 ### With `pipenv`
 
 ```bash
 pipenv shell
 pipenv sync --dev
-PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
 ```
 
 ### With `conda`
@@ -33,7 +41,24 @@ PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
 conda env create -f environment.yml
 source activate chime
 pip install streamlit
-PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
+```
+
+## Run the Streamlit Web App
+
+```bash
+PARAMETERS=-./defaults/webapp.cfg streamlit run st_app.py
+```
+
+## Run the Command Line Interface
+
+```bash
+PARAMETERS=./defaults/cli.cfg penn_chime
+```
+
+## Help with the Command Line Interface
+
+```bash
+penn_chime --help
 ```
 
 ### Choosing a Different Set of Parameters
