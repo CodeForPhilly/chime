@@ -1,7 +1,7 @@
 import altair as alt
 import pytest
 
-from penn_chime.charts import (
+from penn_chime.view.charts import (
     build_admits_chart,
     build_census_chart,
 )

@@ -31,7 +31,6 @@ setup(
         "pandas",
         "pytest",
         "pyyaml",
-        "selenium",
         "streamlit",
         "gspread",
         "oauth2client"

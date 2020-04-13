@@ -1,6 +1,6 @@
 """the callable validator design pattern"""
 
-from ..constants import EPSILON
+from ...constants import EPSILON
 from .validators import (
     OptionalValue as ValOptionalValue,
     Bounded as ValBounded,
