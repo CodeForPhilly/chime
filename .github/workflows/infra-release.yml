@@ -1,0 +1,414 @@
+name: Deployment artifacts
+
+on:
+  release:
+    types:
+      - published
+  # Run tests for any PRs.
+  pull_request:
+
+env:
+  IMAGE_NAME: penn-chime
+  KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_preprod }}
+  # For hub CLI tool
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  # Run tests.
+  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          if [ -f docker-compose.test.yml ]; then
+            docker-compose --file docker-compose.test.yml build
+            docker-compose --file docker-compose.test.yml run sut
+          else
+            docker build . --file Dockerfile
+          fi
+
+  release-data:
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Generate build metadata
+        run: |
+
+          IMAGE_PATH="docker.pkg.github.com/${GITHUB_REPOSITORY,,}/${IMAGE_NAME}"
+
+          # Tagged release
+          if [[ ${{ github.ref }} == refs/tags/* ]]; then
+            # Strip git ref prefix from version
+            TAGNAME=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+            # Strip "v" prefix from tag name
+            VERSION=$(echo $TAGNAME | sed -e 's/^v//')
+          else
+            VERSION=${{ github.sha }}
+          fi
+
+          IMAGE_ID=$IMAGE_PATH:$VERSION
+
+          echo "release/registry-path: $IMAGE_PATH"
+          echo "release/tag:           $TAGNAME"
+          echo "release/version:       $VERSION"
+          echo "release/registry-id:   $IMAGE_ID"
+
+          mkdir release
+          printf '%s' "$IMAGE_PATH" > release/registry-path
+          printf '%s' "$TAGNAME"    > release/tag
+          printf '%s' "$VERSION"    > release/version
+          printf '%s' "$IMAGE_ID"   > release/registry-id
+
+      - name: Expose release information
+        uses: actions/upload-artifact@v1
+        with:
+          name: release
+          path: release
+
+  # Create the Deployment API object
+  new-deployment:
+    needs: release-data
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+
+    steps:
+      - name: Get release information
+        uses: actions/download-artifact@v1
+        with:
+          name: release
+
+      - name: Create deployment object for release
+        run: |
+          set -e
+          # Determine deployment environment
+          if ${{ github.event.release.prerelease }}; then
+            target=preprod
+          else
+            target=prod
+          fi
+
+          # Create deployment
+          hub api /repos/${{ github.repository }}/deployments -X POST --input <(cat <<EOF
+          {
+            "ref": "$(cat release/tag)",
+            "auto_merge": false,
+            "required_contexts": [],
+            "environment": "$target"
+          }
+          EOF) > /tmp/deployment.json
+
+          # Set status to pending
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "pending",
+            "description": "Building deployment artifacts",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  publish-image:
+    # Ensure test job passes before pushing image.
+    needs:
+      - test
+      - release-data
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get release information
+        uses: actions/download-artifact@v1
+        with:
+          name: release
+
+      - name: Get deployment information
+        run: |
+          hub api /repos/${{ github.repository }}/deployments?ref=$(cat release/tag) -X GET | jq .[0] > /tmp/deployment.json
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag image
+
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        run: |
+          # Publish tag
+          image_id=$(cat release/registry-id)
+          docker tag image $image_id
+          docker push $image_id
+
+          # Only publish :latest tag for production releases
+          if ! ${{ github.event.release.prerelease }}; then
+            image_path=$(cat release/registry-path)
+            docker tag image $image_path:latest
+            docker push $image_path:latest
+            echo prod release published to :latest
+          fi
+
+      - name: Mark deployment as failed
+        if: failure()
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "failure",
+            "description": "Error in job publish-image",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+  publish-manifests:
+
+    # Published manifests will signify successful image build
+    needs: publish-image
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get release information
+        uses: actions/download-artifact@v1
+        with:
+          name: release
+
+      - name: Get deployment information
+        run: |
+          hub api /repos/${{ github.repository }}/deployments?ref=$(cat release/tag) -X GET | jq .[0] > /tmp/deployment.json
+
+      - name: Build manifest archive
+        run: |
+          tagname=$(cat release/tag)
+          image_id=$(cat release/registry-id)
+          dir=deploy-$tagname
+          zip=$dir.zip
+
+          ln -s . $dir
+
+          # Update image version in application manifest
+          sed -Ei "s,(- image: )(docker.pkg.github.com.*),\1$image_id," k8s/app.yaml
+
+          # Add application manifest to manifest archive
+          zip -D $zip $dir/k8s/app.yaml
+
+          # Add environment manifests to manifest archive
+          if ${{ github.event.release.prerelease }}; then
+            zip -Dr $zip $dir/k8s.preprod
+          else
+            zip -Dr $zip $dir/k8s.prod
+          fi
+
+      - name: Publish manifest archive
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: '*.zip'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mark deployment as failed
+        if: failure()
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "failure",
+            "description": "Error in job publish-manifests",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+  deploy-preprod:
+
+    needs: publish-manifests
+    if: github.event_name == 'release' && github.event.release.prerelease
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: azure/setup-kubectl@v1
+        with:
+          version: v1.18.0
+
+      - name: Add kubeconfig to environment
+        run: |
+          set -e
+          test -e ~/.kube || mkdir ~/.kube
+          cat <<EOF > ~/.kube/config
+          $(printf '%s' "$KUBE_CONFIG_DATA" | base64 -d)
+          EOF
+
+      - name: Get release information
+        uses: actions/download-artifact@v1
+        with:
+          name: release
+
+      - name: Get deployment information
+        run: |
+          hub api /repos/${{ github.repository }}/deployments?ref=$(cat release/tag) -X GET | jq .[0] > /tmp/deployment.json
+
+      - name: Mark deployment as started
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "in_progress",
+            "description": "Rolling out $(cat release/tag)",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+      - name: Get manifest archive
+        run: |
+          set -e
+          tagname=$(cat release/tag)
+          arc_fname=deploy-$tagname.zip
+          arc_url=https://github.com/${{ github.repository }}/releases/download/$tagname/$arc_fname
+          curl -LO "$arc_url"
+          unzip $arc_fname
+
+      - name: Deploy to preprod
+        run: |
+          set -e
+          manifest_dir=deploy-$(cat release/tag)
+          find $manifest_dir/ -type f -print0 | xargs -0 cat | kubectl diff -f - || true
+          kubectl apply -Rf $manifest_dir
+
+      - name: Wait for deployment to complete
+        run: |
+          set -e
+          kubectl -n chime rollout status deployment.v1.apps/chime
+          kubectl -n chime get deployment/chime -o yaml
+
+      - name: Mark deployment as failed
+        if: failure()
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "failure",
+            "description": "Error in job deploy-preprod",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+      - name: Mark deployment completed
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "success",
+            "description": "$(cat release/tag) deployed",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+  stage-prod-deploy:
+    needs: publish-manifests
+    if: github.event_name == 'release' && ! github.event.release.prerelease
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/setup-kubectl@v1
+        with:
+          version: v1.18.0
+
+      - name: Add kubeconfig to environment
+        run: |
+          set -e
+          test -e ~/.kube || mkdir ~/.kube
+          cat <<EOF > ~/.kube/config
+          $(printf '%s' "$KUBE_CONFIG_DATA" | base64 -d)
+          EOF
+
+      - name: Get release information
+        uses: actions/download-artifact@v1
+        with:
+          name: release
+
+      - name: Load release information into environment
+        run: |
+          echo "::set-env name=VERSION::$(cat release/version)"
+          echo "::set-env name=TAGNAME::$(cat release/tag)"
+
+      - name: Get manifest archive
+        run: |
+          set -e
+          tagname=$TAGNAME
+          arc_fname=deploy-$tagname.zip
+          arc_url=https://github.com/${{ github.repository }}/releases/download/$tagname/$arc_fname
+          curl -LO "$arc_url"
+          unzip $arc_fname
+
+      - name: Get deployment information
+        run: |
+          hub api /repos/${{ github.repository }}/deployments?ref=$(cat release/tag) -X GET | jq .[0] > /tmp/deployment.json
+
+      - name: Open deployment pull request
+        run: |
+          set -e
+          pr_body_file=/tmp/pr_body.txt
+
+          cat <<EOF > $pr_body_file
+          Deploy CHIME ${{ env.VERSION }}
+
+          Actions to deploy $TAGNAME:
+          \`\`\`diff
+          $(find deploy-$TAGNAME/ -type f -print0 | xargs -0 cat | kubectl diff -f - || true)
+          \`\`\`
+          EOF
+
+          hub pull-request -b releases/v1 -h develop -F $pr_body_file > /tmp/pr.json
+
+      - name: Mark deployment as failed
+        if: failure()
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "failure",
+            "description": "Error in job stage-prod-deploy",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+      - name: Mark deployment queued
+        run: |
+          # Update status to success
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "queued",
+            "description": "Awaiting approval/merge of deployment Pull Request",
+            "log_url": "$(jq .html_url < /tmp/pr.json)"
+          }
+          EOF)
