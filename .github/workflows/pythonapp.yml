@@ -43,7 +43,7 @@ jobs:
         python -m pytest
     - name: Run App
       run: |
-        PARAMETERS=./defaults/cypress.cfg streamlit run src/app.py &
+        PARAMETERS=./defaults/cypress.cfg streamlit run st_app.py &
     - name: Cypress
       uses: cypress-io/github-action@v1
       with:
