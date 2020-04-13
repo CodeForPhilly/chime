@@ -15,7 +15,7 @@ from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4
 from dash_core_components import DatePickerSingle
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
-from penn_chime.parameters import Parameters
+from penn_chime.model.parameters import Parameters
 
 # Consider moving this to a config file eventually
 TEMPLATE_DIR = path.join(

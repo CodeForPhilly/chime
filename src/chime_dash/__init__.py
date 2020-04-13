@@ -8,7 +8,7 @@ import os
 from typing import TypeVar
 
 from dash import Dash
-from penn_chime.parameters import Parameters
+from penn_chime.model.parameters import Parameters
 
 from chime_dash.app.config import from_object
 from chime_dash.app.pages.root import Root

@@ -10,7 +10,7 @@ from dash.development.base_component import ComponentMeta
 from chime_dash.app.components.base import Component
 from chime_dash.app.components.menu import Menu
 
-from penn_chime.parameters import Parameters
+from penn_chime.model.parameters import Parameters
 
 
 class Navbar(Component):

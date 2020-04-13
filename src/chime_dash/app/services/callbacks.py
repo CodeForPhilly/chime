@@ -12,8 +12,8 @@ from chime_dash.app.utils import (
     prepare_visualization_group
 )
 
-from penn_chime.models import SimSirModel
-from penn_chime.parameters import Parameters, Disposition
+from penn_chime.model.sir import Sir
+from penn_chime.model.parameters import Parameters, Disposition
 
 
 class ComponentCallbacks:
@@ -37,7 +37,7 @@ class IndexCallbacks(ComponentCallbacks):
         viz_kwargs = {}
         if sidebar_data:
             pars = parameters_deserializer(sidebar_data["parameters"])
-            model = SimSirModel(pars)
+            model = Sir(pars)
             vis = i.components.get("visualizations", None) if i else None
             vis_content = vis.content if vis else None
 
