@@ -24,7 +24,7 @@ See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_starte
 ```bash
 pipenv shell
 pipenv sync --dev
-streamlit run src/app.py
+PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
 ```
 
 ### With `conda`
@@ -33,33 +33,43 @@ streamlit run src/app.py
 conda env create -f environment.yml
 source activate chime
 pip install streamlit
-streamlit run src/app.py
+PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
 ```
+
+### Choosing a Different Set of Parameters
+
+If you want a different set of default parameters, you may use your own configuration file.
+
+```bash
+PARAMETERS=./defaults/yours.cfg streamlit run st_app.py
+```
+
+Be sure to include `--current-date` in the file, if your `--current-hospitalized` is not today's value.
+Be sure to include `--mitigation-date` in the file if social distancing was implemented before today.
 
 ### Choosing a Different Port
 
-If you need to run the application on a different port than the default (8000), you can export a variable in your shell session to override it with any port number of your choice before running:
+If you need to run the application on a different port than the default (8000), you can set an environment variable.
 
 ```bash
-export STREAMLIT_SERVER_PORT=1234
-streamlit run src/app.py
+STREAMLIT_SERVER_PORT=1234 PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
 ```
 
 ## Project Layout
 
 ### Application files
 
-- `src/app.py`: Main source for the application
-- `src/test_app.py`: [pytest](https://docs.pytest.org/en/latest/) tests for `app.py`
+- `st_app.py`: Startup script for the streamlit web application.
+- `src`: Source code for the `penn_chime` module.
+- `tests/`: [pytest](https://docs.pytest.org/en/latest/) tests for the `penn_chime` module.
 - `script/`: Developer workflow scripts following [GitHub's Scripts To Rule Them All](https://github.com/github/scripts-to-rule-them-all) pattern.
 - `.streamlit/`: [Streamlit config options](https://docs.streamlit.io/cli.html)
 - `.env`: Local environment variables to use when running application, this file is copied from `.env.example` to start you out and then ignored by git
-- `pytest.ini`: Configuration for [pytest](https://docs.pytest.org/en/latest/)
+- `environment.yml`
 - `Pipfile`
 - `Pipfile.lock`
-- `environment.yml`
-- `requirements.txt`
 - `setup.py`
+- `setup.cfg`: Configuration for flake8, mypy, [pytest](https://docs.pytest.org/en/latest/)
 
 ### Documentation
 
@@ -85,6 +95,10 @@ To run tests locally, enter an environment first with `pipenv` or `conda` as ind
 pip install pytest
 pytest
 ```
+
+The test code runs from the local `tests` directory. Updating code in `tests` modifies the tests.
+However, the tested code is the *installed* penn_chime module in your virtual environment's site-packages directory, it is *not* the code in the local `src` directory.
+Use `pip install .` to push your local changes in `src` to replace the installed `penn_chime` module.
 
 ## Validating CHIME
 

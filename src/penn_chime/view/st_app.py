@@ -12,7 +12,7 @@ from .charts import (
     build_census_chart,
     build_sim_sir_w_date_chart,
 )
-from .display import (
+from .st_display import (
     display_download_link,
     display_footer,
     display_header,
