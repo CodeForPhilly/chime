@@ -1,0 +1,114 @@
+name: Deploy to production
+
+on:
+  pull_request:
+    branches:
+      - releases/v1
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+env:
+  KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_prod }}
+  # For hub CLI tool
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  deploy-prod:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Get full history for tag lookup
+      - uses: azure/setup-kubectl@v1
+        with:
+          version: v1.18.0
+
+      - name: Add kubeconfig to environment
+        run: |
+          set -e
+          test -e ~/.kube || mkdir ~/.kube
+          cat <<EOF > ~/.kube/config
+          $(printf '%s' "$KUBE_CONFIG_DATA" | base64 -d)
+          EOF
+
+      - name: Get release version
+        run: |
+          # Find tag ref
+          git fetch --tags
+          ref=$(git describe --abbrev=0 --match 'v*' --exclude 'v*-rc.*' --tags ${{ github.sha }})
+          echo "::set-env name=DEPLOY_REF::$ref"
+
+          if [ -z "$ref" ]; then
+            echo error: could not find release tag for commit $head_sha
+            exit 1
+          fi
+
+      - name: Get deployment information
+        run: |
+          hub api /repos/${{ github.repository }}/deployments?ref=$DEPLOY_REF -X GET | jq .[0] > /tmp/deployment.json
+
+      - name: Mark deployment as started
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "in_progress",
+            "description": "Rolling out $DEPLOY_REF",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+      - name: Get manifest archive
+        run: |
+          set -e
+          tagname=${{ env.DEPLOY_REF }}
+          arc_fname=deploy-$tagname.zip
+          arc_url=https://github.com/${{ github.repository }}/releases/download/$tagname/$arc_fname
+          curl -fLO "$arc_url"
+          unzip $arc_fname
+
+      - name: Deploy to prod
+        run: |
+          set -e
+          echo deploying CHIME release ${{ env.DEPLOY_REF }}
+          find deploy-${{ env.DEPLOY_REF }}/ -type f -print0 | xargs -0 cat | kubectl diff -f - || true
+          kubectl apply -Rf deploy-${{ env.DEPLOY_REF }}
+
+      - name: Wait for deployment to complete
+        run: |
+          kubectl -n chime rollout status deployment.v1.apps/chime
+          kubectl -n chime get deployment chime -o yaml
+
+      - name: Mark deployment as failed
+        if: failure()
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "failure",
+            "description": "Error in job deploy-prod",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)
+
+      - name: Mark deployment completed
+        run: |
+          hub api /repos/${{ github.repository }}/deployments/$(jq .id < /tmp/deployment.json)/statuses  \
+            -X POST                                                                                      \
+            -H "Accept: application/json, application/vnd.github.flash-preview+json"                     \
+            --input <(cat <<EOF
+          {
+            "state": "success",
+            "description": "$DEPLOY_REF deployed",
+            "log_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF)

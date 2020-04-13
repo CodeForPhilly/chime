@@ -3,8 +3,8 @@
 ## Table of Contents
 
 - [Developer Requirements](#developer-requirements)
-- [Project Layout](#project-layout)
 - [Running CHIME Locally](#running-chime-locally)
+- [Project Layout](#project-layout)
 - [Testing](#testing)
 - [Validating CHIME](#validating-chime)
 
