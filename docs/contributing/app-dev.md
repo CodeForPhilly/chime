@@ -12,7 +12,7 @@
 
 The application is built with [Streamlit](https://www.streamlit.io/), Streamlit requires:
 
-- Python 2.7.0 or later / Python 3.6.x or later
+- Python 3.6.x or later
 - PIP
 
 See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_started.html) for detailed information on prerequisites and setup
