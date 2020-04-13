@@ -424,40 +424,58 @@
 <h2 id="developer-requirements">Developer Requirements</h2>
 <p>The application is built with <a href="https://www.streamlit.io/" target="_blank">Streamlit</a>, Streamlit requires:</p>
 <ul>
-<li>Python 2.7.0 or later / Python 3.6.x or later</li>
+<li>Python 3.6.x or later</li>
 <li>PIP</li>
 </ul>
 <p>See <a href="https://docs.streamlit.io/getting_started.html" target="_blank">Streamlit&apos;s Getting Started guide</a> for detailed information on prerequisites and setup</p>
 <h2 id="running-chime-locally">Running CHIME Locally</h2>
+<h3 id="with-venv">With <code>venv</code></h3>
+<pre><code class="lang-bash">python3 -m venv ~.venv
+. ~.venv/bin/activate
+pip install <span class="hljs-_">-e</span> .
+</code></pre>
 <h3 id="with-pipenv">With <code>pipenv</code></h3>
 <pre><code class="lang-bash">pipenv shell
 pipenv sync --dev
-PARAMETERS=defaults/webapp.cfg streamlit run src/app.py
 </code></pre>
 <h3 id="with-conda">With <code>conda</code></h3>
 <pre><code class="lang-bash">conda env create <span class="hljs-_">-f</span> environment.yml
 <span class="hljs-built_in">source</span> activate chime
 pip install streamlit
-PARAMETERS=defaults/webapp.cfg streamlit run src/app.py
 </code></pre>
+<h2 id="run-the-streamlit-web-app">Run the Streamlit Web App</h2>
+<pre><code class="lang-bash">PARAMETERS=-./defaults/webapp.cfg streamlit run st_app.py
+</code></pre>
+<h2 id="run-the-command-line-interface">Run the Command Line Interface</h2>
+<pre><code class="lang-bash">PARAMETERS=./defaults/cli.cfg penn_chime
+</code></pre>
+<h2 id="help-with-the-command-line-interface">Help with the Command Line Interface</h2>
+<pre><code class="lang-bash">penn_chime --help
+</code></pre>
+<h3 id="choosing-a-different-set-of-parameters">Choosing a Different Set of Parameters</h3>
+<p>If you want a different set of default parameters, you may use your own configuration file.</p>
+<pre><code class="lang-bash">PARAMETERS=./defaults/yours.cfg streamlit run st_app.py
+</code></pre>
+<p>Be sure to include <code>--current-date</code> in the file, if your <code>--current-hospitalized</code> is not today&apos;s value.
+Be sure to include <code>--mitigation-date</code> in the file if social distancing was implemented before today.</p>
 <h3 id="choosing-a-different-port">Choosing a Different Port</h3>
-<p>If you need to run the application on a different port than the default (8000), you can export a variable in your shell session to override it with any port number of your choice before running:</p>
-<pre><code class="lang-bash">STREAMLIT_SERVER_PORT=1234 PARAMETERS=defaults/webapp.cfg streamlit run src/app.py
+<p>If you need to run the application on a different port than the default (8000), you can set an environment variable.</p>
+<pre><code class="lang-bash">STREAMLIT_SERVER_PORT=1234 PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
 </code></pre>
 <h2 id="project-layout">Project Layout</h2>
 <h3 id="application-files">Application files</h3>
 <ul>
-<li><code>src/app.py</code>: Main source for the application</li>
-<li><code>src/test_app.py</code>: <a href="https://docs.pytest.org/en/latest/" target="_blank">pytest</a> tests for <code>app.py</code></li>
+<li><code>st_app.py</code>: Startup script for the streamlit web application.</li>
+<li><code>src</code>: Source code for the <code>penn_chime</code> module.</li>
+<li><code>tests/</code>: <a href="https://docs.pytest.org/en/latest/" target="_blank">pytest</a> tests for the <code>penn_chime</code> module.</li>
 <li><code>script/</code>: Developer workflow scripts following <a href="https://github.com/github/scripts-to-rule-them-all" target="_blank">GitHub&apos;s Scripts To Rule Them All</a> pattern.</li>
 <li><code>.streamlit/</code>: <a href="https://docs.streamlit.io/cli.html" target="_blank">Streamlit config options</a></li>
 <li><code>.env</code>: Local environment variables to use when running application, this file is copied from <code>.env.example</code> to start you out and then ignored by git</li>
-<li><code>pytest.ini</code>: Configuration for <a href="https://docs.pytest.org/en/latest/" target="_blank">pytest</a></li>
+<li><code>environment.yml</code></li>
 <li><code>Pipfile</code></li>
 <li><code>Pipfile.lock</code></li>
-<li><code>environment.yml</code></li>
-<li><code>requirements.txt</code></li>
 <li><code>setup.py</code></li>
+<li><code>setup.cfg</code>: Configuration for flake8, mypy, <a href="https://docs.pytest.org/en/latest/" target="_blank">pytest</a></li>
 </ul>
 <h3 id="documentation">Documentation</h3>
 <ul>
@@ -479,6 +497,10 @@ PARAMETERS=defaults/webapp.cfg streamlit run src/app.py
 <pre><code class="lang-bash">pip install pytest
 pytest
 </code></pre>
+<p>The test code runs from the local <code>tests</code> directory. Updating code in <code>tests</code> modifies the tests.
+Use <code>pip install -e .</code> so that your local changes to <code>src</code> are also the module under test.
+For CI, use <code>pip install .</code> to test the module installed in site-packages to ensure that the installed module is packaged correctly with all of its dependencies.
+Do not import from src in your tests or your python code as this will appear to work locally, but break the python module.</p>
 <h2 id="validating-chime">Validating CHIME</h2>
 <p><em>No validation routine is available yet. If you have thoughts on how to add one, please contribute!</em></p>
 
@@ -524,7 +546,7 @@ pytest
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Application Development","level":"1.3.1","depth":2,"next":{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},"previous":{"title":"Contributing","level":"1.3","depth":1,"path":"CONTRIBUTING.md","ref":"CONTRIBUTING.md","articles":[{"title":"Application Development","level":"1.3.1","depth":2,"path":"contributing/app-dev.md","ref":"contributing/app-dev.md","articles":[]},{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},{"title":"Operations Support","level":"1.3.3","depth":2,"path":"contributing/operations-support.md","ref":"contributing/operations-support.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"contributing/app-dev.md","mtime":"2020-04-13T19:22:38.705Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-04-13T19:22:48.372Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Application Development","level":"1.3.1","depth":2,"next":{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},"previous":{"title":"Contributing","level":"1.3","depth":1,"path":"CONTRIBUTING.md","ref":"CONTRIBUTING.md","articles":[{"title":"Application Development","level":"1.3.1","depth":2,"path":"contributing/app-dev.md","ref":"contributing/app-dev.md","articles":[]},{"title":"Data Analysis","level":"1.3.2","depth":2,"path":"contributing/data-analysis.md","ref":"contributing/data-analysis.md","articles":[]},{"title":"Operations Support","level":"1.3.3","depth":2,"path":"contributing/operations-support.md","ref":"contributing/operations-support.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["mermaid@git+https://github.com/JarvusInnovations/gitbook-plugin-mermaid.git"],"pluginsConfig":{"mermaid":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"contributing/app-dev.md","mtime":"2020-04-13T20:52:04.560Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-04-13T20:52:12.145Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
