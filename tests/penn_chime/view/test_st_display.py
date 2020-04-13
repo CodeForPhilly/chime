@@ -1,6 +1,6 @@
 import pytest
 
-from penn_chime.presentation import display_header
+from penn_chime.view.st_display import display_header
 
 
 def header_test_helper(expected_str, model, param, mock_st):

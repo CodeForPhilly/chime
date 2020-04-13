@@ -9,5 +9,5 @@ COPY defaults defaults
 COPY src src
 RUN pip install -q .
 
-CMD ["streamlit", "run", "src/app.py"]
+CMD ["streamlit", "run", "st_app.py"]
 

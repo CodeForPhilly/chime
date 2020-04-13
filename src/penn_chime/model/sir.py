@@ -6,15 +6,14 @@ constants.py `change_date`,
 
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from logging import INFO, basicConfig, getLogger
 from sys import stdout
-from typing import Dict, Generator, Tuple, Sequence, Optional
+from typing import Dict, Tuple, Sequence, Optional
 
 import numpy as np
 import pandas as pd
 
-from .constants import EPSILON, CHANGE_DATE
 from .parameters import Parameters
 
 
@@ -26,7 +25,7 @@ basicConfig(
 logger = getLogger(__name__)
 
 
-class SimSirModel:
+class Sir:
 
     def __init__(self, p: Parameters):
 

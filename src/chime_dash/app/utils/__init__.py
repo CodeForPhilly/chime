@@ -7,8 +7,6 @@ Modules
 -------
 templates       utilities for localization templates
 """
-from . import callbacks
-from . import templates
 
 from itertools import repeat
 from json import dumps, loads
@@ -23,9 +21,9 @@ from pandas import DataFrame
 from chime_dash.app.services.plotting import plot_dataframe
 from chime_dash.app.utils.templates import df_to_html_table
 
-from penn_chime.parameters import Parameters, Disposition
+from penn_chime.model.parameters import Parameters, Disposition
 from penn_chime.constants import DATE_FORMAT
-from penn_chime.charts import build_table
+from penn_chime.view.charts import build_table
 
 
 class ReadOnlyDict(Mapping):
