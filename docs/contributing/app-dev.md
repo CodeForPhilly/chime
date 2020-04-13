@@ -97,8 +97,9 @@ pytest
 ```
 
 The test code runs from the local `tests` directory. Updating code in `tests` modifies the tests.
-However, the tested code is the *installed* penn_chime module in your virtual environment's site-packages directory, it is *not* the code in the local `src` directory.
-Use `pip install .` to push your local changes in `src` to replace the installed `penn_chime` module.
+Use `pip install -e .` so that your local changes to `src` are also the module under test.
+For CI, use `pip install .` to test the module installed in site-packages to ensure that the installed module is packaged correctly with all of its dependencies.
+Do not import from src in your tests or your python code as this will appear to work locally, but break the python module.
 
 ## Validating CHIME
 
