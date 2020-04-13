@@ -3,12 +3,15 @@ from datetime import datetime
 import pytest
 import pandas as pd
 
-from src.penn_chime.parameters import (
+from penn_chime.model.parameters import (
     Parameters,
     Disposition,
     Regions,
 )
-from src.penn_chime.models import SimSirModel, build_floor_df
+from penn_chime.model.sir import (
+    Sir,
+    build_floor_df,
+)
 
 
 class MockStreamlit:
@@ -100,12 +103,12 @@ def halving_param():
 
 @pytest.fixture
 def model(param):
-    return SimSirModel(param)
+    return Sir(param)
 
 
 @pytest.fixture
 def halving_model(halving_param):
-    return SimSirModel(halving_param)
+    return Sir(halving_param)
 
 
 @pytest.fixture
