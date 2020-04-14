@@ -1,5 +1,3 @@
-from datetime import datetime
-from math import ceil
 from typing import Dict, Optional
 
 from altair import Chart
@@ -7,8 +5,7 @@ import pandas as pd
 import i18n
 import numpy as np
 
-from .constants import DATE_FORMAT
-from .parameters import Parameters
+from ..constants import DATE_FORMAT
 
 
 def build_admits_chart(

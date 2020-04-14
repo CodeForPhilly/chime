@@ -5,14 +5,13 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 
-from penn_chime.models import (
+from penn_chime.constants import EPSILON
+from penn_chime.model.sir import (
     sir,
     sim_sir,
     get_growth_rate,
-    SimSirModel,
+    Sir,
 )
-
-from src.penn_chime.constants import EPSILON
 
 
 def test_sir():
@@ -104,7 +103,7 @@ def test_model_first_hosp_fit(param):
     param.date_first_hospitalized = param.current_date - timedelta(days=43)
     param.doubling_time = None
 
-    my_model = SimSirModel(param)
+    my_model = Sir(param)
 
     assert abs(my_model.intrinsic_growth_rate - 0.123) / 0.123 < 0.01
     assert abs(my_model.beta - 4.21501347256401e-07) < EPSILON

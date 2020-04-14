@@ -1,17 +1,12 @@
-"""effectful functions for streamlit io"""
+"""Streamlit display."""
 
-from typing import Optional
-from datetime import date
-
-import altair as alt
-import numpy as np
 import os
 import json
+
 import pandas as pd
 import i18n
-import penn_chime.spreadsheet as sp
 
-from .constants import (
+from ..constants import (
     CHANGE_DATE,
     DOCS_URL,
     EPSILON,
@@ -19,10 +14,9 @@ from .constants import (
     FLOAT_INPUT_STEP,
     VERSION,
 )
-
-from .utils import dataframe_to_base64
-from .parameters import Parameters, Disposition
-from .models import SimSirModel as Model
+from ..model.parameters import Parameters, Disposition
+from ..utils import dataframe_to_base64
+from .spreadsheet import spreadsheet
 
 hide_menu_style = """
         <style>
@@ -109,7 +103,11 @@ class NumberInput(Input):
         key=None,
     ):
         kwargs = dict(
-            min_value=min_value, max_value=max_value, step=step, format=format, key=key
+            min_value=min_value,
+            max_value=max_value,
+            step=step,
+            format=format,
+            key=key,
         )
         super().__init__(st_obj.number_input, label, value, kwargs)
 
@@ -133,7 +131,14 @@ class PercentInput(NumberInput):
         key=None,
     ):
         super().__init__(
-            st_obj, label, min_value, max_value, value * 100.0, step, format, key
+            st_obj,
+            label,
+            min_value,
+            max_value,
+            value * 100.0,
+            step,
+            format,
+            key,
         )
 
     def __call__(self):
@@ -205,7 +210,8 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         min_value=FLOAT_INPUT_MIN,
         max_value=100.0
     )
-    icu_pct_input = PercentInput(st_obj,
+    icu_pct_input = PercentInput(
+        st_obj,
         i18n.t("presentation-icu-rate"),
         min_value=0.0,
         value=d.icu.rate,
@@ -425,7 +431,7 @@ def subscribe(st_obj):
 def send_subscription_to_google_sheet(st_obj, row):
     json_secret = readGoogleApiSecretsDict()
     #print(json_secret)
-    spr = sp.spreadsheet (st_obj, json_secret)
+    spr = spreadsheet(st_obj, json_secret)
     spr.writeToSheet("CHIME Form Submissions", row)
 
 def display_footer(st):

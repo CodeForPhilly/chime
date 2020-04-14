@@ -5,9 +5,9 @@ import i18n
 i18n.set('filename_format', '{locale}.{format}')
 i18n.set('locale', 'en')
 i18n.set('fallback', 'en')
-i18n.load_path.append(os.path.dirname(__file__) + '/../../src/penn_chime/locales')
+i18n.load_path.append(os.path.dirname(__file__) + '/../../../src/penn_chime/locales')
 
-from penn_chime.presentation import display_header
+from penn_chime.view.st_display import display_header
 
 
 def header_test_helper(expected_str, model, param, mock_st):

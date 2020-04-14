@@ -4,10 +4,12 @@ WORKDIR /app
 COPY README.md .
 COPY setup.cfg .
 COPY setup.py .
+COPY MANIFEST.in .
 COPY .streamlit .streamlit
 COPY defaults defaults
 COPY src src
+COPY st_app.py st_app.py
 RUN pip install -q .
 
-CMD ["streamlit", "run", "src/app.py"]
+CMD ["streamlit", "run", "st_app.py"]
 
