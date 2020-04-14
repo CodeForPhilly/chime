@@ -33,5 +33,8 @@ def plot_dataframe(
             }
             for col in dataframe.columns
         ],
-        "layout": {"yaxis": yaxis},
+        "layout": {
+            "yaxis": yaxis,
+            "legend": {"orientation": "h"},
+        },
     }
