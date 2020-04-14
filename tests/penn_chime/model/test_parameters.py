@@ -1,6 +1,6 @@
 """Test Parameters."""
 
-from penn_chime.parameters import Parameters
+from penn_chime.model.parameters import Parameters
 
 
 def test_cypress_defaults():

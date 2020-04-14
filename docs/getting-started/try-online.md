@@ -16,4 +16,4 @@ If you're comfortable working on your computer's command line, you can head over
 
 ### Run a Shared Copy Online for Your Organization
 
-If your organization has access to, or can purchase access to, your own Kubernetes cluster, you can [Deploy to Your Own Cluster](./operations/byok8s.md).
+If your organization has access to, or can purchase access to, your own Kubernetes cluster, you can [Deploy to Your Own Cluster](../../operations/byok8s.md).
