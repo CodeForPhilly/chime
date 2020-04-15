@@ -5,11 +5,27 @@
 - Update the user or developer documentation, if affected.
 -->
 
-### Link to issue
+# Link to issue
+
 - Fixes #(issue number)
 
-### Changelog entry
+# Changelog entry
+
 - Short description of problem & solution (1-3 sentences, depending on scope of change)
 
-### Additional info
+# Additional info
+
 - Anything else reviewers and future readers should know
+
+---
+
+## <center>Pull Request Checklist</center>
+
+### <center>For Reviewer</center>
+
+- [ ] Submitted under the correct tag
+- [ ] Runs without error or warning
+- [ ] Documentation  revised / included
+- [ ] Unit tests included
+- [ ] Issues referenced
+- [ ] Does not create new bugs / issues
