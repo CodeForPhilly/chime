@@ -1,5 +1,7 @@
 #!/bin/sh
 export HOME="/hab/svc/chime/config"
+# export the parameters file path
+export PARAMETERS="${pkg_prefix}/defaults/webapp.cfg"
 cd "/hab/svc/chime"
 
 if [ "$(whoami)" = "root" ]; then
