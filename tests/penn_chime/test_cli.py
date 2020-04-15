@@ -4,8 +4,6 @@ import penn_chime.cli
 
 from datetime import date, timedelta
 
-REQUIRED_FIELD_INDEX = 5
-
 def testMainWithDoublingTime():
     """"
     Tests a run via CLI with the minimum amount of parameters. Exponential
@@ -33,7 +31,10 @@ def testMainWithDoublingTime():
     penn_chime.cli.run(arguments)
     
 def testMainWithDateFirstHospitalized():
-    
+    """"
+    Tests a run via CLI with the minimum amount of parameters. Exponential
+    factor is defined by date-first-hospitalized.
+    """
     arguments = [
         "pytest",
         "--current-hospitalized", "69",
