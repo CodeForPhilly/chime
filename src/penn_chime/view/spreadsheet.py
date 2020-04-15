@@ -7,8 +7,8 @@ class spreadsheet:
         # use creds to create a client to interact with the Google Drive API
         self.scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
         #secret = 'client_secret.json'
-        self.creds = ServiceAccountCredentials.from_json(secret)
-        #self.creds = ServiceAccountCredentials.from_json_keyfile_name(secret, self.scope)
+        #self.creds = ServiceAccountCredentials.from_json_keyfile_dict(secret)
+        self.creds = ServiceAccountCredentials.from_json_keyfile_name(secret, self.scope)
         self.client = gspread.authorize(self.creds)
 
 

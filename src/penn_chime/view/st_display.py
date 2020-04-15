@@ -426,9 +426,15 @@ def subscribe(st_obj):
     affiliation = st_obj.text_input (label=i18n.t("presentation-enter-affiliation"), value="", key="na_upper_2")
     if st_obj.button (label=i18n.t("presentation-submit"), key="ta_submit_1"):
         row = [email, name, affiliation]
-        send_subscription_to_google_sheet(st_obj, row)
+        send_subscription_to_google_sheet_secret_json(st_obj, row)
 
-def send_subscription_to_google_sheet(st_obj, row):
+def send_subscription_to_google_sheet_secret_json(st_obj, row):
+    json_secret = "/mnt/google-api-creds/client_secret.json"
+    #print(json_secret)
+    spr = spreadsheet (st_obj, json_secret)
+    spr.writeToSheet("CHIME Form Submissions", row)
+
+def send_subscription_to_google_sheet_secret_dict(st_obj, row):
     json_secret = readGoogleApiSecretsDict()
     #print(json_secret)
     spr = spreadsheet(st_obj, json_secret)

@@ -7,7 +7,7 @@ import streamlit as st  # type: ignore
 import i18n  # type: ignore
 
 i18n.set('filename_format', '{locale}.{format}')
-i18n.set('locale', 'en')
+i18n.set('locale', 'ja')
 i18n.set('fallback', 'en')
 i18n.load_path.append(os.path.dirname(__file__) + '/../locales')
 
@@ -40,8 +40,8 @@ def main():
 
     display_header(st, m, p)
 
-    st.subheader("app-new-admissions-title")
-    st.markdown("app-new-admissions-text")
+    st.subheader(i18n.t("app-new-admissions-title"))
+    st.markdown(i18n.t("app-new-admissions-text"))
     admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis)
     st.altair_chart(admits_chart, use_container_width=True)
     display_download_link(
@@ -51,8 +51,8 @@ def main():
         df=m.admits_df,
     )
 
-    st.subheader("app-admitted-patients-title")
-    st.markdown("app-admitted-patients-text")
+    st.subheader(i18n.t("app-admitted-patients-title"))
+    st.markdown(i18n.t("app-admitted-patients-text"))
     census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis)
     st.altair_chart(census_chart, use_container_width=True)
     display_download_link(
@@ -62,8 +62,8 @@ def main():
         df=m.census_df,
     )
 
-    st.subheader("app-SIR-title")
-    st.markdown("app-SIR-text")
+    st.subheader(i18n.t("app-SIR-title"))
+    st.markdown(i18n.t("app-SIR-text"))
     sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_floor_df=m.sim_sir_w_date_floor_df)
     st.altair_chart(sim_sir_w_date_chart, use_container_width=True)
     display_download_link(
