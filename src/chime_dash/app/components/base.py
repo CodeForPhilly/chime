@@ -11,7 +11,7 @@ from abc import ABC
 from dash.development.base_component import ComponentMeta
 from dash_html_components import Div
 
-from penn_chime.parameters import Parameters
+from penn_chime.model.parameters import Parameters
 
 from chime_dash.app.utils.templates import read_localization_yml, read_localization_markdown
 

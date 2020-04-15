@@ -13,7 +13,7 @@ from logging import INFO, basicConfig, getLogger
 from sys import stdout
 from typing import Dict, List
 
-from .constants import (
+from ..constants import (
     CHANGE_DATE,
     VERSION,
 )
