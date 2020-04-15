@@ -67,6 +67,7 @@ do_build() {
 
 do_install() {
   cp -pr ${PLAN_CONTEXT}/../src/* "${pkg_prefix}/"
+  cp -pr ${PLAN_CONTEXT}/../deafults/webapp.cfg "${pkg_prefix}/defaults/"
   return $?
 }
 
