@@ -4,7 +4,7 @@ import penn_chime.cli
 
 from datetime import date, timedelta
 
-def testMainWithDoublingTime():
+def test_main_with_doubling_time():
     """"
     Tests a run via CLI with the minimum amount of parameters. Exponential
     factor is defined by doubling-time.
@@ -30,7 +30,7 @@ def testMainWithDoublingTime():
     
     penn_chime.cli.run(arguments)
     
-def testMainWithDateFirstHospitalized():
+def test_main_with_date_first_hospitalized():
     """"
     Tests a run via CLI with the minimum amount of parameters. Exponential
     factor is defined by date-first-hospitalized.
@@ -57,7 +57,7 @@ def testMainWithDateFirstHospitalized():
     
     penn_chime.cli.run(arguments)
 
-def testFailureOnMissingParameters():
+def test_failure_on_missing_parameters():
     """Negative test to verify that an error is given when neither defining
        doubling-time nor date-first-hospitalized."""
     arguments = [
@@ -81,7 +81,7 @@ def testFailureOnMissingParameters():
     with pytest.raises(AssertionError):
         penn_chime.cli.run(arguments)
 
-def testMainWithCsvVerification():
+def test_main_with_csv_verification():
     """Integration test for CLI. Runs a five-day simulation and verifies the
        content of the resulting csv files."""
     current_date = date.today().strftime("%Y-%m-%d")
@@ -120,7 +120,7 @@ def testMainWithCsvVerification():
         [2.0802813033400414,104.01406516700195,5.200703258350099]
     ]
     
-    __validateFile(projected_admits_content, ",day,date,admits_hospitalized,admits_icu,admits_ventilated\n", current_date + "_projected_admits.csv")
+    __validate_file(projected_admits_content, ",day,date,admits_hospitalized,admits_icu,admits_ventilated\n", current_date + "_projected_admits.csv")
             
     #Verify content of projected_admits.csv
     projected_census_content = [
@@ -134,7 +134,7 @@ def testMainWithCsvVerification():
         [6.871007705682186,403.7826968991112,17.17751926420546]
     ]
     
-    __validateFile(projected_census_content, ",day,date,census_hospitalized,census_icu,census_ventilated\n", current_date + "_projected_census.csv")
+    __validate_file(projected_census_content, ",day,date,census_hospitalized,census_icu,census_ventilated\n", current_date + "_projected_census.csv")
             
     #Verify content of sim_sir_w_date.csv
     sim_sir_w_date_content = [
@@ -148,10 +148,10 @@ def testMainWithCsvVerification():
         [990924.346062018,5661.176365132148,3424.4775728500767]
     ]
     
-    __validateFile(sim_sir_w_date_content, ",day,date,susceptible,infected,recovered\n", current_date + "_sim_sir_w_date.csv")
+    __validate_file(sim_sir_w_date_content, ",day,date,susceptible,infected,recovered\n", current_date + "_sim_sir_w_date.csv")
     
     
-def __validateFile(reference_file_content, reference_file_header, reference_file_name):
+def __validate_file(reference_file_content, reference_file_header, reference_file_name):
     with open(reference_file_name, "r") as f:
         lines = f.readlines()
         assert len(lines) == len(reference_file_content) + 1
