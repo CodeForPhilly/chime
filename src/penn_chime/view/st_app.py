@@ -7,7 +7,7 @@ import streamlit as st  # type: ignore
 import i18n  # type: ignore
 
 i18n.set('filename_format', '{locale}.{format}')
-i18n.set('locale', 'ja')
+i18n.set('locale', 'en')
 i18n.set('fallback', 'en')
 i18n.load_path.append(os.path.dirname(__file__) + '/../locales')
 
