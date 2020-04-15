@@ -449,7 +449,7 @@ def subscribe(st_obj):
 def send_subscription_to_google_sheet_secret_json(st_obj, row):
     json_secret = "/mnt/google-api-creds/client_secret.json"
     #print(json_secret)
-    spr = sp.spreadsheet (st_obj, json_secret)
+    spr = spreadsheet (st_obj, json_secret)
     spr.writeToSheet("CHIME Form Submissions", row)
 
 def send_subscription_to_google_sheet_secret_dict(st_obj, row):
