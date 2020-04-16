@@ -31,6 +31,10 @@ def main():
     d = Parameters.create(os.environ, [])
     p = display_sidebar(st, d)
     m = Sir(p)
+    
+    if not m.reasonable_model_parameters:
+        st.subheader("Pre-mitigation doubling time is greater than 15 days.\nTry different parameters.")
+        return
 
     display_header(st, m, p)
 
