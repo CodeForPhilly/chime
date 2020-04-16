@@ -119,7 +119,7 @@ class Sir:
             min_loss = self.get_argmin_doubling_time(p, dts)
             if min_loss >= 14:
                 logger.info(
-                    'Pre-mitigation doubling time is greater than 15 days. Try different parameters.'
+                    'Based on the current parameters, the estimated pre-mitigation doubling time is greater than 15 days. Try different parameters.'
                 )
                 self.reasonable_model_parameters = False
                 return
