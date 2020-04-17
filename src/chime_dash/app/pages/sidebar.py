@@ -88,8 +88,7 @@ _SIDEBAR_ELEMENTS = ReadOnlyDict(OrderedDict(
         "initial_visible_month": date.today(),
         "date": date.today(),
     },
-    max_y_axis_value={"type": "number", "min": 10, "step": 10, "value": None},
-    show_tables={"type": "switch", "value": False},
+    show_tables={"type": "switch", "value": False}
 ))
 
 

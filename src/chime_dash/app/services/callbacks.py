@@ -30,7 +30,14 @@ class IndexCallbacks(ComponentCallbacks):
         return get_n_switch_values(switch_value, 3)
 
     @staticmethod
-    def handle_model_change(i, sidebar_data):
+    def change_btn_color(n_clicks):
+        try:
+            return [False] if n_clicks % 2 == 0 else [True]
+        except:
+            return [False]
+
+    @staticmethod
+    def handle_model_change(i, sidebar_data, lock_zoom_clicks, graphs_relayout_data):
         model = {}
         pars = None
         result = []
@@ -44,7 +51,6 @@ class IndexCallbacks(ComponentCallbacks):
             viz_kwargs = dict(
                 labels=pars.labels,
                 table_mod=7,
-                max_y_axis=pars.max_y_axis,
                 content=vis_content
             )
         result.extend(i.components["intro"].build(model, pars))
@@ -53,11 +59,42 @@ class IndexCallbacks(ComponentCallbacks):
             if model:
                 df = model.__dict__.get(df_key, None)
             result.extend(prepare_visualization_group(df, **viz_kwargs))
+
+        figures = [result[1], result[4], result[7]]
+
+        for n_clicks, relayout_data, figure in zip(lock_zoom_clicks, graphs_relayout_data, figures):
+            if relayout_data:
+                if n_clicks == None or n_clicks % 2 == 0:
+                    # Set plot_data figure coordinates 
+                    if "xaxis.range[0]" in relayout_data:
+                        figure["layout"]["xaxis"]["range"] = [
+                            relayout_data["xaxis.range[0]"],
+                            relayout_data["xaxis.range[1]"]
+                        ]
+                    if "yaxis.range[0]" in relayout_data:
+                        figure["layout"]["yaxis"]["range"] = [
+                            relayout_data["yaxis.range[0]"],
+                            relayout_data["yaxis.range[1]"]
+                        ]
+                            
         return result
 
     def __init__(self, component_instance):
-        def handle_model_change_helper(sidebar_mod, sidebar_data):
-            return IndexCallbacks.handle_model_change(component_instance, sidebar_data)
+        def handle_model_change_helper(
+            sidebar_mod, 
+            new_admissions_lock_zoom, 
+            admitted_patients_lock_zoom,
+            SIR_lock_zoom,
+            sidebar_data, 
+            new_admissions_relayout_data, 
+            admitted_patients_relayout_data,
+            SIR_relayout_data
+            ):
+            # parameter order: Inputs (sidebar_mod and all lock_zooms) followed by States (sidebar_data and all relayout_datas)
+            # Order matters; callback_wrapper passes in Inputs before States
+            lock_zoom_clicks = [new_admissions_lock_zoom, admitted_patients_lock_zoom, SIR_lock_zoom]
+            graphs_relayout_data = [new_admissions_relayout_data, admitted_patients_relayout_data, SIR_relayout_data]
+            return IndexCallbacks.handle_model_change(component_instance, sidebar_data, lock_zoom_clicks, graphs_relayout_data)
 
         super().__init__(
             component_instance=component_instance,
@@ -72,7 +109,12 @@ class IndexCallbacks(ComponentCallbacks):
                     callback_fn=IndexCallbacks.toggle_tables
                 ),
                 ChimeCallback(  # If the parameters or model change, update the text
-                    changed_elements={"sidebar-store": "modified_timestamp"},
+                    changed_elements={
+                        "sidebar-store": "modified_timestamp",
+                        "new_admissions_lock_zoom": "n_clicks",
+                        "admitted_patients_lock_zoom": "n_clicks",
+                        "SIR_lock_zoom": "n_clicks"
+                        },
                     dom_updates={
                         "intro": "children",
                         "new_admissions_graph": "figure",
@@ -85,8 +127,28 @@ class IndexCallbacks(ComponentCallbacks):
                         "SIR_table": "children",
                         "SIR_download": "href",
                     },
-                    callback_fn=handle_model_change_helper,
+                    states={
+                        "new_admissions_graph": "relayoutData",
+                        "admitted_patients_graph": "relayoutData",
+                        "SIR_graph": "relayoutData"
+                        },
                     stores=["sidebar-store"],
+                    callback_fn=handle_model_change_helper
+                ),
+                ChimeCallback( # If user presses the Lock Zoom Button, update outline / solid color
+                    changed_elements={"new_admissions_lock_zoom": "n_clicks"},
+                    dom_updates={"new_admissions_lock_zoom": "outline"},
+                    callback_fn=IndexCallbacks.change_btn_color
+                ),
+                ChimeCallback(
+                    changed_elements={"admitted_patients_lock_zoom": "n_clicks"},
+                    dom_updates={"admitted_patients_lock_zoom": "outline"},
+                    callback_fn=IndexCallbacks.change_btn_color
+                ),
+                ChimeCallback(
+                    changed_elements={"SIR_lock_zoom": "n_clicks"},
+                    dom_updates={"SIR_lock_zoom": "outline"},
+                    callback_fn=IndexCallbacks.change_btn_color
                 )
             ]
         )
@@ -139,8 +201,7 @@ class SidebarCallbacks(ComponentCallbacks):
             ventilated=Disposition.create(
                 days=inputs_dict["ventilated_los"],
                 rate=inputs_dict["ventilated_rate"] / 100,
-            ),
-            max_y_axis=inputs_dict.get("max_y_axis_value", None),
+            )
         )
         return [{"inputs_dict": inputs_dict, "parameters": parameters_serializer(pars)}]
 

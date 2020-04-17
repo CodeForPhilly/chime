@@ -11,6 +11,7 @@ class ChimeCallback:
                  callback_fn: Callable,
                  dom_updates: Mapping = None,
                  stores: Iterable = None,
+                 states: Mapping = None,
                  memoize: bool = True
                  ):
         self.inputs = [
@@ -19,6 +20,7 @@ class ChimeCallback:
         ]
         self.outputs = []
         self.stores = []
+        self.states = []
         self.callback_fn = callback_fn
         self.memoize = memoize
         if dom_updates:
@@ -27,20 +29,25 @@ class ChimeCallback:
                 for component_id, component_property in dom_updates.items()
             )
         if stores:
-            self.stores.extend(
+            self.states.extend(
                 State(component_id=component_id, component_property="data")
                 for component_id in stores
             )
+            if states:
+                self.states.extend(
+                    State(component_id=component_id, component_property=component_property)
+                    for component_id, component_property in states.items()
+                )
 
     def wrap(self, app: Dash):
         if self.memoize:
             @lru_cache(maxsize=32)
-            @app.callback(self.outputs, self.inputs, self.stores)
+            @app.callback(self.outputs, self.inputs, self.states)
             def callback_wrapper(*args, **kwargs):
                 print(str(self.callback_fn))
                 return self.callback_fn(*args, **kwargs)
         else:
-            @app.callback(self.outputs, self.inputs, self.stores)
+            @app.callback(self.outputs, self.inputs, self.states)
             def callback_wrapper(*args, **kwargs):
                 return self.callback_fn(*args, **kwargs)
 

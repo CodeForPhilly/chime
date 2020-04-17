@@ -20,8 +20,6 @@ ventilated_los: Average days on ventilator
 display_parameters: Display Parameters
 n_days: Number of days to project
 current_date: Current date (default is today)
-max_y_axis: Set the Y-axis on graphs to a static
-max_y_axis_value: Maximal y-axis value (leave blank for no max value)
 show_tables: Show tables with data
 show_tool_details: Show more info about this tool
 show_additional_projections: Show additional projections
