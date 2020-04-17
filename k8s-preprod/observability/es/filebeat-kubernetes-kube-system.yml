@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: filebeat-config
-  namespace: chime
+  namespace: kube-system
   labels:
     k8s-app: filebeat
 data:
@@ -16,11 +16,7 @@ data:
          hints.default_config:
            type: container
            paths:
-            - /var/log/pods/chime*/chime/*.log
-    
-    filebeat.modules:
-    - module: nginx
-    - module: system
+            - /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
 
     processors:
       - add_cloud_metadata:
@@ -34,20 +30,12 @@ data:
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
       ssl.verification_mode: none
-   
-    setup.kibana:
-      host: 'https://${KIBANA_HOST:kibana}:${KIBANA_PORT:5601}'
-      username: ${ELASTICSEARCH_USERNAME}
-      password: ${ELASTICSEARCH_PASSWORD}
-      ssl.verification_mode: none
-   
-
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
-  namespace: chime
+  namespace: kube-system
   labels:
     k8s-app: filebeat
 spec:
@@ -74,11 +62,7 @@ spec:
         - name: ELASTICSEARCH_HOST
           value: 
         - name: ELASTICSEARCH_PORT
-          value: "9200"
-        - name: KIBANA_HOST
-          value: "10.128.238.157"
-        - name: KIBANA_PORT
-          value: "5601"
+          value: 
         - name: ELASTICSEARCH_USERNAME
           value: 
         - name: ELASTICSEARCH_PASSWORD
@@ -138,7 +122,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: filebeat
-  namespace: chime
+  namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: filebeat
@@ -164,30 +148,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: filebeat
-  namespace: chime
+  namespace: kube-system
   labels:
     k8s-app: filebeat
-
-#The following is required when using across namespaces.
 ---
-  kind: Service
-  apiVersion: v1
-  metadata:
-    name: elasticsearch
-    namespace: chime
-  spec:
-    type: ExternalName
-    externalName: elasticsearch.kube-system.svc.cluster.local
-    ports:
-    - port: 9200
----
-  kind: Service
-  apiVersion: v1
-  metadata:
-    name: kibana
-    namespace: chime
-  spec:
-    type: ExternalName
-    externalName: kibana.kube-system.svc.cluster.local
-    ports:
-    - port: 5601
