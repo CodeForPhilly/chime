@@ -36,7 +36,7 @@ def main():
 
     st.subheader("New Admissions")
     st.markdown("Projected number of **daily** COVID-19 admissions.")
-    admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis)
+    admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis, use_log_scale=p.use_log_scale)
     st.altair_chart(admits_chart, use_container_width=True)
     display_download_link(
         st,
@@ -46,7 +46,7 @@ def main():
 
     st.subheader("Admitted Patients (Census)")
     st.markdown("Projected **census** of COVID-19 patients, accounting for arrivals and discharges.")
-    census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis)
+    census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis, use_log_scale=p.use_log_scale)
     st.altair_chart(census_chart, use_container_width=True)
     display_download_link(
         st,
@@ -56,7 +56,7 @@ def main():
 
     st.subheader("Susceptible, Infected, and Recovered")
     st.markdown("The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment")
-    sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_floor_df=m.sim_sir_w_date_floor_df)
+    sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_floor_df=m.sim_sir_w_date_floor_df, use_log_scale=p.use_log_scale)
     st.altair_chart(sim_sir_w_date_chart, use_container_width=True)
     display_download_link(
         st,
