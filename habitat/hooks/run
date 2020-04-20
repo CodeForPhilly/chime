@@ -8,7 +8,7 @@ if [ "$(whoami)" = "root" ]; then
   exec chpst \
     -U root:hab \
     -u root:hab \
-    streamlit run "{{pkg.path}}/dash_app.py" 2>&1
+    streamlit run "{{pkg.path}}/st_app.py" 2>&1
 else
-  exec streamlit run "{{pkg.path}}/dash_app.py" 2>&1
+  exec streamlit run "{{pkg.path}}/st_app.py" 2>&1
 fi
