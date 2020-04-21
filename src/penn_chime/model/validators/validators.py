@@ -89,7 +89,6 @@ class OptionalDate(Date):
             return None
         super().validate(key, value)
 
-
 class ValDisposition(Validator):
     def __init__(self) -> None:
         pass

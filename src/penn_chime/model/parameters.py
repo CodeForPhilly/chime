@@ -354,11 +354,11 @@ class Parameters:
         )
         icu = Disposition.create(
             days=a.icu_days,
-            rate=a.icu_rate,
+            rate=a.hospitalized_rate * a.icu_rate,
         )
         ventilated = Disposition.create(
             days=a.ventilated_days,
-            rate=a.ventilated_rate,
+            rate=(a.hospitalized_rate * a.icu_rate) * a.ventilated_rate,
         )
 
         del a.hospitalized_days
@@ -414,8 +414,13 @@ class Parameters:
         if self.region is None and self.population is None:
             raise AssertionError('population or regions must be provided.')
 
+
         if self.current_date is None:
             self.current_date = today
+
+        if self.date_first_hospitalized is not None and self.current_date is not None:
+            if self.date_first_hospitalized > self.current_date:
+                raise AssertionError('date first hospitalized cannot be after current date')
 
         if self.mitigation_date is None:
             self.mitigation_date = today

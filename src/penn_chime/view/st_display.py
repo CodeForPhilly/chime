@@ -234,13 +234,13 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     icu_pct_input = PercentInput(
         st_obj,
-        "ICU %(total infections)",
+        "ICU %(total hosp)",
         min_value=0.0,
         value=d.icu.rate,
         step=0.05
     )
     ventilated_pct_input = PercentInput(
-        st_obj, "Ventilated %(total infections)", value=d.ventilated.rate,
+        st_obj, "Ventilated %(critical care)", value=d.ventilated.rate,
     )
     hospitalized_days_input = NumberInput(
         st_obj,
