@@ -15,17 +15,14 @@ from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4, Hr
 from dash_core_components import DatePickerSingle
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
-from penn_chime.parameters import Parameters
+from penn_chime.model.parameters import Parameters
 
 # Consider moving this to a config file eventually
 TEMPLATE_DIR = path.join(
     path.abspath(path.dirname(path.dirname(__file__))), "templates"
 )
 
-LABEL_STYLE = {
-    "fontSize": "0.875rem",
-    "marginBottom": "0.3333em"
-}
+LABEL_STYLE = {"fontSize": "0.875rem", "marginBottom": "0.3333em"}
 
 HEADER_STYLE = {
     "fontSize": "1rem",
@@ -38,6 +35,7 @@ LINE_STYLE = {
     "text-align": "center",
     "color": "#cccccc"
 }
+
 
 def read_localization_yml(file: str, language: str) -> Dict[str, Any]:
     """Reads localization template.
@@ -125,7 +123,11 @@ def df_to_html_table(
 
 
 def create_number_input(
-    idx: str, data: Dict[str, Any], content: Dict[str, str], defaults: Parameters
+    idx: str,
+    data: Dict[str, Any],
+    content: Dict[str, str],
+    defaults: Parameters,
+    debounce: bool = True,
 ):
     """Returns number formgroup for given form data.
 
@@ -134,6 +136,7 @@ def create_number_input(
         data: Input form kwargs.
         content: Localization text
         defaults: Parameters to infer defaults
+        debounce: Trigger callback on enter or unfocus
     """
     input_kwargs = data.copy()
     input_kwargs.pop("percent", None)
@@ -145,7 +148,7 @@ def create_number_input(
     return FormGroup(
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
-            Input(id=idx, **input_kwargs),
+            Input(id=idx, debounce=debounce, **input_kwargs),
         ]
     )
 
@@ -185,6 +188,7 @@ def create_date_input(
             DatePickerSingle(
                 className="form-control",
                 day_size=32,
+                display_format='YYYY-MM-DD',
                 id=idx,
                 **input_kwargs
             ),
