@@ -6,10 +6,8 @@ import sys
 from .model.parameters import Parameters
 from .model.sir import Sir
 
-
-def main():
-    """Main."""
-    p = Parameters.create(os.environ, sys.argv[1:])
+def run(argv):
+    p = Parameters.create(os.environ, argv[1:])
     m = Sir(p)
 
     for df, name in (
@@ -18,3 +16,7 @@ def main():
         (m.census_df, "projected_census"),
     ):
         df.to_csv(f"{p.current_date}_{name}.csv")
+
+def main():
+    """Main."""
+    run(sys.argv)

@@ -26,6 +26,7 @@ setup(
         "gspread",
         "gunicorn",
         "dash",
+        "dash_daq",
         "dash_bootstrap_components",
         "numpy",
         "pandas",
