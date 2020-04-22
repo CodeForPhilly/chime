@@ -170,9 +170,9 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     n_days_input = NumberInput(
         st_obj,
-        "Number of days to project",
+        i18n.t ("presentation-n-days"),
         min_value=1,
-        i18n.t("presentation-n-days"),
+        max_value=30,
         value=d.n_days,
         step=1,
         format="%i",
