@@ -104,12 +104,8 @@ def build_csv_download(df):
 
 def get_n_switch_values(input_value, elements_to_update) -> List[bool]:
     result = []
-    boolean_input_value = False
-    if input_value == [True]:
-        boolean_input_value = True
     for _ in repeat(None, elements_to_update):
-        # todo Fix once switch values make sense. Currently reported as "None" for off and "[False]" for on
-        result.append(not boolean_input_value)
+        result.append(input_value)
     return result
 
 
