@@ -13,7 +13,7 @@ from chime_dash.app.utils import (
 )
 from chime_dash.app.utils.callbacks import ChimeCallback, register_callbacks
 from penn_chime.model.sir import Sir
-from penn_chime.parameters import Parameters, Disposition
+from penn_chime.model.parameters import Parameters, Disposition
 
 
 class ComponentCallbacks:
