@@ -34,7 +34,8 @@ setup(
         "pyyaml",
         "streamlit",
         "gspread",
-        "oauth2client"
+        "oauth2client",
+        "python-i18n"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
