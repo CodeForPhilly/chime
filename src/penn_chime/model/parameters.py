@@ -153,7 +153,7 @@ HELP = {
     "mitigation_date": "Date on which social distancing measures too effect",
     "market_share": "Hospital market share (0.00001 - 1.0)",
     "max_y_axis": "Max y-axis",
-    "n_days": "Number of days to project >= 0",
+    "n_days": "Number of days to project >= 1 and less than 30",
     "parameters": "Parameters file",
     "population": "Regional population >= 1",
     "recovered": "Number of patients already recovered (not yet implemented)",
@@ -259,8 +259,8 @@ ARGS = (
     (
         "n-days",
         int,
-        0,
-        None,
+        1,
+        30,
         True,
     ),
     (
