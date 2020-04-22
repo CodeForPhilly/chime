@@ -3,10 +3,13 @@ population: Regional population
 market_share: Hospital market share (%)
 current_hospitalized: Currently hospitalized COVID-19 patients
 
+spread_parameters_checkbox: I know the date of the first hospitalized case.
 spread_parameters: Spread and Contact Parameters
 date_first_hospitalized: Date of first hospitalized case (enter this date to have CHIME estimate the initial doubling time)
 doubling_time: Doubling time in days (up to today. This overwrites date of first hospitalized estimation)
 relative_contact_rate: Social distancing (% reduction in social contact going forward)
+social_distancing_checkbox: Social distancing measures have been implemented
+social_distancing_start_date: Date of social distancing measures effect (may be delayed from implementation)
 
 severity_parameters: Severity Parameters
 hospitalized_rate: Hospitalization rate (% of total infections)

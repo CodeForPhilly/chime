@@ -2,6 +2,8 @@
 Utility functions for localization templates
 templates themselves can be found in app/templates/en
 """
+import dash_daq as daq
+
 from typing import Dict, Any, Optional
 
 from os import path
@@ -146,6 +148,7 @@ def create_number_input(
             idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
         )
     return FormGroup(
+        id=f'group_{idx}',
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
             Input(id=idx, debounce=debounce, **input_kwargs),
@@ -182,7 +185,14 @@ def create_date_input(
             "initial_visible_month"
         ] = _get_default_values(idx, defaults)
 
+    if 'style' in input_kwargs:
+        style = {'style': input_kwargs.pop('style')}
+    else:
+        style = {}
+
     return FormGroup(
+        id=f'group_{idx}',
+        **style,
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
             DatePickerSingle(
@@ -205,8 +215,8 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
         content: Localization text
         defaults: Parameters to infer defaults
     """
-    return Checklist(
-        id=idx, switch=True, options=[{"label": content[idx], "value": True}],
+    return daq.BooleanSwitch(
+        id=idx, on=False, label=content[idx]
     )
 
 
