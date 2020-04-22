@@ -5,6 +5,7 @@ constants.py `change_date``.
 """
 
 from __future__ import annotations
+import i18n
 
 from argparse import ArgumentParser
 from collections import namedtuple
@@ -424,14 +425,17 @@ class Parameters:
         Date(key='mitigation_date', value=self.mitigation_date)
 
         self.labels = {
-            "hospitalized": "Hospitalized",
-            "icu": "ICU",
-            "ventilated": "Ventilated",
-            "day": "Day",
-            "date": "Date",
-            "susceptible": "Susceptible",
-            "infected": "Infected",
-            "recovered": "Recovered",
+            "admits_hospitalized": i18n.t("admits_hospitalized"),
+            "admits_icu": i18n.t("admits_icu"),
+            "admits_ventilated": i18n.t("admits_ventilated"),
+            "census_hospitalized": i18n.t("census_hospitalized"),
+            "census_icu": i18n.t("census_icu"),
+            "census_ventilated": i18n.t("census_ventilated"),
+            "day": i18n.t("day"),
+            "date": i18n.t("date"),
+            "susceptible" :i18n.t("susceptible"),
+            "infected": i18n.t("infected"),
+            "recovered": i18n.t("recovered")
         }
 
         self.dispositions = {
