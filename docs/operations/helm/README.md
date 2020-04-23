@@ -1,6 +1,6 @@
 # Helm
 
-This directory holds the values.yaml for deploying various pre-defined helm charts. 
+The directory holds the values.yaml for deploying various pre-defined helm charts can be found in `k8s/helm/` 
 
 First off lets assume that helm has already been deployed. 
 
@@ -99,6 +99,9 @@ Deploying the APM server using a custom values.yaml file would look like:
 helm upgrade -i -f values/apm-server.yaml --name apm-server --namespace test-es elastic/apm-server
 ```
 
+Like Kibana the APM server is configured without an ingress. This should not be exposed publicly, except in the case
+where you want to collect APM data from an application that's running outside of the k8s cluster. 
+Even in that event, I would suggest, deploying that app to k8s instead. 
 
 ## Beats
 
@@ -108,4 +111,6 @@ Deploying the metricbeats and filebeats using a custom values.yaml file would lo
 helm upgrade -i -f values/filebeat.yaml --name filebeat --namespace test-es elastic/filebeat
 helm upgrade -i -f values/metricbeat.yaml --name metricbeat --namespace test-es elastic/metricbeat
 ```
+
+Metricbeat and filebeat are both configured by default to start pulling metrics/logs from the k8s cluster and ship to the local Elasticsearch instance. 
 
