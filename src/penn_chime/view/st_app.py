@@ -12,6 +12,7 @@ from .charts import (
     build_census_chart,
     build_sim_sir_w_date_chart,
 )
+from ..ppe.ppe import PPE
 from .st_display import (
     display_download_link,
     display_footer,
@@ -29,6 +30,7 @@ def main():
     st.markdown(hide_menu_style, unsafe_allow_html=True)
 
     d = Parameters.create(os.environ, [])
+    ppe = PPE(os.environ)
     p = display_sidebar(st, d)
     m = Sir(p)
 
@@ -53,6 +55,23 @@ def main():
         filename=f"{p.current_date}_projected_census.csv",
         df=m.census_df,
     )
+
+    st.subheader("PPE Forecasting")
+    ppe.display_ppe_download_link(st)
+    display_download_link(
+        st,
+        filename=f"{p.current_date}_projected_census_for_ppe_tool.csv",
+        df=m.ppe_df,
+    )
+    if st.checkbox("Show a screenshot of the tool"):
+        st.image(image='https://docs.google.com/uc?export=download&id=1K6y3mdo5vHxs2WlnaD-EVykXgrIOFfPk',
+                 width=400,
+                 format='PNG')
+    st.markdown("""
+                    Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the tool</a>.
+                """.format(link_to_docs="https://code-for-philly.gitbook.io/chime/"),
+                unsafe_allow_html=True
+                )
 
     st.subheader("Susceptible, Infected, and Recovered")
     st.markdown("The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment")

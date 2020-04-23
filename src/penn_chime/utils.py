@@ -16,3 +16,9 @@ def dataframe_to_base64(df: pd.DataFrame) -> str:
     csv = df.to_csv(index=False)
     b64 = b64encode(csv.encode()).decode()
     return b64
+
+
+def excel_to_base64(str_excel_filename) -> str:
+    data = open(str_excel_filename, 'rb').read()
+    b64 = b64encode(data).decode()
+    return b64
