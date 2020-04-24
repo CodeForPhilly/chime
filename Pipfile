@@ -19,6 +19,7 @@ PyYAML = "*"
 python-i18n = "*"
 gspread="*"
 oauth2client="*"
+penn-chime = {path = "."}
 
 [requires]
 python_version = "3.7"
