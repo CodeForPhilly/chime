@@ -26,6 +26,7 @@ setup(
         "gspread",
         "gunicorn",
         "dash",
+        "dash_daq",
         "dash_bootstrap_components",
         "numpy",
         "pandas",
@@ -33,7 +34,8 @@ setup(
         "pyyaml",
         "streamlit",
         "gspread",
-        "oauth2client"
+        "oauth2client",
+        "python-i18n"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

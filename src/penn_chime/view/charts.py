@@ -2,6 +2,7 @@ from typing import Dict, Optional
 
 from altair import Chart, Scale
 import pandas as pd
+import i18n
 import numpy as np
 
 from ..constants import DATE_FORMAT
@@ -27,15 +28,15 @@ def build_admits_chart(
     adjusted_admits_floor_df = __adjust_data_for_log_scale(admits_floor_df) if use_log_scale else admits_floor_df
     y_scale = __build_y_scale(alt, max_y_axis, use_log_scale)
 
-    x = dict(shorthand="date:T", title="Date", axis=alt.Axis(format=DATE_FORMAT))
-    y = dict(shorthand="value:Q", title="Daily admissions", scale=y_scale)
+    x = dict(shorthand="date:T", title=i18n.t("charts-date"), axis=alt.Axis(format=(DATE_FORMAT)))
+    y = dict(shorthand="value:Q", title=i18n.t("charts-daily-admissions"), scale=y_scale)
     color = "key:N"
     tooltip = ["date:T", alt.Tooltip("value:Q", format=".0f", title="Admit"), "key:N"]
 
     # TODO fix the fold to allow any number of dispositions
     points = (
         alt.Chart()
-        .transform_fold(fold=["admits_hospitalized", "admits_icu", "admits_ventilated"])
+        .transform_fold(fold=[i18n.t("admits_hospitalized"), i18n.t("admits_icu"), i18n.t("admits_ventilated")])
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
         .encode(
@@ -51,8 +52,13 @@ def build_admits_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
+    admits_floor_df_renamed = adjusted_admits_floor_df.rename({
+        "admits_hospitalized": i18n.t("admits_hospitalized"),
+        "admits_icu": i18n.t("admits_icu"),
+        "admits_ventilated": i18n.t("admits_ventilated")
+    }, axis=1)
     return (
-        alt.layer(points, bar, data=adjusted_admits_floor_df)
+        alt.layer(points, bar, data=admits_floor_df_renamed)
         .configure_legend(orient="bottom")
         .interactive()
     )
@@ -78,15 +84,15 @@ def build_census_chart(
     adjusted_census_floor_df = __adjust_data_for_log_scale(census_floor_df) if use_log_scale else census_floor_df
     y_scale = __build_y_scale(alt, max_y_axis, use_log_scale)
 
-    x = dict(shorthand="date:T", title="Date", axis=alt.Axis(format=(DATE_FORMAT)))
-    y = dict(shorthand="value:Q", title="Census", scale=y_scale)
+    x = dict(shorthand="date:T", title=i18n.t("charts-date"), axis=alt.Axis(format=(DATE_FORMAT)))
+    y = dict(shorthand="value:Q", title=i18n.t("charts-census"), scale=y_scale)
     color = "key:N"
     tooltip = ["date:T", alt.Tooltip("value:Q", format=".0f", title="Census"), "key:N"]
 
     # TODO fix the fold to allow any number of dispositions
     points = (
         alt.Chart()
-        .transform_fold(fold=["census_hospitalized", "census_icu", "census_ventilated"])
+        .transform_fold(fold=[i18n.t("census_hospitalized"), i18n.t("census_icu"), i18n.t("census_ventilated")])
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line(point=True)
         .encode(
@@ -102,8 +108,13 @@ def build_census_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
+    census_floor_df_renamed = adjusted_census_floor_df.rename({
+        "census_hospitalized": i18n.t("census_hospitalized"),
+        "census_icu": i18n.t("census_icu"),
+        "census_ventilated": i18n.t("census_ventilated")
+    }, axis=1)
     return (
-        alt.layer(points, bar, data=adjusted_census_floor_df)
+        alt.layer(points, bar, data=census_floor_df_renamed)
         .configure_legend(orient="bottom")
         .interactive()
     )
@@ -129,15 +140,15 @@ def build_sim_sir_w_date_chart(
     adjusted_sim_sir_w_date_floor_df = __adjust_data_for_log_scale(sim_sir_w_date_floor_df) if use_log_scale else sim_sir_w_date_floor_df
     y_scale = __build_y_scale(alt, max_y_axis, use_log_scale)
 
-    x = dict(shorthand="date:T", title="Date", axis=alt.Axis(format=(DATE_FORMAT)))
-    y = dict(shorthand="value:Q", title="Count", scale=y_scale)
+    x = dict(shorthand="date:T", title=i18n.t("charts-date"), axis=alt.Axis(format=(DATE_FORMAT)))
+    y = dict(shorthand="value:Q", title=i18n.t("charts-count"), scale=y_scale)
     color = "key:N"
     tooltip = ["key:N", "value:Q"]
 
     # TODO fix the fold to allow any number of dispositions
     points = (
         alt.Chart()
-        .transform_fold(fold=["susceptible", "infected", "recovered"])
+        .transform_fold(fold=[i18n.t("susceptible"), i18n.t("infected"), i18n.t("recovered")])
         .encode(x=alt.X(**x), y=alt.Y(**y), color=color, tooltip=tooltip)
         .mark_line()
         .encode(
@@ -153,20 +164,24 @@ def build_sim_sir_w_date_chart(
         .transform_filter(alt.datum.day == 0)
         .mark_rule(color="black", opacity=0.35, size=2)
     )
+    sim_sir_w_date_floor_df_renamed = adjusted_sim_sir_w_date_floor_df.rename({
+        "susceptible": i18n.t("susceptible"),
+        "infected": i18n.t("infected"),
+        "recovered": i18n.t("recovered")
+    }, axis=1)
     return (
-        alt.layer(points, bar, data=adjusted_sim_sir_w_date_floor_df)
+        alt.layer(points, bar, data=sim_sir_w_date_floor_df_renamed)
         .configure_legend(orient="bottom")
         .interactive()
     )
-
 
 def build_table(
     *, df: pd.DataFrame, labels: Dict[str, str], modulo: int = 1
 ) -> pd.DataFrame:
     table_df = df[np.mod(df.day, modulo) == 0].copy()
     table_df.date = table_df.date.dt.strftime(DATE_FORMAT)
-    table_df.rename(labels)
-    return table_df
+    table_df_renamed = table_df.rename(labels, axis=1)
+    return table_df_renamed
 
 
 def __adjust_data_for_log_scale(dataframe: pd.DataFrame) -> pd.DataFrame:

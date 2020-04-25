@@ -4,6 +4,7 @@ WORKDIR /app
 COPY README.md .
 COPY setup.cfg .
 COPY setup.py .
+COPY MANIFEST.in .
 COPY .streamlit .streamlit
 COPY defaults defaults
 COPY src src

@@ -82,7 +82,6 @@ def parameters_deserializer(p_json: str):
         date_first_hospitalized=dates["date_first_hospitalized"],
         doubling_time=values["doubling_time"],
         market_share=values["market_share"],
-        max_y_axis=values["max_y_axis"],
         mitigation_date=dates["mitigation_date"],
         n_days=values["n_days"],
         population=values["population"],
@@ -104,12 +103,8 @@ def build_csv_download(df):
 
 def get_n_switch_values(input_value, elements_to_update) -> List[bool]:
     result = []
-    boolean_input_value = False
-    if input_value == [True]:
-        boolean_input_value = True
     for _ in repeat(None, elements_to_update):
-        # todo Fix once switch values make sense. Currently reported as "None" for off and "[False]" for on
-        result.append(not boolean_input_value)
+        result.append(input_value)
     return result
 
 
@@ -120,8 +115,6 @@ def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
         df: The Dataframe to plot
         content: Dict[str, str]
             Mapping for translating columns and index.
-        max_y_axis:  int
-            Maximal value on y-axis
         labels: List[str]
             Columns to display
         table_mod: int
@@ -148,10 +141,8 @@ def prepare_visualization_group(df: DataFrame = None, **kwargs) -> List[Any]:
             day_column = content.get(day_column, day_column)
 
         plot_data = plot_dataframe(
-            df.dropna().set_index(date_column).drop(columns=[day_column]),
-            max_y_axis=kwargs.get("max_y_axis", None),
+            df.dropna().set_index(date_column).drop(columns=[day_column])
         )
-
 
         # translate back for backwards compability of build_table
         column_map = {day_column: "day", date_column: "date"}
