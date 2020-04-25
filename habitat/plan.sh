@@ -66,8 +66,10 @@ do_build() {
 }
 
 do_install() {
+  mkdir "${pkg_prefix}/defaults/"
   cp -pr ${PLAN_CONTEXT}/../src/* "${pkg_prefix}/"
-  cp -pr ${PLAN_CONTEXT}/../deafults/webapp.cfg "${pkg_prefix}/defaults/"
+  cp -pr ${PLAN_CONTEXT}/../st_app.py "${pkg_prefix}/"
+  cp -pr ${PLAN_CONTEXT}/../defaults/webapp.cfg "${pkg_prefix}/defaults/"
   return $?
 }
 
