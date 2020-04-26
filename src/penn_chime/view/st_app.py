@@ -68,13 +68,15 @@ def main():
     ppe.display_ppe_download_link(st)
     display_download_link(
         st,
-        filename=f"{p.current_date}_projected_census_for_ppe_tool.csv",
+        p,
+        filename=f"{p.current_date}_projected_census_for_ppe_calculator.csv",
         df=m.ppe_df,
     )
+
     if st.checkbox("Show a screenshot of the tool"):
         st.image(image=ppe.ppe_folder+'PPE_Screenshot.jpg',
                  width=600,
-                 format='JPG')
+                 format='JPEG')
     st.markdown("""
                     Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the tool</a>.
                 """.format(link_to_docs="https://code-for-philly.gitbook.io/chime/ppe-calculator"),
