@@ -72,12 +72,12 @@ def main():
         df=m.ppe_df,
     )
     if st.checkbox("Show a screenshot of the tool"):
-        st.image(image='https://docs.google.com/uc?export=download&id=1K6y3mdo5vHxs2WlnaD-EVykXgrIOFfPk',
-                 width=400,
-                 format='PNG')
+        st.image(image=ppe.ppe_folder+'PPE_Screenshot.jpg',
+                 width=600,
+                 format='JPG')
     st.markdown("""
                     Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the tool</a>.
-                """.format(link_to_docs="https://code-for-philly.gitbook.io/chime/"),
+                """.format(link_to_docs="https://code-for-philly.gitbook.io/chime/ppe-calculator"),
                 unsafe_allow_html=True
                 )
 

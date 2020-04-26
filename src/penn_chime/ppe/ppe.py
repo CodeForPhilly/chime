@@ -29,18 +29,19 @@ logger = getLogger(__name__)
 
 class PPE:
 
-    excel_file = None
+    ppe_folder = None
 
     @classmethod
     def __init__(cls, env: Dict[str, str]):
-        cls.excel_file = env.get("PPE_EXCEL")
+        cls.ppe_folder = env.get("PPE_FOLDER")
         return
 
     @classmethod
     def display_ppe_download_link(cls, st):
-        excel = excel_to_base64(cls.excel_file)
-        filename = cls.excel_file[cls.excel_file.rfind('/')+1:]
+        excel_filepath = cls.ppe_folder+'PPE_Calculator_for_COVID-19.xlsx'
+        filename = excel_filepath[excel_filepath.rfind('/')+1:]
+        excel = excel_to_base64(excel_filepath)
         st.markdown("""
-                        Download the PPE forecasting tool here: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
+                        Download the PPE Calculator here: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
                     """.format(excel=excel, filename=filename), unsafe_allow_html=True
                     )
