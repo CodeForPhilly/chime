@@ -1,4 +1,11 @@
 import pytest
+import os
+import i18n
+
+i18n.set('filename_format', '{locale}.{format}')
+i18n.set('locale', 'en')
+i18n.set('fallback', 'en')
+i18n.load_path.append(os.path.dirname(__file__) + '/../../../src/penn_chime/locales')
 
 from penn_chime.view.st_display import display_header
 
