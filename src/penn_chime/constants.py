@@ -8,7 +8,7 @@ longer match current results, indicating when users should
 re-run their reports
 """
 CHANGE_DATE = date(year=2020, month=4, day=8)
-VERSION = 'v1.1.3'
+VERSION = 'v1.1.4'
 
 DATE_FORMAT = "%b, %d"  # see https://strftime.org
 DOCS_URL = "https://code-for-philly.gitbook.io/chime"
