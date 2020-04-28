@@ -14,6 +14,7 @@ from typing import Dict, Tuple, Sequence, Optional
 import numpy as np
 import pandas as pd
 
+from ..constants import PREFIT_ADDITIONAL_DAYS
 from .parameters import Parameters
 
 
@@ -68,7 +69,8 @@ class Sir:
 
             if p.mitigation_date is None:
                 self.i_day = 0 # seed to the full length
-                raw = self.run_projection(p, [(self.beta, p.n_days)])
+                raw = self.run_projection(p, [
+                    (self.beta, p.n_days + PREFIT_ADDITIONAL_DAYS)])
                 self.i_day = i_day = int(get_argmin_ds(raw["census_hospitalized"], p.current_hospitalized))
 
                 self.raw = self.run_projection(p, self.gen_policy(p))
