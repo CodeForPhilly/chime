@@ -166,10 +166,10 @@ class CheckboxInput(Input):
 
 
 def display_sidebar(st, d: Parameters) -> Parameters:
-    # Initialize variables
-    # these functions create input elements and bind the values they are set to
-    # to the variables they are set equal to
-    # it's kindof like ember or angular if you are familiar with those
+    """
+    Initializes the UI in the sidebar. These function calls create input elements, and bind the values they are set to
+    to the appropriate variables. It's similar to Ember or Angular, if you are familiar with those frameworks.
+    """
 
     st_obj = st.sidebar
     # used_widget_key = st.get_last_used_widget_key ( )
@@ -361,7 +361,9 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         max_y_axis = max_y_axis_input()
 
     current_date = current_date_input()
-    #Subscribe implementation
+    use_log_scale = st.sidebar.checkbox(label="Use logarithmic scale on charts instead of linear scale.", value=d.use_log_scale)
+
+    # Subscribe implementation
     subscribe(st_obj)
 
     return Parameters(
@@ -386,9 +388,10 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         ventilated=Disposition.create(
             rate=ventilated_rate,
             days=ventilated_days),
+        use_log_scale=use_log_scale
     )
 
-#Read the environment variables and cteate json key object to use with ServiceAccountCredentials
+# Read the environment variables and create json key object to use with ServiceAccountCredentials
 def readGoogleApiSecrets():
     client_secret = {}
     os.getenv
