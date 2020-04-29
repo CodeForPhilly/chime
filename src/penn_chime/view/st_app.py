@@ -6,8 +6,9 @@ import altair as alt
 import streamlit as st
 import i18n
 
+lang = os.environ.get('LANG') or 'en'
 i18n.set('filename_format', '{locale}.{format}')
-i18n.set('locale', 'en')
+i18n.set('locale', lang)
 i18n.set('fallback', 'en')
 i18n.load_path.append(os.path.dirname(__file__) + '/../locales')
 
@@ -27,7 +28,9 @@ from .st_display import (
     display_sidebar,
     hide_menu_style,
 )
-
+from ..constants import (
+    DOCS_URL,
+)
 
 def main():
     # This is somewhat dangerous:
@@ -75,16 +78,15 @@ def main():
         df=m.ppe_df,
     )
 
-    if st.checkbox("Show a screenshot of the tool"):
+    if st.checkbox(i18n.t("app-PPE-screenshot")):
         st.image(
             image=ppe.screenshot,
             width=600,
             format='JPEG',
         )
-    st.markdown("""
-        Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the tool</a>.
-    """.format(
-            link_to_docs="https://code-for-philly.gitbook.io/chime/ppe-calculator",
+    st.markdown(
+        i18n.t("app-PPE-documentation").format(
+            link_to_docs="{docs_url}/ppe-calculator".format(docs_url=DOCS_URL),
         ),
         unsafe_allow_html=True
     )

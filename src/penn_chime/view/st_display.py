@@ -473,9 +473,8 @@ def display_download_link(st, p, filename: str, df: pd.DataFrame):
 
 def display_excel_download_link(st, filename: str, src: str):
     excel = excel_to_base64(src)
-    st.markdown("""
-        Download the PPE Calculator here: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
-    """.format(
+    st.markdown(
+        i18n.t("presentation-excel-download").format(
             excel=excel, filename=filename
         ),
         unsafe_allow_html=True,

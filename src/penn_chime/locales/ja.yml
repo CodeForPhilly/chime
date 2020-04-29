@@ -3,6 +3,10 @@ ja:
   app-new-admissions-text: "**日毎の**COVID-19関連新規入院患者数予測"
   app-admitted-patients-title: "累計入院患者数"
   app-admitted-patients-text: "入院と退院を考慮したCOVID-19患者の予測**累計患者数**"
+  app-PPE-title: "個人用防護具 (PPE) 計算機"
+  app-PPE-screenshot: "ツールのスクリーンショットを表示"
+  app-PPE-documentation: |+
+    ツールの使い方については<a href="{link_to_docs}">ユーザドキュメントの説明</a>を確認してください。
   app-SIR-title: "感受性保持者、感染者と回復者"
   app-SIR-text: "与えられた時間範囲での、病院の担当範囲領域における感受性保持者、感染者と回復者の人数"
   charts-date: "日付"
@@ -79,6 +83,8 @@ ja:
   presentation-copyright: "© 2020, The Trustees of the University of Pennsylvania"
   presentation-download: |+
     <a download="{filename}" href="data:file/csv;base64,{csv}">{filename} をダウンロード</a>
+  presentation-excel-download: |+
+    個人用防護具計算機のダウンロードはこちら: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
   admits_hospitalized: "新規入院患者数"
   admits_icu: "新規集中治療患者数"
   admits_ventilated: "新規人工呼吸患者数"
