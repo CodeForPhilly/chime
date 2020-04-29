@@ -174,6 +174,15 @@ class Sir:
             'census_icu': self.raw['census_icu'],
             'census_ventilated': self.raw['census_ventilated'],
         })
+        self.ppe_df = pd.DataFrame(data={
+            'day': self.raw['day'],
+            'date': self.raw['date'],
+            'census_hospitalized': self.raw['census_hospitalized'],
+            'census_icu': self.raw['census_icu'],
+            'census_ventilated': self.raw['census_ventilated'],
+            'admits_hospitalized': self.raw['admits_hospitalized'],
+        })
+        self.ppe_df = self.ppe_df[self.ppe_df['day']>=0]
 
         logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))
         logger.info('len(raw_df): %s', len(self.raw_df))

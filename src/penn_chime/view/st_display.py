@@ -3,8 +3,10 @@
 import os
 import json
 
+from logging import INFO, basicConfig, getLogger
 import pandas as pd
 import i18n
+from sys import stdout
 
 from ..constants import (
     CHANGE_DATE,
@@ -15,8 +17,20 @@ from ..constants import (
     VERSION,
 )
 from ..model.parameters import Parameters, Disposition
-from ..utils import dataframe_to_base64
+from ..utils import (
+    dataframe_to_base64,
+    excel_to_base64,
+)
 from .spreadsheet import spreadsheet
+
+
+basicConfig(
+    level=INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=stdout,
+)
+logger = getLogger(__name__)
+
 
 hide_menu_style = """
         <style>
@@ -448,12 +462,21 @@ def display_footer(st):
     )
     st.markdown(i18n.t("presentation-copyright"))
 
-
 def display_download_link(st, p, filename: str, df: pd.DataFrame):
     csv = dataframe_to_base64(df.rename(p.labels, axis=1))
     st.markdown(
         i18n.t("presentation-download").format(
             csv=csv, filename=filename
+        ),
+        unsafe_allow_html=True,
+    )
+
+def display_excel_download_link(st, filename: str, src: str):
+    excel = excel_to_base64(src)
+    st.markdown("""
+        Download the PPE Calculator here: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
+    """.format(
+            excel=excel, filename=filename
         ),
         unsafe_allow_html=True,
     )
