@@ -20,7 +20,7 @@ def test_main_with_doubling_time():
         "--market-share", "0.1",
         "--infectious-days", "5",
         "--max-y-axis", "10000",
-        "--n-days", "200",
+        "--n-days", "30",
         "--recovered", "10",
         "--relative-contact-rate", "0.1",
         "--population", "1000000",
