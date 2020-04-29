@@ -49,7 +49,8 @@ def main():
 
     st.subheader(i18n.t("app-new-admissions-title"))
     st.markdown(i18n.t("app-new-admissions-text"))
-    admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis)
+    admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis, use_log_scale=p.use_log_scale)
+
     st.altair_chart(admits_chart, use_container_width=True)
     display_download_link(
         st,
@@ -60,7 +61,8 @@ def main():
 
     st.subheader(i18n.t("app-admitted-patients-title"))
     st.markdown(i18n.t("app-admitted-patients-text"))
-    census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis)
+    census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis, use_log_scale=p.use_log_scale)
+
     st.altair_chart(census_chart, use_container_width=True)
     display_download_link(
         st,
@@ -93,7 +95,8 @@ def main():
 
     st.subheader(i18n.t("app-SIR-title"))
     st.markdown(i18n.t("app-SIR-text"))
-    sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_floor_df=m.sim_sir_w_date_floor_df)
+    sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_floor_df=m.sim_sir_w_date_floor_df, use_log_scale=p.use_log_scale)
+
     st.altair_chart(sim_sir_w_date_chart, use_container_width=True)
     display_download_link(
         st,
