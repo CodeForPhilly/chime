@@ -3,6 +3,10 @@ en:
   app-new-admissions-text: "Projected number of **daily** COVID-19 admissions."
   app-admitted-patients-title: "Admitted Patients (Census)"
   app-admitted-patients-text: "Projected **census** of COVID-19 patients, accounting for arrivals and discharges."
+  app-PPE-title: "Personal Protective Equipment (PPE) Calculator"
+  app-PPE-screenshot: "Show a screenshot of the tool"
+  app-PPE-documentation: |+
+    Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the tool</a>.
   app-SIR-title: "Susceptible, Infected, and Recovered"
   app-SIR-text: "The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment"
   charts-date: "Date"
@@ -81,6 +85,8 @@ en:
   presentation-copyright: "© 2020, The Trustees of the University of Pennsylvania"
   presentation-download: |+
     <a download="{filename}" href="data:file/csv;base64,{csv}">Download {filename}</a>
+  presentation-excel-download: |+
+    Download the PPE Calculator here: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
   admits_hospitalized: "Hospitalized Admissions"
   admits_icu: "ICU Admissions"
   admits_ventilated: "Ventilated Admissions"
