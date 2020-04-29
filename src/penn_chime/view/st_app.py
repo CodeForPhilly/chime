@@ -6,6 +6,8 @@ import altair as alt  # type: ignore
 import streamlit as st  # type: ignore
 import i18n  # type: ignore
 
+from elasticapm import Client
+
 i18n.set('filename_format', '{locale}.{format}')
 i18n.set('locale', 'en')
 i18n.set('fallback', 'en')
@@ -28,6 +30,10 @@ from .st_display import (
 
 
 def main():
+    #client = Client(server_url='http://apm-server:8200',service_name='chime_local')
+    #client = Client(server_url='${ELASTIC_APM_SERVER_URL}',service_name='${ELASTIC_APM_SERVICE_NAME}')
+    client = Client()
+    client.begin_transaction('main_page')
     # This is somewhat dangerous:
     # Hide the main menu with "Rerun", "run on Save", "clear cache", and "record a screencast"
     # This should not be hidden in prod, but removed
@@ -37,8 +43,9 @@ def main():
     d = Parameters.create(os.environ, [])
     p = display_sidebar(st, d)
     m = Sir(p)
-
+    
     display_header(st, m, p)
+   
 
     st.subheader(i18n.t("app-new-admissions-title"))
     st.markdown(i18n.t("app-new-admissions-text"))
@@ -73,3 +80,4 @@ def main():
         df=m.sim_sir_w_date_df,
     )
     display_footer(st)
+    client.end_transaction('main_page')
