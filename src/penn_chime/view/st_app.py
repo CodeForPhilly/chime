@@ -2,9 +2,9 @@
 
 import os
 
-import altair as alt  # type: ignore
-import streamlit as st  # type: ignore
-import i18n  # type: ignore
+import altair as alt
+import streamlit as st
+import i18n
 
 i18n.set('filename_format', '{locale}.{format}')
 i18n.set('locale', 'en')
@@ -13,14 +13,15 @@ i18n.load_path.append(os.path.dirname(__file__) + '/../locales')
 
 from ..model.parameters import Parameters
 from ..model.sir import Sir
+from ..model.ppe import PPE
 from .charts import (
     build_admits_chart,
     build_census_chart,
     build_sim_sir_w_date_chart,
 )
-from ..ppe.ppe import PPE
 from .st_display import (
     display_download_link,
+    display_excel_download_link,
     display_footer,
     display_header,
     display_sidebar,
@@ -37,6 +38,7 @@ def main():
 
     d = Parameters.create(os.environ, [])
     ppe = PPE(os.environ)
+
     p = display_sidebar(st, d)
     m = Sir(p)
 
@@ -65,7 +67,7 @@ def main():
     )
 
     st.subheader(i18n.t("app-PPE-title"))
-    ppe.display_ppe_download_link(st)
+    display_excel_download_link(st, ppe.filename, ppe.src)
     display_download_link(
         st,
         p,
@@ -74,14 +76,18 @@ def main():
     )
 
     if st.checkbox("Show a screenshot of the tool"):
-        st.image(image=ppe.ppe_folder+'PPE_Screenshot.jpg',
-                 width=600,
-                 format='JPEG')
+        st.image(
+            image=ppe.screenshot,
+            width=600,
+            format='JPEG',
+        )
     st.markdown("""
-                    Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the tool</a>.
-                """.format(link_to_docs="https://code-for-philly.gitbook.io/chime/ppe-calculator"),
-                unsafe_allow_html=True
-                )
+        Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the tool</a>.
+    """.format(
+            link_to_docs="https://code-for-philly.gitbook.io/chime/ppe-calculator",
+        ),
+        unsafe_allow_html=True
+    )
 
     st.subheader(i18n.t("app-SIR-title"))
     st.markdown(i18n.t("app-SIR-text"))

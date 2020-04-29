@@ -1,6 +1,6 @@
 FROM python:3.7.7-slim-buster
 ENV PARAMETERS=./defaults/webapp.cfg
-ENV PPE_FOLDER=./defaults/assets/
+ENV ASSETS=./defaults/assets/
 ENV PORT=8000
 WORKDIR /app
 COPY README.md .
