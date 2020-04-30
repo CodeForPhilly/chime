@@ -56,12 +56,9 @@ def display_header(st, m, p):
         i18n.t("presentation-header"),
         unsafe_allow_html=True,
     )
-    st.markdown(
-        i18n.t("presentation-notice")
-    )
-    st.markdown(
-        i18n.t("presentation-developed-by").format(docs_url=DOCS_URL))
-
+    st.markdown(i18n.t("presentation-notice"))
+    st.markdown(i18n.t("presentation-developed-by").format(
+        docs_url=DOCS_URL))
     st.markdown(
         i18n.t("presentation-estimated-number-of-infection")
         .format(

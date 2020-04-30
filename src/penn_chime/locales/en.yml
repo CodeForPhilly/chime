@@ -17,14 +17,18 @@ en:
   presentation-header: |+
     <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
     <div class="penn-medicine-header__content">
-        <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
-            title="Go to the Penn Medicine home page">Penn Medicine</a>
-        <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics (CHIME)</a>
+        <h3>
+            <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
+                title="Go to the Penn Medicine home page">Penn Medicine</a>
+            <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics (CHIME)</a>
+        </h3>
     </div>
+    <br />
   presentation-notice: |+
-    **Notice**: **CHIME is a modified [SIR](https://mathworld.wolfram.com/SIRModel.html) model of outbreak progression that is limited to short term forecasting
+
+    **Notice**: CHIME is a modified [SIR](https://mathworld.wolfram.com/SIRModel.html) model of outbreak progression that is limited to short term forecasting
     It is only applicable during the period prior to a region’s peak infections, and it accounts only for a single significant social distancing policy.
-    Penn Medicine is actively developing [BayesCHIME](https://github.com/pennsignals/chime_sims/blob/master/README.md) to make use of more data and provide probabilistic forecasts beyond peak infections.**
+    Penn Medicine is actively developing [BayesCHIME](https://github.com/pennsignals/chime_sims/blob/master/README.md) to make use of more data and provide probabilistic forecasts beyond peak infections.
   presentation-developed-by: |+
     This tool was developed by [Predictive Healthcare](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine to assist hospitals and public health officials with hospital capacity planning.
