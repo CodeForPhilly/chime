@@ -26,7 +26,7 @@ en:
     <br />
   presentation-notice: |+
 
-    **Notice**: CHIME is a modified [SIR](https://mathworld.wolfram.com/SIRModel.html) model of outbreak progression that is limited to short term forecasting
+    **Notice**: CHIME is a modified [SIR](https://mathworld.wolfram.com/SIRModel.html) model of outbreak progression that is limited to short term forecasting.
     It is only applicable during the period prior to a region’s peak infections, and it accounts only for a single significant social distancing policy.
     Penn Medicine is actively developing [BayesCHIME](https://github.com/pennsignals/chime_sims/blob/master/README.md) to make use of more data and provide probabilistic forecasts beyond peak infections.
   presentation-developed-by: |+
