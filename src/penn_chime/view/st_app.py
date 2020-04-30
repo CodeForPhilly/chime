@@ -80,17 +80,21 @@ def main():
         df=m.ppe_df,
     )
 
-    if st.checkbox(i18n.t("app-PPE-screenshot")):
-        st.image(
-            image=ppe.screenshot,
-            width=600,
-            format='JPEG',
-        )
+    #if st.checkbox(i18n.t("app-PPE-screenshot")):
+    #    st.markdown(
+    #        "<img src=\"{screenshot}\" width=\"600\" />".format(screenshot=ppe.screenshot),
+    #        unsafe_allow_html=True,
+    #    )
+    #    st.image(
+    #        image=ppe.screenshot,
+    #        width=600,
+    #        format='JPEG',
+    #    )
     st.markdown(
         i18n.t("app-PPE-documentation").format(
             link_to_docs="{docs_url}/ppe-calculator".format(docs_url=DOCS_URL),
         ),
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     st.subheader(i18n.t("app-SIR-title"))
