@@ -1,14 +1,14 @@
 #!/bin/sh
 export HOME="/hab/svc/chime/config"
 # export the parameters file path
-export PARAMETERS="${pkg_prefix}/defaults/webapp.cfg"
+export PARAMETERS="{{pkg.path}}/defaults/webapp.cfg"
 cd "/hab/svc/chime"
 
 if [ "$(whoami)" = "root" ]; then
   exec chpst \
     -U root:hab \
     -u root:hab \
-    streamlit run "{{pkg.path}}/app.py" 2>&1
+    streamlit run "{{pkg.path}}/st_app.py" 2>&1
 else
-  exec streamlit run "{{pkg.path}}/app.py" 2>&1
+  exec streamlit run "{{pkg.path}}/st_app.py" 2>&1
 fi

@@ -5,6 +5,7 @@ constants.py `change_date``.
 """
 
 from __future__ import annotations
+import i18n
 
 from argparse import ArgumentParser
 from collections import namedtuple
@@ -136,6 +137,7 @@ VALIDATORS = {
     "ventilated": ValDisposition,
     "hospitalized": ValDisposition,
     "icu": ValDisposition,
+    "use_log_scale": OptionalValue
 }
 
 
@@ -152,7 +154,7 @@ HELP = {
     "mitigation_date": "Date on which social distancing measures too effect",
     "market_share": "Hospital market share (0.00001 - 1.0)",
     "max_y_axis": "Max y-axis",
-    "n_days": "Number of days to project >= 0",
+    "n_days": "Number of days to project >= 1 and less than 30",
     "parameters": "Parameters file",
     "population": "Regional population >= 1",
     "recovered": "Number of patients already recovered (not yet implemented)",
@@ -160,6 +162,7 @@ HELP = {
     "relative_contact_rate": "Social distancing reduction rate: 0.0 - 1.0",
     "ventilated_days": "Average days on ventilator",
     "ventilated_rate": "Ventilated Rate: 0.0 - 1.0",
+    "use_log_scale": "Flag to use logarithmic scale on charts instead of linear scale."
 }
 
 
@@ -167,9 +170,9 @@ ARGS = (
     (
         "parameters",
         str,
-        None,
-        None,
-        False,
+        None, # Min value
+        None, # Max value
+        False, # Whether it is required or optional.
     ),
     (
         "current_hospitalized",
@@ -258,8 +261,8 @@ ARGS = (
     (
         "n-days",
         int,
-        0,
-        None,
+        1,
+        30,
         True,
     ),
     (
@@ -297,15 +300,24 @@ ARGS = (
         1.0,
         True,
     ),
+    (
+        "use_log_scale",
+        bool,
+        None,
+        None,
+        False
+    )
 )
 
 
 def to_cli(name):
     return "--" + name.replace('_', '-')
 
-
 class Parameters:
-    """Parameters."""
+    """
+    Object containing all of the parameters that can be adjusted by the user, either from the command line or using
+    the side bar of the web app.
+    """
 
     @classmethod
     def parser(cls):
@@ -314,11 +326,20 @@ class Parameters:
 
         for name, cast, min_value, max_value, required in ARGS:
             arg = to_cli(name)
-            parser.add_argument(
-                arg,
-                type=validator(arg, cast, min_value, max_value, required),
-                help=HELP.get(name),
-            )
+            if cast == bool:
+                # This argument is a command-line flag and does not need validation.
+                parser.add_argument(
+                    arg,
+                    action='store_true',
+                    help=HELP.get(name),
+                )
+            else:
+                # Use a custom validator for any arguments that take in values.
+                parser.add_argument(
+                    arg,
+                    type=validator(arg, cast, min_value, max_value, required),
+                    help=HELP.get(name),
+                )
         return parser
 
     @classmethod
@@ -395,6 +416,7 @@ class Parameters:
         self.relative_contact_rate = None
         self.recovered = None
         self.ventilated = None
+        self.use_log_scale = False
 
         passed_and_default_parameters = {}
         for key, value in kwargs.items():
@@ -424,14 +446,17 @@ class Parameters:
         Date(key='mitigation_date', value=self.mitigation_date)
 
         self.labels = {
-            "hospitalized": "Hospitalized",
-            "icu": "ICU",
-            "ventilated": "Ventilated",
-            "day": "Day",
-            "date": "Date",
-            "susceptible": "Susceptible",
-            "infected": "Infected",
-            "recovered": "Recovered",
+            "admits_hospitalized": i18n.t("admits_hospitalized"),
+            "admits_icu": i18n.t("admits_icu"),
+            "admits_ventilated": i18n.t("admits_ventilated"),
+            "census_hospitalized": i18n.t("census_hospitalized"),
+            "census_icu": i18n.t("census_icu"),
+            "census_ventilated": i18n.t("census_ventilated"),
+            "day": i18n.t("day"),
+            "date": i18n.t("date"),
+            "susceptible" :i18n.t("susceptible"),
+            "infected": i18n.t("infected"),
+            "recovered": i18n.t("recovered")
         }
 
         self.dispositions = {
