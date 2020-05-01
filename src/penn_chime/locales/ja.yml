@@ -4,9 +4,13 @@ ja:
   app-admitted-patients-title: "累計入院患者数"
   app-admitted-patients-text: "入院と退院を考慮したCOVID-19患者の予測**累計患者数**"
   app-PPE-title: "個人用防護具 (PPE) 計算機"
+  app-PPE-text: "This Excel-based calculator uses hospitalized/ICU/ventilated censuses and admissions projections from any model to forecast PPE usage."
+  app-PPE-text2: "To use CHIME’s projections based on your own parameters, set the parameters in the sidebar, then download this file:"
   app-PPE-screenshot: "ツールのスクリーンショットを表示"
   app-PPE-documentation: |+
-    ツールの使い方については<a href="{link_to_docs}">ユーザドキュメントの説明</a>を確認してください。
+    Refer to our [user documentation]({link_to_docs}) or
+    watch [a quick tutorial]({link_to_tutorial}) for instructions on
+    how to incorporate these projections--or projections from other models--into the calculator.
   app-SIR-title: "感受性保持者、感染者と回復者"
   app-SIR-text: "与えられた時間範囲での、病院の担当範囲領域における感受性保持者、感染者と回復者の人数"
   charts-date: "日付"
