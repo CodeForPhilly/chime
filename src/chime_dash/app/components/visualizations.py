@@ -10,7 +10,7 @@ from datetime import date
 from dash.development.base_component import ComponentMeta
 from dash_html_components import H2, Div, A
 from dash_core_components import Markdown, Graph
-from dash_bootstrap_components import Table, Container
+from dash_bootstrap_components import Table, Container, Button
 
 from chime_dash.app.components.base import Component
 
@@ -51,6 +51,16 @@ class Visualizations(Component):
                     className="btn btn-sm btn-info",
                 ),
                 Div(
+                    children=Button(
+                        "Lock Zoom", 
+                        id="new_admissions_lock_zoom", 
+                        color="info", 
+                        outline=False,
+                        className="btn btn-sm"
+                        ),
+                    style={"display": "inline-block", "padding": 10}
+                ),
+                Div(
                     className="row justify-content-center",
                     children=Div(
                         id="new_admissions_table_container",
@@ -80,6 +90,16 @@ class Visualizations(Component):
                     className="btn btn-sm btn-info",
                 ),
                 Div(
+                    children=Button(
+                        "Lock Zoom", 
+                        id="admitted_patients_lock_zoom", 
+                        color="info", 
+                        outline=False, 
+                        className="btn btn-sm"
+                        ),
+                    style={"display": "inline-block", "padding": 10}
+                ),
+                Div(
                     className="row justify-content-center",
                     children=Div(
                         id="admitted_patients_table_container",
@@ -107,6 +127,16 @@ class Visualizations(Component):
                     href="",
                     target="_blank",
                     className="btn btn-sm btn-info my-4",
+                ),
+                Div(
+                    children=Button(
+                        "Lock Zoom", 
+                        id="SIR_lock_zoom", 
+                        color="info", 
+                        outline=False, 
+                        className="btn btn-sm"
+                        ),
+                    style={"display": "inline-block", "padding": 10}
                 ),
                 Div(
                     className="row justify-content-center",

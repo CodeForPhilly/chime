@@ -1,4 +1,4 @@
-name: Deploy working development app to Heroku staging project
+name: Deploy develop to Heroku
 
 on:
   push:
