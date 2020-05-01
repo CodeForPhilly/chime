@@ -2,31 +2,35 @@
 
 import os
 
-import altair as alt  # type: ignore
-import streamlit as st  # type: ignore
-import i18n  # type: ignore
+import altair as alt
+import streamlit as st
+import i18n
 
+lang = os.environ.get('LANG') or 'en'
 i18n.set('filename_format', '{locale}.{format}')
-i18n.set('locale', 'en')
+i18n.set('locale', lang)
 i18n.set('fallback', 'en')
 i18n.load_path.append(os.path.dirname(__file__) + '/../locales')
 
 from ..model.parameters import Parameters
 from ..model.sir import Sir
+from ..model.ppe import PPE
 from .charts import (
     build_admits_chart,
     build_census_chart,
     build_sim_sir_w_date_chart,
 )
-from ..ppe.ppe import PPE
 from .st_display import (
     display_download_link,
+    display_excel_download_link,
     display_footer,
     display_header,
     display_sidebar,
     hide_menu_style,
 )
-
+from ..constants import (
+    DOCS_URL,
+)
 
 def main():
     # This is somewhat dangerous:
@@ -37,6 +41,7 @@ def main():
 
     d = Parameters.create(os.environ, [])
     ppe = PPE(os.environ)
+
     p = display_sidebar(st, d)
     m = Sir(p)
 
@@ -44,7 +49,8 @@ def main():
 
     st.subheader(i18n.t("app-new-admissions-title"))
     st.markdown(i18n.t("app-new-admissions-text"))
-    admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis)
+    admits_chart = build_admits_chart(alt=alt, admits_floor_df=m.admits_floor_df, max_y_axis=p.max_y_axis, use_log_scale=p.use_log_scale)
+
     st.altair_chart(admits_chart, use_container_width=True)
     display_download_link(
         st,
@@ -55,7 +61,8 @@ def main():
 
     st.subheader(i18n.t("app-admitted-patients-title"))
     st.markdown(i18n.t("app-admitted-patients-text"))
-    census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis)
+    census_chart = build_census_chart(alt=alt, census_floor_df=m.census_floor_df, max_y_axis=p.max_y_axis, use_log_scale=p.use_log_scale)
+
     st.altair_chart(census_chart, use_container_width=True)
     display_download_link(
         st,
@@ -65,7 +72,7 @@ def main():
     )
 
     st.subheader(i18n.t("app-PPE-title"))
-    ppe.display_ppe_download_link(st)
+    display_excel_download_link(st, ppe.filename, ppe.src)
     display_download_link(
         st,
         p,
@@ -73,19 +80,17 @@ def main():
         df=m.ppe_df,
     )
 
-    if st.checkbox("Show a screenshot of the tool"):
-        st.image(image=ppe.ppe_folder+'PPE_Screenshot.jpg',
-                 width=600,
-                 format='JPEG')
-    st.markdown("""
-                    Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the tool</a>.
-                """.format(link_to_docs="https://code-for-philly.gitbook.io/chime/ppe-calculator"),
-                unsafe_allow_html=True
-                )
+    st.markdown(
+        i18n.t("app-PPE-documentation").format(
+            link_to_docs="{docs_url}/ppe-calculator".format(docs_url=DOCS_URL),
+        ),
+        unsafe_allow_html=True
+    )
 
     st.subheader(i18n.t("app-SIR-title"))
     st.markdown(i18n.t("app-SIR-text"))
-    sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_floor_df=m.sim_sir_w_date_floor_df)
+    sim_sir_w_date_chart = build_sim_sir_w_date_chart(alt=alt, sim_sir_w_date_floor_df=m.sim_sir_w_date_floor_df, use_log_scale=p.use_log_scale)
+
     st.altair_chart(sim_sir_w_date_chart, use_container_width=True)
     display_download_link(
         st,

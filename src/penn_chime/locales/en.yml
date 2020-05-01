@@ -3,7 +3,10 @@ en:
   app-new-admissions-text: "Projected number of **daily** COVID-19 admissions."
   app-admitted-patients-title: "Admitted Patients (Census)"
   app-admitted-patients-text: "Projected **census** of COVID-19 patients, accounting for arrivals and discharges."
-  app-PPE-title: "Personal Protective Equipment (PPE) Calculator"
+  app-PPE-title: "Personal Protective Equipment (PPE) Forecasting Calculator"
+  app-PPE-screenshot: "Show a screenshot of the calculator"
+  app-PPE-documentation: |+
+    Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the calculator</a>.
   app-SIR-title: "Susceptible, Infected, and Recovered"
   app-SIR-text: "The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment"
   charts-date: "Date"
@@ -14,18 +17,24 @@ en:
   presentation-header: |+
     <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
     <div class="penn-medicine-header__content">
-        <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
-            title="Go to the Penn Medicine home page">Penn Medicine</a>
-        <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics (CHIME)</a>
+        <h3>
+            <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
+                title="Go to the Penn Medicine home page">Penn Medicine</a>
+            <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics (CHIME)</a>
+        </h3>
     </div>
+    <br />
   presentation-notice: |+
-    **Notice**: *There is a high
-    degree of uncertainty about the details of COVID-19 infection, transmission, and the effectiveness of social distancing
-    measures. Long-term projections made using this simplified model of outbreak progression should be treated with extreme caution.*
+
+    **Notice**: CHIME is a modified [SIR](https://mathworld.wolfram.com/SIRModel.html) model of outbreak progression that is limited to short term forecasting.
+    It is only applicable during the period prior to a region’s peak infections, and it accounts only for a single significant social distancing policy.
+    Penn Medicine is actively developing [BayesCHIME](https://github.com/pennsignals/chime_sims/blob/master/README.md) to make use of more data and provide probabilistic forecasts beyond peak infections.
   presentation-developed-by: |+
     This tool was developed by [Predictive Healthcare](http://predictivehealthcare.pennmedicine.org/) at
     Penn Medicine to assist hospitals and public health officials with hospital capacity planning.
     Please read [How to Use CHIME]({docs_url}) to customize inputs for your region.
+    The Personal Protective Equipment (PPE) Forecasting Calculator was developed collaboratively by
+    the University of Pennsylvania and Penn Medicine.
   presentation-estimated-number-of-infection: |+
     The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
     Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Regional population (**{S}**),
@@ -82,6 +91,8 @@ en:
   presentation-copyright: "© 2020, The Trustees of the University of Pennsylvania"
   presentation-download: |+
     <a download="{filename}" href="data:file/csv;base64,{csv}">Download {filename}</a>
+  presentation-excel-download: |+
+    Download the PPE Forecasting Calculator: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
   admits_hospitalized: "Hospitalized Admissions"
   admits_icu: "ICU Admissions"
   admits_ventilated: "Ventilated Admissions"

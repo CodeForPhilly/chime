@@ -46,12 +46,14 @@ pip install streamlit
 ## Run the Streamlit Web App
 
 ```bash
+ASSETS=./defaults/assets \
 PARAMETERS=-./defaults/webapp.cfg streamlit run st_app.py
 ```
 
 ## Run the Command Line Interface
 
 ```bash
+ASSETS=./defaults/assets \
 PARAMETERS=./defaults/cli.cfg penn_chime
 ```
 
@@ -66,6 +68,7 @@ penn_chime --help
 If you want a different set of default parameters, you may use your own configuration file.
 
 ```bash
+ASSETS=./defaults/assets \
 PARAMETERS=./defaults/yours.cfg streamlit run st_app.py
 ```
 
@@ -77,7 +80,19 @@ Be sure to include `--mitigation-date` in the file if social distancing was impl
 If you need to run the application on a different port than the default (8000), you can set an environment variable.
 
 ```bash
-STREAMLIT_SERVER_PORT=1234 PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
+ASSETS=./defaults/assets \
+STREAMLIT_SERVER_PORT=1234 \
+PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
+```
+
+### Choosing a Different Language
+
+If you want to run the application in another language, do the following. You can select Japanese as the language other than English.
+
+```bash
+ASSETS=./defaults/assets \
+LANG=ja \
+PARAMETERS=./defaults/webapp.cfg streamlit run st_app.py
 ```
 
 ## Project Layout

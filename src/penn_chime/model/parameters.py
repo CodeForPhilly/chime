@@ -137,6 +137,7 @@ VALIDATORS = {
     "ventilated": ValDisposition,
     "hospitalized": ValDisposition,
     "icu": ValDisposition,
+    "use_log_scale": OptionalValue
 }
 
 
@@ -161,6 +162,7 @@ HELP = {
     "relative_contact_rate": "Social distancing reduction rate: 0.0 - 1.0",
     "ventilated_days": "Average days on ventilator",
     "ventilated_rate": "Ventilated Rate: 0.0 - 1.0",
+    "use_log_scale": "Flag to use logarithmic scale on charts instead of linear scale."
 }
 
 
@@ -168,9 +170,9 @@ ARGS = (
     (
         "parameters",
         str,
-        None,
-        None,
-        False,
+        None, # Min value
+        None, # Max value
+        False, # Whether it is required or optional.
     ),
     (
         "current_hospitalized",
@@ -298,15 +300,24 @@ ARGS = (
         1.0,
         True,
     ),
+    (
+        "use_log_scale",
+        bool,
+        None,
+        None,
+        False
+    )
 )
 
 
 def to_cli(name):
     return "--" + name.replace('_', '-')
 
-
 class Parameters:
-    """Parameters."""
+    """
+    Object containing all of the parameters that can be adjusted by the user, either from the command line or using
+    the side bar of the web app.
+    """
 
     @classmethod
     def parser(cls):
@@ -315,11 +326,20 @@ class Parameters:
 
         for name, cast, min_value, max_value, required in ARGS:
             arg = to_cli(name)
-            parser.add_argument(
-                arg,
-                type=validator(arg, cast, min_value, max_value, required),
-                help=HELP.get(name),
-            )
+            if cast == bool:
+                # This argument is a command-line flag and does not need validation.
+                parser.add_argument(
+                    arg,
+                    action='store_true',
+                    help=HELP.get(name),
+                )
+            else:
+                # Use a custom validator for any arguments that take in values.
+                parser.add_argument(
+                    arg,
+                    type=validator(arg, cast, min_value, max_value, required),
+                    help=HELP.get(name),
+                )
         return parser
 
     @classmethod
@@ -396,6 +416,7 @@ class Parameters:
         self.relative_contact_rate = None
         self.recovered = None
         self.ventilated = None
+        self.use_log_scale = False
 
         passed_and_default_parameters = {}
         for key, value in kwargs.items():
