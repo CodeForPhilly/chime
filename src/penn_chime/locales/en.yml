@@ -97,9 +97,6 @@ en:
     <a download="{filename}" href="data:file/csv;base64,{csv}">Download {filename}</a>
   presentation-excel-download: |+
     Download the PPE Forecasting Calculator: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
-    <br />
-    <br />
-    This Excel-based calculator can use input from any model. To use CHIME’s projections with your existing parameters, download the csv below:
   admits_hospitalized: "Hospitalized Admissions"
   admits_icu: "ICU Admissions"
   admits_ventilated: "Ventilated Admissions"
