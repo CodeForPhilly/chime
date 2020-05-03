@@ -23,6 +23,7 @@ from ..utils import (
 )
 from .spreadsheet import spreadsheet
 
+import elasticapm
 
 basicConfig(
     level=INFO,
@@ -43,9 +44,8 @@ hide_menu_style = """
 # Text #
 ########
 
-
+@elasticapm.capture_span()
 def display_header(st, m, p):
-
     infected_population_warning_str = (
         i18n.t("presentation-infected-population-warning")
         if m.infected > p.population
@@ -161,7 +161,7 @@ class CheckboxInput(Input):
         kwargs = dict(key=key)
         super().__init__(st_obj.checkbox, label, value, kwargs)
 
-
+#@elasticapm.capture_span()
 def display_sidebar(st, d: Parameters) -> Parameters:
     """
     Initializes the UI in the sidebar. These function calls create input elements, and bind the values they are set to
@@ -170,120 +170,137 @@ def display_sidebar(st, d: Parameters) -> Parameters:
 
     st_obj = st.sidebar
     # used_widget_key = st.get_last_used_widget_key ( )
-
-    current_hospitalized_input = NumberInput(
-        st_obj,
-        i18n.t("presentation-current-hospitalized"),
-        min_value=0,
-        value=d.current_hospitalized,
-        step=1,
-        format="%i",
-    )
-    n_days_input = NumberInput(
-        st_obj,
-        i18n.t("presentation-n-days"),
-        min_value=1,
-        max_value=30,
-        value=d.n_days,
-        step=1,
-        format="%i",
-    )
-    doubling_time_input = NumberInput(
-        st_obj,
-        i18n.t("presentation-doubling-time"),
-        min_value=0.5,
-        value=d.doubling_time,
-        step=0.25,
-        format="%f",
-    )
-    current_date_input = DateInput(
-        st_obj, i18n.t("presentation-current-date"), value=d.current_date,
-    )
-    date_first_hospitalized_input = DateInput(
-        st_obj, i18n.t("presentation-date-first-hospitalized"),
-        value=d.date_first_hospitalized,
-    )
-    mitigation_date_input = DateInput(
-        st_obj, i18n.t("presentation-mitigation-date"),
-        value=d.mitigation_date
-    )
-    relative_contact_pct_input = PercentInput(
-        st_obj,
-        i18n.t("presentation-relative-contact-rate"),
-        min_value=0.0,
-        max_value=100.0,
-        value=d.relative_contact_rate,
-        step=1.0,
-    )
-    hospitalized_pct_input = PercentInput(
-        st_obj,
-        i18n.t("presentation-hospitalized-rate"),
-        value=d.hospitalized.rate,
-        min_value=FLOAT_INPUT_MIN,
-        max_value=100.0
-    )
-    icu_pct_input = PercentInput(
-        st_obj,
-        i18n.t("presentation-icu-rate"),
-        min_value=0.0,
-        value=d.icu.rate,
-        step=0.05
-    )
-    ventilated_pct_input = PercentInput(
-        st_obj, i18n.t("presentation-ventilated-rate"), value=d.ventilated.rate,
-    )
-    hospitalized_days_input = NumberInput(
-        st_obj,
-        i18n.t("presentation-hospitalized-days"),
-        min_value=1,
-        value=d.hospitalized.days,
-        step=1,
-        format="%i",
-    )
-    icu_days_input = NumberInput(
-        st_obj,
-        i18n.t("presentation-icu-days"),
-        min_value=1,
-        value=d.icu.days,
-        step=1,
-        format="%i",
-    )
-    ventilated_days_input = NumberInput(
-        st_obj,
-        i18n.t("presentation-ventilated-days"),
-        min_value=1,
-        value=d.ventilated.days,
-        step=1,
-        format="%i",
-    )
-    market_share_pct_input = PercentInput(
-        st_obj,
-        i18n.t("presentation-market-share"),
-        min_value=0.5,
-        value=d.market_share,
-    )
-    population_input = NumberInput(
-        st_obj,
-        i18n.t("presentation-population"),
-        min_value=1,
-        value=(d.population),
-        step=1,
-        format="%i",
-    )
-    infectious_days_input = NumberInput(
-        st_obj,
-        i18n.t("presentation-infectious-days"),
-        min_value=1,
-        value=d.infectious_days,
-        step=1,
-        format="%i",
-    )
-    max_y_axis_set_input = CheckboxInput(
-        st_obj, i18n.t("presentation-max-y-axis-set")
-    )
-    max_y_axis_input = NumberInput(
-        st_obj, i18n.t("presentation-max-y-axis"), value=500, format="%i", step=25
-    )
+    with elasticapm.capture_span('current_hospitalized_input'):
+        current_hospitalized_input = NumberInput(
+            st_obj,
+            i18n.t("presentation-current-hospitalized"),
+            min_value=0,
+            value=d.current_hospitalized,
+            step=1,
+            format="%i",
+        )
+    with elasticapm.capture_span('n_days_input'):
+        n_days_input = NumberInput(
+            st_obj,
+            i18n.t("presentation-n-days"),
+            min_value=1,
+            max_value=30,
+            value=d.n_days,
+            step=1,
+            format="%i",
+        )
+    with elasticapm.capture_span('doubling_time_input'):
+        doubling_time_input = NumberInput(
+            st_obj,
+            i18n.t("presentation-doubling-time"),
+            min_value=0.5,
+            value=d.doubling_time,
+            step=0.25,
+            format="%f",
+        )
+    with elasticapm.capture_span('current_date_input'):    
+        current_date_input = DateInput(
+            st_obj, i18n.t("presentation-current-date"), value=d.current_date,
+        )
+    with elasticapm.capture_span('date_first_hospitalized_input'):    
+        date_first_hospitalized_input = DateInput(
+            st_obj, i18n.t("presentation-date-first-hospitalized"),
+            value=d.date_first_hospitalized,
+        )
+    with elasticapm.capture_span('mitigation_date_input'):
+        mitigation_date_input = DateInput(
+            st_obj, i18n.t("presentation-mitigation-date"),
+            value=d.mitigation_date
+        )
+    with elasticapm.capture_span('relative_contact_pct_input'):    
+        relative_contact_pct_input = PercentInput(
+            st_obj,
+            i18n.t("presentation-relative-contact-rate"),
+            min_value=0.0,
+            max_value=100.0,
+            value=d.relative_contact_rate,
+            step=1.0,
+        )
+    with elasticapm.capture_span('hospitalized_pct_input'):
+        hospitalized_pct_input = PercentInput(
+            st_obj,
+            i18n.t("presentation-hospitalized-rate"),
+            value=d.hospitalized.rate,
+            min_value=FLOAT_INPUT_MIN,
+            max_value=100.0
+        )
+    with elasticapm.capture_span('icu_pct_input'):
+        icu_pct_input = PercentInput(
+            st_obj,
+            i18n.t("presentation-icu-rate"),
+            min_value=0.0,
+            value=d.icu.rate,
+            step=0.05
+        )
+    with elasticapm.capture_span('ventilated_pct_input'):
+        ventilated_pct_input = PercentInput(
+            st_obj, i18n.t("presentation-ventilated-rate"), value=d.ventilated.rate,
+        )
+    with elasticapm.capture_span('hospitalized_days_input'):
+        hospitalized_days_input = NumberInput(
+            st_obj,
+            i18n.t("presentation-hospitalized-days"),
+            min_value=1,
+            value=d.hospitalized.days,
+            step=1,
+            format="%i",
+        )
+    with elasticapm.capture_span('icu_days_input'):
+        icu_days_input = NumberInput(
+            st_obj,
+            i18n.t("presentation-icu-days"),
+            min_value=1,
+            value=d.icu.days,
+            step=1,
+            format="%i",
+        )
+    with elasticapm.capture_span('ventilated_days_input'):
+        ventilated_days_input = NumberInput(
+            st_obj,
+            i18n.t("presentation-ventilated-days"),
+            min_value=1,
+            value=d.ventilated.days,
+            step=1,
+            format="%i",
+        )
+    with elasticapm.capture_span('market_share_pct_input'):
+        market_share_pct_input = PercentInput(
+            st_obj,
+            i18n.t("presentation-market-share"),
+            min_value=0.5,
+            value=d.market_share,
+        )
+    with elasticapm.capture_span('population_input'):
+        population_input = NumberInput(
+            st_obj,
+            i18n.t("presentation-population"),
+            min_value=1,
+            value=(d.population),
+            step=1,
+            format="%i",
+        )
+    with elasticapm.capture_span('infectious_days_input'):
+        infectious_days_input = NumberInput(
+            st_obj,
+            i18n.t("presentation-infectious-days"),
+            min_value=1,
+            value=d.infectious_days,
+            step=1,
+            format="%i",
+        )
+    with elasticapm.capture_span('max_y_axis_set_input'):
+        max_y_axis_set_input = CheckboxInput(
+            st_obj, i18n.t("presentation-max-y-axis-set")
+        )
+    with elasticapm.capture_span('max_y_axis_input'):
+        max_y_axis_input = NumberInput(
+            st_obj, i18n.t("presentation-max-y-axis"), value=500, format="%i", step=25
+        )
 
     # Build in desired order
     st.sidebar.markdown(

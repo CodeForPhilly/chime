@@ -249,7 +249,7 @@ class Sir:
             (self.beta,   pre_mitigation_days),
             (self.beta_t, post_mitigation_days),
         ]
-
+    
     def run_projection(self, p: Parameters, policy: Sequence[Tuple[float, int]]):
         raw = sim_sir(
             self.susceptible,
@@ -266,11 +266,9 @@ class Sir:
 
         return raw
 
-
 def get_loss(current_hospitalized, predicted) -> float:
     """Squared error: predicted vs. actual current hospitalized."""
     return (current_hospitalized - predicted) ** 2.0
-
 
 def get_argmin_ds(census, current_hospitalized: float) -> float:
     # By design, this forbids choosing a day after the peak
@@ -278,7 +276,6 @@ def get_argmin_ds(census, current_hospitalized: float) -> float:
     peak_day = census.argmax()
     losses = (census[:peak_day] - current_hospitalized) ** 2.0
     return losses.argmin()
-
 
 def get_beta(
     intrinsic_growth_rate: float,
@@ -292,13 +289,11 @@ def get_beta(
         * (1.0 - relative_contact_rate)
     )
 
-
 def get_growth_rate(doubling_time: Optional[float]) -> float:
     """Calculates average daily growth rate from doubling time."""
     if doubling_time is None or doubling_time == 0.0:
         return 0.0
     return (2.0 ** (1.0 / doubling_time) - 1.0)
-
 
 def sir(
     s: float, i: float, r: float, beta: float, gamma: float, n: float
@@ -309,7 +304,6 @@ def sir(
     r_n = gamma * i + r
     scale = n / (s_n + i_n + r_n)
     return s_n * scale, i_n * scale, r_n * scale
-
 
 def sim_sir(
     s: float, i: float, r: float, gamma: float, i_day: int, policies: Sequence[Tuple[float, int]]
@@ -355,7 +349,6 @@ def sim_sir(
         "ever_infected": i_a + r_a
     }
 
-
 def build_sim_sir_w_date_df(
     raw_df: pd.DataFrame,
     current_date: datetime,
@@ -371,7 +364,6 @@ def build_sim_sir_w_date_df(
         }
     })
 
-
 def build_floor_df(df, keys, prefix):
     """Build floor sim sir w date."""
     return pd.DataFrame({
@@ -383,7 +375,6 @@ def build_floor_df(df, keys, prefix):
         }
     })
 
-
 def calculate_dispositions(
     raw: Dict,
     rates: Dict[str, float],
@@ -394,7 +385,6 @@ def calculate_dispositions(
         raw["ever_" + key] = raw["ever_infected"] * rate * market_share
         raw[key] = raw["ever_infected"] * rate * market_share
 
-
 def calculate_admits(raw: Dict, rates):
     """Build admits dataframe from dispositions."""
     for key in rates.keys():
@@ -404,7 +394,6 @@ def calculate_admits(raw: Dict, rates):
         admit[1:] = ever[1:] - ever[:-1]
         raw["admits_"+key] = admit
         raw[key] = admit
-
 
 def calculate_census(
     raw: Dict,

@@ -35,7 +35,8 @@ setup(
         "streamlit",
         "gspread",
         "oauth2client",
-        "python-i18n"
+        "python-i18n",
+        "elastic-apm"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

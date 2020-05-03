@@ -4,10 +4,11 @@ from altair import Chart, Scale
 import pandas as pd
 import i18n
 import numpy as np
+import elasticapm
 
 from ..constants import DATE_FORMAT
 
-
+@elasticapm.capture_span()
 def build_admits_chart(
     *, alt, admits_floor_df: pd.DataFrame, max_y_axis: Optional[int] = None, use_log_scale: bool = False
 ) -> Chart:
@@ -63,7 +64,7 @@ def build_admits_chart(
         .interactive()
     )
 
-
+@elasticapm.capture_span()
 def build_census_chart(
     *, alt, census_floor_df: pd.DataFrame, max_y_axis: Optional[int] = None, use_log_scale: bool = False
 ) -> Chart:
@@ -119,7 +120,7 @@ def build_census_chart(
         .interactive()
     )
 
-
+@elasticapm.capture_span()
 def build_sim_sir_w_date_chart(
     *, alt, sim_sir_w_date_floor_df: pd.DataFrame, max_y_axis: Optional[int] = None, use_log_scale: bool = False
 ) -> Chart:
@@ -175,6 +176,7 @@ def build_sim_sir_w_date_chart(
         .interactive()
     )
 
+@elasticapm.capture_span()
 def build_table(
     *, df: pd.DataFrame, labels: Dict[str, str], modulo: int = 1
 ) -> pd.DataFrame:
