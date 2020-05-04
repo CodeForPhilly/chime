@@ -246,7 +246,7 @@ jobs:
     steps:
       - uses: azure/setup-kubectl@v1
         with:
-          version: v1.18.0
+          version: v1.18.2
 
       - name: Add kubeconfig to environment
         run: |
@@ -331,12 +331,14 @@ jobs:
     needs: publish-manifests
     if: github.event_name == 'release' && ! github.event.release.prerelease
     runs-on: ubuntu-latest
+    env:
+      KUBE_CONFIG_DATA: ${{ secrets.kubeconfig_data_prod }}
 
     steps:
       - uses: actions/checkout@v2
       - uses: azure/setup-kubectl@v1
         with:
-          version: v1.18.0
+          version: v1.18.2
 
       - name: Add kubeconfig to environment
         run: |
