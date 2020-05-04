@@ -4,9 +4,13 @@ en:
   app-admitted-patients-title: "Admitted Patients (Census)"
   app-admitted-patients-text: "Projected **census** of COVID-19 patients, accounting for arrivals and discharges."
   app-PPE-title: "Personal Protective Equipment (PPE) Forecasting Calculator"
+  app-PPE-text: "This Excel-based calculator uses hospitalized/ICU/ventilated censuses and admissions projections from any model to forecast PPE usage."
+  app-PPE-text2: "To use CHIME’s projections based on your own parameters, set the parameters in the sidebar, then download this file:"
   app-PPE-screenshot: "Show a screenshot of the calculator"
   app-PPE-documentation: |+
-    Refer to our <a href="{link_to_docs}">user documentation for instructions on how to use the calculator</a>.
+    Refer to our [user documentation]({link_to_docs}) or
+    watch [a quick tutorial]({link_to_tutorial}) for instructions on
+    how to incorporate these projections--or projections from other models--into the calculator.
   app-SIR-title: "Susceptible, Infected, and Recovered"
   app-SIR-text: "The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment"
   charts-date: "Date"

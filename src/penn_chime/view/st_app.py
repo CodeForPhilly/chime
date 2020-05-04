@@ -76,17 +76,19 @@ def main():
     )
 
     st.subheader(i18n.t("app-PPE-title"))
+    st.markdown(i18n.t("app-PPE-text"))
     display_excel_download_link(st, ppe.filename, ppe.src)
+    st.markdown(i18n.t("app-PPE-text2"))
     display_download_link(
         st,
         p,
         filename=f"{p.current_date}_projected_census_for_ppe_calculator.csv",
         df=m.ppe_df,
     )
-
     st.markdown(
         i18n.t("app-PPE-documentation").format(
             link_to_docs="{docs_url}/ppe-calculator".format(docs_url=DOCS_URL),
+            link_to_tutorial="{docs_url}/ppe-calculator/ppe-basic-tutorial".format(docs_url=DOCS_URL),
         ),
         unsafe_allow_html=True
     )
