@@ -8,7 +8,7 @@ Our project work is organized by 4 main areas:
 
 | Area        | What type of help wanted? | Project Board                                         | Slack channel           | Maintainers |
 | --- | --- | --- | --- | --- |
-| App Platform        | Python wizards to work on application development, hardening the code, making it more flexible, and unit testing | [Board](https://github.com/CodeForPhilly/chime/projects/3) | [#chime-app](https://codeforphilly.org/chat?channel=chime-app) | @quinndougherty                      |
+| App Platform        | Python wizards to work on application development, hardening the code, making it more flexible, and unit testing | [Board](https://github.com/CodeForPhilly/chime/projects/3) | [#chime-app](https://codeforphilly.org/chat?channel=chime-app) | @brianthomasross                   |
 | Analysis            | Epidemiologists and other math and stats friends, for model improvements | [Board](https://github.com/CodeForPhilly/chime/projects/5) | [#chime-analysis](https://codeforphilly.org/chat?channel=chime-analysis) | @sam-qordoba, @cjbayesian                   |
 | DevOps              | DevOps heroes (especially if you have Kubernetes experience) for hosting, maintenance, and ensuring easy redeploys. | [Board](https://github.com/CodeForPhilly/chime/projects/2) | [#chime-ops](https://codeforphilly.org/chat?channel=chime-ops) | @moosequest, @themightychris, @lottspot |
 | General Project Ops | Writing, documentation, and project and product management | [Board](https://github.com/CodeForPhilly/chime/projects/6) |  | @mariekers                           |
