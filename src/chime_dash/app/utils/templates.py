@@ -2,6 +2,8 @@
 Utility functions for localization templates
 templates themselves can be found in app/templates/en
 """
+import dash_daq as daq
+
 from typing import Dict, Any, Optional
 
 from os import path
@@ -11,7 +13,7 @@ from yaml import safe_load
 from numpy import mod
 from pandas import DataFrame
 
-from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4
+from dash_html_components import Table, Thead, Tbody, Tr, Td, Th, H4, Hr
 from dash_core_components import DatePickerSingle
 from dash_bootstrap_components import FormGroup, Label, Input, Checklist
 
@@ -27,7 +29,13 @@ LABEL_STYLE = {"fontSize": "0.875rem", "marginBottom": "0.3333em"}
 HEADER_STYLE = {
     "fontSize": "1rem",
     "fontWeight": "bold",
-    "margin": "2rem 0 1rem",
+    "margin-bottom": "1rem",
+}
+
+LINE_STYLE = {
+    "width": "30%",
+    "text-align": "center",
+    "color": "#cccccc"
 }
 
 
@@ -140,6 +148,7 @@ def create_number_input(
             idx, defaults, min_val=data.get("min", None), max_val=data.get("max", None)
         )
     return FormGroup(
+        id=f'group_{idx}',
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
             Input(id=idx, debounce=debounce, **input_kwargs),
@@ -154,6 +163,8 @@ def create_header(idx: str, content: Dict[str, str]):
 
     return H4(id=idx, children=content[idx], style=HEADER_STYLE)
 
+def create_line_break(idx: str):
+    return Hr(id=idx, style=LINE_STYLE)
 
 def create_date_input(
     idx: str, data: Dict[str, Any], content: Dict[str, str], defaults: Parameters
@@ -174,7 +185,14 @@ def create_date_input(
             "initial_visible_month"
         ] = _get_default_values(idx, defaults)
 
+    if 'style' in input_kwargs:
+        style = {'style': input_kwargs.pop('style')}
+    else:
+        style = {}
+
     return FormGroup(
+        id=f'group_{idx}',
+        **style,
         children=[
             Label(html_for=idx, children=content[idx], style=LABEL_STYLE),
             DatePickerSingle(
@@ -197,8 +215,8 @@ def create_switch_input(idx: str, data: Dict[str, Any], content: Dict[str, str])
         content: Localization text
         defaults: Parameters to infer defaults
     """
-    return Checklist(
-        id=idx, switch=True, options=[{"label": content[idx], "value": True}],
+    return daq.BooleanSwitch(
+        id=idx, on=False, label=content[idx]
     )
 
 
