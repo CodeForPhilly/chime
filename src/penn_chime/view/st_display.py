@@ -231,7 +231,6 @@ def display_sidebar(st, d: Parameters) -> Parameters:
     )
     ventilated_pct_input = PercentInput(
         st_obj, i18n.t("presentation-ventilated-rate"), value=d.ventilated.rate,
-
     )
     hospitalized_days_input = NumberInput(
         st_obj,
