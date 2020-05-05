@@ -82,6 +82,7 @@ en:
   presentation-social-distancing-implemented: "Social distancing measures have been implemented"
   presentation-severity-parameters: "Severity Parameters"
   presentation-display-parameters: "Display Parameters"
+  presentation-logarithmic-scale: "Use logarithmic scale on charts instead of linear scale."
   presentation-subscribe: "Subscribe"
   presentation-enter-email: "Enter Email"
   presentation-enter-name: "Enter Name"

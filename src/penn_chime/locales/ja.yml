@@ -79,6 +79,7 @@ ja:
   presentation-social-distancing-implemented: "社会的距離戦略が導入済みの場合"
   presentation-severity-parameters: "深刻度パラメータ"
   presentation-display-parameters: "表示パラメータ"
+  presentation-logarithmic-scale: "グラフ上で線形スケールでなく対数スケールを使う"
   presentation-subscribe: "購読"
   presentation-enter-email: "メールアドレス"
   presentation-enter-name: "名前"
