@@ -358,7 +358,7 @@ def display_sidebar(st, d: Parameters) -> Parameters:
         max_y_axis = max_y_axis_input()
 
     current_date = current_date_input()
-    use_log_scale = st.sidebar.checkbox(label="Use logarithmic scale on charts instead of linear scale.", value=d.use_log_scale)
+    use_log_scale = st.sidebar.checkbox(label=i18n.t("presentation-logarithmic-scale"), value=d.use_log_scale)
 
     # Subscribe implementation
     subscribe(st_obj)
