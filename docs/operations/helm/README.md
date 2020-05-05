@@ -36,7 +36,7 @@ Next let's assume we want to deploy elasticsearch to a testing namespace. Lets c
 $ helm install --name elasticsearch --namespace test-es elastic/elasticsearch
 ```
 
-Now you can monitor the pods to see if elasticearch is up and ready. 
+Now you can monitor the pods to see if elasticsearch is up and ready. 
 
 Now lets say we want to make some changes to the options for deploying elasticsearch. 
 You can create a file in `values` called `Elasticsearch.yaml`. And to deploy these changes
