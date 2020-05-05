@@ -113,4 +113,3 @@ helm upgrade -i -f values/metricbeat.yaml --name metricbeat --namespace test-es 
 ```
 
 Metricbeat and filebeat are both configured by default to start pulling metrics/logs from the k8s cluster and ship to the local Elasticsearch instance. 
-
