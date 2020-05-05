@@ -1,4 +1,4 @@
-# Operations: The `chime-bus` Pre-Produciton Cluster
+# Operations: The `chime-bus` Pre-Production Cluster
 
 ## Connecting with `kubectl`
 
