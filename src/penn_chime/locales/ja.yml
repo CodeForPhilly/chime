@@ -3,14 +3,14 @@ ja:
   app-new-admissions-text: "**日毎の**COVID-19関連新規入院患者数予測"
   app-admitted-patients-title: "累計入院患者数"
   app-admitted-patients-text: "入院と退院を考慮したCOVID-19患者の予測**累計患者数**"
-  app-PPE-title: "個人用防護具 (PPE) 計算機"
-  app-PPE-text: "This Excel-based calculator uses hospitalized/ICU/ventilated censuses and admissions projections from any model to forecast PPE usage."
-  app-PPE-text2: "To use CHIME’s projections based on your own parameters, set the parameters in the sidebar, then download this file:"
-  app-PPE-screenshot: "ツールのスクリーンショットを表示"
+  app-PPE-title: "個人用防護具 (PPE) 予測計算機 (注:現状英語版のみ)"
+  app-PPE-text: "このExcelベースの計算機は、個人用防護具の将来必要数を予測するために、あらゆるモデルの入院患者/集中治療患者/人工呼吸患者の累計数と新規数の予測を用います。"
+  app-PPE-text2: "独自のパラメータに基づいたCHIMEの予測を用いるために、左サイドバー内でそれぞれのパラメータを設定し、その後にExcelファイルをダウンロードしてください。"
+  app-PPE-screenshot: "計算機のスクリーンショットを表示"
   app-PPE-documentation: |+
-    Refer to our [user documentation]({link_to_docs}) or
-    watch [a quick tutorial]({link_to_tutorial}) for instructions on
-    how to incorporate these projections--or projections from other models--into the calculator.
+    これらの予測、あるいは他のモデルからの予測を計算機に組み込む方法については、
+    [ユーザドキュメント]({link_to_docs})もしくは[チュートリアル動画]({link_to_tutorial})での
+    説明を確認してください。
   app-SIR-title: "感受性保持者、感染者と回復者"
   app-SIR-text: "与えられた時間範囲での、病院の担当範囲領域における感受性保持者、感染者と回復者の人数"
   charts-date: "日付"
@@ -22,18 +22,23 @@ ja:
     <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
 
     <div class="penn-medicine-header__content">
-    <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
-    title="Penn Medicineのホームページへ行く">Penn Medicine</a>
-    <a id="title" class="penn-medicine-header__title">COVID-19における伝染病の病院影響モデル</a>
+        <h3>
+            <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
+                title="Penn Medicineのホームページへ行く">Penn Medicine</a>
+            <a id="title" class="penn-medicine-header__title">COVID-19における伝染病の病院影響モデル (CHIME)</a>
+        </h3>
     </div>
+    <br />
   presentation-notice: |+
-    **重要**: COVID-19の感染、伝播、
-    社会的遠距離戦略の厳密な有効性については、まだ多くの不確実な点があります。
-    この簡略化されたアウトブレイク進行モデルを用いた長期予測は、細心の注意を払って取り扱ってください。
+
+    **重要**: CHIMEは、アウトブレイクの進行に関する、短期予測に限定された修正[SIR](https://mathworld.wolfram.com/SIRModel.html)モデルです。
+    これは、地域の感染がピークに達するより以前の期間にのみ適用でき、有効に社会的距離戦略を保つための施策にのみ適用できます。
+    Penn Medicineは、より多くのデータを活用し、感染のピーク以降での確率的予測を提供するために、[BayesCHIME](https://github.com/pennsignals/chime_sims/blob/master/README.md)を鋭意開発中です。
   presentation-developed-by: |+
     このツールはペンシルバニア州立大学の医療部門であるPenn Medicineの、[予測医療チーム](http://predictivehealthcare.pennmedicine.org/)によって、
     病院や公衆衛生担当者の収容能力把握を支援するために開発されました。
     地域の状況に応じたデータにカスタマイズするには、「[CHIMEの使い方]({docs_url})」をご覧ください。
+    個人用防護具 (PPE) 予測計算機はペンシルバニア大学とPenn Medicineが共同で開発しています。
   presentation-estimated-number-of-infection: |+
     現在の予測感染者人数は**{total_infections:.0f}**人です。
     この結果は入院患者数(**{current_hosp}**)、患者の入院割合(**{hosp_rate:.0%}**)、地域の人口(**{S}**)および病院の患者シェア(**{market_share:.0%}**)を元に計算されています。
@@ -74,6 +79,7 @@ ja:
   presentation-social-distancing-implemented: "社会的距離戦略が導入済みの場合"
   presentation-severity-parameters: "深刻度パラメータ"
   presentation-display-parameters: "表示パラメータ"
+  presentation-logarithmic-scale: "グラフ上で線形スケールでなく対数スケールを使う"
   presentation-subscribe: "購読"
   presentation-enter-email: "メールアドレス"
   presentation-enter-name: "名前"
@@ -88,7 +94,7 @@ ja:
   presentation-download: |+
     <a download="{filename}" href="data:file/csv;base64,{csv}">{filename} をダウンロード</a>
   presentation-excel-download: |+
-    個人用防護具計算機のダウンロードはこちら: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
+    個人用防護具予測計算機のダウンロード: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
   admits_hospitalized: "新規入院患者数"
   admits_icu: "新規集中治療患者数"
   admits_ventilated: "新規人工呼吸患者数"

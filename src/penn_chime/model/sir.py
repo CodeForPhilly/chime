@@ -59,6 +59,8 @@ class Sir:
         self.infected = infected
         self.recovered = p.recovered
 
+        self.reasonable_model_parameters = True
+
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             # Back-projecting to when the first hospitalized case would have been admitted
             logger.info('Using doubling_time: %s', p.doubling_time)
@@ -127,6 +129,13 @@ class Sir:
             # Make an initial coarse estimate
             dts = np.linspace(1, 15, 15)
             min_loss = self.get_argmin_doubling_time(p, dts)
+            if min_loss >= 14:
+                logger.info(
+                    'Based on the current parameters, the estimated pre-mitigation doubling time is greater than 15 days. Try different parameters.'
+                )
+                self.reasonable_model_parameters = False
+                return
+
 
             # Refine the coarse estimate
             for iteration in range(4):
