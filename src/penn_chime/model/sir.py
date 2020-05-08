@@ -14,6 +14,7 @@ from typing import Dict, Tuple, Sequence, Optional
 import numpy as np
 import pandas as pd
 
+from ..constants import PREFIT_ADDITIONAL_DAYS
 from .parameters import Parameters
 
 
@@ -58,6 +59,8 @@ class Sir:
         self.infected = infected
         self.recovered = p.recovered
 
+        self.reasonable_model_parameters = True
+
         if p.date_first_hospitalized is None and p.doubling_time is not None:
             # Back-projecting to when the first hospitalized case would have been admitted
             logger.info('Using doubling_time: %s', p.doubling_time)
@@ -68,31 +71,42 @@ class Sir:
 
             if p.mitigation_date is None:
                 self.i_day = 0 # seed to the full length
-                raw = self.run_projection(p, [(self.beta, p.n_days)])
+                raw = self.run_projection(p, [
+                    (self.beta, p.n_days + PREFIT_ADDITIONAL_DAYS)])
                 self.i_day = i_day = int(get_argmin_ds(raw["census_hospitalized"], p.current_hospitalized))
 
-                self.raw = self.run_projection(p, self.gen_policy(p))
+                self.raw = self.run_projection(p, self.get_policies(p))
 
                 logger.info('Set i_day = %s', i_day)
             else:
-                projections = {}
                 best_i_day = -1
                 best_i_day_loss = float('inf')
-                for i_day in range(p.n_days):
-                    self.i_day = i_day
-                    raw = self.run_projection(p, self.gen_policy(p))
+                for self.i_day in range(p.n_days + PREFIT_ADDITIONAL_DAYS):
+                    mitigation_day = -(p.current_date - p.mitigation_date).days
+                    if mitigation_day < -self.i_day:
+                        mitigation_day = -self.i_day
+
+                    total_days = self.i_day + p.n_days + PREFIT_ADDITIONAL_DAYS
+                    pre_mitigation_days = self.i_day + mitigation_day
+                    post_mitigation_days = total_days - pre_mitigation_days
+
+                    raw = self.run_projection(p, [
+                            (self.beta,   pre_mitigation_days),
+                            (self.beta_t, post_mitigation_days),
+                        ]
+                    )
 
                     # Don't fit against results that put the peak before the present day
-                    if raw["census_hospitalized"].argmax() < i_day:
+                    if raw["census_hospitalized"].argmax() < self.i_day:
                         continue
 
-                    loss = get_loss(raw["census_hospitalized"][i_day], p.current_hospitalized)
+                    loss = get_loss(raw["census_hospitalized"][self.i_day], p.current_hospitalized)
                     if loss < best_i_day_loss:
                         best_i_day_loss = loss
-                        best_i_day = i_day
-                        self.raw = raw
+                        best_i_day = self.i_day
 
                 self.i_day = best_i_day
+                self.raw = self.run_projection(p, self.get_policies(p))
 
             logger.info(
                 'Estimated date_first_hospitalized: %s; current_date: %s; i_day: %s',
@@ -115,6 +129,13 @@ class Sir:
             # Make an initial coarse estimate
             dts = np.linspace(1, 15, 15)
             min_loss = self.get_argmin_doubling_time(p, dts)
+            if min_loss >= 14:
+                logger.info(
+                    'Based on the current parameters, the estimated pre-mitigation doubling time is greater than 15 days. Try different parameters.'
+                )
+                self.reasonable_model_parameters = False
+                return
+
 
             # Refine the coarse estimate
             for iteration in range(4):
@@ -127,7 +148,7 @@ class Sir:
             intrinsic_growth_rate = get_growth_rate(p.doubling_time)
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
-            self.raw = self.run_projection(p, self.gen_policy(p))
+            self.raw = self.run_projection(p, self.get_policies(p))
 
             self.population = p.population
         else:
@@ -162,6 +183,15 @@ class Sir:
             'census_icu': self.raw['census_icu'],
             'census_ventilated': self.raw['census_ventilated'],
         })
+        self.ppe_df = pd.DataFrame(data={
+            'day': self.raw['day'],
+            'date': self.raw['date'],
+            'census_hospitalized': self.raw['census_hospitalized'],
+            'census_icu': self.raw['census_icu'],
+            'census_ventilated': self.raw['census_ventilated'],
+            'admits_hospitalized': self.raw['admits_hospitalized'],
+        })
+        self.ppe_df = self.ppe_df[self.ppe_df['day']>=0]
 
         logger.info('len(np.arange(-i_day, n_days+1)): %s', len(np.arange(-self.i_day, p.n_days+1)))
         logger.info('len(raw_df): %s', len(self.raw_df))
@@ -196,7 +226,7 @@ class Sir:
             self.beta = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, 0.0)
             self.beta_t = get_beta(intrinsic_growth_rate, self.gamma, self.susceptible, p.relative_contact_rate)
 
-            raw = self.run_projection(p, self.gen_policy(p))
+            raw = self.run_projection(p, self.get_policies(p))
 
             # Skip values the would put the fit past peak
             peak_admits_day = raw["admits_hospitalized"].argmax()
@@ -210,7 +240,7 @@ class Sir:
         min_loss = pd.Series(losses).argmin()
         return min_loss
 
-    def gen_policy(self, p: Parameters) -> Sequence[Tuple[float, int]]:
+    def get_policies(self, p: Parameters) -> Sequence[Tuple[float, int]]:
         if p.mitigation_date is not None:
             mitigation_day = -(p.current_date - p.mitigation_date).days
         else:

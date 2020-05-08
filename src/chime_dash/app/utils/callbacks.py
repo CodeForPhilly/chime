@@ -10,6 +10,7 @@ class ChimeCallback:
                  changed_elements: Mapping,
                  callback_fn: Callable,
                  dom_updates: Mapping = None,
+                 dom_states: Mapping = None,
                  stores: Iterable = None,
                  states: Mapping = None,
                  memoize: bool = True
@@ -28,6 +29,12 @@ class ChimeCallback:
                 Output(component_id=component_id, component_property=component_property)
                 for component_id, component_property in dom_updates.items()
             )
+        if dom_states:
+            self.outputs.extend(
+                Output(component_id=component_id, component_property=component_property)
+                for component_id, component_property in dom_states.items()
+            )
+
         if stores:
             self.states.extend(
                 State(component_id=component_id, component_property="data")
@@ -40,6 +47,7 @@ class ChimeCallback:
                 )
 
     def wrap(self, app: Dash):
+        print(f'Registering callback: \nOutputs: \n{self.outputs}, \nInputs:\n{self.inputs}, \nStore: \n{self.stores} \nUsing: {self.callback_fn}\n\n')
         if self.memoize:
             @lru_cache(maxsize=32)
             @app.callback(self.outputs, self.inputs, self.states)

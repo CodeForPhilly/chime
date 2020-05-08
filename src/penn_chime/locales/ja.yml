@@ -1,0 +1,108 @@
+ja:
+  app-new-admissions-title: "新規入院患者数"
+  app-new-admissions-text: "**日毎の**COVID-19関連新規入院患者数予測"
+  app-admitted-patients-title: "累計入院患者数"
+  app-admitted-patients-text: "入院と退院を考慮したCOVID-19患者の予測**累計患者数**"
+  app-PPE-title: "個人用防護具 (PPE) 予測計算機 (注:現状英語版のみ)"
+  app-PPE-text: "このExcelベースの計算機は、個人用防護具の将来必要数を予測するために、あらゆるモデルの入院患者/集中治療患者/人工呼吸患者の累計数と新規数の予測を用います。"
+  app-PPE-text2: "独自のパラメータに基づいたCHIMEの予測を用いるために、左サイドバー内でそれぞれのパラメータを設定し、その後にExcelファイルをダウンロードしてください。"
+  app-PPE-screenshot: "計算機のスクリーンショットを表示"
+  app-PPE-documentation: |+
+    これらの予測、あるいは他のモデルからの予測を計算機に組み込む方法については、
+    [ユーザドキュメント]({link_to_docs})もしくは[チュートリアル動画]({link_to_tutorial})での
+    説明を確認してください。
+  app-SIR-title: "感受性保持者、感染者と回復者"
+  app-SIR-text: "与えられた時間範囲での、病院の担当範囲領域における感受性保持者、感染者と回復者の人数"
+  charts-date: "日付"
+  charts-daily-admissions: "毎日の新規入院患者数"
+  charts-census: "累計患者数"
+  charts-count: "人数"
+  presentation-infected-population-warning: "(警告:推定感染者数が地域の人口を上回っています。サイドバーに入力された値を確認してください。)"
+  presentation-header: |+
+    <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
+
+    <div class="penn-medicine-header__content">
+        <h3>
+            <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
+                title="Penn Medicineのホームページへ行く">Penn Medicine</a>
+            <a id="title" class="penn-medicine-header__title">COVID-19における伝染病の病院影響モデル (CHIME)</a>
+        </h3>
+    </div>
+    <br />
+  presentation-notice: |+
+
+    **重要**: CHIMEは、アウトブレイクの進行に関する、短期予測に限定された修正[SIR](https://mathworld.wolfram.com/SIRModel.html)モデルです。
+    これは、地域の感染がピークに達するより以前の期間にのみ適用でき、有効に社会的距離戦略を保つための施策にのみ適用できます。
+    Penn Medicineは、より多くのデータを活用し、感染のピーク以降での確率的予測を提供するために、[BayesCHIME](https://github.com/pennsignals/chime_sims/blob/master/README.md)を鋭意開発中です。
+  presentation-developed-by: |+
+    このツールはペンシルバニア州立大学の医療部門であるPenn Medicineの、[予測医療チーム](http://predictivehealthcare.pennmedicine.org/)によって、
+    病院や公衆衛生担当者の収容能力把握を支援するために開発されました。
+    地域の状況に応じたデータにカスタマイズするには、「[CHIMEの使い方]({docs_url})」をご覧ください。
+    個人用防護具 (PPE) 予測計算機はペンシルバニア大学とPenn Medicineが共同で開発しています。
+  presentation-estimated-number-of-infection: |+
+    現在の予測感染者人数は**{total_infections:.0f}**人です。
+    この結果は入院患者数(**{current_hosp}**)、患者の入院割合(**{hosp_rate:.0%}**)、地域の人口(**{S}**)および病院の患者シェア(**{market_share:.0%}**)を元に計算されています。
+
+    {infected_population_warning_str}
+
+    初期倍加時間が**{doubling_time}**日で、回復までの時間が**{recovery_days}**日であれば、$R_0$は**{r_naught:.2f}**となり、
+    日々の増加率は**{daily_growth:.2f}%**となります。
+
+    {mitigation_str}
+  presentation-mitigation-rt-less-then-1: |+
+    **緩和**: アウトブレイク発生後の社会的接触が**{relative_contact_rate:.0%}**減少すると、**感染の半減期は{doubling_time_t:.1f}**日となり、
+    実効$R_t$は**${r_t:.2f}$**、日々の増加率は**{daily_growth_t:.2f}%**となります。
+  presentation-mitigation-rt-more-then-equal-1: |+
+    **緩和**: アウトブレイク発生後の社会的接触が**{relative_contact_rate:.0%}**減少すると、**倍加時間は改善されて{doubling_time_t:.1f}**日となり、
+    実効$R_t$は**${r_t:.2f}$**、日々の増加率は**{daily_growth_t:.2f}%**となります。
+  presentation-current-hospitalized: "現在入院しているCOVID-19患者数"
+  presentation-n-days: "予測する日数"
+  presentation-doubling-time: "今日までの倍加時間 (日数)"
+  presentation-current-date: "今の日付 (初期値は今日)"
+  presentation-date-first-hospitalized: "最初の入院患者が発生した日付 (CHIMEが初期倍加時間を推定するために使います)"
+  presentation-mitigation-date: "社会的距離戦略が効果を発揮し始めた日付 (おそらく実施日よりも遅れます)"
+  presentation-relative-contact-rate: "社会的距離戦略 (今後の社会的接触の減少率 %)"
+  presentation-hospitalized-rate: "入院患者率 %(総感染者数比)"
+  presentation-icu-rate: "集中治療患者率 %(総感染者数比)"
+  presentation-ventilated-rate: "人工呼吸患者率 %(総感染者数比)"
+  presentation-hospitalized-days: "平均入院日数"
+  presentation-icu-days: "平均集中治療日数"
+  presentation-ventilated-days: "平均人工呼吸治療日数"
+  presentation-market-share: "病院の患者シェア率 (%)"
+  presentation-population: "地域の人口"
+  presentation-infectious-days: "感染力を持つ期間 (日数)"
+  presentation-max-y-axis-set: "グラフのY軸最大値を固定値にします"
+  presentation-max-y-axis: "Y軸固定値"
+  presentation-hospital-parameters: "病院パラメータ"
+  presentation-spread-and-contact-parameters: "感染と接触のパラメータ"
+  presentation-first-hospitalized-check: "最初の入院事例の日付が既知の場合"
+  presentation-social-distancing-implemented: "社会的距離戦略が導入済みの場合"
+  presentation-severity-parameters: "深刻度パラメータ"
+  presentation-display-parameters: "表示パラメータ"
+  presentation-logarithmic-scale: "グラフ上で線形スケールでなく対数スケールを使う"
+  presentation-subscribe: "購読"
+  presentation-enter-email: "メールアドレス"
+  presentation-enter-name: "名前"
+  presentation-enter-affiliation: "所属"
+  presentation-submit: "送信"
+  presentation-references-acknowledgements: "参考資料と謝辞"
+  presentation-references-acknowledgements-text: |+
+    * アメリカ病院協会(AHA)ウェビナー、2月26日、James Lawler医師 (ネブラスカ大学医療センター准教授)、「COVID-19への準備として、医療リーダーが知っておくべきこと」
+    * ペレルマン医科大学の生物統計学・疫学・疫学・情報学部門の疫学准教授であるMichael Z.Levy博士による、モデル仮説の検討とレビューにおける貴重な支援をここに特筆いたします。
+    * 最後に、[Code for Philly](https://codeforphilly.org/)と、このプロジェクトに[貢献](https://github.com/CodeForPhilly/chime/graphs/contributors)してくれたオープンソースコミュニティの多くのメンバーに感謝いたします。
+  presentation-copyright: "© 2020, The Trustees of the University of Pennsylvania"
+  presentation-download: |+
+    <a download="{filename}" href="data:file/csv;base64,{csv}">{filename} をダウンロード</a>
+  presentation-excel-download: |+
+    個人用防護具予測計算機のダウンロード: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
+  admits_hospitalized: "新規入院患者数"
+  admits_icu: "新規集中治療患者数"
+  admits_ventilated: "新規人工呼吸患者数"
+  census_hospitalized: "累計入院患者数"
+  census_icu: "累計集中治療患者数"
+  census_ventilated: "累計人工呼吸患者数"
+  susceptible: "感受性保持者数"
+  infected: "感染者数"
+  recovered: "回復者数"
+  day: "日数"
+  date: "日付"

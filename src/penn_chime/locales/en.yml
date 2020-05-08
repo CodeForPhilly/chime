@@ -1,0 +1,116 @@
+en:
+  app-new-admissions-title: "New Admissions"
+  app-new-admissions-text: "Projected number of **daily** COVID-19 admissions."
+  app-admitted-patients-title: "Admitted Patients (Census)"
+  app-admitted-patients-text: "Projected **census** of COVID-19 patients, accounting for arrivals and discharges."
+  app-PPE-title: "Personal Protective Equipment (PPE) Forecasting Calculator"
+  app-PPE-text: "This Excel-based calculator uses hospitalized/ICU/ventilated censuses and admissions projections from any model to forecast PPE usage."
+  app-PPE-text2: "To use CHIME’s projections based on your own parameters, set the parameters in the sidebar, then download this file:"
+  app-PPE-screenshot: "Show a screenshot of the calculator"
+  app-PPE-documentation: |+
+    Refer to our [user documentation]({link_to_docs}) or
+    watch [a quick tutorial]({link_to_tutorial}) for instructions on
+    how to incorporate these projections--or projections from other models--into the calculator.
+  app-SIR-title: "Susceptible, Infected, and Recovered"
+  app-SIR-text: "The number of susceptible, infected, and recovered individuals in the hospital catchment region at any given moment"
+  charts-date: "Date"
+  charts-daily-admissions: "Daily admissions"
+  charts-census: "Census"
+  charts-count: "Count"
+  presentation-infected-population-warning: "(Warning: The number of estimated infections is greater than the total regional population. Please verify the values entered in the sidebar.)"
+  presentation-header: |+
+    <link rel="stylesheet" href="https://www1.pennmedicine.org/styles/shared/penn-medicine-header.css">
+    <div class="penn-medicine-header__content">
+        <h3>
+            <a href="https://www.pennmedicine.org" class="penn-medicine-header__logo"
+                title="Go to the Penn Medicine home page">Penn Medicine</a>
+            <a id="title" class="penn-medicine-header__title">COVID-19 Hospital Impact Model for Epidemics (CHIME)</a>
+        </h3>
+    </div>
+    <br />
+  presentation-notice: |+
+
+    **Notice**: CHIME is a modified [SIR](https://mathworld.wolfram.com/SIRModel.html) model of outbreak progression that is limited to short term forecasting.
+    It is only applicable during the period prior to a region’s peak infections, and it accounts only for a single significant social distancing policy.
+    Penn Medicine is actively developing [BayesCHIME](https://github.com/pennsignals/chime_sims/blob/master/README.md) to make use of more data and provide probabilistic forecasts beyond peak infections.
+  presentation-developed-by: |+
+    This tool was developed by [Predictive Healthcare](http://predictivehealthcare.pennmedicine.org/) at
+    Penn Medicine to assist hospitals and public health officials with hospital capacity planning.
+    Please read [How to Use CHIME]({docs_url}) to customize inputs for your region.
+    The Personal Protective Equipment (PPE) Forecasting Calculator was developed collaboratively by
+    the University of Pennsylvania and Penn Medicine.
+  presentation-estimated-number-of-infection: |+
+    The estimated number of currently infected individuals is **{total_infections:.0f}**. This is based on current inputs for
+    Hospitalizations (**{current_hosp}**), Hospitalization rate (**{hosp_rate:.0%}**), Regional population (**{S}**),
+    and Hospital market share (**{market_share:.0%}**).
+
+    {infected_population_warning_str}
+
+    An initial doubling time of **{doubling_time}** days and a recovery time of **{recovery_days}** days imply an $R_0$ of
+    **{r_naught:.2f}** and daily growth rate of **{daily_growth:.2f}%**.
+
+    {mitigation_str}
+  presentation-mitigation-rt-less-then-1: |+
+    **Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
+    outbreak **halves the infections every {doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**
+    and daily growth rate of **{daily_growth_t:.2f}%**.
+  presentation-mitigation-rt-more-then-equal-1: |+
+    **Mitigation**: A **{relative_contact_rate:.0%}** reduction in social contact after the onset of the
+    outbreak **reduces the doubling time to {doubling_time_t:.1f}** days, implying an effective $R_t$ of **${r_t:.2f}$**
+    and daily growth rate of **{daily_growth_t:.2f}%**.
+  presentation-current-hospitalized: "Currently hospitalized COVID-19 patients"
+  presentation-n-days: "Number of days to project"
+  presentation-doubling-time: "Doubling time in days (up to today)"
+  presentation-current-date: "Current date (default is today)"
+  presentation-date-first-hospitalized: "Date of first hospitalized case (enter this date to have CHIME estimate the initial doubling time)"
+  presentation-mitigation-date: "Date of social distancing measures effect (may be delayed from implementation)"
+  presentation-relative-contact-rate: "Social distancing (% reduction in social contact going forward)"
+  presentation-hospitalized-rate: "Hospitalization %(total infections)"
+  presentation-icu-rate: "ICU %(total infections)"
+  presentation-ventilated-rate: "Ventilated %(total infections)"
+  presentation-hospitalized-days: "Average hospital length of stay (in days)"
+  presentation-icu-days: "Average days in ICU"
+  presentation-ventilated-days: "Average days on ventilator"
+  presentation-market-share: "Hospital market share (%)"
+  presentation-population: "Regional population"
+  presentation-infectious-days: "Infectious days"
+  presentation-max-y-axis-set: "Set the Y-axis on graphs to a static value"
+  presentation-max-y-axis: "Y-axis static value"
+  presentation-hospital-parameters: "Hospital Parameters"
+  presentation-spread-and-contact-parameters: "Spread and Contact Parameters"
+  presentation-first-hospitalized-check: "I know the date of the first hospitalized case."
+  presentation-social-distancing-implemented: "Social distancing measures have been implemented"
+  presentation-severity-parameters: "Severity Parameters"
+  presentation-display-parameters: "Display Parameters"
+  presentation-logarithmic-scale: "Use logarithmic scale on charts instead of linear scale."
+  presentation-subscribe: "Subscribe"
+  presentation-enter-email: "Enter Email"
+  presentation-enter-name: "Enter Name"
+  presentation-enter-affiliation: "Enter Affiliation"
+  presentation-submit: "Submit"
+  presentation-references-acknowledgements: "References & Acknowledgements"
+  presentation-references-acknowledgements-text: |+
+    * AHA Webinar, Feb 26, James Lawler, MD, an associate professor University of Nebraska Medical Center, What Healthcare Leaders Need To Know: Preparing for the COVID-19
+    * We would like to recognize the valuable assistance in consultation and review of model assumptions by Michael Z. Levy, PhD, Associate Professor of Epidemiology, Department of Biostatistics, Epidemiology and Informatics at the Perelman School of Medicine
+    * The PPE tool was developed by Kristian Lum, James Johndrow, April Cardone, Barry Fuchs, Cody E. Cotner,
+    Olivia Jew, Richard Eden, Ravi B. Parikh, Gary E. Weissman, Christian Terwiesch, and Kevin G. Volpp from various departments across
+    the University of Pennsylvania (Department of Computer and
+    Information Science; Wharton School; Perelman School of Medicine; Center for Health Incentives and Behavioral
+    Economics) and Penn Medicine (Hospital of the University of Pennsylvania).
+    * Finally we'd like to thank [Code for Philly](https://codeforphilly.org/) and the many members of the open-source community that [contributed](https://github.com/CodeForPhilly/chime/graphs/contributors) to this project.
+  presentation-copyright: "© 2020, The Trustees of the University of Pennsylvania"
+  presentation-download: |+
+    <a download="{filename}" href="data:file/csv;base64,{csv}">Download {filename}</a>
+  presentation-excel-download: |+
+    Download the PPE Forecasting Calculator: <a download="{filename}" href="data:file/xlsx;base64,{excel}">{filename}</a>.
+  admits_hospitalized: "Hospitalized Admissions"
+  admits_icu: "ICU Admissions"
+  admits_ventilated: "Ventilated Admissions"
+  census_hospitalized: "Hospitalized Census"
+  census_icu: "ICU Census"
+  census_ventilated: "Ventilated Census"
+  susceptible: "Susceptible"
+  infected: "Infected"
+  recovered: "Recovered"
+  day: "Day"
+  date: "Date"

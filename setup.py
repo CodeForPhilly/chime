@@ -1,9 +1,9 @@
 """Setup file for chime
 """
-__version__ = "1.1.3"  # update VERSION in constants.py
+__version__ = "1.1.5"  # update VERSION in constants.py
 __author__ = "Predictive Healthcare @ Penn Medicine"
 
-from setuptools import setup, find_namespace_packages
+from setuptools import setup, find_packages
 
 
 setup(
@@ -19,13 +19,14 @@ setup(
         "Documentation": "https://codeforphilly.github.io/chime/",
     },
     package_dir={'': 'src'},
-    packages=find_namespace_packages(where='src', exclude=('tests')),
+    packages=find_packages(where='src', exclude=('tests')),
     install_requires=[
         "altair",
         "black",
         "gspread",
         "gunicorn",
         "dash",
+        "dash_daq",
         "dash_bootstrap_components",
         "numpy",
         "pandas",
@@ -33,7 +34,8 @@ setup(
         "pyyaml",
         "streamlit",
         "gspread",
-        "oauth2client"
+        "oauth2client",
+        "python-i18n"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
