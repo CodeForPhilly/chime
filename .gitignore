@@ -1,6 +1,6 @@
 # Editors
 .idea/
-.vscode/settings.json
+.vscode/
 
 # Environments
 .env
@@ -13,6 +13,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# bytecode
+# Devs: Consider setting PYTHONDONTWRITEBYTECODE=1 in your local environments
 __pycache__/
 
 # pytest
