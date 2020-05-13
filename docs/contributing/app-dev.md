@@ -19,6 +19,12 @@ See [Streamlit's Getting Started guide](https://docs.streamlit.io/getting_starte
 
 ## Running CHIME Locally
 
+### With `poetry`
+```bash
+poetry install
+poetry shell
+```
+
 
 ### With `venv`
 
