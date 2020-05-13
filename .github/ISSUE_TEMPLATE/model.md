@@ -3,7 +3,7 @@ name: Bug report for model
 about: Feedback or bug report for the epidemiological model and analysis.
 title: [model]
 labels: 'models'
-assignees: ''
+assignees: '@jlubken'
 
 ---
 

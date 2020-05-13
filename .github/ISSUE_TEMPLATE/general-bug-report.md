@@ -3,7 +3,7 @@ name: General bug report
 about: Create an report to help us improve.
 title: [bug]
 labels: 'bug'
-assignees: ''
+assignees: '@brianthomasross'
 
 ---
 
@@ -14,14 +14,27 @@ Before you begin, please help us manage volume by checking if this could be subm
 - Is this something you can debug and fix? Pull requests are very welcome.
 -->
 
-### Description:
+Description
+-----------
+<!--
+Be descriptive and succinct.
+-->
 
-### Steps to reproduce:
-1.
-2.
-3.
 
-### Expected behavior:
+Steps to reproduce
+------------------
+<!--
+Be as detailed as possible, if required link to external sources, code snippets etc.
+-->
 
-### What I got instead:
+
+Expected behavior
+-----------------
+<!--
+What was the expected outcome of the above steps?
+-->
+
+What I got instead
+------------------
+
 (screenshots if applicable)
