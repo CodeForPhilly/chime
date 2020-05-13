@@ -1,9 +1,0 @@
-name: chime
-channels: 
-- defaults
-- conda-forge
-dependencies: 
-- python>=3.6
-- numpy
-- pandas
-- altair
