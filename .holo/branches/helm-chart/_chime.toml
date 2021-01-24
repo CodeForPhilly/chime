@@ -1,0 +1,3 @@
+[holomapping]
+root = "helm-chart"
+files = "**"
