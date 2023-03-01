@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: docker.pkg.github.com/codeforphilly/chime/penn-chime
+  repository: ghcr.io/codeforphilly/chime/penn-chime
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
