@@ -369,17 +369,23 @@ class Parameters:
         Rate(key='icu_rate', value=a.icu_rate)
         Rate(key='ventilated_rate', value=a.ventilated_rate)
 
+        # ICU % Total infections = Hosp %(total infections) * ICU (% total hosp)
+        # Vent % Total infections = ICU % Total infections * Vent (% critical care)
+
+        icu_of_total_inf = a.hospitalized_rate * a.icu_rate
+        vent_of_total_inf = icu_of_total_inf * a.ventilated_rate
+
         hospitalized = Disposition.create(
             days=a.hospitalized_days,
             rate=a.hospitalized_rate,
         )
         icu = Disposition.create(
             days=a.icu_days,
-            rate=a.icu_rate,
+            rate=icu_of_total_inf,
         )
         ventilated = Disposition.create(
             days=a.ventilated_days,
-            rate=a.ventilated_rate,
+            rate=vent_of_total_inf,
         )
 
         del a.hospitalized_days
